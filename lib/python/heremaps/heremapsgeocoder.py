@@ -2,7 +2,7 @@ import inspect
 import json
 import urllib
 
-from heremapsexceptions import BadGeocodingParams, NoGeocodingParams
+from heremapsexceptions import BadGeocodingParams, EmptyGeocoderResponse, NoGeocodingParams
 
 class Geocoder:
     'A Here Maps Geocoder wrapper for python'
@@ -94,8 +94,12 @@ class Geocoder:
 
         return self.geocode(params)
 
-    def extractLngLatFromResponse(response):
-        location = response['Response']['View'][0]['Result'][0]['Location']
+    def extractLngLatFromResponse(self, response):
+        view = response['Response']['View']
+
+        if len(view) is 0: raise EmptyGeocoderResponse()
+
+        location = view[0]['Result'][0]['Location']
 
         longitude = location['DisplayPosition']['Longitude']
         latitude = location['DisplayPosition']['Latitude']
