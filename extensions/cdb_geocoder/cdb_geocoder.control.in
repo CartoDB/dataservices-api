@@ -1,0 +1,6 @@
+# cdb_geocoder extension
+comment = 'A geocoding PostgreSQL extension for CartoDB'
+default_version = '@@VERSION@@'
+relocatable = false
+schema = cdb_geocoder
+requires = 'plpythonu, schema_triggers, postgis'
