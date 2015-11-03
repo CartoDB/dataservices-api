@@ -46,8 +46,8 @@ class Geocoder:
     app_code = ''
 
     def __init__(self, app_id, app_code):
-    self.app_id = app_id
-    self.app_code = app_code
+        self.app_id = app_id
+        self.app_code = app_code
 
     def geocode(self, params):
         if not set(params.keys()).issubset(set(self.ADDRESS_PARAMS)):
