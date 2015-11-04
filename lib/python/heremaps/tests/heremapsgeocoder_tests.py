@@ -55,7 +55,7 @@ class GeocoderTestCase(unittest.TestCase):
                             }
                         },
                         "Address":{
-                            "Label":"Calle de Eloy Gonzalo, Madrid (Madrid), España",
+                            "Label":"Calle de Eloy Gonzalo, Madrid, España",
                             "Country":"ESP",
                             "State":"Comunidad de Madrid",
                             "County":"Madrid",
