@@ -4,7 +4,9 @@
 import unittest
 
 from heremaps import heremapsgeocoder
-from heremaps.heremapsexceptions import BadGeocodingParams, EmptyGeocoderResponse, NoGeocodingParams
+from heremaps.heremapsexceptions import BadGeocodingParams
+from heremaps.heremapsexceptions import EmptyGeocoderResponse
+from heremaps.heremapsexceptions import NoGeocodingParams
 
 from secrets import *
 
