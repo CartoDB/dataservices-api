@@ -1,3 +1,6 @@
+#!/usr/local/bin/python
+# -*- coding: utf-8 -*-
+
 import json
 import urllib
 
@@ -6,8 +9,8 @@ from heremapsexceptions import BadGeocodingParams, EmptyGeocoderResponse, NoGeoc
 class Geocoder:
     'A Here Maps Geocoder wrapper for python'
 
-    URL_GEOCODE_JSON = 'http://geocoder.cit.api.here.com/6.2/geocode.json'
-    MAX_RESULTS = 1
+    URL_GEOCODE_JSON = 'http://geocoder.api.here.com/6.2/geocode.json'
+    DEFAULT_MAXRESULTS = 1
 
     ADDRESS_PARAMS = [
         'city',
@@ -43,19 +46,31 @@ class Geocoder:
 
     app_id = ''
     app_code = ''
+    maxresults = ''
 
-    def __init__(self, app_id, app_code):
+    def __init__(self, app_id, app_code, maxresults=DEFAULT_MAXRESULTS):
         self.app_id = app_id
         self.app_code = app_code
+        self.maxresults = maxresults
 
     def geocode(self, params):
         if not set(params.keys()).issubset(set(self.ADDRESS_PARAMS)):
             raise BadGeocodingParams(params)
 
+        response = self.performRequest(params)
+
+        try:
+            results = response['Response']['View'][0]['Result']
+        except IndexError:
+            raise EmptyGeocoderResponse()
+
+        return results
+
+    def performRequest(self, params):
         request_params = {
             'app_id' : self.app_id,
             'app_code' : self.app_code,
-            'maxresults' : self.MAX_RESULTS,
+            'maxresults' : self.maxresults,
             'gen' : '9'
             }
         request_params.update(params)
@@ -78,12 +93,8 @@ class Geocoder:
 
         return self.geocode(params)
 
-    def extractLngLatFromResponse(self, response):
-        view = response['Response']['View']
-
-        if len(view) is 0: raise EmptyGeocoderResponse()
-
-        location = view[0]['Result'][0]['Location']
+    def extractLngLatFromResult(self, result):
+        location = result['Location']
 
         longitude = location['DisplayPosition']['Longitude']
         latitude = location['DisplayPosition']['Latitude']
