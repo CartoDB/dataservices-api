@@ -4,7 +4,9 @@
 import json
 import urllib
 
-from heremapsexceptions import BadGeocodingParams, EmptyGeocoderResponse, NoGeocodingParams
+from heremaps.heremapsexceptions import BadGeocodingParams
+from heremaps.heremapsexceptions import EmptyGeocoderResponse
+from heremaps.heremapsexceptions import NoGeocodingParams
 
 class Geocoder:
     'A Here Maps Geocoder wrapper for python'
