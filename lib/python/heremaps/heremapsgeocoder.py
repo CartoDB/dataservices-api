@@ -1,4 +1,3 @@
-import inspect
 import json
 import urllib
 
@@ -70,25 +69,10 @@ class Geocoder:
 
         return response
 
-    def geocodeAddress(self,
-            searchtext=None,
-            city=None,
-            country=None,
-            county=None,
-            district=None,
-            housenumber=None,
-            postalcode=None,
-            state=None,
-            street=None):
-        frame = inspect.currentframe()
-        keys, _, _, values = inspect.getargvalues(frame)
-
-        iterableKeys = iter(keys)
-        next(iterableKeys)
-
+    def geocodeAddress(self, **kwargs):
         params = {}
-        for key in iterableKeys:
-            if values[key]: params[key] = values[key]
+        for key, value in kwargs.iteritems():
+            if value: params[key] = value
 
         if not params: raise NoGeocodingParams()
 
