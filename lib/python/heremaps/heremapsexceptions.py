@@ -16,3 +16,7 @@ class NoGeocodingParams(Exception):
 class EmptyGeocoderResponse(Exception):
     def __str__(self):
         return repr('The request could not be geocoded')
+
+class MalformedResult(Exception):
+  def __str__(self):
+        return repr('Result structure is malformed')

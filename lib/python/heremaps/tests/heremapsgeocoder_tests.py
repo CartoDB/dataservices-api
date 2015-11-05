@@ -7,6 +7,7 @@ from heremaps import heremapsgeocoder
 from heremaps.heremapsexceptions import BadGeocodingParams
 from heremaps.heremapsexceptions import EmptyGeocoderResponse
 from heremaps.heremapsexceptions import NoGeocodingParams
+from heremaps.heremapsexceptions import MalformedResult
 
 from secrets import *
 
@@ -40,8 +41,8 @@ class GeocoderTestCase(unittest.TestCase):
                         "LocationType":"address",
                         "DisplayPosition":{
                             "Latitude":40.43433,
-                                "Longitude":-3.70126
-                            },
+                            "Longitude":-3.70126
+                        },
                         "NavigationPosition":[{
                             "Latitude":40.43433,
                             "Longitude":-3.70126
@@ -86,27 +87,40 @@ class GeocoderTestCase(unittest.TestCase):
     def setUp(self):
         self.geocoder = heremapsgeocoder.Geocoder(None, None)
 
-    def test_geocodeAddress_with_valid_params(self):
-        self.geocoder.performRequest = lambda x: self.GOOD_RESPONSE
-        response = self.geocoder.geocodeAddress(
+    def test_geocode_address_with_valid_params(self):
+        self.geocoder.perform_request = lambda x: self.GOOD_RESPONSE
+        response = self.geocoder.geocode_address(
             searchtext='Calle Eloy Gonzalo 27',
             city='Madrid',
             country='España')
 
-    def test_geocodeAddress_with_invalid_params(self):
+    def test_geocode_address_with_invalid_params(self):
         with self.assertRaises(BadGeocodingParams):
-            self.geocoder.geocodeAddress(
+            self.geocoder.geocode_address(
                 searchtext='Calle Eloy Gonzalo 27',
                 manolo='escobar')
 
-    def test_geocodeAddress_with_no_params(self):
+    def test_geocode_address_with_no_params(self):
         with self.assertRaises(NoGeocodingParams):
-            self.geocoder.geocodeAddress()
+            self.geocoder.geocode_address()
 
-    def test_geocodeAddress_empty_response(self):
-        self.geocoder.performRequest = lambda x: self.EMPTY_RESPONSE
+    def test_geocode_address_empty_response(self):
+        self.geocoder.perform_request = lambda x: self.EMPTY_RESPONSE
         with self.assertRaises(EmptyGeocoderResponse):
-            self.geocoder.geocodeAddress(searchtext='lkajfñlasjfñ')
+            self.geocoder.geocode_address(searchtext='lkajfñlasjfñ')
+
+    def test_extract_lng_lat_from_result(self):
+        result = self.GOOD_RESPONSE['Response']['View'][0]['Result'][0]
+        coordinates = self.geocoder.extract_lng_lat_from_result(result)
+
+        self.assertEqual(coordinates[0], -3.70126)
+        self.assertEqual(coordinates[1], 40.43433)
+
+    def test_extract_lng_lat_from_result_with_malformed_result(self):
+        result = {'manolo':'escobar'}
+
+        with self.assertRaises(MalformedResult):
+            self.geocoder.extract_lng_lat_from_result(result)
 
 if __name__ == '__main__':
     main()
