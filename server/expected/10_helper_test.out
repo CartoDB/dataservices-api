@@ -1,13 +1,13 @@
 -- Check that check_host is working
-select check_host('cartodb.com');
- check_host 
-------------
+select cdb_geocoder_server._check_host('cartodb.com');
+ _check_host 
+-------------
  t
 (1 row)
 
 -- Check that check_pwd is working
-select pwd();
-             pwd              
+select cdb_geocoder_server._pwd();
+             _pwd             
 ------------------------------
  /var/lib/postgresql/9.3/main
 (1 row)
