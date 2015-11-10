@@ -1,5 +1,5 @@
 -- Geocodes a street address given a searchtext and a state and/or country
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_street(searchtext TEXT, state TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION geocode_street(searchtext TEXT, state TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
   RETURNS Geometry
 AS $$
   from heremaps import heremapsgeocoder
