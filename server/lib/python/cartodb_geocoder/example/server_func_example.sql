@@ -10,9 +10,9 @@ $$
 
   if user_id in SD and tx_id in SD[user_id] and 'redis_connection' in SD[user_id][tx_id]:
     logging.debug("Using redis cached connection...")
-    qs = quota_service.QuotaService(logging, user_id, tx_id, redis_connection=SD[user_id][tx_id]['redis_connection'])
+    qs = quota_service.QuotaService(user_id, tx_id, redis_connection=SD[user_id][tx_id]['redis_connection'])
   else:
-    qs = quota_service.QuotaService(logging, user_id, tx_id, redis_host='localhost', redis_port=6379, redis_db=5)
+    qs = quota_service.QuotaService(user_id, tx_id, redis_host='localhost', redis_port=6379, redis_db=5)
 
   if qs.check_user_quota():
     result = plpy.execute("SELECT geom FROM geocode_admin0_polygons(Array[\'{0}\']::text[])".format(search))

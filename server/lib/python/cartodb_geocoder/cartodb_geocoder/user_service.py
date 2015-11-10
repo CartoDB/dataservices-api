@@ -14,9 +14,8 @@ class UserService:
   REDIS_DEFAULT_HOST = 'localhost'
   REDIS_DEFAULT_PORT = 6379
 
-  def __init__(self, logger, user_id, **kwargs):
+  def __init__(self, user_id, **kwargs):
     self.user_id = user_id
-    self.logger = logger
     if self.REDIS_CONNECTION_KEY in kwargs:
       self._redis_connection = self.__get_redis_connection(redis_connection=kwargs[self.REDIS_CONNECTION_KEY])
     else:
@@ -55,7 +54,6 @@ class UserService:
       return conn
 
   def __create_redis_connection(self, redis_config):
-      self.logger.debug("Connecting to redis...")
       pool = redis.ConnectionPool(host=redis_config['host'], port=redis_config['port'], db=redis_config['db'])
       conn = redis.Redis(connection_pool=pool)
       return conn

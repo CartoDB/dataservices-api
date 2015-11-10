@@ -5,9 +5,8 @@ from datetime import date
 class QuotaService:
     """ Class to manage all the quota operation for the Geocoder SQL API Extension """
 
-    def __init__(self, logger, user_id, transaction_id, **kwargs):
-        self.logger = logger
-        self._user_service = user_service.UserService(logger, user_id, **kwargs)
+    def __init__(self, user_id, transaction_id, **kwargs):
+        self._user_service = user_service.UserService(user_id, **kwargs)
         self.transaction_id = transaction_id
 
     def check_user_quota(self):
@@ -15,7 +14,6 @@ class QuotaService:
         # TODO We need to add the hard/soft limit flag for the geocoder
         user_quota = self.user_service.user_quota()
         current_used = self.user_service.used_quota_month()
-        self.logger.debug("User quota: {0} --- Current used quota: {1}".format(user_quota, current_used))
         return True if (current_used + 1) < user_quota else False
 
     def increment_geocoder_use(self, amount=1):
