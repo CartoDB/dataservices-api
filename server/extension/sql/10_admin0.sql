@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION geocode_admin0_polygons(user_id name, rx_id bigint, country_name text)
+CREATE OR REPLACE FUNCTION geocode_admin0_polygons(user_id name, tx_id bigint, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin0_polygons')
     plpy.debug('user_name = %s' % user_name)
