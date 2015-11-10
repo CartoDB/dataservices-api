@@ -3,9 +3,7 @@ FUNCTION geocode_admin0(search text, tx_id bigint, user_id name)
   RETURNS Geometry AS
 $$
   import logging
-  from sys import path
-  path.append( '/home/ubuntu/www/cartodb-geocoder/server/lib/python/cartodb_geocoder' )
-  import quota_service
+  from cartodb_geocoder import quota_service
 
   LOG_FILENAME = '/tmp/plpython.log'
   logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
