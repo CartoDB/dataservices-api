@@ -18,32 +18,33 @@ class UserService:
     self.user_id = user_id
     self.logger = logger
     if self.REDIS_CONNECTION_KEY in kwargs:
-      self.redis_connection = self.__get_redis_connection(redis_connection=kwargs[self.REDIS_CONNECTION_KEY])
+      self._redis_connection = self.__get_redis_connection(redis_connection=kwargs[self.REDIS_CONNECTION_KEY])
     else:
       if self.REDIS_CONNECTION_HOST not in kwargs:
         raise "You have to provide redis configuration"
       redis_config = self.__build_redis_config(kwargs)
-      self.redis_connection = self.__get_redis_connection(redis_config = redis_config)
+      self._redis_connection = self.__get_redis_connection(redis_config = redis_config)
 
-  def get_user_quota(self):
+  def user_quota(self):
       # Check for exceptions or redis timeout
-      user_quota = self.redis_connection.hget(self.__get_user_redis_key(), self.GEOCODING_QUOTA_KEY)
+      user_quota = self._redis_connection.hget(self.__get_user_redis_key(), self.GEOCODING_QUOTA_KEY)
       return int(user_quota) if user_quota else 0
 
-  def get_current_used_quota(self):
+  def used_quota_month(self):
       """ Recover the used quota for the user in the current month """
       # Check for exceptions or redis timeout
       current_used = 0
-      for _, value in self.redis_connection.hscan_iter(self.__get_month_redis_key()):
+      for _, value in self._redis_connection.hscan_iter(self.__get_month_redis_key()):
           current_used += int(value)
       return current_used
 
   def increment_geocoder_use(self, key, amount=1):
       # TODO Manage exceptions or timeout
-      self.redis_connection.hincrby(self.__get_month_redis_key(),key,amount)
+      self._redis_connection.hincrby(self.__get_month_redis_key(),key,amount)
 
-  def get_redis_connection(self):
-      return self.redis_connection
+  @property
+  def redis_connection(self):
+      return self._redis_connection
 
   def __get_redis_connection(self, redis_connection=None, redis_config=None):
       if redis_connection:
@@ -61,7 +62,7 @@ class UserService:
 
   def __build_redis_config(self, config):
       redis_host = config[self.REDIS_CONNECTION_HOST] if self.REDIS_CONNECTION_HOST in config else self.REDIS_DEFAULT_HOST
-      redis_port = config[self.REDIS_CONNECTION_PORT] if self.REDIS_CONNECTION_PORT in config else self.REDIS_CONNECTION_PORT
+      redis_port = config[self.REDIS_CONNECTION_PORT] if self.REDIS_CONNECTION_PORT in config else self.REDIS_DEFAULT_PORT
       redis_db = config[self.REDIS_CONNECTION_DB] if self.REDIS_CONNECTION_DB in config else self.REDIS_DEFAULT_USER_DB
       return {'host': redis_host, 'port': redis_port, 'db': redis_db}
 
