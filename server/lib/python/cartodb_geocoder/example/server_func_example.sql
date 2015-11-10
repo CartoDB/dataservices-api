@@ -17,8 +17,8 @@ $$
   if qs.check_user_quota():
     result = plpy.execute("SELECT geom FROM geocode_admin0_polygons(Array[\'{0}\']::text[])".format(search))
     if result.status() == 5 and result.nrows() == 1:
-      qs.increment_georeference_use()
-      SD[user_id] = {tx_id: {'redis_connection': qs.get_redis_connection()}}
+      qs.increment_geocoder_use()
+      SD[user_id] = {tx_id: {'redis_connection': qs.get_user_service().get_redis_connection()}}
       return result[0]["geom"]
     else:
       raise Exception('Something wrong with the georefence operation')
