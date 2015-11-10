@@ -13,4 +13,4 @@ AS $$
   point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
 
   return point['st_setsrid']
-$$ LANGUAGE plpythonu VOLATILE;
+$$ LANGUAGE plpythonu;
