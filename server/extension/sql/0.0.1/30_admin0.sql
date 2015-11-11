@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION geocode_admin0_polygons(user_id name, tx_id bigint, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygons(user_id name, tx_id bigint, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin0_polygons')
     plpy.debug('user_id = %s' % user_id)
@@ -26,7 +26,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION _geocode_admin0_polygons(country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._geocode_admin0_polygons(country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
