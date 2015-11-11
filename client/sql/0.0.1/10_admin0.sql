@@ -21,7 +21,6 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_geocoder_client._geocode_admin0_polygons(user_id name, tx_id bigint, country_name text)
 RETURNS Geometry AS $$
-  -- TODO check if we can move the config to its own function
   CONNECT cdb_geocoder_client._server_conn_str();
   SELECT cdb_geocoder_server.geocode_admin0_polygons(user_id, tx_id, country_name);
 $$ LANGUAGE plproxy;
