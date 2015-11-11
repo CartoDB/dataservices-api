@@ -28,16 +28,29 @@ $$ LANGUAGE plpythonu;
 -- Note: these functions depend on the cdb_geocoder extension
 CREATE OR REPLACE FUNCTION _geocode_ip_point(ip TEXT)
 RETURNS Geometry AS $$
-  DECLARE
-    ret Geometry;
+    DECLARE
+        ret geocode_ip_v1%rowtype;
 
-    LIM INTEGER := 1;
-  BEGIN
-    SELECT ips.the_geom as geom INTO ret
-      FROM public.ip_address_locations ips
-        WHERE ips.network_start_ip = ip::inet
-    LIMIT LIM;
-
-    RETURN ret;
-  END
+        new_ips INET[];
+        old_ips TEXT[];
+    BEGIN
+    BEGIN
+        IF family(ip::inet) = 6 THEN
+            new_ips := array_append(new_ips, ip::inet);
+            old_ips := array_append(old_ips, ip);
+        ELSE
+            new_ips := array_append(new_ips, ('::ffff:' || ip)::inet);
+            old_ips := array_append(old_ips, ip);
+        END IF;
+    EXCEPTION WHEN OTHERS THEN
+        SELECT ip AS q, NULL as geom, FALSE as success INTO ret;
+        RETURN ret;
+    END;
+    FOR ret IN WITH ips AS (SELECT unnest(old_ips) s, unnest(new_ips) net),
+        matches AS (SELECT s, (SELECT the_geom FROM ip_address_locations WHERE network_start_ip <= ips.net ORDER BY network_start_ip DESC LIMIT 1) geom FROM ips)
+        SELECT s, geom, CASE WHEN geom IS NULL THEN FALSE ELSE TRUE END AS success FROM matches
+        LOOP
+        RETURN ret.geom;
+    END LOOP;
+END
 $$ LANGUAGE plpgsql;
