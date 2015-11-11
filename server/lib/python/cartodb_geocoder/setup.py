@@ -35,6 +35,6 @@ setup(
 
     extras_require={
         'dev': ['unittest'],
-        'test': ['unittest'],
+        'test': ['unittest', 'nose', 'mockredispy'],
     }
 )
