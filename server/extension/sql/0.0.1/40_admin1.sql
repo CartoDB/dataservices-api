@@ -58,13 +58,13 @@ RETURNS Geometry AS $$
     SELECT geom INTO ret
     FROM (
       SELECT q, (
-          SELECT the_geom 
+          SELECT the_geom
           FROM global_province_polygons
-          WHERE d.c = ANY (synonyms) 
+          WHERE d.c = ANY (synonyms)
           ORDER BY frequency DESC LIMIT 1
         ) geom
       FROM (
-        SELECT 
+        SELECT
           trim(replace(lower(admin1_name),'.',' ')) c, admin1_name q
         ) d
       ) v;
@@ -83,11 +83,11 @@ RETURNS Geometry AS $$
     SELECT
       geom INTO ret
     FROM (
-      SELECT 
+      SELECT
         q, (
-          SELECT the_geom 
+          SELECT the_geom
           FROM global_province_polygons
-          WHERE p.c = ANY (synonyms) 
+          WHERE p.c = ANY (synonyms)
           AND iso3 = p.i
           ORDER BY frequency DESC LIMIT 1
         ) geom
