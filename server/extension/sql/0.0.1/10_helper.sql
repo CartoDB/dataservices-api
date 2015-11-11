@@ -1,5 +1,5 @@
 -- Get values_json for provided key from conf table
-CREATE OR REPLACE FUNCTION _get_conf(_key TEXT)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_conf(_key TEXT)
   RETURNS text
 AS $$
 DECLARE
