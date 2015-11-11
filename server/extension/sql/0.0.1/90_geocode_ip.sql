@@ -30,10 +30,13 @@ CREATE OR REPLACE FUNCTION _geocode_ip_point(ip TEXT)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
+
+    LIM INTEGER := 1;
   BEGIN
     SELECT ips.the_geom as geom INTO ret
       FROM public.ip_address_locations ips
-        WHERE ips.network_start_ip = ip::inet;
+        WHERE ips.network_start_ip = ip::inet
+    LIMIT LIM;
 
     RETURN ret;
   END
