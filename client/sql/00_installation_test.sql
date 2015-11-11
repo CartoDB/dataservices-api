@@ -10,3 +10,8 @@ SELECT cdb_geocoder_client._config_set('db_server_config', '{"connection_str": "
 
 -- Mock the server schema
 CREATE SCHEMA cdb_geocoder_server;
+
+-- Create a test user to check permissions
+DROP ROLE IF EXISTS test_regular_user;
+CREATE ROLE test_regular_user;
+GRANT publicuser TO test_regular_user;
