@@ -22,7 +22,27 @@ RETURNS Geometry AS $$
     return rv[0]["mypoint"]
 $$ LANGUAGE plpythonu;
 
----- geocode_admin1_polygons(admin1_name text, country_name text)
+---- geocode_namedplace(city_name text, country_name text)
+CREATE OR REPLACE FUNCTION geocode_namedplace(user_id name, tx_id bigint, city_name text, country_name text)
+RETURNS Geometry AS $$
+    plpy.debug('Entering geocode_namedplace(city_name text, country_name text)')
+    plpy.debug('user_id = %s' % user_id)
+
+    #-- Access control
+    #-- TODO: this should be part of cdb python library
+    if user_id == 'publicuser':
+        plpy.error('The api_key must be provided')
+
+    #--TODO: rate limiting check
+    #--TODO: quota check
+
+    #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
+    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_namedplace($1, $2) AS mypoint", ["text", "text"])
+    rv = plpy.execute(plan, [city_name, country_name], 1)
+
+    plpy.debug('Returning from Returning from geocode_namedplace')
+    return rv[0]["mypoint"]
+$$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
 
@@ -49,5 +69,22 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- geocode_namedplace(city_name text, country_name text)
+CREATE OR REPLACE FUNCTION _geocode_namedplace(city_name text, country_name text)
+RETURNS Geometry AS $$
+  DECLARE
+    ret Geometry;
+  BEGIN
+  SELECT geom INTO ret
+  FROM (
+    WITH p AS (SELECT r.s, r.c, (SELECT iso2 FROM country_decoder WHERE lower(r.c) = ANY (synonyms)) i FROM (SELECT city_name AS s, country_name::text AS c) r),
+        best AS (SELECT p.s AS q, p.c AS c, (SELECT gp.the_geom AS geom FROM global_cities_points_limited gp WHERE gp.lowername = lower(p.s) AND gp.iso2 = p.i ORDER BY population DESC LIMIT 1) AS geom FROM p),
+        next AS (SELECT p.s AS q, p.c AS c, (SELECT gp.the_geom FROM global_cities_points_limited gp, global_cities_alternates_limited ga WHERE lower(p.s) = ga.lowername AND gp.iso2 = p.i AND ga.geoname_id = gp.geoname_id ORDER BY preferred DESC LIMIT 1) geom FROM p WHERE p.s NOT IN (SELECT q FROM best WHERE c = p.c AND geom IS NOT NULL))
+        SELECT geom FROM best WHERE geom IS NOT NULL
+        UNION ALL
+        SELECT geom FROM next
+   ) v;
 
+    RETURN ret;
+  END
+$$ LANGUAGE plpgsql;
 

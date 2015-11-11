@@ -12,6 +12,11 @@ INSERT INTO global_cities_alternates_limited (geoname_id, name, preferred, lower
   'POINT(0.6983 39.26787)',4326)
 );
 
+-- Insert dummy data into country decoder table
+INSERT INTO country_decoder (synonyms, iso2) VALUES (Array['spain'], 'ES');
+
 -- This should return the point inserted above
 SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx');
 SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche');
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx', 'Spain');
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche', 'Spain');
