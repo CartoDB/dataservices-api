@@ -15,7 +15,8 @@ class QuotaService:
         user_quota = self.user_service.user_quota()
         today = date.today()
         current_used = self.user_service.used_quota_month(today.year, today.month)
-        return True if (current_used + 1) < user_quota else False
+        soft_geocoder_limit = self.user_service.soft_geocoder_limit()
+        return True if soft_geocoder_limit or (current_used + 1) < user_quota else False
 
     def increment_geocoder_use(self, amount=1):
         today = date.today()
