@@ -1,7 +1,7 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_geocoder_server.geocode_admin1_polygons(session_user, txid_current(), 'California');
-SELECT cdb_geocoder_server.geocode_admin1_polygons(session_user, txid_current(), 'California', 'United States');
+SELECT cdb_geocoder_server.geocode_admin1_polygon(session_user, txid_current(), 'California');
+SELECT cdb_geocoder_server.geocode_admin1_polygon(session_user, txid_current(), 'California', 'United States');
 
 -- Insert dummy data into country decoder table
 INSERT INTO country_decoder (synonyms, iso3) VALUES (Array['united states'], 'USA');
@@ -15,8 +15,8 @@ INSERT INTO global_province_polygons (synonyms, iso3, the_geom) VALUES (Array['c
 );
 
 -- This should return the polygon inserted above
-SELECT cdb_geocoder_server.geocode_admin1_polygons(session_user, txid_current(), 'California');
-SELECT cdb_geocoder_server.geocode_admin1_polygons(session_user, txid_current(), 'California', 'United States');
+SELECT cdb_geocoder_server.geocode_admin1_polygon(session_user, txid_current(), 'California');
+SELECT cdb_geocoder_server.geocode_admin1_polygon(session_user, txid_current(), 'California', 'United States');
 
 
 
