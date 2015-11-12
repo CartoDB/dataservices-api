@@ -1,5 +1,6 @@
 -- Make sure dbs are clean
 DELETE FROM global_postal_code_points;
+DELETE FROM global_postal_code_polygons;
 DELETE FROM country_decoder;
 DELETE FROM available_services;
 DELETE FROM admin0_synonyms;
@@ -11,6 +12,13 @@ SELECT cdb_geocoder_server.geocode_postalcode_point(session_user, txid_current()
 -- Insert dummy data into ip_address_locations
 INSERT INTO global_postal_code_points (the_geom, iso3, postal_code, postal_code_num) VALUES (
   '0101000020E61000000000000000E040408036B47414764840',
+  'ESP',
+  '03204',
+  3204
+);
+
+INSERT INTO global_postal_code_polygons (the_geom, iso3, postal_code, postal_code_num) VALUES (
+  '0106000020E610000001000000010300000001000000040000000000000000E000C01F383D7839B740400000000000E000C0AA3C0EDE220F3B4000000000004812404FB7FCCD04893D400000000000E000C01F383D7839B74040',
   'ESP',
   '03204',
   3204
@@ -40,8 +48,13 @@ SELECT cdb_geocoder_server.geocode_postalcode_point(session_user, txid_current()
 
 SELECT cdb_geocoder_server.geocode_postalcode_point(session_user, txid_current(), '03204', 'spain');
 
+SELECT cdb_geocoder_server.geocode_postalcode_polygon(session_user, txid_current(), '03204');
+
+SELECT cdb_geocoder_server.geocode_postalcode_polygon(session_user, txid_current(), '03204', 'spain');
+
 -- Clean dbs
 DELETE FROM global_postal_code_points;
+DELETE FROM global_postal_code_polygons;
 DELETE FROM country_decoder;
 DELETE FROM available_services;
 DELETE FROM admin0_synonyms;
