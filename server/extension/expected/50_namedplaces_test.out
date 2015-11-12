@@ -6,6 +6,36 @@ SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx
  
 (1 row)
 
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche');
+ geocode_namedplace 
+--------------------
+ 
+(1 row)
+
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx', 'Spain');
+ geocode_namedplace 
+--------------------
+ 
+(1 row)
+
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche', 'Spain');
+ geocode_namedplace 
+--------------------
+ 
+(1 row)
+
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx', 'Valencia', 'Spain');
+ geocode_namedplace 
+--------------------
+ 
+(1 row)
+
+SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche', 'valencia', 'Spain');
+ geocode_namedplace 
+--------------------
+ 
+(1 row)
+
 -- Insert dummy data into points table
 INSERT INTO global_cities_points_limited (geoname_id, name, iso2, admin1, admin2, population, lowername, the_geom) VALUES (3128760, 'Elche', 'ES', 'Valencia', 'AL', 34534, 'elche', ST_GeomFromText(
   'POINT(0.6983 39.26787)',4326)
