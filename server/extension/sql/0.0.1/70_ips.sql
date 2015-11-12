@@ -40,7 +40,7 @@ RETURNS Geometry AS $$
             new_ip := ('::ffff:' || ip)::inet;
         END IF;
     EXCEPTION WHEN OTHERS THEN
-        SELECT ip AS q, NULL as geom, FALSE as success INTO ret;
+        SELECT NULL as geom INTO ret;
         RETURN ret;
     END;
 
