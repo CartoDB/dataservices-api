@@ -2,3 +2,5 @@ results/
 regression.diffs
 regression.out
 cdb_geocoder_server--0.0.1.sql
+
+result/*.out
