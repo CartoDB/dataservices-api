@@ -50,7 +50,7 @@ RETURNS Geometry AS $$
     WITH
         ips AS (SELECT unnest(old_ips) s, unnest(new_ips) net),
         matches AS (SELECT s, (SELECT the_geom FROM ip_address_locations WHERE network_start_ip <= ips.net ORDER BY network_start_ip DESC LIMIT 1) geom FROM ips)
-        SELECT geom INTO ret
+    SELECT geom INTO ret
         FROM matches;
     RETURN ret;
 END
