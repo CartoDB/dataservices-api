@@ -1,11 +1,11 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
 SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elx');
-SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche');
-SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx', 'Spain');
-SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche', 'Spain');
-SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elx', 'Valencia', 'Spain');
-SELECT cdb_geocoder_server.geocode_namedplace(session_user, txid_current(), 'Elche', 'valencia', 'Spain');
+SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elche');
+SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elx', 'Spain');
+SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elche', 'Spain');
+SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elx', 'Valencia', 'Spain');
+SELECT cdb_geocoder_server.geocode_namedplace_point(session_user, txid_current(), 'Elche', 'valencia', 'Spain');
 
 -- Insert dummy data into points table
 INSERT INTO global_cities_points_limited (geoname_id, name, iso2, admin1, admin2, population, lowername, the_geom) VALUES (3128760, 'Elche', 'ES', 'Valencia', 'AL', 34534, 'elche', ST_GeomFromText(
