@@ -31,16 +31,13 @@ RETURNS Geometry AS $$
     DECLARE
         ret Geometry;
 
-        new_ips INET[];
-        old_ips TEXT[];
+        new_ip INET;
     BEGIN
     BEGIN
         IF family(ip::inet) = 6 THEN
-            new_ips := array_append(new_ips, ip::inet);
-            old_ips := array_append(old_ips, ip);
+            new_ip := ip::inet;
         ELSE
-            new_ips := array_append(new_ips, ('::ffff:' || ip)::inet);
-            old_ips := array_append(old_ips, ip);
+            new_ip := ('::ffff:' || ip)::inet;
         END IF;
     EXCEPTION WHEN OTHERS THEN
         SELECT ip AS q, NULL as geom, FALSE as success INTO ret;
@@ -48,7 +45,7 @@ RETURNS Geometry AS $$
     END;
 
     WITH
-        ips AS (SELECT unnest(old_ips) s, unnest(new_ips) net),
+        ips AS (SELECT ip s, new_ip net),
         matches AS (SELECT s, (SELECT the_geom FROM ip_address_locations WHERE network_start_ip <= ips.net ORDER BY network_start_ip DESC LIMIT 1) geom FROM ips)
     SELECT geom INTO ret
         FROM matches;
