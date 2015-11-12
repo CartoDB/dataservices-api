@@ -29,7 +29,7 @@ $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION _geocode_ip_point(ip TEXT)
 RETURNS Geometry AS $$
     DECLARE
-        ret geocode_ip_v1%rowtype;
+        ret Geometry;
 
         new_ips INET[];
         old_ips TEXT[];
@@ -46,11 +46,12 @@ RETURNS Geometry AS $$
         SELECT ip AS q, NULL as geom, FALSE as success INTO ret;
         RETURN ret;
     END;
-    FOR ret IN WITH ips AS (SELECT unnest(old_ips) s, unnest(new_ips) net),
+
+    WITH
+        ips AS (SELECT unnest(old_ips) s, unnest(new_ips) net),
         matches AS (SELECT s, (SELECT the_geom FROM ip_address_locations WHERE network_start_ip <= ips.net ORDER BY network_start_ip DESC LIMIT 1) geom FROM ips)
-        SELECT s, geom, CASE WHEN geom IS NULL THEN FALSE ELSE TRUE END AS success FROM matches
-        LOOP
-        RETURN ret.geom;
-    END LOOP;
+        SELECT geom INTO ret
+        FROM matches;
+    RETURN ret;
 END
 $$ LANGUAGE plpgsql;
