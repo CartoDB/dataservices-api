@@ -1,0 +1,6 @@
+## Customize test commands
+test:
+  post:
+    - cd server/extension
+    - make all install
+    - PGUSER=postgres make installcheck
