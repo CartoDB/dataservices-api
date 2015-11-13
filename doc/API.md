@@ -23,6 +23,7 @@ Due to the fact that the Geocoder API is used on top of the CartoDB SQL API you 
 #### Pre/post conditions
 
 #### Possible side-effects
+The Geocoder API can return different types of geometries as result of different geocoding processes. The CartoDB platform does not support multigeometry layers or datasets, therefore the final users of this Geocoder API must check that they are using consistent geometry types inside a table to avoid further conflicts in the map visualization.
 
 For each function:
 function names
