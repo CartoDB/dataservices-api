@@ -6,10 +6,10 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_postalcode_polygon(user_id name, tx_id bigint, postal_code integer, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_postalcode_point(user_id name, tx_id bigint, postal_code text, country_name text)
 RETURNS Geometry AS $$
 BEGIN
-  RAISE NOTICE 'cbd_geocoder_server.geocode_postalcode_polygon invoked with params (%, %, %, %)', user_id, 'some_transaction_id', postal_code, country_name;
+  RAISE NOTICE 'cbd_geocoder_server.geocode_postalcode_point invoked with params (%, %, %, %)', user_id, 'some_transaction_id', postal_code, country_name;
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -23,12 +23,12 @@ PL/pgSQL function cdb_geocoder_client.geocode_postalcode_polygon(text,text) line
  
 (1 row)
 
-SELECT cdb_geocoder_client.geocode_postalcode_polygon(3204, 'Spain');
-NOTICE:  cdb_geocoder_client._geocode_postalcode_polygon(4): [contrib_regression] REMOTE NOTICE: cbd_geocoder_server.geocode_postalcode_polygon invoked with params (postgres, some_transaction_id, 3204, Spain)
-CONTEXT:  SQL statement "SELECT cdb_geocoder_client._geocode_postalcode_polygon(session_user, txid_current(), postal_code, country_name)"
-PL/pgSQL function cdb_geocoder_client.geocode_postalcode_polygon(integer,text) line 5 at SQL statement
- geocode_postalcode_polygon 
-----------------------------
+SELECT cdb_geocoder_client.geocode_postalcode_point('03204', 'Spain');
+NOTICE:  cdb_geocoder_client._geocode_postalcode_point(4): [contrib_regression] REMOTE NOTICE: cbd_geocoder_server.geocode_postalcode_polygon invoked with params (postgres, some_transaction_id, 03204, Spain)
+CONTEXT:  SQL statement "SELECT cdb_geocoder_client._geocode_postalcode_point(session_user, txid_current(), postal_code, country_name)"
+PL/pgSQL function cdb_geocoder_client.geocode_postalcode_point(text,text) line 5 at SQL statement
+ geocode_postalcode_point 
+--------------------------
  
 (1 row)
 
