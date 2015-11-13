@@ -87,32 +87,11 @@ possible side-effects
       SELECT geocode_postalcode_polygons('11211', 'USA')
       `````
 
-  * `geocode_postalcode_polygons(code text)` **PROBABLY WE DON'T WANT TO PUBLISH THIS ONE**
-    * **Return type:** `polygon` 
-    * **Usage example:**
-      `````
-      SELECT geocode_postalcode_polygons('11211')
-      `````
-
   * `geocode_postalcode_points(code text, country text)`
     * **Return type:** `point`
     * **Usage example:**
         `````
       SELECT geocode_postalcode_points('11211', 'USA')
-      `````
-
-  * `geocode_postalcode_points(code integer, country text)`
-    * **Return type:** `point`
-    * **Usage example:**
-        `````
-      SELECT geocode_postalcode_points(11211, 'USA')
-      `````
-
-  * `geocode_postalcode_points(code text)`
-    * **Return type:** `point`
-    * **Usage example:**
-        `````
-      SELECT geocode_postalcode_points('11211')
       `````
 
 
