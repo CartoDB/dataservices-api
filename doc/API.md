@@ -5,6 +5,8 @@
 ### General concepts
 The Geocoder API offers geocoding services on top of the CartoDB SQL API by means of a set of geocoding functions. Each one of these functions is oriented to one kind of geocoding operation and it will return the corresponding geometry (a `polygon` or a `point`) according to the input information.
 
+The Geocoder API decouples the geocoding service from the CartoDB Editor, and allows to geocode data (being single rows, complete datasets or simple inputs) programatically. 
+
 #### Errors
 Errors will be described in the response of the geocoder request. An example is as follows:
 
