@@ -39,11 +39,11 @@ return type for the functions  (Geometry or NULL if not found, with SRID 4326)
 **WIP**
 #### Geocoding functions
 **WIP**
-##### Country geocoder functions
+##### Country geocoder function
+This function provides a country geocoding service by receiving a country name text as parameter and returns a polygon geometry (SRID 4326) for the corresponding country.
+
 ###### geocode_admin0_polygon
-* Description:
- This function receives a country name and returns a polygon geometry (SRID 4326) for the corresponding input.
-* Functions:
+
   * `geocode_admin0_polygon(country_name text)`
      * **Parameters**: A text parameter with the name of the country to geocode.
      * **Return type:** `polygon`
