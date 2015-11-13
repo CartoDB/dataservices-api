@@ -1,4 +1,4 @@
-import redis
+import redis_helper
 from datetime import date
 
 class UserService:
@@ -12,19 +12,9 @@ class UserService:
   REDIS_CONNECTION_PORT = "redis_port"
   REDIS_CONNECTION_DB = "redis_db"
 
-  REDIS_DEFAULT_USER_DB = 5
-  REDIS_DEFAULT_HOST = 'localhost'
-  REDIS_DEFAULT_PORT = 6379
-
-  def __init__(self, user_id, **kwargs):
+  def __init__(self, user_id, redis_connection):
     self.user_id = user_id
-    if self.REDIS_CONNECTION_KEY in kwargs:
-      self._redis_connection = self.__get_redis_connection(redis_connection=kwargs[self.REDIS_CONNECTION_KEY])
-    else:
-      if self.REDIS_CONNECTION_HOST not in kwargs:
-        raise Exception("You have to provide redis configuration")
-      redis_config = self.__build_redis_config(kwargs)
-      self._redis_connection = self.__get_redis_connection(redis_config = redis_config)
+    self._redis_connection = redis_connection
 
   def user_quota(self):
       # Check for exceptions or redis timeout
@@ -51,25 +41,6 @@ class UserService:
   @property
   def redis_connection(self):
       return self._redis_connection
-
-  def __get_redis_connection(self, redis_connection=None, redis_config=None):
-      if redis_connection:
-          conn = redis_connection
-      else:
-          conn = self.__create_redis_connection(redis_config)
-
-      return conn
-
-  def __create_redis_connection(self, redis_config):
-      pool = redis.ConnectionPool(host=redis_config['host'], port=redis_config['port'], db=redis_config['db'])
-      conn = redis.Redis(connection_pool=pool)
-      return conn
-
-  def __build_redis_config(self, config):
-      redis_host = config[self.REDIS_CONNECTION_HOST] if self.REDIS_CONNECTION_HOST in config else self.REDIS_DEFAULT_HOST
-      redis_port = config[self.REDIS_CONNECTION_PORT] if self.REDIS_CONNECTION_PORT in config else self.REDIS_DEFAULT_PORT
-      redis_db = config[self.REDIS_CONNECTION_DB] if self.REDIS_CONNECTION_DB in config else self.REDIS_DEFAULT_USER_DB
-      return {'host': redis_host, 'port': redis_port, 'db': redis_db}
 
   def __get_month_redis_key(self, year, month):
       today = date.today()

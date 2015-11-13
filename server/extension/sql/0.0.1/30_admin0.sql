@@ -11,14 +11,23 @@ RETURNS Geometry AS $$
         plpy.error('The api_key must be provided')
 
     #--TODO: rate limiting check
-    #--TODO: quota check
+    #--This will create and cache a redis connection, if needed, in the GD object for the current user
+    redis_conn_plan = plpy.prepare("SELECT cdb_geocoder_server._connect_to_redis($1)", ["name"])
+    redis_conn_result = plpy.execute(redis_conn_plan, [user_id], 1)
+    qs = quota_service.QuotaService(user_id, tx_id, GD[user_id]['redis_connection'])
+
+    if not qs.check_user_quota():
+      plpy.error("Not enough quota for this user")
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
     plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_admin0_polygon($1) AS mypolygon", ["text"])
-    rv = plpy.execute(plan, [country_name], 1)
-
-    plpy.debug('Returning from Returning from geocode_admin0_polygons')
-    return rv[0]["mypolygon"]
+    result = plpy.execute(plan, [country_name], 1)
+    if result.status() == 5 and result.nrows() == 1:
+      qs.increment_geocoder_use()
+      plpy.debug('Returning from geocode_admin0_polygons')
+      return result[0]["mypolygon"]
+    else:
+      plpy.error('Something wrong with the georefence operation')
 $$ LANGUAGE plpythonu;
 
 
