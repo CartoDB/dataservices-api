@@ -48,9 +48,16 @@ return type for the functions  (Geometry or NULL if not found, with SRID 4326)
      * **Parameters**: A text parameter with the name of the country to geocode.
      * **Return type:** `polygon`
      * **Usage example:**
+     
+       SELECT
        `````
-      SELECT geocode_admin0_polygon('France')
-      `````
+       SELECT geocode_admin0_polygon('France')
+       `````
+
+       UPDATE
+       `````
+       UPDATE {tablename} SET {the_geom} = geocode_admin0_polygon({country_column})
+       `````
 
 #### Level-1 Administrative regions geocoder
 ###### geocode_admin1_polygon
@@ -59,17 +66,31 @@ return type for the functions  (Geometry or NULL if not found, with SRID 4326)
     * **Parameters**: 
     * **Return type:** `polygon`
     * **Usage example:**
+    
+      SELECT
       `````
       SELECT geocode_admin1_polygon('Alicante')
+      `````
+
+      UPDATE
+      `````
+      UPDATE {tablename} SET the_geom = geocode_admin1_polygon({province_column})
       `````
 
   *  `geocode_admin1_polygon(admin1_name text, country_name text)`
     * **Parameters**: 
     * **Return type:** `polygon`
     * **Usage example:**
+     
+     SELECT
       `````
       SELECT geocode_admin1_polygon('Alicante', 'Spain')
       `````
+
+     UPDATE
+     `````
+     UPDATE {tablename} SET the_geom = geocode_admin1_polygon({province_column}, {country_column})
+     `````
 
 #### City geocoder
 ##### geocode_namedplace_point
@@ -78,18 +99,32 @@ return type for the functions  (Geometry or NULL if not found, with SRID 4326)
     * **Parameters**: 
     * **Return type:** `point`
     * **Usage example:**
+    
+      SELECT
       `````
       SELECT geocode_namedplace_point('Barcelona')
+      `````
+
+      UPDATE
+      `````
+      UPDATE {tablename} SET the_geom = geocode_namedplace_point({city_column})
       `````
 
   *  `geocode_namedplace_point(city_name text, country_name text)`
     * **Parameters**: 
     * **Return type:** `point`
     * **Usage example:**
+    
+      SELECT
       `````
       SELECT geocode_namedplace_point('Barcelona', 'Spain')
       `````
 
+      UPDATE
+      `````
+      UPDATE {tablename} SET the_geom = geocode_namedplace_point({city_column}, 'Spain')
+      `````
+      
   *  `geocode_namedplace_point(city_name text, admin1_name text, country_name text)`
     * **Parameters**: 
     * **Return type:** `point`
