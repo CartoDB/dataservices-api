@@ -1,7 +1,9 @@
 ## Geocoder API
 
 ### Overview
+**WIP**
 ### Quickstart
+**WIP**
 ### General concepts
 The Geocoder API offers geocoding services on top of the CartoDB SQL API by means of a set of geocoding functions. Each one of these functions is oriented to one kind of geocoding operation and it will return the corresponding geometry (a `polygon` or a `point`) according to the input information.
 
@@ -21,9 +23,12 @@ Errors will be described in the response of the geocoder request. An example is 
 Due to the fact that the Geocoder API is used on top of the CartoDB SQL API you can check the [Making calls to the SQL API](http://docs.cartodb.com/cartodb-platform/sql-api/making-calls/) section to help you debug your SQL errors.
 
 #### Pre/post conditions
+**WIP**
 
 #### Possible side-effects
 The Geocoder API can return different types of geometries as result of different geocoding processes. The CartoDB platform does not support multigeometry layers or datasets, therefore the final users of this Geocoder API must check that they are using consistent geometry types inside a table to avoid further conflicts in the map visualization.
+
+====
 
 For each function:
 function names
@@ -31,7 +36,9 @@ function parameters and types
 return type for the functions  (Geometry or NULL if not found, with SRID 4326)
 
 ### Reference
+**WIP**
 #### Geocoding functions
+**WIP**
 ##### Country geocoder functions
 ###### geocode_admin0_polygon
 * Description:
