@@ -120,9 +120,9 @@ return type for the functions  (Geometry or NULL if not found, with SRID 4326)
       `````
 
 #### IP addresses Geocoder
-##### geocode_ip_point(ipaddress text)
+##### geocode_ip_point
 * Functions:
-  * `geocode_ip_point(ipaddress text)`
+  * `geocode_ip_point(ip_address text)`
     * **Parameters**: 
     * **Return type:** `point`
     * **Usage example:**
