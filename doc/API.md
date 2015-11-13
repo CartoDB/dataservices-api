@@ -3,6 +3,16 @@
 ### Overview
 ### Quickstart
 ### General concepts
+#### Auth?
+#### Errors
+#### Possible side-effects
+
+For each function:
+function names
+function parameters and types 
+return type for the functions  (Geometry or NULL if not found, with SRID 4326)
+pre- and post-conditions or invariants
+
 ### Reference
 #### Geocoding functions
 ##### Country geocoder functions
@@ -97,13 +107,6 @@
       `````
 
 
-For each function:
-function names
-function parameters and types 
-return type for the functions  (Geometry or NULL if not found, with SRID 4326)
-a description of the handling of any error condition
-pre- and post-conditions or invariants
-possible side-effects
 
 
 
