@@ -3,15 +3,27 @@
 ### Overview
 ### Quickstart
 ### General concepts
-#### Auth?
 #### Errors
+Errors will be described in the response of the geocoder request. An example is as follows:
+
+  ```json
+  {
+     error: [
+          "function geocode_countries(text) does not exist"
+     ]
+  }
+  ```
+
+Due to the fact that the Geocoder API is used on top of the CartoDB SQL API you can check the [Making calls to the SQL API](http://docs.cartodb.com/cartodb-platform/sql-api/making-calls/) section to help you debug your SQL errors.
+
+### Pre/post conditions
+
 #### Possible side-effects
 
 For each function:
 function names
 function parameters and types 
 return type for the functions  (Geometry or NULL if not found, with SRID 4326)
-pre- and post-conditions or invariants
 
 ### Reference
 #### Geocoding functions
