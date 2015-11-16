@@ -10,7 +10,7 @@ AS $$
   if not google:
     from heremaps import heremapsgeocoder
 
-    config = json.loads(plpy.execute("SELECT cdb_geocoder_server._config_get('hire-geocoder')", 1)[0]['_config_get'])
+    config = json.loads(plpy.execute("SELECT cdb_geocoder_server._config_get('hires-geocoder')", 1)[0]['_config_get'])
 
     app_id = config['app_id']
     app_code = config['app_code']
