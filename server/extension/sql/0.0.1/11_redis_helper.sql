@@ -1,23 +1,12 @@
--- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id name)
-RETURNS boolean AS $$
-  if user_id in GD and 'redis_connection' in GD[user_id]:
-    return False
-  else:
-    from cartodb_geocoder import redis_helper
-    config_params = plpy.execute("select c.host, c.port, c.timeout, c.db from cdb_geocoder_server._get_redis_conf() c;")[0]
-    redis_connection = redis_helper.RedisHelper(config_params['host'], config_params['port'], config_params['db']).redis_connection()
-    GD[user_id] = {'redis_connection': redis_connection}
-    return True
-$$ LANGUAGE plpythonu;
-
 CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
-    host text,
-    port int,
-    timeout float,
-    db text
+    sentinel_host text,
+    sentinel_port int,
+    sentinel_master_id text,
+    redis_db text,
+    timeout float
 );
 
+-- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf()
 RETURNS cdb_geocoder_server._redis_conf_params AS $$
     conf = plpy.execute("SELECT cdb_geocoder_server._config_get('redis_conf') conf")[0]['conf']
@@ -26,5 +15,30 @@ RETURNS cdb_geocoder_server._redis_conf_params AS $$
     else:
       import json
       params = json.loads(conf)
-      return { "host": params['host'], "port": params['port'], 'timeout': params['timeout'], 'db': params['db'] }
+      return {
+        "sentinel_host": params['sentinel_host'],
+        "sentinel_port": params['sentinel_port'],
+        "sentinel_master_id": params['sentinel_master_id'],
+        "timeout": params['timeout'],
+        "redis_db": params['redis_db']
+      }
+$$ LANGUAGE plpythonu;
+
+-- Get the connection to redis from cache or create a new one
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id name)
+RETURNS boolean AS $$
+  if user_id in GD and 'redis_connection' in GD[user_id]:
+    return False
+  else:
+    from cartodb_geocoder import redis_helper
+    config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
+        c.sentinel_master_id, c.timeout, c.redis_db
+        from cdb_geocoder_server._get_redis_conf() c;""")[0]
+    redis_connection = redis_helper.RedisHelper(config_params['sentinel_host'],
+        config_params['sentinel_port'],
+        config_params['sentinel_master_id'],
+        timeout=config_params['timeout'],
+        redis_db=config_params['redis_db']).redis_connection()
+    GD[user_id] = {'redis_connection': redis_connection}
+    return True
 $$ LANGUAGE plpythonu;
