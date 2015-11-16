@@ -2,6 +2,7 @@
 
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygon(user_id name, tx_id bigint, country_name text)
 RETURNS Geometry AS $$
+    from cartodb_geocoder import quota_service
     plpy.debug('Entering geocode_admin0_polygons')
     plpy.debug('user_id = %s' % user_id)
 

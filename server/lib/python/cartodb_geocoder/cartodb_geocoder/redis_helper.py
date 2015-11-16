@@ -15,5 +15,6 @@ class RedisHelper:
     return self.__create_redis_connection()
 
   def __create_redis_connection(self):
+    #TODO Change to use Sentinel
     pool = redis.ConnectionPool(host=self.host, port=self.port, db=self.db)
     return redis.Redis(connection_pool=pool)
