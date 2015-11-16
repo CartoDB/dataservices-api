@@ -7,10 +7,12 @@ AS $$
   -- TODO: grab c
   google = True
 
+  provider = 'gme-geocoder' if google else 'hires-geocoder'
+
+  config = json.loads(plpy.execute("SELECT cdb_geocoder_server._config_get('{}')".format(provider), 1)[0]['_config_get'])
+
   if not google:
     from heremaps import heremapsgeocoder
-
-    config = json.loads(plpy.execute("SELECT cdb_geocoder_server._config_get('hires-geocoder')", 1)[0]['_config_get'])
 
     app_id = config['app_id']
     app_code = config['app_code']
@@ -22,23 +24,16 @@ AS $$
   else:
     import googlemaps
 
-    config = json.loads(plpy.execute("SELECT _config_get::text from cdb_geocoder_server._config_get('gme-geocoder')", 1)[0]['_config_get'])
-
     client_id = config['client_id']
     client_secret = config['client_secret']
 
     gmaps = googlemaps.Client(client_id=client_id, client_secret=client_secret)
 
-    arg = lambda x: x if x else ''
-    comma = lambda x: ', ' if bool(x) else ''
+    arg = lambda x: (', ' + x) if x else ''
 
-    geocode_result = gmaps.geocode(
-      "{}{}{}{}{}{}{}".format(
-        searchtext, comma(city),
-        arg(city), comma(state_province),
-        arg(state_province), comma(country),
-        arg(country)))
+    query = searchtext + arg(city) + arg(state_province) + arg(country)
 
+    geocode_result = gmaps.geocode(query)
 
     lng = geocode_result[0]['geometry']['location']['lng']
     lat = geocode_result[0]['geometry']['location']['lat']
