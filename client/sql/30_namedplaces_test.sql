@@ -2,7 +2,7 @@
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_namedplace_point(user_id name, tx_id bigint, city_name text)
 RETURNS Geometry AS $$
 BEGIN
-  RAISE NOTICE 'cbd_geocoder_server.geocode_namedplace_point invoked with params (%, %, %)', user_id, 'some_transaction_id', city_name;
+  RAISE NOTICE 'cdb_geocoder_server.geocode_namedplace_point invoked with params (%, %, %)', user_id, 'some_transaction_id', city_name;
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -10,7 +10,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_namedplace_point(user_id name, tx_id bigint, city_name text, country_name text)
 RETURNS Geometry AS $$
 BEGIN
-  RAISE NOTICE 'cbd_geocoder_server.geocode_namedplace_point invoked with params (%, %, %, %)', user_id, 'some_transaction_id', city_name, country_name;
+  RAISE NOTICE 'cdb_geocoder_server.geocode_namedplace_point invoked with params (%, %, %, %)', user_id, 'some_transaction_id', city_name, country_name;
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -18,7 +18,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_namedplace_point(user_id name, tx_id bigint, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
 BEGIN
-  RAISE NOTICE 'cbd_geocoder_server.geocode_namedplace_point invoked with params (%, %, %, %, %)', user_id, 'some_transaction_id', city_name, admin1_name, country_name;
+  RAISE NOTICE 'cdb_geocoder_server.geocode_namedplace_point invoked with params (%, %, %, %, %)', user_id, 'some_transaction_id', city_name, admin1_name, country_name;
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
