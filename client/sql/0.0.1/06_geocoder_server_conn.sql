@@ -9,7 +9,7 @@ RETURNS text AS $$
 DECLARE
   db_connection_str text;
 BEGIN
-  SELECT cdb_geocoder_client._config_get('db_server_config')->'connection_str' INTO db_connection_str;
+  SELECT cartodb.cdb_conf_getconf('geocoder_server_config')->'connection_str' INTO db_connection_str;
   SELECT trim(both '"' FROM db_connection_str) INTO db_connection_str;
   RETURN db_connection_str;
 END;
