@@ -23,6 +23,3 @@ SELECT cdb_geocoder_client._geocode_namedplace_point('evil_user', 666, 'Sheol', 
 SELECT cdb_geocoder_client._geocode_postalcode_polygon('evil_user', 666, '66666', 'Hell');
 SELECT cdb_geocoder_client._geocode_postalcode_point('evil_user', 666, '66666', 'Hell');
 SELECT cdb_geocoder_client._geocode_ip('evil_user', 666, '8.8.8.8');
-
--- Check the regular user cannot look into config table
-SELECT * from cdb_geocoder_client._config;
