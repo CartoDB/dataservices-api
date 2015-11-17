@@ -1,8 +1,7 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygon(user_id name, tx_id bigint, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygon(user_id name, user_config_data JSON, geocoder_config_data JSON, country_name text)
 RETURNS Geometry AS $$
-    from cartodb_geocoder import quota_service
     plpy.debug('Entering geocode_admin0_polygons')
     plpy.debug('user_id = %s' % user_id)
 
@@ -12,23 +11,14 @@ RETURNS Geometry AS $$
         plpy.error('The api_key must be provided')
 
     #--TODO: rate limiting check
-    #--This will create and cache a redis connection, if needed, in the GD object for the current user
-    redis_conn_plan = plpy.prepare("SELECT cdb_geocoder_server._connect_to_redis($1)", ["name"])
-    redis_conn_result = plpy.execute(redis_conn_plan, [user_id], 1)
-    qs = quota_service.QuotaService(user_id, tx_id, GD[user_id]['redis_connection'])
-
-    if not qs.check_user_quota():
-      plpy.error("Not enough quota for this user")
+    #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
     plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_admin0_polygon($1) AS mypolygon", ["text"])
-    result = plpy.execute(plan, [country_name], 1)
-    if result.status() == 5 and result.nrows() == 1:
-      qs.increment_geocoder_use()
-      plpy.debug('Returning from geocode_admin0_polygons')
-      return result[0]["mypolygon"]
-    else:
-      plpy.error('Something wrong with the georefence operation')
+    rv = plpy.execute(plan, [country_name], 1)
+
+    plpy.debug('Returning from Returning from geocode_admin0_polygons')
+    return rv[0]["mypolygon"]
 $$ LANGUAGE plpythonu;
 
 

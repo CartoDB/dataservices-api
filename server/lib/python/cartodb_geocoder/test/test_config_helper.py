@@ -7,9 +7,10 @@ class TestConfigHelper(TestCase):
 
   def test_should_return_list_of_user_config_if_its_ok(self):
     user_config_json = '{"is_organization": false, "entity_name": "test_user"}'
-    user_config = config_helper.UserConfig(user_config_json)
+    user_config = config_helper.UserConfig(user_config_json, 'development_cartodb_user_UUID')
     assert user_config.is_organization == False
     assert user_config.entity_name == 'test_user'
+    assert user_config.user_id == 'UUID'
 
   def test_should_return_raise_config_exception_if_not_ok(self):
     user_config_json = '{"is_organization": "false"}'

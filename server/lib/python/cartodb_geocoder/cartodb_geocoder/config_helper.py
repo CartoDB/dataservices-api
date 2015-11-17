@@ -7,21 +7,18 @@ class UserConfig:
 
   USER_CONFIG_KEYS = ['is_organization', 'entity_name']
 
-  def __init__(self, user_config_json):
+  def __init__(self, user_config_json, db_user_id = None):
     config = json.loads(user_config_json)
     filtered_config = { key: config[key] for key in self.USER_CONFIG_KEYS if key in config.keys() }
     self.__check_config(filtered_config)
     self.__parse_config(filtered_config)
+    self._user_id = self.__extract_uuid(db_user_id)
 
   def __check_config(self, filtered_config):
     if len(filtered_config.keys()) != len(self.USER_CONFIG_KEYS):
       raise ConfigException("Passed user configuration is not correct, check it please")
 
     return True
-
-  def __parse_config(self, filtered_config):
-    self._is_organization = filtered_config['is_organization']
-    self._entity_name = filtered_config['entity_name']
 
   @property
   def is_organization(self):
@@ -30,6 +27,18 @@ class UserConfig:
   @property
   def entity_name(self):
     return self._entity_name
+
+  @property
+  def user_id(self):
+    return self._user_id
+
+  def __parse_config(self, filtered_config):
+    self._is_organization = filtered_config['is_organization']
+    self._entity_name = filtered_config['entity_name']
+
+  def __extract_uuid(self, db_user_id):
+    # Format: development_cartodb_user_<UUID>
+    return db_user_id.split('_')[-1]
 
 class GeocoderConfig:
 
@@ -69,6 +78,10 @@ class GeocoderConfig:
     elif self.NOKIA_GEOCODER == self._geocoder_type:
       self._nokia_monthly_quota = filtered_config[self.NOKIA_QUOTA_KEY]
       self._nokia_soft_geocoder_limit = filtered_config[self.NOKIA_SOFT_LIMIT_KEY]
+
+  @property
+  def service_type(self):
+    return self._geocoder_type
 
   @property
   def nokia_geocoder(self):

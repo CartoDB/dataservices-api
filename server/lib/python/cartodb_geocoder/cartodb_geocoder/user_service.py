@@ -12,39 +12,53 @@ class UserService:
   REDIS_CONNECTION_PORT = "redis_port"
   REDIS_CONNECTION_DB = "redis_db"
 
-  def __init__(self, user_id, redis_connection):
-    self.user_id = user_id
+  def __init__(self, user_config, service_type, redis_connection):
+    self.user_config = user_config
+    self.service_type = service_type
     self._redis_connection = redis_connection
 
-  def user_quota(self):
-      # Check for exceptions or redis timeout
-      user_quota = self._redis_connection.hget(self.__get_user_redis_key(), self.GEOCODING_QUOTA_KEY)
-      return int(user_quota) if user_quota and int(user_quota) >= 0 else 0
-
-  def soft_geocoder_limit(self):
-    """ Check what kind of limit the user has """
-    soft_limit = self._redis_connection.hget(self.__get_user_redis_key(), self.GEOCODING_SOFT_LIMIT_KEY)
-    return True if soft_limit == '1' else False
-
-  def used_quota_month(self, year, month):
+  def used_quota(self, service_type, year, month, day=None):
       """ Recover the used quota for the user in the current month """
-      # Check for exceptions or redis timeout
-      current_used = 0
-      for _, value in self._redis_connection.hscan_iter(self.__get_month_redis_key(year,month)):
-          current_used += int(value)
-      return current_used
+      redis_key_data = self.__get_redis_key(service_type, year, month, day)
+      current_use = self._redis_connection.hget(redis_key_data['redis_name'], redis_key_data['redis_key'])
+      return int(current_use) if current_use else 0
 
-  def increment_geocoder_use(self, year, month, key, amount=1):
-      # TODO Manage exceptions or timeout
-      self._redis_connection.hincrby(self.__get_month_redis_key(year, month),key,amount)
+  def increment_service_use(self, service_type, date=date.today(), amount=1):
+      """ Increment the services uses in monthly and daily basis"""
+      self.__increment_monthly_uses(date, service_type, amount)
+      self.__increment_daily_uses(date, service_type, amount)
 
-  @property
-  def redis_connection(self):
-      return self._redis_connection
+  # Private functions
 
-  def __get_month_redis_key(self, year, month):
-      today = date.today()
-      return "geocoder:{0}:{1}{2}".format(self.user_id, year, month)
+  def __increment_monthly_uses(self, date, service_type, amount):
+    redis_key_data = self.__get_redis_key(service_type, date.year, date.month)
+    self._redis_connection.hincrby(redis_key_data['redis_name'],redis_key_data['redis_key'],amount)
 
-  def __get_user_redis_key(self):
-      return "geocoder:{0}".format(self.user_id)
+  def __increment_daily_uses(self, date, service_type, amount):
+    redis_key_data = self.__get_redis_key(service_type, date.year, date.month, date.day)
+    self._redis_connection.hincrby(redis_key_data['redis_name'],redis_key_data['redis_key'],amount)
+
+  def __get_redis_key(self, service_type, year, month, day=None):
+    redis_name = self.__parse_redis_name(service_type,day)
+    redis_key = self.__parse_redis_key(year,month,day)
+
+    return {'redis_name': redis_name, 'redis_key': redis_key}
+
+  def __parse_redis_name(self,service_type, day=None):
+    prefix = "org" if self.user_config.is_organization else "user"
+    dated_key = "used_quota_day" if day else "used_quota_month"
+    redis_name = "{0}:{1}:{2}:{3}".format(
+      prefix, self.user_config.entity_name, service_type, dated_key
+    )
+    if self.user_config.is_organization and day:
+      redis_name = "{0}:{1}".format(redis_name, self.user_config.user_id)
+
+    return redis_name
+
+  def __parse_redis_key(self,year,month,day=None):
+    if day:
+      redis_key = "{0}_{1}_{2}".format(year,month,day)
+    else:
+      redis_key = "{0}_{1}".format(year,month)
+
+    return redis_key

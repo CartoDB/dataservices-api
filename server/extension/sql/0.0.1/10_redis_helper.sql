@@ -25,7 +25,7 @@ RETURNS cdb_geocoder_server._redis_conf_params AS $$
 $$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id name)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
   if user_id in GD and 'redis_connection' in GD[user_id]:
     return False
