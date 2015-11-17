@@ -1,48 +1,20 @@
 -- Geocodes a street address given a searchtext and a state and/or country
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_address(searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_address_point(user_config JSON, geocoder_config JSON, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
   RETURNS Geometry
 AS $$
   import json
+  from geocoderfactory import geocoderfactory
 
-  -- TODO: grab c
-  google = True
+  # TODO: Check quota
 
-  provider = 'gme-geocoder' if google else 'hires-geocoder'
+  geocoder_config_json = json.loads(geocoder_config)
 
-  config = json.loads(plpy.execute("SELECT cdb_geocoder_server._config_get('{}')".format(provider), 1)[0]['_config_get'])
+  geocoder = geocoderfactory.Factory(geocoder_config_json['app_id'], geocoder_config_json['app_secret']).factory(geocoder_config_json['provider'])
+  result = geocoder.geocode_address(searchtext=searchtext, city=city, state_province=state_province, country=country)[0]
+  coordinates = geocoder.extract_lng_lat_from_result(result)
 
-  if not google:
-    from heremaps import heremapsgeocoder
+  plan = plpy.prepare("SELECT * FROM ST_SetSRID(ST_MakePoint($1, $2), 4326) the_geom", ["double precision", "double precision"])
+  point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
 
-    app_id = config['app_id']
-    app_code = config['app_code']
-
-    geocoder = heremapsgeocoder.Geocoder(app_id, app_code)
-
-    results = geocoder.geocode_address(searchtext=searchtext, city=city, state=state_province, country=country)
-    coordinates = geocoder.extract_lng_lat_from_result(results[0])
-  else:
-    import googlemaps
-
-    client_id = config['client_id']
-    client_secret = config['client_secret']
-
-    gmaps = googlemaps.Client(client_id=client_id, client_secret=client_secret)
-
-    arg = lambda x: (', ' + x) if x else ''
-
-    query = searchtext + arg(city) + arg(state_province) + arg(country)
-
-    geocode_result = gmaps.geocode(query)
-
-    lng = geocode_result[0]['geometry']['location']['lng']
-    lat = geocode_result[0]['geometry']['location']['lat']
-
-    coordinates = [lng, lat]
-  end
-
-    plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-    point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-
-    return point['st_setsrid']
+  return point['the_geom']
 $$ LANGUAGE plpythonu;

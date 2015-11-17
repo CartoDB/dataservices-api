@@ -5,7 +5,6 @@ import json
 import urllib
 
 from heremaps.heremapsexceptions import BadGeocodingParams
-from heremaps.heremapsexceptions import EmptyGeocoderResponse
 from heremaps.heremapsexceptions import NoGeocodingParams
 from heremaps.heremapsexceptions import MalformedResult
 
@@ -67,9 +66,9 @@ class Geocoder:
         try:
             results = response['Response']['View'][0]['Result']
         except IndexError:
-            raise EmptyGeocoderResponse()
+            raise MalformedResult()
 
-        return results
+        return results if results else None
 
     def perform_request(self, params):
         request_params = {
@@ -101,10 +100,10 @@ class Geocoder:
     def extract_lng_lat_from_result(self, result):
         try:
             location = result['Location']
+
+            longitude = location['DisplayPosition']['Longitude']
+            latitude = location['DisplayPosition']['Latitude']
         except KeyError:
             raise MalformedResult()
-
-        longitude = location['DisplayPosition']['Longitude']
-        latitude = location['DisplayPosition']['Latitude']
 
         return [longitude, latitude]
