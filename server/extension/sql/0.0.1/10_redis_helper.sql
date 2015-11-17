@@ -9,7 +9,7 @@ CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
 -- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf()
 RETURNS cdb_geocoder_server._redis_conf_params AS $$
-    conf = plpy.execute("SELECT cdb_geocoder_server._config_get('redis_conf') conf")[0]['conf']
+    conf = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('redis_conf') conf")[0]['conf']
     if conf is None:
       plpy.error("There is no redis configuration defined")
     else:
