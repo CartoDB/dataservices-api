@@ -3,13 +3,15 @@ CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_address_point(user_config
   RETURNS Geometry
 AS $$
   import json
+  from cartodb_geocoder import confighelper
   from geocoderfactory import geocoderfactory
 
   # TODO: Check quota
 
   geocoder_config_json = json.loads(geocoder_config)
+  auth_dict = confighelper.GeocoderAuth(geocoder_config_json).get_auth_dict()
 
-  geocoder = geocoderfactory.Factory(geocoder_config_json['app_id'], geocoder_config_json['app_secret']).factory(geocoder_config_json['provider'])
+  geocoder = geocoderfactory.Factory(auth_dict['identifier'], auth_dict['secret']).factory(auth_dict['provider'])
   result = geocoder.geocode_address(searchtext=searchtext, city=city, state_province=state_province, country=country)[0]
   coordinates = geocoder.extract_lng_lat_from_result(result)
 
