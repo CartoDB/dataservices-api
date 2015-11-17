@@ -1,22 +1,6 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-# client_id = config['client_id']
-# client_secret = config['client_secret']
-
-# gmaps = googlemaps.Client(client_id=client_id, client_secret=client_secret)
-
-# arg = lambda x: (', ' + x) if x else ''
-
-# query = searchtext + arg(city) + arg(state_province) + arg(country)
-
-# geocode_result = gmaps.geocode(query)
-
-# lng = geocode_result[0]['geometry']['location']['lng']
-# lat = geocode_result[0]['geometry']['location']['lat']
-
-# coordinates = [lng, lat]
-
 import googlemaps
 
 from googlemapswrapperexceptions import MalformedResult
