@@ -12,7 +12,7 @@ REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_geocoder_client FROM PUBLIC, publi
 
 -- Explicitly grant permissions to public functions
 -- NOTE: All public functions must be listed below, grating permissions to publicuser
-GRANT EXECUTE ON FUNCTION cdb_geocoder_client.geocode_admin0_polygons(country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.geocode_admin0_polygon(country_name text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.geocode_admin1_polygon(admin1_name text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.geocode_admin1_polygon(admin1_name text, country_name text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.geocode_namedplace_point(city_name text) TO publicuser;
