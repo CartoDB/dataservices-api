@@ -9,18 +9,17 @@ GEOCODER_CLIENT_SCHEMA = 'cdb_geocoder_client'
 INTERFACE_SOURCE_FILE = 'interface.csv'
 
 class GrantExecute
-  TEMPLATE=<<-END
-GRANT EXECUTE ON FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= function_signature['function_name'] %>(<%= function_signature['argument_data_types'] %>) TO publicuser;
-END
+  TEMPLATE_FILE = 'templates/grant-execute.erb'
 
   attr_reader :function_signature
 
   def initialize(function_signature)
     @function_signature = function_signature
+    @template = File.read(TEMPLATE_FILE)
   end
 
   def render
-    ERB.new(TEMPLATE).result(binding)
+    ERB.new(@template).result(binding)
   end  
 end
 
