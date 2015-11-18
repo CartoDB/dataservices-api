@@ -14,3 +14,32 @@
   params:
     - { name: admin1_name,  type: text }
     - { name: country_name, type: text }
+
+- name: geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name, type: text}
+
+- name: geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: country_name, type: text}
+
+- name: geocode_postalcode_polygon
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: geocode_postalcode_point
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: geocode_ipaddress_point
+  return_type: Geometry
+  params:
+    - { name: ip_address,  type: text}
+
