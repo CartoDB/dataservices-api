@@ -1,0 +1,5 @@
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>._<%= signature['function_name'] %> (user_id name, tx_id bigint, <%= signature['argument_data_types'] %>)
+RETURNS Geometry AS $$
+  CONNECT <%= GEOCODER_CLIENT_SCHEMA %>._server_conn_str();
+  SELECT cdb_geocoder_server.<%= signature['function_name'] %> (user_id, tx_id, signature['argument_data_types']);
+$$ LANGUAGE plproxy;
