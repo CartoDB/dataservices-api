@@ -12,14 +12,29 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
+SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
-SOURCES_DATA = $(wildcard sql/$(EXTVERSION)/*.sql)
+# The interface definition is used along with some templates to automatically generate code
+RENDERER = ../sql-template-renderer
+INTERFACE_FILE = ../interface.csv
+TEMPLATE_DIR = templates
+TEMPLATE_FILES = $(wildcard $(TEMPLATE_DIR)/*.erb)
+GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sql, $(TEMPLATE_FILES))
+
+$(GENERATED_SQL_FILES): $(SOURCES_DATA_DIR)/%.sql: $(TEMPLATE_DIR)/%.erb $(INTERFACE_FILE) $(RENDERER)
+	$(RENDERER) $(INTERFACE_FILE) $< > $@
+
+all: $(GENERATED_SQL_FILES)
+	@echo $(GENERATED_SQL_FILES)
+
+
+SOURCES_DATA = $(wildcard $(SOURCES_DATA_DIR)/*.sql)
 
 $(DATA): $(SOURCES_DATA)
 	rm -f $@
 	cat $(SOURCES_DATA) >> $@
 
-all: $(DATA)
+#all: $(DATA)
 
 # Only meant for development time, do not use once a version is released
 devclean:
