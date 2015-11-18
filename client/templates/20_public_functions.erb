@@ -9,7 +9,7 @@ RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
 BEGIN
-  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._geocode_admin0_polygon(session_user, txid_current(), <%= params %>) INTO ret;
+  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(session_user, txid_current(), <%= params %>) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
