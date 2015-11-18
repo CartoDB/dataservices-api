@@ -1,0 +1,16 @@
+---
+- name: geocode_admin0_polygon
+  return_type: Geometry
+  params:
+    - { name: country_name, type: text }
+
+- name: geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name, type: text }
+
+- name: geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name,  type: text }
+    - { name: country_name, type: text }

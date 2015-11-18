@@ -16,7 +16,7 @@ SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
 # The interface definition is used along with some templates to automatically generate code
 RENDERER = ../sql-template-renderer
-INTERFACE_FILE = ../interface.csv
+INTERFACE_FILE = ../interface.yaml
 TEMPLATE_DIR = templates
 TEMPLATE_FILES = $(wildcard $(TEMPLATE_DIR)/*.erb)
 GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sql, $(TEMPLATE_FILES))
@@ -24,18 +24,15 @@ GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sq
 $(GENERATED_SQL_FILES): $(SOURCES_DATA_DIR)/%.sql: $(TEMPLATE_DIR)/%.erb $(INTERFACE_FILE) $(RENDERER)
 	$(RENDERER) $(INTERFACE_FILE) $< > $@
 
-all: $(GENERATED_SQL_FILES)
-	@echo $(GENERATED_SQL_FILES)
-
-
-SOURCES_DATA = $(wildcard $(SOURCES_DATA_DIR)/*.sql)
+SOURCES_DATA = $(wildcard $(SOURCES_DATA_DIR)/*.sql) $(GENERATED_SQL_FILES)
 
 $(DATA): $(SOURCES_DATA)
 	rm -f $@
-	cat $(SOURCES_DATA) >> $@
+	cat $(SOURCES_DATA_DIR)/*.sql >> $@
 
-#all: $(DATA)
+all: $(DATA)
 
 # Only meant for development time, do not use once a version is released
 devclean:
 	rm -f $(DATA)
+	rm -f $(GENERATED_SQL_FILES)

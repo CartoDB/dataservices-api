@@ -4,13 +4,12 @@
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= signature['function_name'] %> (<%= signature['argument_data_types'] %>)
-RETURNS <%= signature['result_data_type'] %> AS $$
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type %>)
+RETURNS <%= return_type %> AS $$
 DECLARE
-  ret <%= signature['result_data_type'] %>;
+  ret <%= return_type %>;
 BEGIN
-  -- TODO: this is to be changed according to the feature doc
-  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._geocode_admin0_polygon(session_user, txid_current(), <%= signature['argument_data_types'] %>) INTO ret;
+  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._geocode_admin0_polygon(session_user, txid_current(), <%= params %>) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

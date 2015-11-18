@@ -3,33 +3,52 @@
 # A script to automatically generate SQL files from an interface definition.
 # To be called like this: sql-template-renderer interface.csv templates/sql-template.erb
 
-require 'csv'
+require 'yaml'
 require 'erb'
 
 class SqlTemplateRenderer
 
   GEOCODER_CLIENT_SCHEMA = 'cdb_geocoder_client'
 
-  attr_reader :signature
-
-  def initialize(template_file, signature)
-    @signature = signature
+  def initialize(template_file, function_signature)
+    @f = function_signature
     @template = File.read(template_file)
   end
 
   def render
     ERB.new(@template).result(binding)
-  end  
+  end
+
+  def name
+    @f['name']
+  end
+
+  def return_type
+    @f['return_type']
+  end
+
+  def params
+    @f['params'].map { |p| p['name'] }.join(', ')
+  end
+
+  def params_with_type
+    @f['params'].map { |p| "#{p['name']} #{p['type']}"}.join(', ')
+  end
+
 end
 
+
 if ARGV.length != 2 then
-  puts "Usage: sql-template-renderer <interface.csv> <template.erb>"
+  puts "Usage: sql-template-renderer <interface.yaml> <template.erb>"
   exit
 end
 
 interface_source_file = ARGV[0]
 template_file = ARGV[1]
 
-CSV.foreach(interface_source_file, {headers: true}) do |function_signature|
-  puts SqlTemplateRenderer.new(template_file, function_signature).render
+
+functions = YAML.load(File.open(interface_source_file))
+
+functions.each do |f|
+  puts SqlTemplateRenderer.new(template_file, f).render
 end
