@@ -26,6 +26,14 @@
     - { name: city_name,    type: text}
     - { name: country_name, type: text}
 
+- name: geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: admin1_name,  type: text}
+    - { name: country_name, type: text}
+
+
 - name: geocode_postalcode_polygon
   return_type: Geometry
   params:
