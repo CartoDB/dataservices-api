@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # A script to automatically generate SQL files from an interface definition.
-# To be called like this: sql-template-renderer interface.csv templates/sql-template.erb
+# To be called like this: sql-template-renderer interface.yaml sql-template.erb
 
 require 'yaml'
 require 'erb'
