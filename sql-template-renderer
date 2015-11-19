@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # A script to automatically generate SQL files from an interface definition.
-# To be called like this: sql-template-renderer interface.csv templates/sql-template.erb
+# To be called like this: sql-template-renderer interface.yaml sql-template.erb
 
 require 'yaml'
 require 'erb'
@@ -11,7 +11,7 @@ class SqlTemplateRenderer
   GEOCODER_CLIENT_SCHEMA = 'cdb_geocoder_client'
 
   def initialize(template_file, function_signature)
-    @f = function_signature
+    @function_signature = function_signature
     @template = File.read(template_file)
   end
 
@@ -20,19 +20,19 @@ class SqlTemplateRenderer
   end
 
   def name
-    @f['name']
+    @function_signature['name']
   end
 
   def return_type
-    @f['return_type']
+    @function_signature['return_type']
   end
 
   def params
-    @f['params'].map { |p| p['name'] }.join(', ')
+    @function_signature['params'].map { |p| p['name'] }.join(', ')
   end
 
   def params_with_type
-    @f['params'].map { |p| "#{p['name']} #{p['type']}"}.join(', ')
+    @function_signature['params'].map { |p| "#{p['name']} #{p['type']}"}.join(', ')
   end
 
 end
