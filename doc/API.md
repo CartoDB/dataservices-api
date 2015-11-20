@@ -105,7 +105,7 @@ The following functions provide a city geocoder service. It is recommended to us
   *  `geocode_namedplace_point(city_name text)`
     * **Parameters**: 
         * Name: `city_name` Type: `text` Description: Name of the city
-    * **Return type:** `point` Description: Name of the country in which the city is located
+    * **Return type:** `point`
     * **Usage example:**
     
       SELECT
