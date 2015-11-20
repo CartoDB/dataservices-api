@@ -8,8 +8,12 @@ CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params
 RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
+  user_config JSON;
+  geocoder_config JSON;
 BEGIN
-  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(session_user, txid_current(), <%= params %>) INTO ret;
+  SELECT cartodb.CDB_Conf_GetConf('user_config') INTO user_config;
+  SELECT cartodb.CDB_Conf_GetConf('geocoder_config') INTO geocoder_config;
+  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(session_user, user_config, geocoder_config, <%= params %>) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

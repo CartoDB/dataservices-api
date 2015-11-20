@@ -1,8 +1,8 @@
 -- Mock the server function
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygon(user_id name, tx_id bigint, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.geocode_admin0_polygon(user_id name, user_config JSON, geocoder_config JSON, country_name text)
 RETURNS Geometry AS $$
 BEGIN
-  RAISE NOTICE 'cdb_geocoder_server.geocode_admin0_polygon invoked with params (%, %, %)', user_id, 'some_transaction_id', country_name;
+  RAISE NOTICE 'cdb_geocoder_server.geocode_admin0_polygon invoked with params (%, %, %, %)', user_id, '{"is_organization": false, "entity_name": "test_user"}', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 100, "nokia_soft_geocoder_limit": false}' , country_name;
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
