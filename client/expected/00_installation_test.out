@@ -13,6 +13,20 @@ SELECT cartodb.cdb_conf_setconf('geocoder_server_config', '{"connection_str": "d
  
 (1 row)
 
+-- Mock the user configuration
+SELECT cartodb.cdb_conf_setconf('user_config', '{"is_organization": false, "entity_name": "test_user"}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+-- Mock the geocoder configuration
+SELECT cartodb.cdb_conf_setconf('geocoder_config', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 100, "nokia_soft_geocoder_limit": false}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 -- Mock the server schema
 CREATE SCHEMA cdb_geocoder_server;
 -- Create a test user to check permissions
