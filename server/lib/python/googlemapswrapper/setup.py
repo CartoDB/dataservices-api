@@ -1,19 +1,18 @@
 """
-A Here Maps API Python wrapper
+A Google Maps wrapper for the CartoDB geocoder server PostgreSQL extension
 
 See:
-https://developer.here.com
 https://github.com/CartoDB/geocoder-api
 """
 
 from setuptools import setup, find_packages
 
 setup(
-    name='heremaps',
+    name='googlemapswrapper',
 
     version='0.0.1',
 
-    description='A Here Maps API Python wrapper',
+    description='A Google Maps wrapper for the CartoDB geocoder server PostgreSQL extension',
 
     url='https://github.com/CartoDB/geocoder-api',
 
