@@ -1,7 +1,7 @@
 -- Interfacess of the server extension
 
 ---- geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, tx_id bigint, city_name text)
+CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_namedplace_point(city_name text)')
     plpy.debug('user_id = %s' % user_id)
@@ -23,7 +23,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, tx_id bigint, city_name text, country_name text)
+CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_namedplace_point(city_name text, country_name text)')
     plpy.debug('user_id = %s' % user_id)
@@ -45,7 +45,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, tx_id bigint, city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_namedplace_point(city_name text, admin1_name text, country_name text)')
     plpy.debug('user_id = %s' % user_id)

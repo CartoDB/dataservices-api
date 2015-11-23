@@ -1,7 +1,7 @@
 -- Interfacess of the server extension
 
 ---- geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, tx_id bigint, admin1_name text)
+CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin1_polygon(admin1_name text)')
     plpy.debug('user_id = %s' % user_id)
@@ -23,7 +23,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, tx_id bigint, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin1_polygon(admin1_name text, country_name text)')
     plpy.debug('user_id = %s' % user_id)
