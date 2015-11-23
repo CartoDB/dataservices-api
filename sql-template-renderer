@@ -27,6 +27,14 @@ class SqlTemplateRenderer
     @function_signature['return_type']
   end
 
+  def user_config_key
+    @function_signature['user_config_key']
+  end
+
+  def geocoder_config_key
+    @function_signature['geocoder_config_key']
+  end
+
   def params
     @function_signature['params'].map { |p| p['name'] }.join(', ')
   end
