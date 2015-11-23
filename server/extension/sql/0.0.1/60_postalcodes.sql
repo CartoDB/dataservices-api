@@ -2,7 +2,7 @@
 
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id NAME, tx_id BIGINT, code text)
+CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
@@ -23,7 +23,7 @@ RETURNS Geometry AS $$
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id NAME, tx_id BIGINT, code text, country text)
+CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
@@ -44,7 +44,7 @@ RETURNS Geometry AS $$
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id NAME, tx_id BIGINT, code text)
+CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_polygon')
     plpy.debug('user_id = %s' % user_id)
@@ -65,7 +65,7 @@ RETURNS Geometry AS $$
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id NAME, tx_id BIGINT, code text, country text)
+CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)

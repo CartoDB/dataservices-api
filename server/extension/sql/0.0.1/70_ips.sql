@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION geocode_ip_point(user_id NAME, tx_id BIGINT, ip TEXT)
+CREATE OR REPLACE FUNCTION geocode_ip_point(user_id name, user_config json, geocoder_config json, ip text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_ip_point')
     plpy.debug('user_id = %s' % user_id)
@@ -26,7 +26,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION _geocode_ip_point(ip TEXT)
+CREATE OR REPLACE FUNCTION _geocode_ip_point(ip text)
 RETURNS Geometry AS $$
     DECLARE
         ret Geometry;

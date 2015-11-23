@@ -1,21 +1,21 @@
 -- Create a conf table
-SELECT cdb_geocoder_server._config_set('cds', '{"Manolo Escobar": {"El Limonero":"En stock", "Viva el vino":"Sin stock"}}');
- _config_set 
--------------
+SELECT cartodb.cdb_conf_setconf('cds', '{"Manolo Escobar": {"El Limonero":"En stock", "Viva el vino":"Sin stock"}}');
+ cdb_conf_setconf 
+------------------
  
 (1 row)
 
 -- Test key retrieval
-SELECT cdb_geocoder_server._config_get('cds');
-                                _config_get                                 
+SELECT cartodb.cdb_conf_getconf('cds');
+                              cdb_conf_getconf                              
 ----------------------------------------------------------------------------
  {"Manolo Escobar": {"El Limonero":"En stock", "Viva el vino":"Sin stock"}}
 (1 row)
 
 -- Test returns NULL if key doesn't exist
-SELECT cdb_geocoder_server._config_get('no existe');
- _config_get 
--------------
+SELECT cartodb.cdb_conf_getconf('no existe');
+ cdb_conf_getconf 
+------------------
  
 (1 row)
 
