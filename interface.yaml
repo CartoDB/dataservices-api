@@ -62,7 +62,7 @@
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
 
-- name: geocode_ip_point
+- name: geocode_ipaddress_point
   return_type: Geometry
   user_config_key: user_config
   geocoder_config_key: geocoder_config
