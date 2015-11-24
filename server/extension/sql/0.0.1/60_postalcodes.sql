@@ -1,68 +1,66 @@
--- TODO geocode_postalcode_polygon(code text, country text)
-
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering _geocode_postalcode_point')
+    plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_postalcode_point($1) AS point", ["text"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1) AS point", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
-    plpy.debug('Returning from _geocode_postalcode_point')
+    plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(user_id name, user_config json, geocoder_config json, code text, country text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering _geocode_postalcode_point')
+    plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
-    plpy.debug('Returning from _geocode_postalcode_point')
+    plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering _geocode_postalcode_polygon')
+    plpy.debug('Entering _cdb_geocode_postalcode_polygon')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_postalcode_polygon($1) AS polygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1) AS polygon", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
-    plpy.debug('Returning from _geocode_postalcode_polygon')
+    plpy.debug('Returning from _cdb_geocode_postalcode_polygon')
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(user_id name, user_config json, geocoder_config json, code text, country text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering _geocode_postalcode_point')
+    plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
-    plpy.debug('Returning from _geocode_postalcode_point')
+    plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
@@ -71,7 +69,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION _geocode_postalcode_point(code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -92,7 +90,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION _geocode_postalcode_point(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -117,7 +115,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION _geocode_postalcode_polygon(code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -138,7 +136,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION _geocode_postalcode_polygon(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;

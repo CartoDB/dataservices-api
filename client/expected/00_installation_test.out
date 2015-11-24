@@ -33,3 +33,4 @@ CREATE SCHEMA cdb_geocoder_server;
 DROP ROLE IF EXISTS test_regular_user;
 CREATE ROLE test_regular_user;
 GRANT publicuser TO test_regular_user;
+ALTER ROLE test_regular_user SET search_path TO "$user",public,cartodb,cdb_geocoder_client;
