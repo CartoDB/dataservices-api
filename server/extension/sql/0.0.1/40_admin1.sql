@@ -1,36 +1,36 @@
 -- Interfacess of the server extension
 
----- geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text)
+---- cdb_geocode_admin1_polygon(admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering geocode_admin1_polygon(admin1_name text)')
+    plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text)')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_admin1_polygon($1) AS mypolygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin1_polygon($1) AS mypolygon", ["text"])
     rv = plpy.execute(plan, [admin1_name], 1)
 
-    plpy.debug('Returning from Returning from geocode_admin1_polygons')
+    plpy.debug('Returning from Returning from cdb_geocode_admin1_polygons')
     return rv[0]["mypolygon"]
 $$ LANGUAGE plpythonu;
 
----- geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text, country_name text)
+---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(user_id name, user_config json, geocoder_config json, admin1_name text, country_name text)
 RETURNS Geometry AS $$
-    plpy.debug('Entering geocode_admin1_polygon(admin1_name text, country_name text)')
+    plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
     plpy.debug('user_id = %s' % user_id)
 
     #--TODO: rate limiting check
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._geocode_admin1_polygon($1, $2) AS mypolygon", ["text", "text"])
+    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin1_polygon($1, $2) AS mypolygon", ["text", "text"])
     rv = plpy.execute(plan, [admin1_name, country_name], 1)
 
-    plpy.debug('Returning from Returning from geocode_admin1_polygon(admin1_name text, country_name text)')
+    plpy.debug('Returning from Returning from cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
     return rv[0]["mypolygon"]
 $$ LANGUAGE plpythonu;
 
@@ -39,8 +39,8 @@ $$ LANGUAGE plpythonu;
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
 
----- geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION _geocode_admin1_polygon(admin1_name text)
+---- cdb_geocode_admin1_polygon(admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin1_polygon(admin1_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -63,8 +63,8 @@ RETURNS Geometry AS $$
   END
 $$ LANGUAGE plpgsql;
 
----- geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION _geocode_admin1_polygon(admin1_name text, country_name text)
+---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
