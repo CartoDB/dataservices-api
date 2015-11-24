@@ -7,11 +7,6 @@ RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
 
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
-
     #--TODO: rate limiting check
     #--TODO: quota check
 
@@ -27,11 +22,6 @@ CREATE OR REPLACE FUNCTION geocode_postalcode_point(user_id name, user_config js
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
-
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
 
     #--TODO: rate limiting check
     #--TODO: quota check
@@ -49,11 +39,6 @@ RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_polygon')
     plpy.debug('user_id = %s' % user_id)
 
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
-
     #--TODO: rate limiting check
     #--TODO: quota check
 
@@ -69,11 +54,6 @@ CREATE OR REPLACE FUNCTION geocode_postalcode_polygon(user_id name, user_config 
 RETURNS Geometry AS $$
     plpy.debug('Entering _geocode_postalcode_point')
     plpy.debug('user_id = %s' % user_id)
-
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
 
     #--TODO: rate limiting check
     #--TODO: quota check
