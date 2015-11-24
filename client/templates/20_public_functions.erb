@@ -11,6 +11,9 @@ DECLARE
   user_config json;
   geocoder_config json;
 BEGIN
+  IF session_user = 'publicuser' THEN
+    RAISE EXCEPTION 'The api_key must be provided';
+  END IF;
   SELECT cartodb.CDB_Conf_GetConf('<%= user_config_key %>') INTO user_config;
   SELECT cartodb.CDB_Conf_GetConf('<%= geocoder_config_key %>') INTO geocoder_config;
   SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(session_user, user_config, geocoder_config, <%= params %>) INTO ret;

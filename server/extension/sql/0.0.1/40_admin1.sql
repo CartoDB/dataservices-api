@@ -6,11 +6,6 @@ RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin1_polygon(admin1_name text)')
     plpy.debug('user_id = %s' % user_id)
 
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
-
     #--TODO: rate limiting check
     #--TODO: quota check
 
@@ -27,11 +22,6 @@ CREATE OR REPLACE FUNCTION geocode_admin1_polygon(user_id name, user_config json
 RETURNS Geometry AS $$
     plpy.debug('Entering geocode_admin1_polygon(admin1_name text, country_name text)')
     plpy.debug('user_id = %s' % user_id)
-
-    #-- Access control
-    #-- TODO: this should be part of cdb python library
-    if user_id == 'publicuser':
-        plpy.error('The api_key must be provided')
 
     #--TODO: rate limiting check
     #--TODO: quota check
