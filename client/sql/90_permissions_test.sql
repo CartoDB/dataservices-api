@@ -2,7 +2,7 @@
 SET ROLE test_regular_user;
 
 -- Add to the search path the schema
-SET search_path TO "$user",public,cartodb,cdb_geocoder_client;
+SET search_path TO public,cartodb,cdb_geocoder_client;
 
 -- Exercise the public function
 -- it is public, it shall work

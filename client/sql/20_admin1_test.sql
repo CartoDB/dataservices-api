@@ -1,5 +1,5 @@
 -- Add to the search path the schema
-SET search_path TO "$user",public,cartodb,cdb_geocoder_client;
+SET search_path TO public,cartodb,cdb_geocoder_client;
 
 -- Mock the server functions
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(user_id name, user_config JSON, geocoder_config JSON, admin1_name text)
