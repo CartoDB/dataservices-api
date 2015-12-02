@@ -23,13 +23,13 @@ Geometry (polygon)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_admin0_polygon('France')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
     ```
 
@@ -54,13 +54,13 @@ Geometry (polygon)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
     ```
 
@@ -81,13 +81,13 @@ polygon
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
     ```
 
@@ -112,13 +112,13 @@ Geometry (point)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_namedplace_point('Barcelona')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
     ```
 
@@ -139,13 +139,13 @@ Geometry (point)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
     ```
 
@@ -167,13 +167,13 @@ Geometry (point)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'Spain')
     ```
 
@@ -198,13 +198,13 @@ Geometry (polygon)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'Spain')
     ```
 
@@ -227,13 +227,13 @@ Geometry (point)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_postalcode_point('11211', 'USA')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'United States')
     ```
 
@@ -258,12 +258,12 @@ Geometry (point)
 
 - **Select**
 
-    ```
+    ```sql
     SELECT cdb_geocode_ipaddress_point('102.23.34.1')
     ```
 
 - **Update**
 
-    ```
+    ```sql
     UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
     ```
