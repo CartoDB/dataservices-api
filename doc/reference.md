@@ -23,15 +23,15 @@ Geometry (polygon)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_admin0_polygon('France')
-    ```
+```sql
+SELECT cdb_geocode_admin0_polygon('France')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
-    ```
+```sql
+UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
+```
 
 
 ## Level-1 Administrative regions geocoder
@@ -54,15 +54,15 @@ Geometry (polygon)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
-    ```
+```sql
+SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
+```
 
 ### cdb_geocode_admin1_polygon(admin1_name text, country_name text_)
 
@@ -81,15 +81,15 @@ polygon
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
-    ```
+```sql
+SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
+```
 
 
 ## City geocoder
@@ -112,15 +112,15 @@ Geometry (point)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_namedplace_point('Barcelona')
-    ```
+```sql
+SELECT cdb_geocode_namedplace_point('Barcelona')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
+```
 
 ### cdb_geocode_namedplace_point(_city_name text, country_name text_)
 
@@ -139,15 +139,15 @@ Geometry (point)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
-    ```
+```sql
+SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
+```
 
 ### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
@@ -167,15 +167,15 @@ Geometry (point)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
-    ```
+```sql
+SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'Spain')
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'Spain')
+```
 
 ## Postal codes geocoder
 
@@ -198,15 +198,15 @@ Geometry (polygon)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
-    ```
+```sql
+SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'Spain')
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'Spain')
+```
 
 **Note:** For the USA, US Census ZCTAs are considered.
 
@@ -227,15 +227,15 @@ Geometry (point)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_postalcode_point('11211', 'USA')
-    ```
+```sql
+SELECT cdb_geocode_postalcode_point('11211', 'USA')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'United States')
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'United States')
+```
 
 ## IP addresses Geocoder
 
@@ -258,12 +258,12 @@ Geometry (point)
 
 - **Select**
 
-    ```sql
-    SELECT cdb_geocode_ipaddress_point('102.23.34.1')
-    ```
+```sql
+SELECT cdb_geocode_ipaddress_point('102.23.34.1')
+```
 
 - **Update**
 
-    ```sql
-    UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
-    ```
+```sql
+UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
+```
