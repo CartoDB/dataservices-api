@@ -8,11 +8,11 @@ The geometries provided by this API are projected in the projection [WGS 84 SRID
 
 The Geocoder API can return different types of geometries (points or polygons) as result of different geocoding processes. The CartoDB platform does not support multigeometry layers or datasets, therefore the final users of this Geocoder API must check that they are using consistent geometry types inside a table to avoid further conflicts in the map visualization.
 
-#### Authentication
+## Authentication
 
 All requests performed to the CartoDB Geocoder API must be authenticated with the user API Key. For more information about where to find your API Key, and how to authenticate your SQL API requests, view the [SQL API authentication](/cartodb-platform/sql-api/authentication/) guide.
 
-#### Errors
+## Errors
 
 Errors are described in the response of the geocoder request. An example is as follows:
 
@@ -28,6 +28,6 @@ Since the Geocoder API is used on top of the CartoDB SQL API, you can refer to t
 
 If the requested information is not in the CartoDB geocoding database, or if CartoDB is unable to recognize your input and match it with a result, the geocoding function returns `null` as a result.
 
-#### Limits
+## Limits
 
 Usage of the Geocoder API is subject to the CartoDB SQL API limits, stated in our [Terms of Service](https://cartodb.com/terms/#excessive).
