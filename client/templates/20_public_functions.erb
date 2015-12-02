@@ -13,7 +13,10 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT _CDB_username() INTO username;
+  SELECT _cdb_username() INTO username;
+  IF username IS NULL OR username = '' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
   SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(username, <%= params %>) INTO ret;
   RETURN ret;
 END;
