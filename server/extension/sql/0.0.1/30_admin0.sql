@@ -1,9 +1,9 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin0_polygon(user_id name, user_config_data JSON, geocoder_config_data JSON, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin0_polygon(username text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin0_polygons')
-    plpy.debug('user_id = %s' % user_id)
+    plpy.debug('user = %s' % username)
 
     #--TODO: rate limiting check
     #--TODO: quota check

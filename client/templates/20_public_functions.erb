@@ -8,15 +8,13 @@ CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params
 RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
-  user_config json;
-  geocoder_config json;
+  username text;
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT cartodb.CDB_Conf_GetConf('<%= user_config_key %>') INTO user_config;
-  SELECT cartodb.CDB_Conf_GetConf('<%= geocoder_config_key %>') INTO geocoder_config;
-  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(session_user, user_config, geocoder_config, <%= params %>) INTO ret;
+  SELECT _CDB_username() INTO username;
+  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(username, <%= params %>) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

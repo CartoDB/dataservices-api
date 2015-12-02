@@ -1,6 +1,6 @@
-CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %> (user_id name, user_config json, geocoder_config json, <%= params_with_type %>)
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %> (username text, <%= params_with_type %>)
 RETURNS <%= return_type %> AS $$
   CONNECT <%= GEOCODER_CLIENT_SCHEMA %>._server_conn_str();
-  SELECT cdb_geocoder_server.<%= name %> (user_id, user_config, geocoder_config, <%= params %>);
+  SELECT cdb_geocoder_server.<%= name %> (username, <%= params %>);
 $$ LANGUAGE plproxy;
 

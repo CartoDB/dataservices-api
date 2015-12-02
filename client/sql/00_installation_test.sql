@@ -12,8 +12,6 @@ CREATE EXTENSION cdb_geocoder_client;
 SELECT cartodb.cdb_conf_setconf('geocoder_server_config', '{"connection_str": "dbname=contrib_regression host=127.0.0.1 user=postgres"}');
 -- Mock the user configuration
 SELECT cartodb.cdb_conf_setconf('user_config', '{"is_organization": false, "entity_name": "test_user"}');
--- Mock the geocoder configuration
-SELECT cartodb.cdb_conf_setconf('geocoder_config', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 100, "nokia_soft_geocoder_limit": false}');
 
 -- Mock the server schema
 CREATE SCHEMA cdb_geocoder_server;

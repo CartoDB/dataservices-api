@@ -1,10 +1,10 @@
 -- Interfacess of the server extension
 
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, city_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text)')
-    plpy.debug('user_id = %s' % user_id)
+    plpy.debug('user = %s' % username)
 
     #--TODO: rate limiting check
     #--TODO: quota check
@@ -18,10 +18,10 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, city_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, country_name text)')
-    plpy.debug('user_id = %s' % user_id)
+    plpy.debug('user = %s' % username)
 
     #--TODO: rate limiting check
     #--TODO: quota check
@@ -35,10 +35,10 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(user_id name, user_config json, geocoder_config json, city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)')
-    plpy.debug('user_id = %s' % user_id)
+    plpy.debug('user = %s' % username)
 
     #--TODO: rate limiting check
     #--TODO: quota check
