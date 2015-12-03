@@ -1,7 +1,7 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon(session_user, '{"is_organization": false, "entity_name": "test_user"}', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 100, "nokia_soft_geocoder_limit": false}', 'California');
-SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon(session_user, '{"is_organization": false, "entity_name": "test_user"}', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 100, "nokia_soft_geocoder_limit": false}', 'California', 'United States');
+SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon('test_user', 'test_orgname', 'California');
+SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon('test_user', 'test_orgname', 'California', 'United States');
 
 -- Insert dummy data into country decoder table
 INSERT INTO country_decoder (synonyms, iso3) VALUES (Array['united states'], 'USA');
@@ -15,8 +15,8 @@ INSERT INTO global_province_polygons (synonyms, iso3, the_geom) VALUES (Array['c
 );
 
 -- This should return the polygon inserted above
-SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon(session_user, '{"is_organization": false, "entity_name": "test_user"}', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 0, "nokia_soft_geocoder_limit": false}', 'California');
-SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon(session_user, '{"is_organization": false, "entity_name": "test_user"}', '{"street_geocoder_provider": "nokia","nokia_monthly_quota": 0, "nokia_soft_geocoder_limit": false}', 'California', 'United States');
+SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon('test_user', 'test_orgname', 'California');
+SELECT cdb_geocoder_server.cdb_geocode_admin1_polygon('test_user', 'test_orgname', 'California', 'United States');
 
 -- Check for admin1 signatures
 SELECT exists(SELECT *
@@ -24,14 +24,14 @@ SELECT exists(SELECT *
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_geocoder_server'
               AND proname = 'cdb_geocode_admin1_polygon'
-              AND oidvectortypes(p.proargtypes)  = 'name, json, json, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text');
 
 SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_geocoder_server'
               AND proname = 'cdb_geocode_admin1_polygon'
-              AND oidvectortypes(p.proargtypes)  = 'name, json, json, text, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
 
 SELECT exists(SELECT *
               FROM pg_proc p
