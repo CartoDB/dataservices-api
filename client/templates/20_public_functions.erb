@@ -9,15 +9,17 @@ RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
   username text;
+  orgname text;
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT _cdb_username() INTO username;
-  IF username IS NULL OR username = '' THEN
+  SELECT u, o INTO username, orgname FROM _cdb_entity_config() AS (u text, o text);
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(username, <%= params %>) INTO ret;
+  SELECT <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

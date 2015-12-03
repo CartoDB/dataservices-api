@@ -1,15 +1,21 @@
+CREATE TYPE cdb_geocoder_client._entity_config AS (
+    username text,
+    organization_name text
+);
+
 --
--- Get username function
+-- Get entity config function
 --
--- The purpose of this function is to retrieve the username from
+-- The purpose of this function is to retrieve the username and organization name from
 -- a) schema where he/her is the owner in case is an organization user
 -- b) entity_name from the cdb_conf database in case is a non organization user
-
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_username()
-RETURNS text AS $$
+CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_entity_config()
+RETURNS record AS $$
 DECLARE
-  is_organization boolean;
-  username text;
+    result cdb_geocoder_client._entity_config;
+    is_organization boolean;
+    username text;
+    organization_name text;
 BEGIN
     SELECT cartodb.cdb_conf_getconf('user_config')->'is_organization' INTO is_organization;
     IF is_organization IS NULL THEN
@@ -19,9 +25,13 @@ BEGIN
         FROM pg_namespace s
         LEFT JOIN pg_roles r ON s.nspowner = r.oid
         WHERE r.rolname = session_user INTO username;
+        SELECT cartodb.cdb_conf_getconf('user_config')->'entity_name' INTO organization_name;
     ELSE
-        SELECT cartodb.cdb_conf_getconf('user_config')::json->'entity_name' INTO username;
+        SELECT cartodb.cdb_conf_getconf('user_config')->'entity_name' INTO username;
+        organization_name = NULL;
     END IF;
-    RETURN username;
+    result.username = username;
+    result.organization_name = organization_name;
+    RETURN result;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

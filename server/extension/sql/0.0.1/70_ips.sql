@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_ipaddress_point(username text, ip text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_ipaddress_point')
     plpy.debug('user = %s' % username)

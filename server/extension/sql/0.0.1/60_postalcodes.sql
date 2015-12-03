@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -16,7 +16,7 @@ RETURNS Geometry AS $$
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -32,7 +32,7 @@ RETURNS Geometry AS $$
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, code text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_polygon')
     plpy.debug('user = %s' % username)
@@ -48,7 +48,7 @@ RETURNS Geometry AS $$
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)

@@ -1,7 +1,7 @@
 -- Interfacess of the server extension
 
 ---- cdb_geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text)')
     plpy.debug('user = %s' % username)
@@ -18,7 +18,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
     plpy.debug('user = %s' % username)
