@@ -13,7 +13,7 @@ This function provides a country geocoding service. It recognizes the names of t
 
 Name | Type | Description
 --- | --- | ---
-`cdb_geocode_admin0_polygon(country_name text)` | `text` | Name of the country
+`country_name` | `text` | Name of the country
 
 #### Returns
 
@@ -38,7 +38,7 @@ UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
 
 The following functions provide a geocoding service for administrative regions of level 1 (or NUTS-1) such as states for the United States, regions in France or autonomous communities in Spain.
 
-### cdb_geocode_admin1_polygon(admin1_name text_)
+### cdb_geocode_admin1_polygon(_admin1_name text_)
 
 #### Arguments
 
@@ -64,7 +64,7 @@ SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
 ```
 
-### cdb_geocode_admin1_polygon(admin1_name text, country_name text_)
+### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
 
 #### Arguments
 
@@ -75,7 +75,7 @@ Name | Type | Description
 
 #### Returns
 
-polygon
+Geometry (polygon)
 
 #### Example
 
@@ -102,7 +102,7 @@ The following functions provide a city geocoder service. It is recommended to us
 
 Name | Type | Description
 --- | --- | ---
-`cdb_geocode_namedplace_point(city_name text)` | `text` | Name of the city
+`city_name` | `text` | Name of the city
 
 #### Returns
 
