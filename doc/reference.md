@@ -17,7 +17,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
@@ -48,7 +48,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
@@ -75,7 +75,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
@@ -106,7 +106,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
@@ -133,7 +133,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
@@ -161,7 +161,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
@@ -192,7 +192,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
@@ -221,7 +221,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
@@ -252,7 +252,7 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
