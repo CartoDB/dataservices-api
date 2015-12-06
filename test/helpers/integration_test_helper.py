@@ -2,6 +2,7 @@ import os
 import requests
 import json
 
+
 class IntegrationTestHelper:
 
     @classmethod
@@ -20,11 +21,11 @@ class IntegrationTestHelper:
 
     @classmethod
     def execute_query(cls, sql_api_url, query):
-        query_url = "{0}&q={1}".format(sql_api_url, query)
+        query_url = "{0}?q={1}".format(sql_api_url, query)
         print "Executing query: {0}".format(query_url)
         query_response = requests.get(query_url)
         if query_response.status_code != 200:
-            raise Exception("Error executing SQL API query")
+            raise Exception(json.loads(query_response.text)['error'])
         query_response_data = json.loads(query_response.text)
 
         return query_response_data['rows'][0]['geometry']
