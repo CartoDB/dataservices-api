@@ -44,9 +44,9 @@ def usage():
 
 
 def import_test_dataset(username, api_key, host):
-    url = "https://{0}.{1}/api/v1/imports/?api_key={2}".format(
-        username, host, api_key
-    )
+    url = "https://{0}.{1}/api/v1/imports/"\
+        "?type_guessing=false&api_key={2}".format(
+        username, host, api_key)
     dataset = {'file': open('fixtures/geocoder_api_test_dataset.csv', 'rb')}
     response = requests.post(url, files=dataset)
     response_json = json.loads(response.text)
