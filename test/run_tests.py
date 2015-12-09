@@ -48,10 +48,8 @@ def usage():
 
 
 def execute_tests():
-    print "Start testing..."
     process = subprocess.Popen(["nosetests", "--where=integration/"])
     process.wait()
-    print "Testing finished!"
 
 
 def set_environment_variables(username, api_key, table_name, host):
@@ -62,7 +60,6 @@ def set_environment_variables(username, api_key, table_name, host):
 
 
 def clean_environment_variables():
-    print "Cleaning test dataset environment variables..."
     del os.environ["GEOCODER_API_TEST_USERNAME"]
     del os.environ["GEOCODER_API_TEST_API_KEY"]
     del os.environ["GEOCODER_API_TEST_TABLE_NAME"]
@@ -70,7 +67,6 @@ def clean_environment_variables():
 
 
 def clean_test_dataset(username, api_key, table_name, host):
-    print "Cleaning test dataset {0}...".format(table_name)
     url = "https://{0}.{1}/api/v2/sql?q=drop table {2}&api_key={3}".format(
         username, host, table_name, api_key
     )
