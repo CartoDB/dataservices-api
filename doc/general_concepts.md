@@ -19,7 +19,7 @@ Errors are described in the response of the geocoder request. An example is as f
 ```json
 {
   error: [
-    "function cdb_geocode_countries(text) does not exist"
+    "The api_key must be provided"
   ]
 }
 ```
