@@ -3,6 +3,7 @@ import sys
 import time
 import subprocess
 import os
+import re
 from helpers.import_helper import ImportHelper
 
 
@@ -46,8 +47,16 @@ def usage():
 
 
 def execute_tests():
-    process = subprocess.Popen(["nosetests", "--where=integration/"])
-    process.wait()
+    process = subprocess.Popen(
+        ["nosetests", "--where=integration/"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    out, err = process.communicate()
+    print err
+    regexp = re.compile(r'FAILED \(.*\)')
+    if regexp.search(err) is not None:
+        sys.exit(1)
 
 
 def set_environment_variables(username, api_key, table_name, host):
