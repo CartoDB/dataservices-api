@@ -4,13 +4,14 @@ import json
 
 import time
 
+
 class ImportHelper:
 
     @classmethod
     def import_test_dataset(cls, username, api_key, host):
         requests.packages.urllib3.disable_warnings()
         url = "https://{0}.{1}/api/v1/imports/"\
-            "?type_guessing=false&api_key={2}".format(
+            "?type_guessing=false&privacy=public&api_key={2}".format(
             username, host, api_key)
         dataset = {
             'file': open('fixtures/geocoder_api_test_dataset.csv', 'rb')}
