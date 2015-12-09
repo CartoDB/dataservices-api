@@ -13,21 +13,21 @@ This function provides a country geocoding service. It recognizes the names of t
 
 Name | Type | Description
 --- | --- | ---
-`cdb_geocode_admin0_polygon(country_name text)` | `text` | Name of the country
+`country_name` | `text` | Name of the country
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_admin0_polygon('France')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
@@ -38,7 +38,7 @@ UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
 
 The following functions provide a geocoding service for administrative regions of level 1 (or NUTS-1) such as states for the United States, regions in France or autonomous communities in Spain.
 
-### cdb_geocode_admin1_polygon(admin1_name text_)
+### cdb_geocode_admin1_polygon(_admin1_name text_)
 
 #### Arguments
 
@@ -48,23 +48,23 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
 ```
 
-### cdb_geocode_admin1_polygon(admin1_name text, country_name text_)
+### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
 
 #### Arguments
 
@@ -75,17 +75,17 @@ Name | Type | Description
 
 #### Returns
 
-polygon
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
@@ -102,21 +102,21 @@ The following functions provide a city geocoder service. It is recommended to us
 
 Name | Type | Description
 --- | --- | ---
-`cdb_geocode_namedplace_point(city_name text)` | `text` | Name of the city
+`city_name` | `text` | Name of the city
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_namedplace_point('Barcelona')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
@@ -133,17 +133,17 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
@@ -161,17 +161,17 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'Spain')
@@ -192,17 +192,17 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (polygon)
+Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'Spain')
@@ -221,17 +221,17 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_postalcode_point('11211', 'USA')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'United States')
@@ -252,17 +252,17 @@ Name | Type | Description
 
 #### Returns
 
-Geometry (point)
+Geometry (point, EPSG 4326) or null
 
 #### Example
 
-- **Select**
+##### Select
 
 ```sql
 SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 
-- **Update**
+##### Update
 
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
