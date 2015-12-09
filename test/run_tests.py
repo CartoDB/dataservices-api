@@ -1,8 +1,6 @@
 import getopt
 import sys
-import requests
 import time
-import json
 import subprocess
 import os
 from helpers.import_helper import ImportHelper
@@ -37,7 +35,7 @@ def main():
         sys.exit(1)
     finally:
         clean_environment_variables()
-        clean_test_dataset(username, api_key, table_name, host)
+        ImportHelper.clean_test_dataset(username, api_key, table_name, host)
 
 
 def usage():
@@ -64,16 +62,6 @@ def clean_environment_variables():
     del os.environ["GEOCODER_API_TEST_API_KEY"]
     del os.environ["GEOCODER_API_TEST_TABLE_NAME"]
     del os.environ["GEOCODER_API_TEST_HOST"]
-
-
-def clean_test_dataset(username, api_key, table_name, host):
-    url = "https://{0}.{1}/api/v2/sql?q=drop table {2}&api_key={3}".format(
-        username, host, table_name, api_key
-    )
-    response = requests.get(url)
-    if response.status_code != 200:
-        print "Error cleaning the test dataset: {0}".format(response.text)
-        sys.exit(1)
 
 if __name__ == "__main__":
     main()

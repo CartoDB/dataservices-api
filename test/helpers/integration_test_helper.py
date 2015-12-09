@@ -21,6 +21,7 @@ class IntegrationTestHelper:
 
     @classmethod
     def execute_query(cls, sql_api_url, query):
+        requests.packages.urllib3.disable_warnings()
         query_url = "{0}?q={1}".format(sql_api_url, query)
         print "Executing query: {0}".format(query_url)
         query_response = requests.get(query_url)
