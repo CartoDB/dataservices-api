@@ -30,8 +30,6 @@ sudo PGUSER=postgres make all install installcheck
 
 ## Install onto a cartodb user's database
 
-Remember that **is mandatory to install it on top of cdb_geocoder**
-
 ```
 psql -U postgres cartodb_dev_user_fe3b850a-01c0-48f9-8a26-a82f09e9b53f_db
 ```
