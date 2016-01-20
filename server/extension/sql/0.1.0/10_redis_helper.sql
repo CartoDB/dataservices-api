@@ -1,4 +1,5 @@
 -- Get the Redis configuration from the _conf table --
+DROP FUNCTION IF EXISTS cdb_geocoder_server._get_redis_conf();
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf(config_key text)
 RETURNS cdb_geocoder_server._redis_conf_params AS $$
     conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(config_key)
@@ -20,7 +21,8 @@ $$ LANGUAGE plpythonu;
 -- Get the connection to redis from cache or create a new one
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
-  if user_id in GD and 'redis_connection' in GD[user_id]:
+  cache_key = "redis_connection_{0}".format(user_id)
+  if cache_key in GD:
     return False
   else:
     from cartodb_geocoder import redis_helper
@@ -40,7 +42,7 @@ RETURNS boolean AS $$
         metrics_config_params['sentinel_master_id'],
         timeout=metrics_config_params['timeout'],
         redis_db=metrics_config_params['redis_db']).redis_connection()
-    GD[user_id] = {
+    GD[cache_key] = {
       'redis_metadata_connection': redis_metadata_connection,
       'redis_metrics_connection': redis_metrics_connection,
     }
