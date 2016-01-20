@@ -1,6 +1,6 @@
 # cdb geocoder server extension
 comment = 'CartoDB server geocoder extension'
-default_version = '0.0.1'
+default_version = '0.1.0'
 requires = 'plpythonu, postgis, cdb_geocoder'
 superuser = true
 schema = cdb_geocoder_server
