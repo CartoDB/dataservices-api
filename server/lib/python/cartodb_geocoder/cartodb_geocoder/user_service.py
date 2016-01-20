@@ -1,64 +1,96 @@
-import redis_helper
-from datetime import date
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+
 
 class UserService:
-  """ Class to manage all the user info """
+    """ Class to manage all the user info """
 
-  GEOCODING_QUOTA_KEY = "geocoding_quota"
-  GEOCODING_SOFT_LIMIT_KEY = "soft_geocoder_limit"
+    SERVICE_GEOCODER_NOKIA = 'geocoder_here'
+    SERVICE_GEOCODER_GOOGLE = 'geocoder_google'
+    SERVICE_GEOCODER_CACHE = 'geocoder_cache'
 
-  REDIS_CONNECTION_KEY = "redis_connection"
-  REDIS_CONNECTION_HOST = "redis_host"
-  REDIS_CONNECTION_PORT = "redis_port"
-  REDIS_CONNECTION_DB = "redis_db"
+    GEOCODING_QUOTA_KEY = "geocoding_quota"
+    GEOCODING_SOFT_LIMIT_KEY = "soft_geocoder_limit"
 
-  def __init__(self, user_config, service_type, redis_connection):
-    self.user_config = user_config
-    self.service_type = service_type
-    self._redis_connection = redis_connection
+    REDIS_CONNECTION_KEY = "redis_connection"
+    REDIS_CONNECTION_HOST = "redis_host"
+    REDIS_CONNECTION_PORT = "redis_port"
+    REDIS_CONNECTION_DB = "redis_db"
 
-  def used_quota(self, service_type, year, month, day=None):
-      """ Recover the used quota for the user in the current month """
-      redis_key_data = self.__get_redis_key(service_type, year, month, day)
-      current_use = self._redis_connection.hget(redis_key_data['redis_name'], redis_key_data['redis_key'])
-      return int(current_use) if current_use else 0
+    def __init__(self, user_geocoder_config, redis_connection, username, orgname=None):
+        self._user_geocoder_config = user_geocoder_config
+        self._redis_connection = redis_connection
+        self._username = username
+        self._orgname = orgname
 
-  def increment_service_use(self, service_type, date=date.today(), amount=1):
-      """ Increment the services uses in monthly and daily basis"""
-      self.__increment_monthly_uses(date, service_type, amount)
-      self.__increment_daily_uses(date, service_type, amount)
+    def used_quota(self, service_type, date):
+        """ Recover the used quota for the user in the current month """
+        date_from, date_to = self.__current_billing_cycle()
+        current_use = 0
+        success_responses = self.__get_metrics(service_type,
+                                               'success_responses', date_from,
+                                               date_to)
+        empty_responses = self.__get_metrics(service_type,
+                                             'empty_responses', date_from,
+                                             date_to)
+        current_use += (success_responses + empty_responses)
+        if service_type == self.SERVICE_GEOCODER_NOKIA:
+            cache_hits = self.__get_metrics(self.SERVICE_GEOCODER_CACHE,
+                                            'success_responses', date_from,
+                                            date_to)
+            current_use += cache_hits
 
-  # Private functions
+        return current_use
 
-  def __increment_monthly_uses(self, date, service_type, amount):
-    redis_key_data = self.__get_redis_key(service_type, date.year, date.month)
-    self._redis_connection.hincrby(redis_key_data['redis_name'],redis_key_data['redis_key'],amount)
+    def increment_service_use(self, service_type, metric, date=date.today(), amount=1):
+        """ Increment the services uses in monthly and daily basis"""
+        self.__increment_user_uses(service_type, metric, date, amount)
+        if self._orgname:
+            self.__increment_organization_uses(service_type, metric, date, amount)
 
-  def __increment_daily_uses(self, date, service_type, amount):
-    redis_key_data = self.__get_redis_key(service_type, date.year, date.month, date.day)
-    self._redis_connection.hincrby(redis_key_data['redis_name'],redis_key_data['redis_key'],amount)
+    # Private functions
 
-  def __get_redis_key(self, service_type, year, month, day=None):
-    redis_name = self.__parse_redis_name(service_type,day)
-    redis_key = self.__parse_redis_key(year,month,day)
+    def __increment_user_uses(self, service_type, metric, date, amount):
+        redis_prefix = self.__parse_redis_prefix("user", self._username,
+                                                 service_type, metric, date)
+        self._redis_connection.hincrby(redis_prefix, date.day, amount)
 
-    return {'redis_name': redis_name, 'redis_key': redis_key}
+    def __increment_organization_uses(self, service_type, metric, date, amount):
+        redis_prefix = self.__parse_redis_prefix("org", self._orgname,
+                                                 service_type, metric, date)
+        self._redis_connection.hincrby(redis_prefix, date.day, amount)
 
-  def __parse_redis_name(self,service_type, day=None):
-    prefix = "org" if self.user_config.is_organization else "user"
-    dated_key = "used_quota_day" if day else "used_quota_month"
-    redis_name = "{0}:{1}:{2}:{3}".format(
-      prefix, self.user_config.entity_name, service_type, dated_key
-    )
-    if self.user_config.is_organization and day:
-      redis_name = "{0}:{1}".format(redis_name, self.user_config.user_id)
+    def __parse_redis_prefix(self, prefix, entity_name, service_type, metric, date):
+        yearmonth_key = date.strftime('%Y%m')
+        redis_name = "{0}:{1}:{2}:{3}:{4}".format(prefix, entity_name,
+                                              service_type, metric,
+                                              yearmonth_key)
 
-    return redis_name
+        return redis_name
 
-  def __parse_redis_key(self,year,month,day=None):
-    if day:
-      redis_key = "{0}_{1}_{2}".format(year,month,day)
-    else:
-      redis_key = "{0}_{1}".format(year,month)
+    def __get_metrics(self, service, metric, date_from, date_to):
+        aggregated_metric = 0
+        key_prefix = "org" if self._orgname else "user"
+        entity_name = self._orgname if self._orgname else self._username
+        for date in self.__generate_date_range(date_from, date_to):
+            redis_prefix = self.__parse_redis_prefix(key_prefix, entity_name,
+                                                     service, metric, date)
+            score = self._redis_connection.zscore(redis_prefix, date.day)
+            aggregated_metric += score if score else 0
+        return aggregated_metric
 
-    return redis_key
+    def __current_billing_cycle(self):
+        """ Return the begining and end date for the current billing cycle """
+        end_period_day = self._user_geocoder_config.period_end_date.day
+        today = date.today()
+        if end_period_day > today.day:
+            temp_date = today + relativedelta(months=-1)
+            date_from = date(temp_date.year, temp_date.month, end_period_day)
+        else:
+            date_from = date(today.year, today.month, end_period_day)
+
+        return date_from, today
+
+    def __generate_date_range(self, date_from, date_to):
+        for n in range(int((date_to - date_from).days)):
+            yield date_from + timedelta(n)

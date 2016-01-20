@@ -6,36 +6,6 @@ class ConfigException(Exception):
     pass
 
 
-class UserConfig:
-
-    USER_CONFIG_KEYS = ['is_organization', 'entity_name']
-
-    def __init__(self, user_config_json, db_user_id=None):
-        config = json.loads(user_config_json)
-        filtered_config = {key: config[key] for key in self.USER_CONFIG_KEYS if key in config.keys()}
-        self.__check_config(filtered_config)
-        self.__parse_config(filtered_config)
-
-    def __check_config(self, filtered_config):
-        if len(filtered_config.keys()) != len(self.USER_CONFIG_KEYS):
-            raise ConfigException(
-                "Passed user configuration is not correct, check it please")
-
-        return True
-
-    @property
-    def is_organization(self):
-        return self._is_organization
-
-    @property
-    def entity_name(self):
-        return self._entity_name
-
-    def __parse_config(self, filtered_config):
-        self._is_organization = filtered_config['is_organization']
-        self._entity_name = filtered_config['entity_name']
-
-
 class GeocoderConfig:
 
     GEOCODER_CONFIG_KEYS = ['google_maps_client_id', 'google_maps_api_key',
@@ -85,14 +55,17 @@ class GeocoderConfig:
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         self._google_maps_private_key = None
-        self._nokia_monthly_quota = 0
-        self._nokia_soft_geocoder_limit = False
+        self._geocoding_quota = 0
+        self._soft_geocoding_limit = False
         if self.GOOGLE_GEOCODER == self._geocoder_type:
             self._google_maps_private_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
         elif self.NOKIA_GEOCODER == self._geocoder_type:
-            self._geocoding_quota = filtered_config[self.QUOTA_KEY]
-            self._soft_geocoding_limit = filtered_config[self.SOFT_LIMIT_KEY]
+            self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
+            if filtered_config[self.SOFT_LIMIT_KEY] == 'true':
+                self._soft_geocoding_limit = True
+            else:
+                self._soft_geocoding_limit = False
 
     @property
     def service_type(self):
