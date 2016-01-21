@@ -2,7 +2,6 @@
 DROP FUNCTION IF EXISTS cdb_geocoder_server.cdb_geocode_street_point(TEXT, TEXT, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  import json
   from heremaps import heremapsgeocoder
   from cartodb_geocoder import quota_service
 
@@ -14,13 +13,9 @@ RETURNS Geometry AS $$
   # -- Check the quota
   quota_service = quota_service.QuotaService(user_geocoder_config, redis_conn, username, orgname)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach limit of your quota')
+    plpy.error('You have reach the limit of your quota')
 
-  heremaps_conf = json.loads(plpy.execute("SELECT cdb_geocoder_server._get_conf('heremaps')", 1)[0]['get_conf'])
-  app_id = heremaps_conf['geocoder']['app_id']
-  app_code = heremaps_conf['geocoder']['app_code']
-
-  geocoder = heremapsgeocoder.Geocoder(app_id, app_code)
+  geocoder = heremapsgeocoder.Geocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
   results = geocoder.geocode_address(searchtext=searchtext, city=city, state=state_province, country=country)
   coordinates = geocoder.extract_lng_lat_from_result(results[0])
   plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
