@@ -92,5 +92,5 @@ class UserService:
         return date_from, today
 
     def __generate_date_range(self, date_from, date_to):
-        for n in range(int((date_to - date_from).days)):
+        for n in range(int((date_to - date_from).days + 1)):
             yield date_from + timedelta(n)
