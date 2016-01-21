@@ -15,11 +15,23 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     plpy.error('You have reach the limit of your quota')
 
-  geocoder = heremapsgeocoder.Geocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
-  results = geocoder.geocode_address(searchtext=searchtext, city=city, state=state_province, country=country)
-  coordinates = geocoder.extract_lng_lat_from_result(results[0])
-  plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-  point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+  try:
+    geocoder = heremapsgeocoder.Geocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
+    results = geocoder.geocode_address(searchtext=searchtext, city=city, state=state_province, country=country)
+    coordinates = geocoder.extract_lng_lat_from_result(results[0])
+    quota_service.increment_success_geocoder_use()
+    plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+    point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+    return point['st_setsrid']
+  except heremapsgeocoder.EmptyGeocoderResponse:
+    quota_service.increment_empty_geocoder_use()
+    return None
+  except BaseException as e:
+    import sys, traceback
+    type_, value_, traceback_ = sys.exc_info()
+    quota_service.increment_failed_geocoder_use()
+    error_msg = 'There was an error trying to geocode using here maps geocoder: {0}'.format(e)
+    plpy.notice(traceback.format_tb(traceback_))
+    plpy.error(error_msg)
 
-  return point['st_setsrid']
 $$ LANGUAGE plpythonu;

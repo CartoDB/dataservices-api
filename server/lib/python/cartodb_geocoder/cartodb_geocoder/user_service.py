@@ -53,12 +53,12 @@ class UserService:
     def __increment_user_uses(self, service_type, metric, date, amount):
         redis_prefix = self.__parse_redis_prefix("user", self._username,
                                                  service_type, metric, date)
-        self._redis_connection.hincrby(redis_prefix, date.day, amount)
+        self._redis_connection.zincrby(redis_prefix, date.day, amount)
 
     def __increment_organization_uses(self, service_type, metric, date, amount):
         redis_prefix = self.__parse_redis_prefix("org", self._orgname,
                                                  service_type, metric, date)
-        self._redis_connection.hincrby(redis_prefix, date.day, amount)
+        self._redis_connection.zincrby(redis_prefix, date.day, amount)
 
     def __parse_redis_prefix(self, prefix, entity_name, service_type, metric, date):
         yearmonth_key = date.strftime('%Y%m')
