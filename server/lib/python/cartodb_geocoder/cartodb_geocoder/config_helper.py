@@ -86,10 +86,11 @@ class GeocoderConfig:
             self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
             self._heremaps_app_id = filtered_config[self.NOKIA_GEOCODER_APP_ID_KEY]
             self._heremaps_app_code = filtered_config[self.NOKIA_GEOCODER_APP_CODE_KEY]
-            if filtered_config[self.SOFT_LIMIT_KEY] == 'true':
-                self._soft_geocoding_limit = True
-            else:
-                self._soft_geocoding_limit = False
+
+        if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_geocoding_limit = True
+        else:
+            self._soft_geocoding_limit = False
 
     @property
     def service_type(self):
