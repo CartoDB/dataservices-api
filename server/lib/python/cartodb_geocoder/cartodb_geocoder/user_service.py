@@ -27,17 +27,17 @@ class UserService:
         """ Recover the used quota for the user in the current month """
         date_from, date_to = self.__current_billing_cycle()
         current_use = 0
-        success_responses = self.__get_metrics(service_type,
-                                               'success_responses', date_from,
-                                               date_to)
-        empty_responses = self.__get_metrics(service_type,
-                                             'empty_responses', date_from,
+        success_responses = self.get_metrics(service_type,
+                                             'success_responses', date_from,
                                              date_to)
+        empty_responses = self.get_metrics(service_type,
+                                           'empty_responses', date_from,
+                                           date_to)
         current_use += (success_responses + empty_responses)
         if service_type == self.SERVICE_GEOCODER_NOKIA:
-            cache_hits = self.__get_metrics(self.SERVICE_GEOCODER_CACHE,
-                                            'success_responses', date_from,
-                                            date_to)
+            cache_hits = self.get_metrics(self.SERVICE_GEOCODER_CACHE,
+                                          'success_responses', date_from,
+                                          date_to)
             current_use += cache_hits
 
         return current_use
@@ -47,6 +47,17 @@ class UserService:
         self.__increment_user_uses(service_type, metric, date, amount)
         if self._orgname:
             self.__increment_organization_uses(service_type, metric, date, amount)
+
+    def get_metrics(self, service, metric, date_from, date_to):
+        aggregated_metric = 0
+        key_prefix = "org" if self._orgname else "user"
+        entity_name = self._orgname if self._orgname else self._username
+        for date in self.__generate_date_range(date_from, date_to):
+            redis_prefix = self.__parse_redis_prefix(key_prefix, entity_name,
+                                                     service, metric, date)
+            score = self._redis_connection.zscore(redis_prefix, date.day)
+            aggregated_metric += score if score else 0
+        return aggregated_metric
 
     # Private functions
 
@@ -67,17 +78,6 @@ class UserService:
                                               yearmonth_key)
 
         return redis_name
-
-    def __get_metrics(self, service, metric, date_from, date_to):
-        aggregated_metric = 0
-        key_prefix = "org" if self._orgname else "user"
-        entity_name = self._orgname if self._orgname else self._username
-        for date in self.__generate_date_range(date_from, date_to):
-            redis_prefix = self.__parse_redis_prefix(key_prefix, entity_name,
-                                                     service, metric, date)
-            score = self._redis_connection.zscore(redis_prefix, date.day)
-            aggregated_metric += score if score else 0
-        return aggregated_metric
 
     def __current_billing_cycle(self):
         """ Return the begining and end date for the current billing cycle """

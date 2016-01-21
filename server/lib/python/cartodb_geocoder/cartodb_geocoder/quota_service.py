@@ -23,9 +23,6 @@ class QuotaService:
         current_used = self._user_service.used_quota(service_type, today)
         soft_geocoding_limit = self._user_geocoder_config.soft_geocoding_limit
 
-        print "User quota: {0} --- current_used: {1} --- limit: {2}".format(
-            user_quota, current_used, soft_geocoding_limit)
-
         if soft_geocoding_limit or current_used <= user_quota:
             return True
         else:
