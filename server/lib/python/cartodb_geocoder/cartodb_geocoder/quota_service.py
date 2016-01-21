@@ -6,14 +6,10 @@ class QuotaService:
     """ Class to manage all the quota operation for
     the Geocoder SQL API Extension """
 
-    def __init__(self, user_geocoder_config, redis_connection, username, orgname=None):
+    def __init__(self, user_geocoder_config, redis_connection):
         self._user_geocoder_config = user_geocoder_config
         self._user_service = user_service.UserService(
-            self._user_geocoder_config,
-            redis_connection,
-            username,
-            orgname
-        )
+            self._user_geocoder_config, redis_connection)
 
     def check_user_quota(self):
         """ Check if the current user quota surpasses the current quota """

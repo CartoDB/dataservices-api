@@ -11,7 +11,7 @@ RETURNS Geometry AS $$
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   # -- Check the quota
-  quota_service = quota_service.QuotaService(user_geocoder_config, redis_conn, username, orgname)
+  quota_service = quota_service.QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
     plpy.error('You have reach the limit of your quota')
 

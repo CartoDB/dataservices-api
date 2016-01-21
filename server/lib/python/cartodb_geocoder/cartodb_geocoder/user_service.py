@@ -17,11 +17,11 @@ class UserService:
     REDIS_CONNECTION_PORT = "redis_port"
     REDIS_CONNECTION_DB = "redis_db"
 
-    def __init__(self, user_geocoder_config, redis_connection, username, orgname=None):
+    def __init__(self, user_geocoder_config, redis_connection):
         self._user_geocoder_config = user_geocoder_config
         self._redis_connection = redis_connection
-        self._username = username
-        self._orgname = orgname
+        self._username = user_geocoder_config.username
+        self._orgname = user_geocoder_config.organization
 
     def used_quota(self, service_type, date):
         """ Recover the used quota for the user in the current month """
