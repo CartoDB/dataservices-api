@@ -76,11 +76,12 @@ class GeocoderConfig:
             self._orgname = None
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
-        self._google_maps_private_key = None
+        self._google_maps_api_key = None
+        self._google_maps_client_id = None
         self._geocoding_quota = 0
         self._soft_geocoding_limit = False
         if self.GOOGLE_GEOCODER == self._geocoder_type:
-            self._google_maps_private_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
+            self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
         elif self.NOKIA_GEOCODER == self._geocoder_type:
             self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
@@ -113,7 +114,7 @@ class GeocoderConfig:
 
     @property
     def google_api_key(self):
-        return self._google_maps_private_key
+        return self._google_maps_api_key
 
     @property
     def geocoding_quota(self):
