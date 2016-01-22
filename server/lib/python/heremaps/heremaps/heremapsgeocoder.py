@@ -80,7 +80,7 @@ class Geocoder:
             'gen': self.gen
         }
         request_params.update(params)
-        response = requests.get(self.URL_DEV_GEOCODE_JSON, params=request_params)
+        response = requests.get(self.URL_GEOCODE_JSON, params=request_params)
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
         else:
