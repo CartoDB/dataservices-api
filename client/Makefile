@@ -6,8 +6,6 @@ EXTVERSION = $(shell grep default_version $(EXTENSION).control | sed -e "s/defau
 DATA = $(EXTENSION)--$(EXTVERSION).sql
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
-TEST_DIR = test/$(EXTVERSION)
-REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
 
 # postgres build stuff
 PG_CONFIG = pg_config
