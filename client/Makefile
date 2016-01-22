@@ -3,7 +3,18 @@
 EXTENSION = cdb_geocoder_client
 EXTVERSION = $(shell grep default_version $(EXTENSION).control | sed -e "s/default_version[[:space:]]*=[[:space:]]*'\([^']*\)'/\1/")
 
-DATA = $(EXTENSION)--$(EXTVERSION).sql
+# The new version to be generated from templates
+NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
+
+# DATA is a special variable used by postgres build infrastructure
+# These are the files to be installed in the server shared dir,
+# for installation from scratch, upgrades and downgrades.
+# @see http://www.postgresql.org/docs/current/static/extend-pgxs.html
+DATA =  $(NEW_EXTENSION_ARTIFACT) \
+  cdb_geocoder_client--0.0.1.sql \
+  cdb_geocoder_client--0.1.0--0.0.1.sql \
+  cdb_geocoder_client--0.0.1--0.1.0.sql
+
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
 
@@ -26,7 +37,7 @@ $(GENERATED_SQL_FILES): $(SOURCES_DATA_DIR)/%.sql: $(TEMPLATE_DIR)/%.erb $(INTER
 
 SOURCES_DATA = $(wildcard $(SOURCES_DATA_DIR)/*.sql) $(GENERATED_SQL_FILES)
 
-$(DATA): $(SOURCES_DATA)
+$(NEW_EXTENSION_ARTIFACT): $(SOURCES_DATA)
 	rm -f $@
 	cat $(SOURCES_DATA_DIR)/*.sql >> $@
 
@@ -34,5 +45,5 @@ all: $(DATA)
 
 # Only meant for development time, do not use once a version is released
 devclean:
-	rm -f $(DATA)
+	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
