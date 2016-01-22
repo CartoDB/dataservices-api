@@ -1,0 +1,10 @@
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_admin0_polygon(country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_admin1_polygon(admin1_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_admin1_polygon(admin1_name text, country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_namedplace_point(city_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_namedplace_point(city_name text, country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_postalcode_polygon(postal_code text, country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_postalcode_point(postal_code text, country_name text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_ipaddress_point(ip_address text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point(searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL) TO publicuser;
