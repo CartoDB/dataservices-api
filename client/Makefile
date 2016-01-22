@@ -2,22 +2,12 @@
 # Once a version is released, it is not meant to be changed. E.g: once version 0.0.1 is out, it SHALL NOT be changed.
 EXTENSION = cdb_geocoder_client
 EXTVERSION = $(shell grep default_version $(EXTENSION).control | sed -e "s/default_version[[:space:]]*=[[:space:]]*'\([^']*\)'/\1/")
-SED = sed
 
-UPGRADABLE = \
-	0.0.1 \
-	$(END)
+DATA = $(EXTENSION)--$(EXTVERSION).sql
 
-UPGRADES = \
-	$(shell echo $(UPGRADABLE) | \
-		$(SED) 's/^/$(EXTENSION)--/' | \
-		$(SED) 's/$$/--$(EXTVERSION).sql/' | \
-		$(SED) 's/ /--$(EXTVERSION).sql $(EXTENSION)--/g')
-
-DATA = $(EXTENSION)--$(EXTVERSION).sql \
-	$(UPGRADES)
-
-REGRESS = $(notdir $(basename $(wildcard sql/*test.sql)))
+REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
+TEST_DIR = test/$(EXTVERSION)
+REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
 
 # postgres build stuff
 PG_CONFIG = pg_config
@@ -28,7 +18,7 @@ SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
 # The interface definition is used along with some templates to automatically generate code
 RENDERER = ../sql-template-renderer
-INTERFACE_FILE = ../interface.yaml
+INTERFACE_FILE = ../interface_$(EXTVERSION).yaml
 TEMPLATE_DIR = templates
 TEMPLATE_FILES = $(wildcard $(TEMPLATE_DIR)/*.erb)
 GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sql, $(TEMPLATE_FILES))

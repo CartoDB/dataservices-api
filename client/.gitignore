@@ -1,4 +1,8 @@
 results/
 regression.diffs
 regression.out
-cdb_geocoder_client--*
+20_public_functions.sql
+30_plproxy_functions.sql
+90_grant_execute.sql
+cdb_geocoder_client--0.0.1.sql
+cdb_geocoder_client--0.1.0.sql

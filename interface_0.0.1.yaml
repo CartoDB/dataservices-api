@@ -50,11 +50,3 @@
   return_type: Geometry
   params:
     - { name: ip_address,  type: text}
-
-- name: cdb_geocode_street_point
-  return_type: Geometry
-  params:
-    - { name: searchtext,  type: text}
-    - { name: city,  type: text, default: 'NULL'}
-    - { name: state_province,  type: text, default: 'NULL'}
-    - { name: country,  type: text, default: 'NULL'}

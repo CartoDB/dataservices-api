@@ -1,0 +1,60 @@
+---
+- name: cdb_geocode_admin0_polygon
+  return_type: Geometry
+  params:
+    - { name: country_name, type: text }
+
+- name: cdb_geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name, type: text }
+
+- name: cdb_geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name,  type: text }
+    - { name: country_name, type: text }
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name, type: text}
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: admin1_name,  type: text}
+    - { name: country_name, type: text}
+
+
+- name: cdb_geocode_postalcode_polygon
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_postalcode_point
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_ipaddress_point
+  return_type: Geometry
+  params:
+    - { name: ip_address,  type: text}
+
+- name: cdb_geocode_street_point_v2
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
