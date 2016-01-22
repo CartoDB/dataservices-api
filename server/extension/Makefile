@@ -25,6 +25,8 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
+SOURCES_DATA_DIR = sql/$(EXTVERSION)
+
 SOURCES_DATA = $(wildcard sql/$(EXTVERSION)/*.sql)
 
 $(DATA): $(SOURCES_DATA)
@@ -39,4 +41,4 @@ all: $(DATA)
 
 # Only meant for development time, do not use once a version is released
 devclean:
-	rm -f $(DATA)
+	rm -f $(NEW_EXTENSION_ARTIFACT)
