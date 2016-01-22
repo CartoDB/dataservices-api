@@ -40,6 +40,10 @@ class SqlTemplateRenderer
   end
 
   def params_with_type
+    @function_signature['params'].map { |p| "#{p['name']} #{p['type']}" }.join(', ')
+  end
+
+  def params_with_type_and_default
     parameters = @function_signature['params'].map do |p|
       if not p['default'].nil?
         "#{p['name']} #{p['type']} DEFAULT #{p['default']}"
@@ -49,7 +53,6 @@ class SqlTemplateRenderer
     end
     return parameters.join(', ')
   end
-
 end
 
 

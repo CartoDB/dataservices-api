@@ -7,4 +7,4 @@ GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_namedplace_point(city_
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_postalcode_polygon(postal_code text, country_name text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_postalcode_point(postal_code text, country_name text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_ipaddress_point(ip_address text) TO publicuser;
-GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point(searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;

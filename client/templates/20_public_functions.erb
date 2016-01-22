@@ -4,7 +4,7 @@
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type %>)
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
