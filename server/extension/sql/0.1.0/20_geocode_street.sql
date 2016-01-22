@@ -1,13 +1,31 @@
--- Geocodes a street address given a searchtext and a state and/or country
+-- We have change arguments so we need to drop the former function
 DROP FUNCTION IF EXISTS cdb_geocoder_server.cdb_geocode_street_point(TEXT, TEXT, TEXT, TEXT);
+
+-- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config('{0}', '{1}')".format(username, orgname))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  if user_geocoder_config.heremaps_geocoder:
+    here_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  elif user_geocoder_config.google_geocoder:
+    google_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  else:
+    plpy.error('Requested geocoder is not available')
+
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from heremaps import heremapsgeocoder
   from cartodb_geocoder import quota_service
 
-  plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config('{0}', '{1}')".format(username, orgname))
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   # -- Check the quota
@@ -34,4 +52,10 @@ RETURNS Geometry AS $$
     plpy.notice(traceback.format_tb(traceback_))
     plpy.error(error_msg)
 
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+    plpy.error('Google geocoder is not available yet')
+    return None
 $$ LANGUAGE plpythonu;

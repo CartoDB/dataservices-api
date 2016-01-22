@@ -75,23 +75,18 @@ class GeocoderConfig:
         else:
             self._orgname = None
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
+        self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
-        self._google_maps_api_key = None
-        self._google_maps_client_id = None
-        self._geocoding_quota = 0
-        self._soft_geocoding_limit = False
-        if self.GOOGLE_GEOCODER == self._geocoder_type:
-            self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
-            self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
-        elif self.NOKIA_GEOCODER == self._geocoder_type:
-            self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
-            self._heremaps_app_id = filtered_config[self.NOKIA_GEOCODER_APP_ID_KEY]
-            self._heremaps_app_code = filtered_config[self.NOKIA_GEOCODER_APP_CODE_KEY]
-
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_geocoding_limit = True
         else:
             self._soft_geocoding_limit = False
+        if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
+            self._heremaps_app_id = filtered_config[self.NOKIA_GEOCODER_APP_ID_KEY]
+            self._heremaps_app_code = filtered_config[self.NOKIA_GEOCODER_APP_CODE_KEY]
+        elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
+            self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
+            self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
 
     @property
     def service_type(self):
