@@ -30,9 +30,6 @@ $(DATA): $(SOURCES_DATA)
 	rm -f $@
 	cat $(SOURCES_DATA_DIR)/*.sql >> $@
 
-$(EXTENSION)--%--$(EXTVERSION).sql: $(EXTENSION)--$(EXTVERSION).sql
-		cp $< $@
-
 all: $(DATA)
 
 # Only meant for development time, do not use once a version is released
