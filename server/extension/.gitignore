@@ -3,5 +3,3 @@ regression.diffs
 regression.out
 cdb_geocoder_server--0.0.1.sql
 cdb_geocoder_server--0.1.0.sql
-cdb_geocoder_server--0.0.1--0.1.0.sql
-

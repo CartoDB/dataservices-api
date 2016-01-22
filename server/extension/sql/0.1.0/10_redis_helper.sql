@@ -1,6 +1,13 @@
+CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
+    sentinel_host text,
+    sentinel_port int,
+    sentinel_master_id text,
+    redis_db text,
+    timeout float
+);
+
 -- Get the Redis configuration from the _conf table --
-DROP FUNCTION IF EXISTS cdb_geocoder_server._get_redis_conf();
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf(config_key text)
+CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf_v2(config_key text)
 RETURNS cdb_geocoder_server._redis_conf_params AS $$
     conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(config_key)
     conf = plpy.execute(conf_query)[0]['conf']
@@ -28,10 +35,10 @@ RETURNS boolean AS $$
     from cartodb_geocoder import redis_helper
     metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf('redis_metadata_config') c;""")[0]
+        from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
     metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf('redis_metrics_config') c;""")[0]
+        from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
     redis_metadata_connection = redis_helper.RedisHelper(metadata_config_params['sentinel_host'],
         metadata_config_params['sentinel_port'],
         metadata_config_params['sentinel_master_id'],
