@@ -10,7 +10,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 -- Exercise the public and the proxied function
 SELECT cdb_geocode_street_point_v2('One street, 1');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, 1, <NULL>, <NULL>, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, 1, <NULL>, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -19,7 +19,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, <NULL>, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -28,7 +28,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', 'state');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, state, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, state, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -37,7 +37,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', 'state', 'country');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, state, country)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, state, country)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -46,7 +46,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', NULL, 'country');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, <NULL>, country)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, <NULL>, country)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -55,7 +55,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street, 1');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, 1, <NULL>, <NULL>, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, 1, <NULL>, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -64,7 +64,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, <NULL>, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -73,7 +73,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', 'state');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, state, <NULL>)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, state, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -82,7 +82,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', 'state', 'country');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, state, country)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, state, country)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
@@ -91,7 +91,7 @@ PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQ
 (1 row)
 
 SELECT cdb_geocode_street_point_v2('One street', 'city', NULL, 'country');
-NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params ("test_user", <NULL>, One street, city, <NULL>, country)
+NOTICE:  cdb_geocoder_client._cdb_geocode_street_point_v2(6): [contrib_regression] REMOTE NOTICE: cdb_geocoder_server.cdb_geocode_geocoder_street_point_v2 invoked with params (test_user, <NULL>, One street, city, <NULL>, country)
 CONTEXT:  SQL statement "SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country)"
 PL/pgSQL function cdb_geocode_street_point_v2(text,text,text,text) line 15 at SQL statement
  cdb_geocode_street_point_v2 
