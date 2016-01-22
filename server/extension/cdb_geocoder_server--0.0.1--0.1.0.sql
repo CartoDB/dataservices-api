@@ -77,7 +77,7 @@ CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point_v2(usern
 RETURNS Geometry AS $$
   plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config('{0}', '{1}')".format(username, orgname))
+  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   if user_geocoder_config.heremaps_geocoder:
