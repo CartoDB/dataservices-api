@@ -29,10 +29,6 @@ SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
 SOURCES_DATA = $(wildcard sql/$(EXTVERSION)/*.sql)
 
-$(DATA): $(SOURCES_DATA)
-	rm -f $@
-	cat $(SOURCES_DATA) >> $@
-
 $(NEW_EXTENSION_ARTIFACT): $(SOURCES_DATA)
 	rm -f $@
 	cat $(SOURCES_DATA_DIR)/*.sql >> $@
