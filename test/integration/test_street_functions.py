@@ -15,7 +15,7 @@ class TestStreetFunctions(TestCase):
         )
 
     def test_if_select_with_street_point_is_ok(self):
-        query = "SELECT cdb_geocode_street_point_v2_(street) " \
+        query = "SELECT cdb_geocode_street_point_v2(street) " \
                 "as geometry FROM {0} LIMIT 1&api_key={1}".format(
                     self.env_variables['table_name'],
                     self.env_variables['api_key'])
@@ -23,7 +23,7 @@ class TestStreetFunctions(TestCase):
         assert_not_equal(geometry, None)
 
     def test_if_select_with_street_without_api_key_raise_error(self):
-        query = "SELECT cdb_geocode_street_point_v2_(street) " \
+        query = "SELECT cdb_geocode_street_point_v2(street) " \
             "as geometry FROM {0} LIMIT 1".format(
                 self.env_variables['table_name'])
         try:
