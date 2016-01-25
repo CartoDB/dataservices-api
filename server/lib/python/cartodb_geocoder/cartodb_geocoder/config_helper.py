@@ -41,19 +41,28 @@ class GeocoderConfig:
                           heremaps_app_code=None):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
-        user_config[self.USERNAME_KEY] = username
-        user_config[self.ORGNAME_KEY] = orgname
-        user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = heremaps_app_id
-        user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = heremaps_app_code
-        if orgname:
-            org_config = self._redis_connection.hgetall(
-                "rails:orgs:{0}".format(orgname))
+        if not user_config:
+            raise ConfigException("""There is no user config available. Please check your configuration.'""")
+        else:
+            user_config[self.USERNAME_KEY] = username
+            user_config[self.ORGNAME_KEY] = orgname
+            user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = heremaps_app_id
+            user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = heremaps_app_code
+            if orgname:
+                self.__get_organization_config(orgname, user_config)
+
+            return user_config
+
+    def __get_organization_config(self, orgname, user_config):
+        org_config = self._redis_connection.hgetall(
+            "rails:orgs:{0}".format(orgname))
+        if not org_config:
+            raise ConfigException("""There is no organization config available. Please check your configuration.'""")
+        else:
             user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
             user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
-
-        return user_config
 
     def __check_config(self, filtered_config):
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
@@ -63,8 +72,7 @@ class GeocoderConfig:
                 raise ConfigException("""Nokia geocoder configuration is missing. Check it please""")
         elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
-                raise ConfigException("""Google geocoder need the mandatory
-                                      parameter 'google_maps_private_key'""")
+                raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
 
         return True
 
