@@ -13,8 +13,8 @@ from heremaps.heremapsexceptions import MalformedResult
 class Geocoder:
     'A Here Maps Geocoder wrapper for python'
 
-    URL_GEOCODE_JSON = 'http://geocoder.api.here.com/6.2/geocode.json'
-    URL_DEV_GEOCODE_JSON = 'http://localhost:6083/geocode.json'
+    PRODUCTION_GEOCODE_JSON_URL = 'https://geocoder.api.here.com/6.2/geocode.json'
+    STAGING_GEOCODE_JSON_URL = 'https://geocoder.cit.api.here.com/6.2/geocode.json'
     DEFAULT_MAXRESULTS = 1
     DEFAULT_GEN = 9
 
@@ -55,11 +55,12 @@ class Geocoder:
     maxresults = ''
 
     def __init__(self, app_id, app_code, maxresults=DEFAULT_MAXRESULTS,
-                 gen=DEFAULT_GEN):
+                 gen=DEFAULT_GEN, host=PRODUCTION_GEOCODE_JSON_URL):
         self.app_id = app_id
         self.app_code = app_code
         self.maxresults = maxresults
         self.gen = gen
+        self.host = host
 
     def geocode(self, params):
         if not set(params.keys()).issubset(set(self.ADDRESS_PARAMS)):
@@ -80,7 +81,7 @@ class Geocoder:
             'gen': self.gen
         }
         request_params.update(params)
-        response = requests.get(self.URL_GEOCODE_JSON, params=request_params)
+        response = requests.get(self.host, params=request_params)
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
         else:
