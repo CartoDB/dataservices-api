@@ -1,31 +1,52 @@
 import user_service
-import config_helper
 from datetime import date
 
-class QuotaService:
-    """ Class to manage all the quota operation for the Geocoder SQL API Extension """
 
-    def __init__(self, user_config, geocoder_config, redis_connection):
-        self._user_config = user_config
-        self._geocoder_config = geocoder_config
-        self._user_service = user_service.UserService(self._user_config,
-            self._geocoder_config.service_type, redis_connection)
+class QuotaService:
+    """ Class to manage all the quota operation for
+    the Geocoder SQL API Extension """
+
+    def __init__(self, user_geocoder_config, redis_connection):
+        self._user_geocoder_config = user_geocoder_config
+        self._user_service = user_service.UserService(
+            self._user_geocoder_config, redis_connection)
 
     def check_user_quota(self):
         """ Check if the current user quota surpasses the current quota """
         # We don't have quota check for google geocoder
-        if self._geocoder_config.google_geocoder:
+        if self._user_geocoder_config.google_geocoder:
             return True
 
-        user_quota = self._geocoder_config.nokia_monthly_quota
+        user_quota = self._user_geocoder_config.geocoding_quota
         today = date.today()
-        service_type = self._geocoder_config.service_type
-        current_used = self._user_service.used_quota(service_type, today.year, today.month)
-        soft_geocoder_limit = self._geocoder_config.nokia_soft_limit
+        service_type = self._user_geocoder_config.service_type
+        current_used = self._user_service.used_quota(service_type, today)
+        soft_geocoding_limit = self._user_geocoder_config.soft_geocoding_limit
 
-        print "User quota: {0} --- current_used: {1} --- limit: {2}".format(user_quota, current_used, soft_geocoder_limit)
+        if soft_geocoding_limit or current_used <= user_quota:
+            return True
+        else:
+            return False
 
-        return True if soft_geocoder_limit or current_used <= user_quota else False
+    def increment_success_geocoder_use(self, amount=1):
+        self._user_service.increment_service_use(
+            self._user_geocoder_config.service_type, "success_responses",
+            amount=amount)
+        self.increment_total_geocoder_use(amount)
 
-    def increment_geocoder_use(self, amount=1):
-        self._user_service.increment_service_use(self._geocoder_config.service_type)
+    def increment_empty_geocoder_use(self, amount=1):
+        self._user_service.increment_service_use(
+            self._user_geocoder_config.service_type, "empty_responses",
+            amount=amount)
+        self.increment_total_geocoder_use(amount)
+
+    def increment_failed_geocoder_use(self, amount=1):
+        self._user_service.increment_service_use(
+            self._user_geocoder_config.service_type, "fail_responses",
+            amount=amount)
+        self.increment_total_geocoder_use(amount)
+
+    def increment_total_geocoder_use(self, amount=1):
+        self._user_service.increment_service_use(
+            self._user_geocoder_config.service_type, "total_requests",
+            amount=amount)

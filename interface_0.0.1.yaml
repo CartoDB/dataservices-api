@@ -50,4 +50,3 @@
   return_type: Geometry
   params:
     - { name: ip_address,  type: text}
-

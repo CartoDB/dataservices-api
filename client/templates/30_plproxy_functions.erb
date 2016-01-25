@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %> (username text, organization_name text, <%= params_with_type %>)
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>._<%= name %> (username text, organization_name text, <%= params_with_type_and_default %>)
 RETURNS <%= return_type %> AS $$
   CONNECT <%= GEOCODER_CLIENT_SCHEMA %>._server_conn_str();
   SELECT cdb_geocoder_server.<%= name %> (username, organization_name, <%= params %>);

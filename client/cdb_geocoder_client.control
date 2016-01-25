@@ -1,6 +1,6 @@
 # CartoDB geocoder client API extension
 comment = 'CartoDB geocoder client API extension'
-default_version = '0.0.1'
+default_version = '0.1.0'
 requires = 'plproxy, cartodb'
 superuser = true
 schema = cdb_geocoder_client

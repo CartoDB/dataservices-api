@@ -4,7 +4,7 @@
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type %>)
+CREATE OR REPLACE FUNCTION <%= GEOCODER_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
   ret <%= return_type %>;
@@ -14,7 +14,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM _cdb_entity_config() AS (u text, o text);
+  SELECT u, o INTO username, orgname FROM <%= GEOCODER_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text);
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';

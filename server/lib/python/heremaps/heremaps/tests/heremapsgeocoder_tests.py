@@ -9,73 +9,72 @@ from heremaps.heremapsexceptions import EmptyGeocoderResponse
 from heremaps.heremapsexceptions import NoGeocodingParams
 from heremaps.heremapsexceptions import MalformedResult
 
-from secrets import *
 
 class GeocoderTestCase(unittest.TestCase):
     EMPTY_RESPONSE = {
-        "Response":{
-            "MetaInfo":{
-                "Timestamp":"2015-11-04T16:31:57.273+0000"
+        "Response": {
+            "MetaInfo": {
+                "Timestamp": "2015-11-04T16:31:57.273+0000"
             },
-            "View":[]
+            "View": []
         }
     }
 
     GOOD_RESPONSE = {
         "Response": {
             "MetaInfo": {
-                "Timestamp":"2015-11-04T16:30:32.187+0000"
+                "Timestamp": "2015-11-04T16:30:32.187+0000"
             },
-            "View":[{
-                "_type":"SearchResultsViewType",
-                "ViewId":0,
-                "Result":[{
-                    "Relevance":0.89,
-                    "MatchLevel":"street",
-                    "MatchQuality":{
-                        "City":1.0,
-                        "Street":[1.0]
+            "View": [{
+                "_type": "SearchResultsViewType",
+                "ViewId": 0,
+                "Result": [{
+                    "Relevance": 0.89,
+                    "MatchLevel": "street",
+                    "MatchQuality": {
+                        "City": 1.0,
+                        "Street": [1.0]
                     },
-                    "Location":{
-                        "LocationId":"NT_yyKB4r3mCWAX4voWgxPcuA",
-                        "LocationType":"address",
-                        "DisplayPosition":{
-                            "Latitude":40.43433,
-                            "Longitude":-3.70126
+                    "Location": {
+                        "LocationId": "NT_yyKB4r3mCWAX4voWgxPcuA",
+                        "LocationType": "address",
+                        "DisplayPosition": {
+                            "Latitude": 40.43433,
+                            "Longitude": -3.70126
                         },
-                        "NavigationPosition":[{
-                            "Latitude":40.43433,
-                            "Longitude":-3.70126
+                        "NavigationPosition": [{
+                            "Latitude": 40.43433,
+                            "Longitude": -3.70126
                         }],
-                        "MapView":{
-                            "TopLeft":{
-                                "Latitude":40.43493,
-                                "Longitude":-3.70404
+                        "MapView": {
+                            "TopLeft": {
+                                "Latitude": 40.43493,
+                                "Longitude": -3.70404
                             },
-                            "BottomRight":{
-                                "Latitude":40.43373,
-                                "Longitude":-3.69873
+                            "BottomRight": {
+                                "Latitude": 40.43373,
+                                "Longitude": -3.69873
                             }
                         },
-                        "Address":{
-                            "Label":"Calle de Eloy Gonzalo, Madrid, España",
-                            "Country":"ESP",
-                            "State":"Comunidad de Madrid",
-                            "County":"Madrid",
-                            "City":"Madrid",
-                            "District":"Trafalgar",
-                            "Street":"Calle de Eloy Gonzalo",
-                            "AdditionalData":[{
-                                "value":"España",
-                                "key":"CountryName"
+                        "Address": {
+                            "Label": "Calle de Eloy Gonzalo, Madrid, España",
+                            "Country": "ESP",
+                            "State": "Comunidad de Madrid",
+                            "County": "Madrid",
+                            "City": "Madrid",
+                            "District": "Trafalgar",
+                            "Street": "Calle de Eloy Gonzalo",
+                            "AdditionalData": [{
+                                "value": "España",
+                                "key": "CountryName"
                             },
                             {
-                                "value":"Comunidad de Madrid",
-                                "key":"StateName"
+                                "value": "Comunidad de Madrid",
+                                "key": "StateName"
                             },
                             {
-                                "value":"Madrid",
-                                "key":"CountyName"
+                                "value": "Madrid",
+                                "key": "CountyName"
                             }]
                         }
                     }
@@ -117,10 +116,7 @@ class GeocoderTestCase(unittest.TestCase):
         self.assertEqual(coordinates[1], 40.43433)
 
     def test_extract_lng_lat_from_result_with_malformed_result(self):
-        result = {'manolo':'escobar'}
+        result = {'manolo': 'escobar'}
 
         with self.assertRaises(MalformedResult):
             self.geocoder.extract_lng_lat_from_result(result)
-
-if __name__ == '__main__':
-    main()

@@ -18,3 +18,4 @@ This suite of tests test the following parts of the geocoding API through the SQ
 - Named places functions
 - Postal code functions
 - Ip address functions
+- Street address functions (This will call Heremaps or Google so it will cost you 2 credits)
