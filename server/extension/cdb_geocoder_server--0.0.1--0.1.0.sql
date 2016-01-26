@@ -132,3 +132,10 @@ RETURNS Geometry AS $$
     plpy.error('Google geocoder is not available yet')
     return None
 $$ LANGUAGE plpythonu;
+
+-- We apply again the grants to include the new functions
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_geocoder_server TO geocoder_api;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO geocoder_api;
+GRANT USAGE ON SCHEMA cdb_geocoder_server TO geocoder_api;
+GRANT USAGE ON SCHEMA public TO geocoder_api;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO geocoder_api;
