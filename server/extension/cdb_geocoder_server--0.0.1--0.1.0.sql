@@ -46,7 +46,7 @@ RETURNS boolean AS $$
       'redis_metrics_connection': redis_metrics_connection,
     }
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_geocoder_config(username text, orgname text)
