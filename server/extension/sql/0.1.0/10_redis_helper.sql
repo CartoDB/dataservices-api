@@ -54,4 +54,4 @@ RETURNS boolean AS $$
       'redis_metrics_connection': redis_metrics_connection,
     }
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
