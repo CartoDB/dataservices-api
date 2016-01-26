@@ -31,7 +31,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_client.cdb_geocode_street_point_v2 (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_geocoder_client.cdb_geocode_street_point (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
 DECLARE
   ret Geometry;
@@ -46,15 +46,15 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_geocoder_client._cdb_geocode_street_point_v2(username, orgname, searchtext, city, state_province, country) INTO ret;
+  SELECT cdb_geocoder_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_geocode_street_point_v2 (username text, organization_name text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_geocode_street_point (username text, organization_name text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
   CONNECT cdb_geocoder_client._server_conn_str();
-  SELECT cdb_geocoder_server.cdb_geocode_street_point_v2 (username, organization_name, searchtext, city, state_province, country);
+  SELECT cdb_geocoder_server.cdb_geocode_street_point (username, organization_name, searchtext, city, state_province, country);
 $$ LANGUAGE plproxy;
 
-GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point_v2(searchtext text, city text, state_province text, country text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;

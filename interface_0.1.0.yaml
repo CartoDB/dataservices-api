@@ -51,7 +51,7 @@
   params:
     - { name: ip_address,  type: text}
 
-- name: cdb_geocode_street_point_v2
+- name: cdb_geocode_street_point
   return_type: Geometry
   params:
     - { name: searchtext,  type: text}
