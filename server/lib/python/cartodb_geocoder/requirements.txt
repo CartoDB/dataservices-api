@@ -1,6 +1,9 @@
 redis==2.10.5
 # Dependency with incsv in the import
 python-dateutil==2.2
+heremaps==0.0.1
+googlegeocoder==0.0.1
+googlemaps
 
 # Test
 mock==1.3.0

@@ -32,19 +32,16 @@ class QuotaService:
         self._user_service.increment_service_use(
             self._user_geocoder_config.service_type, "success_responses",
             amount=amount)
-        self.increment_total_geocoder_use(amount)
 
     def increment_empty_geocoder_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_geocoder_config.service_type, "empty_responses",
             amount=amount)
-        self.increment_total_geocoder_use(amount)
 
     def increment_failed_geocoder_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_geocoder_config.service_type, "fail_responses",
             amount=amount)
-        self.increment_total_geocoder_use(amount)
 
     def increment_total_geocoder_use(self, amount=1):
         self._user_service.increment_service_use(
