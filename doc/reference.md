@@ -267,3 +267,45 @@ SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 ```
+## Street-level geocoder
+
+This function provides a street-level geocoding service. This service uses the street level geocoder defined for the user (currently, only the Here geocoder is available).
+
+**This service is subject to quota limitations, and extra fees may apply.** Please view our [terms and conditions](https://cartodb.com/terms/)
+
+Be mindful of the following when using this function:
+  - **One credit per function call will be consumed**, and the results are not cached. If the query applies to a N rows dataset, then N credits will be used.
+  - You are discouraged from using dynamic queries to the Geocoder API in your maps. This can result in credits consumption per map view. Note: **queries to the Geocoder API in your maps may be forbidden in the future**.
+  - You are advised to store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
+
+### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
+
+#### Arguments
+
+Name | Type | Description
+--- | --- | ---
+`searchtext` | `text` | searchtext contains free-form text containing address elements. You can specify the searchtext parameter by itself, or you can specify it with other parameters to narrow your search. For example, you can specify the state or country parameters, along with a free-form address in the searchtext field.
+`city` | `text` | (Optional) Name of the city
+`state` | `text` | (Optional) Name of the state
+`country` | `text` | (Optional) Name of the country
+
+#### Returns
+
+Geometry (point, EPSG 4326) or null
+
+#### Example
+
+##### Select
+
+```sql
+SELECT cdb_geocode_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
+SELECT cdb_geocode_geocode_street_point('651 Lombard Street' 'San Francisco')
+SELECT cdb_geocode_geocode_street_point('651 Lombard Street' 'San Francisco', 'California')
+SELECT cdb_geocode_geocode_street_point('651 Lombard Street' 'San Francisco', 'California', 'United States')
+```
+
+##### Update
+
+```sql
+UPDATE {tablename} SET {the_geom} = cdb_geocode_street_point({street_name_column})
+```
