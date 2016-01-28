@@ -267,16 +267,16 @@ SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```sql
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 ```
-## Street geocoder
+## Street-level geocoder
 
-This function provides a street geocoding service. This service uses the street level geocoder defined for the user (right now only Heremaps geocoder is available).
+This function provides a street-level geocoding service. This service uses the street level geocoder defined for the user (right now only Here geocoder is available).
 
 **This service is subject to quota limitations, and extra fees may apply. Please check our [terms and conditions](https://cartodb.com/terms/)**
 
-You should take into account the following advises about the use of this function:
-  - One credit per query will be charged, so you are therefore discouraged from using dynamic queries to the Geocoder API in your maps
-  - Dynamic queries in the maps may be forbidden in the futures.
-  - Store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
+You should take into account the following remarks about the usage of this function:
+  - **One credit per function call will be consumed** and the results are not cached. If the query applies to a N rows dataset, then N credits will be used.
+  - You are therefore discouraged from using dynamic queries to the Geocoder API in your maps. This can result in credits consumption per map view. Furthermore, **queries to the Geocoder API in the maps may be forbidden in the future**.
+  - You are advised to store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
@@ -308,3 +308,4 @@ SELECT cdb_geocode_geocode_street_point('Lombard Street' 'San Francisco', 'Calif
 
 ```sql
 UPDATE {tablename} SET {the_geom} = cdb_geocode_street_point({street_name_column})
+```
