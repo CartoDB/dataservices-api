@@ -6,7 +6,7 @@ import googlemaps
 from exceptions import MalformedResult
 
 
-class Geocoder:
+class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
 
     def __init__(self, client_id, client_secret):
@@ -15,23 +15,24 @@ class Geocoder:
         self.geocoder = googlemaps.Client(
             client_id=self.client_id, client_secret=self.client_secret)
 
-    def geocode_address(self, searchtext, city=None, state=None,
-                        country=None):
-        opt_params = self._build_optional_parameters(city, state, country)
-        results = self.geocoder.geocode(address=searchtext, components=opt_params)
-        if results:
-            return self._extract_lng_lat_from_result(results[0])
-        else:
-            return []
-
-    def _extract_lng_lat_from_result(self, result):
+    def geocode(self, searchtext, city=None, state=None,
+                country=None):
         try:
-            location = result['geometry']['location']
-            longitude = location['lng']
-            latitude = location['lat']
-            return [longitude, latitude]
+            opt_params = self._build_optional_parameters(city, state, country)
+            results = self.geocoder.geocode(address=searchtext,
+                                            components=opt_params)
+            if results:
+                return self._extract_lng_lat_from_result(results[0])
+            else:
+                return []
         except KeyError:
             raise MalformedResult()
+
+    def _extract_lng_lat_from_result(self, result):
+        location = result['geometry']['location']
+        longitude = location['lng']
+        latitude = location['lat']
+        return [longitude, latitude]
 
     def _build_optional_parameters(self, city=None, state=None,
                        country=None):

@@ -1,7 +1,7 @@
 import test_helper
 from mockredis import MockRedis
-from cartodb_geocoder import quota_service
-from cartodb_geocoder import config_helper
+from cartodb_services.metrics import QuotaService
+from cartodb_services.metrics import GeocoderConfig
 from unittest import TestCase
 from nose.tools import assert_raises
 from datetime import datetime, date
@@ -13,10 +13,6 @@ class TestQuotaService(TestCase):
     #   user:<username>:<service>:<metric>:YYYYMM:DD
     # organization user
     #   org:<orgname>:<service>:<metric>:YYYYMM:DD
-
-# def increment_geocoder_uses(self, username, orgname=None,
-#                             date=date.today(), service='geocoder_here',
-#                             metric='success_responses', amount=20):
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -68,28 +64,19 @@ class TestQuotaService(TestCase):
     def test_should_check_user_increment_and_quota_check_correctly(self):
         qs = self.__build_quota_service('test_user', quota=2)
         qs.increment_success_geocoder_use()
-        assert qs.check_user_quota() == True
+        assert qs.check_user_quota() is True
         qs.increment_success_geocoder_use(amount=2)
-        assert qs.check_user_quota() == False
+        assert qs.check_user_quota() is False
         month = date.today().strftime('%Y%m')
-        name = 'user:test_user:geocoder_here:total_requests:{0}'.format(month)
-        total_requests = self.redis_conn.zscore(name, date.today().day)
-        assert total_requests == 3
 
     def test_should_check_org_increment_and_quota_check_correctly(self):
         qs = self.__build_quota_service('test_user', orgname='test_org',
                                         quota=2)
         qs.increment_success_geocoder_use()
-        assert qs.check_user_quota() == True
+        assert qs.check_user_quota() is True
         qs.increment_success_geocoder_use(amount=2)
-        assert qs.check_user_quota() == False
+        assert qs.check_user_quota() is False
         month = date.today().strftime('%Y%m')
-        org_name = 'org:test_org:geocoder_here:total_requests:{0}'.format(month)
-        org_total_requests = self.redis_conn.zscore(org_name, date.today().day)
-        assert org_total_requests == 3
-        user_name = 'user:test_user:geocoder_here:total_requests:{0}'.format(month)
-        user_total_requests = self.redis_conn.zscore(user_name, date.today().day)
-        assert user_total_requests == 3
 
     def __build_quota_service(self, username, quota=100, service='heremaps',
                               orgname=None, soft_limit=False,
@@ -101,9 +88,9 @@ class TestQuotaService(TestCase):
         if orgname:
             test_helper.build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, end_date=end_date)
-        geocoder_config = config_helper.GeocoderConfig(self.redis_conn,
-                                                       username, orgname,
-                                                       'nokia_id', 'nokia_cod')
-        return quota_service.QuotaService(geocoder_config,
-                                          redis_connection = self.redis_conn)
+        geocoder_config = GeocoderConfig(self.redis_conn,
+                                         username, orgname,
+                                        'nokia_id', 'nokia_cod')
+        return QuotaService(geocoder_config,
+                             redis_connection = self.redis_conn)
 

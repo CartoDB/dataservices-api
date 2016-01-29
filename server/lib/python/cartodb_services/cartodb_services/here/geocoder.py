@@ -4,13 +4,10 @@
 import json
 import requests
 
-from heremaps.exception import BadGeocodingParams
-from heremaps.exception import EmptyGeocoderResponse
-from heremaps.exception import NoGeocodingParams
-from heremaps.exception import MalformedResult
+from exceptions import *
 
 
-class Geocoder:
+class HereMapsGeocoder:
     'A Here Maps Geocoder wrapper for python'
 
     PRODUCTION_GEOCODE_JSON_URL = 'https://geocoder.api.here.com/6.2/geocode.json'
@@ -65,17 +62,19 @@ class Geocoder:
                 params[key] = value
         if not params:
             raise NoGeocodingParams()
-        return self.geocode(params)
+        return self._execute_geocode(params)
 
     def _execute_geocode(self, params):
         if not set(params.keys()).issubset(set(self.ADDRESS_PARAMS)):
             raise BadGeocodingParams(params)
         try:
             response = self._perform_request(params)
-            results = response['Response']['View'][0]['Result']
+            results = response['Response']['View'][0]['Result'][0]
             return self._extract_lng_lat_from_result(results)
         except IndexError:
             return []
+        except KeyError:
+            raise MalformedResult()
 
     def _perform_request(self, params):
         request_params = {
@@ -92,11 +91,7 @@ class Geocoder:
             response.raise_for_status()
 
     def _extract_lng_lat_from_result(self, result):
-        try:
-            location = result['Location']
-        except KeyError:
-            raise MalformedResult()
-
+        location = result['Location']
         longitude = location['DisplayPosition']['Longitude']
         latitude = location['DisplayPosition']['Latitude']
 

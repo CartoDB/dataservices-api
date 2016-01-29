@@ -32,19 +32,19 @@ RETURNS boolean AS $$
   if cache_key in GD:
     return False
   else:
-    from cartodb_geocoder import redis_helper
+    from cartodb_services.tools import RedisConnection
     metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
         from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
     metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
         from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
-    redis_metadata_connection = redis_helper.RedisHelper(metadata_config_params['sentinel_host'],
+    redis_metadata_connection = RedisConnection(metadata_config_params['sentinel_host'],
         metadata_config_params['sentinel_port'],
         metadata_config_params['sentinel_master_id'],
         timeout=metadata_config_params['timeout'],
         redis_db=metadata_config_params['redis_db']).redis_connection()
-    redis_metrics_connection = redis_helper.RedisHelper(metrics_config_params['sentinel_host'],
+    redis_metrics_connection = RedisConnection(metrics_config_params['sentinel_host'],
         metrics_config_params['sentinel_port'],
         metrics_config_params['sentinel_master_id'],
         timeout=metrics_config_params['timeout'],

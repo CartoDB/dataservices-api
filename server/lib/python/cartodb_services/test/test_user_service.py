@@ -1,7 +1,7 @@
 import test_helper
 from mockredis import MockRedis
-from cartodb_geocoder import user_service
-from cartodb_geocoder import config_helper
+from cartodb_services.metrics import UserMetricsService
+from cartodb_services.metrics import GeocoderConfig
 from datetime import datetime, date
 from unittest import TestCase
 from nose.tools import assert_raises
@@ -84,7 +84,7 @@ class TestUserService(TestCase):
         if orgname:
             test_helper.build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, end_date=end_date)
-        geocoder_config = config_helper.GeocoderConfig(self.redis_conn,
-                                                       username, orgname,
-                                                       'nokia_id', 'nokia_cod')
-        return user_service.UserService(geocoder_config, self.redis_conn)
+        geocoder_config = GeocoderConfig(self.redis_conn,
+                                         username, orgname,
+                                         'nokia_id', 'nokia_cod')
+        return UserMetricsService(geocoder_config, self.redis_conn)

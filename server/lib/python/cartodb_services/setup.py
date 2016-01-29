@@ -1,5 +1,5 @@
 """
-CartoDB Geocoder Python Library
+CartoDB Services Python Library
 
 See:
 https://github.com/CartoDB/geocoder-api
@@ -8,11 +8,11 @@ https://github.com/CartoDB/geocoder-api
 from setuptools import setup, find_packages
 
 setup(
-    name='cartodb_geocoder',
+    name='cartodb_services',
 
-    version='0.0.1',
+    version='0.1.0',
 
-    description='CartoDB Geocoder Python Library',
+    description='CartoDB Services API Python Library',
 
     url='https://github.com/CartoDB/geocoder-api',
 
@@ -29,7 +29,7 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
 
-    keywords='maps api mapping tools geocoder',
+    keywords='maps api mapping tools geocoder routing',
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 

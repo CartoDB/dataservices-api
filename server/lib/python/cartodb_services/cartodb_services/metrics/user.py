@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 
-class UserService:
+class UserMetricsService:
     """ Class to manage all the user info """
 
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'

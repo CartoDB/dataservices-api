@@ -1,4 +1,4 @@
-import user_service
+from user import UserMetricsService
 from datetime import date
 
 
@@ -8,7 +8,7 @@ class QuotaService:
 
     def __init__(self, user_geocoder_config, redis_connection):
         self._user_geocoder_config = user_geocoder_config
-        self._user_service = user_service.UserService(
+        self._user_service = UserMetricsService(
             self._user_geocoder_config, redis_connection)
 
     def check_user_quota(self):

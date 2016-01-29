@@ -1,7 +1,7 @@
 from redis.sentinel import Sentinel
 
 
-class RedisHelper:
+class RedisConnection:
 
     REDIS_DEFAULT_USER_DB = 5
     REDIS_DEFAULT_TIMEOUT = 2  #seconds

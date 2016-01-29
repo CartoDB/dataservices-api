@@ -2,25 +2,28 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import requests_mock
 
-from heremaps import heremapsgeocoder
-from heremaps.heremapsexceptions import BadGeocodingParams
-from heremaps.heremapsexceptions import EmptyGeocoderResponse
-from heremaps.heremapsexceptions import NoGeocodingParams
-from heremaps.heremapsexceptions import MalformedResult
+from cartodb_services.here import HereMapsGeocoder
+from cartodb_services.here.exceptions import BadGeocodingParams
+from cartodb_services.here.exceptions import NoGeocodingParams
+from cartodb_services.here.exceptions import MalformedResult
+
+requests_mock.Mocker.TEST_PREFIX = 'test_'
 
 
-class GeocoderTestCase(unittest.TestCase):
-    EMPTY_RESPONSE = {
+@requests_mock.Mocker()
+class HereMapsGeocoderTestCase(unittest.TestCase):
+    EMPTY_RESPONSE = """{
         "Response": {
             "MetaInfo": {
                 "Timestamp": "2015-11-04T16:31:57.273+0000"
             },
             "View": []
         }
-    }
+    }"""
 
-    GOOD_RESPONSE = {
+    GOOD_RESPONSE = """{
         "Response": {
             "MetaInfo": {
                 "Timestamp": "2015-11-04T16:30:32.187+0000"
@@ -28,7 +31,7 @@ class GeocoderTestCase(unittest.TestCase):
             "View": [{
                 "_type": "SearchResultsViewType",
                 "ViewId": 0,
-                "Result": [{
+                "Result": {
                     "Relevance": 0.89,
                     "MatchLevel": "street",
                     "MatchQuality": {
@@ -57,7 +60,7 @@ class GeocoderTestCase(unittest.TestCase):
                             }
                         },
                         "Address": {
-                            "Label": "Calle de Eloy Gonzalo, Madrid, España",
+                            "Label": "Calle de Eloy Gonzalo, Madrid, Espana",
                             "Country": "ESP",
                             "State": "Comunidad de Madrid",
                             "County": "Madrid",
@@ -65,7 +68,7 @@ class GeocoderTestCase(unittest.TestCase):
                             "District": "Trafalgar",
                             "Street": "Calle de Eloy Gonzalo",
                             "AdditionalData": [{
-                                "value": "España",
+                                "value": "Espana",
                                 "key": "CountryName"
                             },
                             {
@@ -78,45 +81,52 @@ class GeocoderTestCase(unittest.TestCase):
                             }]
                         }
                     }
-                }]
+                }
             }]
         }
-    }
+    }"""
+
+    MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
-        self.geocoder = heremapsgeocoder.Geocoder(None, None)
+        self.geocoder = HereMapsGeocoder(None, None)
 
-    def test_geocode_address_with_valid_params(self):
-        self.geocoder.perform_request = lambda x: self.GOOD_RESPONSE
-        response = self.geocoder.geocode_address(
+    def test_geocode_address_with_valid_params(self, req_mock):
+        req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
+                       text=self.GOOD_RESPONSE)
+        response = self.geocoder.geocode(
             searchtext='Calle Eloy Gonzalo 27',
             city='Madrid',
             country='España')
 
-    def test_geocode_address_with_invalid_params(self):
+        self.assertEqual(response[0], -3.70126)
+        self.assertEqual(response[1], 40.43433)
+
+    def test_geocode_address_with_invalid_params(self, req_mock):
+        req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
+                       text=self.GOOD_RESPONSE)
         with self.assertRaises(BadGeocodingParams):
-            self.geocoder.geocode_address(
+            self.geocoder.geocode(
                 searchtext='Calle Eloy Gonzalo 27',
                 manolo='escobar')
 
-    def test_geocode_address_with_no_params(self):
+    def test_geocode_address_with_no_params(self, req_mock):
+        req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
+                       text=self.GOOD_RESPONSE)
         with self.assertRaises(NoGeocodingParams):
-            self.geocoder.geocode_address()
+            self.geocoder.geocode()
 
-    def test_geocode_address_empty_response(self):
-        self.geocoder.perform_request = lambda x: self.EMPTY_RESPONSE
-        with self.assertRaises(EmptyGeocoderResponse):
-            self.geocoder.geocode_address(searchtext='lkajfñlasjfñ')
+    def test_geocode_address_empty_response(self, req_mock):
+        req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
+                       text=self.EMPTY_RESPONSE)
+        result = self.geocoder.geocode(searchtext='lkajfñlasjfñ')
+        self.assertEqual(result, [])
 
-    def test_extract_lng_lat_from_result(self):
-        result = self.GOOD_RESPONSE['Response']['View'][0]['Result'][0]
-        coordinates = self.geocoder.extract_lng_lat_from_result(result)
-
-        self.assertEqual(coordinates[0], -3.70126)
-        self.assertEqual(coordinates[1], 40.43433)
-
-    def test_extract_lng_lat_from_result_with_malformed_result(self):
-        result = {'manolo': 'escobar'}
-
+    def test_geocode_with_malformed_result(self, req_mock):
+        req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
+                       text=self.MALFORMED_RESPONSE)
         with self.assertRaises(MalformedResult):
-            self.geocoder.extract_lng_lat_from_result(result)
+            self.geocoder.geocode(
+                searchtext='Calle Eloy Gonzalo 27',
+                city='Madrid',
+                country='España')
