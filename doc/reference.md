@@ -55,13 +55,13 @@ Geometry (polygon, EPSG 4326) or null
 ##### Select
 
 ```sql
-SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
+SELECT cdb_geocode_admin1_polygon('Alicante')
 ```
 
 ##### Update
 
 ```sql
-UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
+UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 ```
 
 ### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
@@ -174,7 +174,7 @@ SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ##### Update
 
 ```sql
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'Spain')
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
 ```
 
 ## Postal codes geocoder
@@ -205,7 +205,7 @@ SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ##### Update
 
 ```sql
-UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'Spain')
+UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'USA')
 ```
 
 **Note:** For the USA, US Census ZCTAs are considered.
@@ -234,7 +234,7 @@ SELECT cdb_geocode_postalcode_point('11211', 'USA')
 ##### Update
 
 ```sql
-UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'United States')
+UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'USA')
 ```
 
 ## IP addresses Geocoder
