@@ -274,6 +274,7 @@ This function provides a street-level geocoding service. This service uses the s
 **This service is subject to quota limitations, and extra fees may apply.** Please view our [terms and conditions](https://cartodb.com/terms/)
 
 Be mindful of the following when using this function:
+
   - **One credit per function call will be consumed**, and the results are not cached. If the query applies to a N rows dataset, then N credits will be used.
   - You are discouraged from using dynamic queries to the Geocoder API in your maps. This can result in credits consumption per map view. Note: **queries to the Geocoder API in your maps may be forbidden in the future**.
   - You are advised to store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
