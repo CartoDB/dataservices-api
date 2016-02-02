@@ -23,13 +23,13 @@ Geometry (polygon, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_admin0_polygon('France')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
 ```
 
@@ -54,13 +54,13 @@ Geometry (polygon, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_admin1_polygon('Alicante')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 ```
 
@@ -81,13 +81,13 @@ Geometry (polygon, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
 ```
 
@@ -112,13 +112,13 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_namedplace_point('Barcelona')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
 ```
 
@@ -139,13 +139,13 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
 ```
 
@@ -167,13 +167,13 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
 ```
 
@@ -198,13 +198,13 @@ Geometry (polygon, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'USA')
 ```
 
@@ -227,17 +227,17 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_postalcode_point('11211', 'USA')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'USA')
 ```
 
-## IP addresses Geocoder
+## IP addresses geocoder
 
 This function provides an IP address geocoding service, for both IPv4 and IPv6 addresses.
 
@@ -258,13 +258,13 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 
 ##### Update
 
-```sql
+```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 ## Street-level geocoder
@@ -298,7 +298,7 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```sql
+```bash
 SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California')
@@ -307,6 +307,6 @@ SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'Californ
 
 ##### Update
 
-```sql
-UPDATE {tablename} SET {the_geom} = cdb_geocode_street_point({street_name_column})
+```bash
+UPDATE {tablename} SET the_geom = cdb_geocode_street_point({street_name_column})
 ```
