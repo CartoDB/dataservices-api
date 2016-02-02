@@ -30,7 +30,7 @@ SELECT cdb_geocode_admin0_polygon('France')
 ##### Update
 
 ```bash
-UPDATE {tablename} SET {the_geom} = cdb_geocode_admin0_polygon({country_column})
+UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ```
 
 
