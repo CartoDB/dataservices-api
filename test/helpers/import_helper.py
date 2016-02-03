@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import sys
 
 import time
 
@@ -11,11 +12,12 @@ class ImportHelper:
     def import_test_dataset(cls, username, api_key, host):
         requests.packages.urllib3.disable_warnings()
         url = "https://{0}.{1}/api/v1/imports/"\
-            "?type_guessing=false&privacy=public&api_key={2}".format(
-            username, host, api_key)
+              "?type_guessing=false&privacy=public&api_key={2}".format(
+              username, host, api_key)
         dataset = {
             'file': open('fixtures/geocoder_api_test_dataset.csv', 'rb')}
         response = requests.post(url, files=dataset)
+        response.raise_for_status()
         response_json = json.loads(response.text)
         if not response_json['success']:
             print "Error importing the test dataset: {0}".format(response.text)
@@ -40,8 +42,7 @@ class ImportHelper:
         import_data_response = requests.get(import_url)
         if import_data_response.status_code != 200:
             print "Error getting the table name from " \
-                "the import data: {0}".format(
-                import_data_response.text)
+                "the import data: {0}".format(import_data_response.text)
             sys.exit(1)
         import_data_json = json.loads(import_data_response.text)
 
