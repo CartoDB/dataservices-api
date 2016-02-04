@@ -1,8 +1,0 @@
-redis==2.10.5
-# Dependency with incsv in the import
-python-dateutil==2.2
-
-# Test
-mock==1.3.0
-mockredispy==2.9.0.11
-nose==1.3.7
