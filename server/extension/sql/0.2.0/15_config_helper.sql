@@ -22,4 +22,4 @@ RETURNS boolean AS $$
     # --for this user session but...
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
