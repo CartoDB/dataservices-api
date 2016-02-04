@@ -28,9 +28,9 @@ include $(PGXS)
 SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
 # The interface definition is used along with some templates to automatically generate code
-RENDERER = ../sql-template-renderer
-INTERFACE_FILE = ../interface_$(EXTVERSION).yaml
-TEMPLATE_DIR = templates
+RENDERER = renderer/sql-template-renderer
+INTERFACE_FILE = renderer/interfaces/interface_$(EXTVERSION).yaml
+TEMPLATE_DIR = renderer/templates
 TEMPLATE_FILES = $(wildcard $(TEMPLATE_DIR)/*.erb)
 GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sql, $(TEMPLATE_FILES))
 
