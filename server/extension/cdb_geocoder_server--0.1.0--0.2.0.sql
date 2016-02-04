@@ -22,7 +22,7 @@ RETURNS boolean AS $$
     # --for this user session but...
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Get the connection to redis from cache or create a new one
 CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
