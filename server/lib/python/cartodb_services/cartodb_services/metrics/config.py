@@ -1,4 +1,5 @@
 import json
+import abc
 from dateutil.parser import parse as date_parse
 
 
@@ -6,7 +7,39 @@ class ConfigException(Exception):
     pass
 
 
-class GeocoderConfig:
+class ServiceConfig(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, redis_connection, username, orgname=None):
+        self._redis_connection = redis_connection
+        self._username = username
+        self._orgname = orgname
+
+    @abc.abstractproperty
+    def service_type(self):
+        raise NotImplementedError('service_type property must be defined')
+
+    @property
+    def username(self):
+        return self._username
+
+    @property
+    def organization(self):
+        return self._orgname
+
+
+class InternalGeocoderConfig(ServiceConfig):
+
+    def __init__(self, redis_connection, username, orgname=None):
+        super(InternalGeocoderConfig, self).__init__(redis_connection,
+                                                     username, orgname)
+
+    @property
+    def service_type(self):
+        return 'geocoder_internal'
+
+
+class GeocoderConfig(ServiceConfig):
 
     GEOCODER_CONFIG_KEYS = ['google_maps_client_id', 'google_maps_api_key',
                             'geocoding_quota', 'soft_geocoding_limit',
@@ -30,7 +63,8 @@ class GeocoderConfig:
 
     def __init__(self, redis_connection, username, orgname=None,
                  heremaps_app_id=None, heremaps_app_code=None):
-        self._redis_connection = redis_connection
+        super(GeocoderConfig, self).__init__(redis_connection, username,
+                                             orgname)
         config = self.__get_user_config(username, orgname, heremaps_app_id,
                                         heremaps_app_code)
         filtered_config = {key: config[key] for key in self.GEOCODER_CONFIG_KEYS if key in config.keys()}
@@ -44,8 +78,6 @@ class GeocoderConfig:
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
         else:
-            user_config[self.USERNAME_KEY] = username
-            user_config[self.ORGNAME_KEY] = orgname
             user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = heremaps_app_id
             user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = heremaps_app_code
             if orgname:
@@ -77,11 +109,6 @@ class GeocoderConfig:
         return True
 
     def __parse_config(self, filtered_config):
-        self._username = filtered_config[self.USERNAME_KEY].lower()
-        if filtered_config[self.ORGNAME_KEY]:
-            self._orgname = filtered_config[self.ORGNAME_KEY].lower()
-        else:
-            self._orgname = None
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
         self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
@@ -138,11 +165,3 @@ class GeocoderConfig:
     @property
     def heremaps_app_code(self):
         return self._heremaps_app_code
-
-    @property
-    def username(self):
-        return self._username
-
-    @property
-    def organization(self):
-        return self._orgname
