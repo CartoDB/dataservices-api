@@ -13,11 +13,13 @@ NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
 DATA =  $(NEW_EXTENSION_ARTIFACT) \
   cdb_geocoder_server--0.0.1.sql \
   cdb_geocoder_server--0.1.0.sql \
+  cdb_geocoder_server--0.2.0.sql \
   cdb_geocoder_server--0.1.0--0.0.1.sql \
   cdb_geocoder_server--0.0.1--0.1.0.sql \
 	cdb_geocoder_server--0.2.0--0.1.0.sql \
-	cdb_geocoder_server--0.1.0--0.2.0.sql
-
+	cdb_geocoder_server--0.1.0--0.2.0.sql \
+	cdb_geocoder_server--0.2.0--0.2.1.sql \
+	cdb_geocoder_server--0.2.1--0.2.0.sql
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
 TEST_DIR = test/$(EXTVERSION)
