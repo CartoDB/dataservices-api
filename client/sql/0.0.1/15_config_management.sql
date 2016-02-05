@@ -1,4 +1,4 @@
-CREATE TYPE cdb_geocoder_client._entity_config AS (
+CREATE TYPE cdb_dataservices_client._entity_config AS (
     username text,
     organization_name text
 );
@@ -9,10 +9,10 @@ CREATE TYPE cdb_geocoder_client._entity_config AS (
 -- The purpose of this function is to retrieve the username and organization name from
 -- a) schema where he/her is the owner in case is an organization user
 -- b) entity_name from the cdb_conf database in case is a non organization user
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_entity_config()
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_entity_config()
 RETURNS record AS $$
 DECLARE
-    result cdb_geocoder_client._entity_config;
+    result cdb_dataservices_client._entity_config;
     is_organization boolean;
     username text;
     organization_name text;
