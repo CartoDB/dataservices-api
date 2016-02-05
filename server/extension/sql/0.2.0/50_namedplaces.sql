@@ -1,7 +1,7 @@
 -- Interfacess of the server extension
 
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text)')
     plpy.debug('user = %s' % username)
@@ -10,7 +10,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1) AS mypoint", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1) AS mypoint", ["text"])
     rv = plpy.execute(plan, [city_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -18,7 +18,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, country_name text)')
     plpy.debug('user = %s' % username)
@@ -27,7 +27,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1, $2) AS mypoint", ["text", "text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1, $2) AS mypoint", ["text", "text"])
     rv = plpy.execute(plan, [city_name, country_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -35,7 +35,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)')
     plpy.debug('user = %s' % username)
@@ -44,7 +44,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1, $2, $3) AS mypoint", ["text", "text", "text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1, $2, $3) AS mypoint", ["text", "text", "text"])
     rv = plpy.execute(plan, [city_name, admin1_name, country_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -57,7 +57,7 @@ $$ LANGUAGE plpythonu;
 -- Note: these functions depend on the cdb_geocoder extension
 
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -76,7 +76,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -96,7 +96,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;

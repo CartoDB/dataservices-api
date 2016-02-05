@@ -1,11 +1,11 @@
 -- Geocodes a street address given a searchtext and a state and/or country
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point(searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
   RETURNS Geometry
 AS $$
   import json
   from heremaps import heremapsgeocoder
 
-  heremaps_conf = json.loads(plpy.execute("SELECT cdb_geocoder_server._get_conf('heremaps')", 1)[0]['get_conf'])
+  heremaps_conf = json.loads(plpy.execute("SELECT cdb_dataservices_server._get_conf('heremaps')", 1)[0]['get_conf'])
 
   app_id = heremaps_conf['geocoder']['app_id']
   app_code = heremaps_conf['geocoder']['app_code']

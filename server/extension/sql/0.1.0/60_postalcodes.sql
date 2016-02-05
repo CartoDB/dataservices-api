@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -9,14 +9,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1) AS point", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point($1) AS point", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -25,14 +25,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_polygon')
     plpy.debug('user = %s' % username)
@@ -41,14 +41,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1) AS polygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon($1) AS polygon", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_polygon')
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -57,7 +57,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
@@ -69,7 +69,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -90,7 +90,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -115,7 +115,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -136,7 +136,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
