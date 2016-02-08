@@ -1,4 +1,4 @@
-CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
+CREATE TYPE cdb_dataservices_server._redis_conf_params AS (
     sentinel_host text,
     sentinel_port int,
     sentinel_master_id text,
@@ -7,8 +7,8 @@ CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
 );
 
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf_v2(config_key text)
-RETURNS cdb_geocoder_server._redis_conf_params AS $$
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_redis_conf_v2(config_key text)
+RETURNS cdb_dataservices_server._redis_conf_params AS $$
     conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(config_key)
     conf = plpy.execute(conf_query)[0]['conf']
     if conf is None:
@@ -26,7 +26,7 @@ RETURNS cdb_geocoder_server._redis_conf_params AS $$
 $$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
   cache_key = "redis_connection_{0}".format(user_id)
   if cache_key in GD:
@@ -35,10 +35,10 @@ RETURNS boolean AS $$
     from cartodb_geocoder import redis_helper
     metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
     metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
     redis_metadata_connection = redis_helper.RedisHelper(metadata_config_params['sentinel_host'],
         metadata_config_params['sentinel_port'],
         metadata_config_params['sentinel_master_id'],

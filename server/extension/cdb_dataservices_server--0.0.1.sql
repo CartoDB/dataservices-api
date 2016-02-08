@@ -1,7 +1,6 @@
---DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION cdb_geocoder_server" to load this file. \quit
-CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
+\echo Use "CREATE EXTENSION cdb_dataservices_server" to load this file. \quit
+CREATE TYPE cdb_dataservices_server._redis_conf_params AS (
     sentinel_host text,
     sentinel_port int,
     sentinel_master_id text,
@@ -10,10 +9,9 @@ CREATE TYPE cdb_geocoder_server._redis_conf_params AS (
 );
 
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf_v2(config_key text)
-RETURNS cdb_geocoder_server._redis_conf_params AS $$
-    conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(config_key)
-    conf = plpy.execute(conf_query)[0]['conf']
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_redis_conf()
+RETURNS cdb_dataservices_server._redis_conf_params AS $$
+    conf = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('redis_conf') conf")[0]['conf']
     if conf is None:
       plpy.error("There is no redis configuration defined")
     else:
@@ -29,147 +27,46 @@ RETURNS cdb_geocoder_server._redis_conf_params AS $$
 $$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
-  cache_key = "redis_connection_{0}".format(user_id)
-  if cache_key in GD:
+  if user_id in GD and 'redis_connection' in GD[user_id]:
     return False
   else:
-    from cartodb_services.tools import RedisConnection
-    metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
+    from cartodb_geocoder import redis_helper
+    config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
-    metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
-        c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
-    redis_metadata_connection = RedisConnection(metadata_config_params['sentinel_host'],
-        metadata_config_params['sentinel_port'],
-        metadata_config_params['sentinel_master_id'],
-        timeout=metadata_config_params['timeout'],
-        redis_db=metadata_config_params['redis_db']).redis_connection()
-    redis_metrics_connection = RedisConnection(metrics_config_params['sentinel_host'],
-        metrics_config_params['sentinel_port'],
-        metrics_config_params['sentinel_master_id'],
-        timeout=metrics_config_params['timeout'],
-        redis_db=metrics_config_params['redis_db']).redis_connection()
-    GD[cache_key] = {
-      'redis_metadata_connection': redis_metadata_connection,
-      'redis_metrics_connection': redis_metrics_connection,
-    }
+        from cdb_dataservices_server._get_redis_conf() c;""")[0]
+    redis_connection = redis_helper.RedisHelper(config_params['sentinel_host'],
+        config_params['sentinel_port'],
+        config_params['sentinel_master_id'],
+        timeout=config_params['timeout'],
+        redis_db=config_params['redis_db']).redis_connection()
+    GD[user_id] = {'redis_connection': redis_connection}
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
--- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_geocoder_config(username text, orgname text)
-RETURNS boolean AS $$
-  cache_key = "user_geocoder_config_{0}".format(username)
-  if cache_key in GD:
-    return False
-  else:
-    import json
-    from cartodb_services.metrics import GeocoderConfig
-    plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
-    heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
-    if not heremaps_conf_json:
-      heremaps_app_id = None
-      heremaps_app_code = None
-    else:
-      heremaps_conf = json.loads(heremaps_conf_json)
-      heremaps_app_id = heremaps_conf['app_id']
-      heremaps_app_code = heremaps_conf['app_code']
-    geocoder_config = GeocoderConfig(redis_conn, username, orgname, heremaps_app_id, heremaps_app_code)
-    # --Think about the security concerns with this kind of global cache, it should be only available
-    # --for this user session but...
-    GD[cache_key] = geocoder_config
-    return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
--- Geocodes a street address given a searchtext and a state and/or country
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point_v2(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+$$ LANGUAGE plpythonu;-- Geocodes a street address given a searchtext and a state and/or country
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+  RETURNS Geometry
+AS $$
+  import json
+  from heremaps import heremapsgeocoder
 
-  if user_geocoder_config.heremaps_geocoder:
-    here_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-    return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-  elif user_geocoder_config.google_geocoder:
-    google_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-    return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-  else:
-    plpy.error('Requested geocoder is not available')
+  heremaps_conf = json.loads(plpy.execute("SELECT cdb_dataservices_server._get_conf('heremaps')", 1)[0]['get_conf'])
 
-$$ LANGUAGE plpythonu;
+  app_id = heremaps_conf['geocoder']['app_id']
+  app_code = heremaps_conf['geocoder']['app_code']
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.here import HereMapsGeocoder
-  from cartodb_services.metrics import QuotaService
+  geocoder = heremapsgeocoder.Geocoder(app_id, app_code)
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  results = geocoder.geocode_address(searchtext=searchtext, city=city, state=state_province, country=country)
+  coordinates = geocoder.extract_lng_lat_from_result(results[0])
 
-  # -- Check the quota
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+  plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+  point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
 
-  try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
-    coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
-    if coordinates:
-      quota_service.increment_success_geocoder_use()
-      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-      return point['st_setsrid']
-    else:
-      quota_service.increment_empty_geocoder_use()
-      return None
-  except BaseException as e:
-    import sys, traceback
-    type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
-    error_msg = 'There was an error trying to geocode using here maps geocoder: {0}'.format(e)
-    plpy.notice(traceback.format_tb(traceback_))
-    plpy.error(error_msg)
-  finally:
-    quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+  return point['st_setsrid']
+$$ LANGUAGE plpythonu;-- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.google import GoogleMapsGeocoder
-  from cartodb_services.metrics import QuotaService
-
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-
-  try:
-    geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key)
-    coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
-    if coordinates:
-      quota_service.increment_success_geocoder_use()
-      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-      return point['st_setsrid']
-    else:
-      quota_service.increment_empty_geocoder_use()
-      return None
-  except BaseException as e:
-    import sys, traceback
-    type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
-    error_msg = 'There was an error trying to geocode using google maps geocoder: {0}'.format(e)
-    plpy.notice(traceback.format_tb(traceback_))
-    plpy.error(error_msg)
-  finally:
-    quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
--- Interface of the server extension
-
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin0_polygons')
     plpy.debug('user = %s' % username)
@@ -178,7 +75,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin0_polygon($1) AS mypolygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon($1) AS mypolygon", ["text"])
     rv = plpy.execute(plan, [country_name], 1)
 
     plpy.debug('Returning from Returning from cdb_geocode_admin0_polygons')
@@ -190,7 +87,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin0_polygon(country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin0_polygon(country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -207,7 +104,7 @@ $$ LANGUAGE plpgsql;
 -- Interfacess of the server extension
 
 ---- cdb_geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text)')
     plpy.debug('user = %s' % username)
@@ -216,7 +113,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin1_polygon($1) AS mypolygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon($1) AS mypolygon", ["text"])
     rv = plpy.execute(plan, [admin1_name], 1)
 
     plpy.debug('Returning from Returning from cdb_geocode_admin1_polygons')
@@ -224,7 +121,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
     plpy.debug('user = %s' % username)
@@ -233,7 +130,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin1_polygon($1, $2) AS mypolygon", ["text", "text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon($1, $2) AS mypolygon", ["text", "text"])
     rv = plpy.execute(plan, [admin1_name, country_name], 1)
 
     plpy.debug('Returning from Returning from cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
@@ -246,7 +143,7 @@ $$ LANGUAGE plpythonu;
 -- Note: these functions depend on the cdb_geocoder extension
 
 ---- cdb_geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin1_polygon(admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin1_polygon(admin1_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -270,7 +167,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin1_polygon(admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -296,7 +193,7 @@ $$ LANGUAGE plpgsql;
 -- Interfacess of the server extension
 
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text)')
     plpy.debug('user = %s' % username)
@@ -305,7 +202,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1) AS mypoint", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1) AS mypoint", ["text"])
     rv = plpy.execute(plan, [city_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -313,7 +210,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, country_name text)')
     plpy.debug('user = %s' % username)
@@ -322,7 +219,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1, $2) AS mypoint", ["text", "text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1, $2) AS mypoint", ["text", "text"])
     rv = plpy.execute(plan, [city_name, country_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -330,7 +227,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)')
     plpy.debug('user = %s' % username)
@@ -339,7 +236,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_namedplace_point($1, $2, $3) AS mypoint", ["text", "text", "text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point($1, $2, $3) AS mypoint", ["text", "text", "text"])
     rv = plpy.execute(plan, [city_name, admin1_name, country_name], 1)
 
     plpy.debug('Returning from Returning from geocode_namedplace')
@@ -352,7 +249,7 @@ $$ LANGUAGE plpythonu;
 -- Note: these functions depend on the cdb_geocoder extension
 
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -371,7 +268,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -391,7 +288,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpgsql;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -416,7 +313,7 @@ $$ LANGUAGE plpgsql;
 
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -425,14 +322,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1) AS point", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point($1) AS point", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -441,14 +338,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point($1, $2) AS point", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_polygon')
     plpy.debug('user = %s' % username)
@@ -457,14 +354,14 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1) AS polygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon($1) AS polygon", ["text"])
     rv = plpy.execute(plan, [code], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_polygon')
     return rv[0]["polygon"]
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_postalcode_point')
     plpy.debug('user = %s' % username)
@@ -473,7 +370,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon($1, $2) AS polygon", ["TEXT", "TEXT"])
     rv = plpy.execute(plan, [code, country], 1)
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
@@ -485,7 +382,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -506,7 +403,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_point(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -531,7 +428,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -552,7 +449,7 @@ RETURNS Geometry AS $$
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_postalcode_polygon(code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text, country text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;
@@ -578,7 +475,7 @@ END
 $$ LANGUAGE plpgsql;
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
     plpy.debug('Entering _cdb_geocode_ipaddress_point')
     plpy.debug('user = %s' % username)
@@ -587,7 +484,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_ipaddress_point($1) AS point", ["TEXT"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point($1) AS point", ["TEXT"])
     rv = plpy.execute(plan, [ip], 1)
 
     plpy.debug('Returning from _cdb_geocode_ipaddress_point')
@@ -599,7 +496,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_ipaddress_point(ip text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_ipaddress_point(ip text)
 RETURNS Geometry AS $$
     DECLARE
         ret Geometry;
@@ -634,9 +531,9 @@ BEGIN
 
             CREATE USER geocoder_api;
     END IF;
-    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_geocoder_server TO geocoder_api;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_dataservices_server TO geocoder_api;
     GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO geocoder_api;
-    GRANT USAGE ON SCHEMA cdb_geocoder_server TO geocoder_api;
+    GRANT USAGE ON SCHEMA cdb_dataservices_server TO geocoder_api;
     GRANT USAGE ON SCHEMA public TO geocoder_api;
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO geocoder_api;
 END$$;

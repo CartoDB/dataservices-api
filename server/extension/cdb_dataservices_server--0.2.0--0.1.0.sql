@@ -1,5 +1,5 @@
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_geocoder_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
   if cache_key in GD:
@@ -7,7 +7,7 @@ RETURNS boolean AS $$
   else:
     import json
     from cartodb_geocoder import config_helper
-    plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
     if not heremaps_conf_json:
@@ -25,7 +25,7 @@ RETURNS boolean AS $$
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
   cache_key = "redis_connection_{0}".format(user_id)
   if cache_key in GD:
@@ -34,10 +34,10 @@ RETURNS boolean AS $$
     from cartodb_geocoder import redis_helper
     metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
     metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
     redis_metadata_connection = redis_helper.RedisHelper(metadata_config_params['sentinel_host'],
         metadata_config_params['sentinel_port'],
         metadata_config_params['sentinel_master_id'],
@@ -55,7 +55,7 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from heremaps import heremapsgeocoder
   from cartodb_geocoder import quota_service
@@ -88,7 +88,7 @@ RETURNS Geometry AS $$
     plpy.error(error_msg)
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
     plpy.error('Google geocoder is not available yet')
     return None

@@ -1,6 +1,6 @@
 # Makefile to generate the extension out of separate sql source files.
 # Once a version is released, it is not meant to be changed. E.g: once version 0.0.1 is out, it SHALL NOT be changed.
-EXTENSION = cdb_geocoder_client
+EXTENSION = cdb_dataservices_client
 EXTVERSION = $(shell grep default_version $(EXTENSION).control | sed -e "s/default_version[[:space:]]*=[[:space:]]*'\([^']*\)'/\1/")
 
 # The new version to be generated from templates
@@ -11,9 +11,9 @@ NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
 # for installation from scratch, upgrades and downgrades.
 # @see http://www.postgresql.org/docs/current/static/extend-pgxs.html
 DATA =  $(NEW_EXTENSION_ARTIFACT) \
-  cdb_geocoder_client--0.0.1.sql \
-  cdb_geocoder_client--0.1.0--0.0.1.sql \
-  cdb_geocoder_client--0.0.1--0.1.0.sql
+  cdb_dataservices_client--0.0.1.sql \
+  cdb_dataservices_client--0.1.0--0.0.1.sql \
+  cdb_dataservices_client--0.0.1--0.1.0.sql
 
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
@@ -28,9 +28,9 @@ include $(PGXS)
 SOURCES_DATA_DIR = sql/$(EXTVERSION)
 
 # The interface definition is used along with some templates to automatically generate code
-RENDERER = ../sql-template-renderer
-INTERFACE_FILE = ../interface_$(EXTVERSION).yaml
-TEMPLATE_DIR = templates
+RENDERER = renderer/sql-template-renderer
+INTERFACE_FILE = renderer/interfaces/interface_$(EXTVERSION).yaml
+TEMPLATE_DIR = renderer/templates
 TEMPLATE_FILES = $(wildcard $(TEMPLATE_DIR)/*.erb)
 GENERATED_SQL_FILES = $(patsubst $(TEMPLATE_DIR)/%.erb, $(SOURCES_DATA_DIR)/%.sql, $(TEMPLATE_FILES))
 

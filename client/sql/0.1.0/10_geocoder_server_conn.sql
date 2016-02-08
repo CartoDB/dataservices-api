@@ -4,7 +4,7 @@
 -- The purpose of this function is provide to the PL/Proxy functions
 -- the connection string needed to connect with the server
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._server_conn_str()
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._server_conn_str()
 RETURNS text AS $$
 DECLARE
   db_connection_str text;

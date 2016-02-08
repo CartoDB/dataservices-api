@@ -4,10 +4,10 @@
 -- The purpose of this function is to retrieve the username and organization name from
 -- a) schema where he/her is the owner in case is an organization user
 -- b) entity_name from the cdb_conf database in case is a non organization user
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_entity_config()
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_entity_config()
 RETURNS record AS $$
 DECLARE
-    result cdb_geocoder_client._entity_config;
+    result cdb_dataservices_client._entity_config;
     is_organization boolean;
     username text;
     organization_name text;
@@ -31,7 +31,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_client.cdb_geocode_street_point (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_geocode_street_point (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
 DECLARE
   ret Geometry;
@@ -41,20 +41,20 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_geocoder_client._cdb_entity_config() AS (u text, o text);
+  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_geocoder_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret;
+  SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_client._cdb_geocode_street_point (username text, organization_name text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_street_point (username text, organization_name text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
-  CONNECT cdb_geocoder_client._server_conn_str();
-  SELECT cdb_geocoder_server.cdb_geocode_street_point (username, organization_name, searchtext, city, state_province, country);
+  CONNECT cdb_dataservices_client._server_conn_str();
+  SELECT cdb_dataservices_server.cdb_geocode_street_point (username, organization_name, searchtext, city, state_province, country);
 $$ LANGUAGE plproxy;
 
-GRANT EXECUTE ON FUNCTION cdb_geocoder_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;

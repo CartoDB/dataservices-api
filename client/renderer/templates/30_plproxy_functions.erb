@@ -1,0 +1,6 @@
+CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (username text, organization_name text, <%= params_with_type_and_default %>)
+RETURNS <%= return_type %> AS $$
+  CONNECT <%= DATASERVICES_CLIENT_SCHEMA %>._server_conn_str();
+  SELECT <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (username, organization_name, <%= params %>);
+$$ LANGUAGE plproxy;
+

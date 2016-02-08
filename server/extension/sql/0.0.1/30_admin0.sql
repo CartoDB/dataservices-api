@@ -1,6 +1,6 @@
 -- Interface of the server extension
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
     plpy.debug('Entering cdb_geocode_admin0_polygons')
     plpy.debug('user = %s' % username)
@@ -9,7 +9,7 @@ RETURNS Geometry AS $$
     #--TODO: quota check
 
     #-- Copied from the doc, see http://www.postgresql.org/docs/9.4/static/plpython-database.html
-    plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_geocode_admin0_polygon($1) AS mypolygon", ["text"])
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon($1) AS mypolygon", ["text"])
     rv = plpy.execute(plan, [country_name], 1)
 
     plpy.debug('Returning from Returning from cdb_geocode_admin0_polygons')
@@ -21,7 +21,7 @@ $$ LANGUAGE plpythonu;
 
 -- Implementation of the server extension
 -- Note: these functions depend on the cdb_geocoder extension
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_geocode_admin0_polygon(country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin0_polygon(country_name text)
 RETURNS Geometry AS $$
   DECLARE
     ret Geometry;

@@ -1,6 +1,6 @@
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_redis_conf_v2(config_key text)
-RETURNS cdb_geocoder_server._redis_conf_params AS $$
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_redis_conf_v2(config_key text)
+RETURNS cdb_dataservices_server._redis_conf_params AS $$
     conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(config_key)
     conf = plpy.execute(conf_query)[0]['conf']
     if conf is None:
@@ -18,7 +18,7 @@ RETURNS cdb_geocoder_server._redis_conf_params AS $$
 $$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._connect_to_redis(user_id text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
   cache_key = "redis_connection_{0}".format(user_id)
   if cache_key in GD:
@@ -27,10 +27,10 @@ RETURNS boolean AS $$
     from cartodb_geocoder import redis_helper
     metadata_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metadata_config') c;""")[0]
     metrics_config_params = plpy.execute("""select c.sentinel_host, c.sentinel_port,
         c.sentinel_master_id, c.timeout, c.redis_db
-        from cdb_geocoder_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
+        from cdb_dataservices_server._get_redis_conf_v2('redis_metrics_config') c;""")[0]
     redis_metadata_connection = redis_helper.RedisHelper(metadata_config_params['sentinel_host'],
         metadata_config_params['sentinel_port'],
         metadata_config_params['sentinel_master_id'],
@@ -49,7 +49,7 @@ RETURNS boolean AS $$
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._get_geocoder_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
   if cache_key in GD:
@@ -57,7 +57,7 @@ RETURNS boolean AS $$
   else:
     import json
     from cartodb_geocoder import config_helper
-    plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
     if not heremaps_conf_json:
@@ -75,26 +75,26 @@ RETURNS boolean AS $$
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Geocodes a street address given a searchtext and a state and/or country
-DROP FUNCTION IF EXISTS cdb_geocoder_server.cdb_geocode_street_point(TEXT, TEXT, TEXT, TEXT);
-CREATE OR REPLACE FUNCTION cdb_geocoder_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_geocode_street_point(TEXT, TEXT, TEXT, TEXT);
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_geocoder_server._connect_to_redis('{0}')".format(username))
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_geocoder_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   if user_geocoder_config.heremaps_geocoder:
-    here_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.google_geocoder:
-    google_plan = plpy.prepare("SELECT cdb_geocoder_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
     plpy.error('Requested geocoder is not available')
 
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from heremaps import heremapsgeocoder
   from cartodb_geocoder import quota_service
@@ -128,15 +128,15 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_geocoder_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
     plpy.error('Google geocoder is not available yet')
     return None
 $$ LANGUAGE plpythonu;
 
 -- We apply again the grants to include the new functions
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_geocoder_server TO geocoder_api;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_dataservices_server TO geocoder_api;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO geocoder_api;
-GRANT USAGE ON SCHEMA cdb_geocoder_server TO geocoder_api;
+GRANT USAGE ON SCHEMA cdb_dataservices_server TO geocoder_api;
 GRANT USAGE ON SCHEMA public TO geocoder_api;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO geocoder_api;

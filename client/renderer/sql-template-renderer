@@ -8,7 +8,8 @@ require 'erb'
 
 class SqlTemplateRenderer
 
-  GEOCODER_CLIENT_SCHEMA = 'cdb_geocoder_client'
+  DATASERVICES_CLIENT_SCHEMA = 'cdb_dataservices_client'
+  DATASERVICES_SERVER_SCHEMA = 'cdb_dataservices_server'
 
   def initialize(template_file, function_signature)
     @function_signature = function_signature
