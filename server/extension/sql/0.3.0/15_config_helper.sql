@@ -6,7 +6,7 @@ RETURNS boolean AS $$
     return False
   else:
     import json
-    from cartodb_services.quota import GeocoderConfig
+    from cartodb_services.metrics import GeocoderConfig
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
