@@ -58,3 +58,20 @@
     - { name: city,  type: text, default: 'NULL'}
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
+
+- name: cdb_isodistance
+  return_type: SETOF isoline
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'NULL' }
+
+- name: cdb_isochrone
+  return_type: SETOF isoline
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'NULL' }
+
