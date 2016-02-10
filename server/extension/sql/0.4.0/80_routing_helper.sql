@@ -19,11 +19,11 @@ RETURNS SETOF isoline AS $$
 
     #-- TODO: move this to a module function
     if source:
-        lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
-        lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
-        start_str = 'geo!%f,%f' % (lat, lon)
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      start_str = 'geo!%f,%f' % (lat, lon)
     else:
-        source_str = None
+      source_str = None
 
     if type == 'isodistance':
       resp = client.calculate_isodistance(source_str, mode, range, options)
@@ -34,7 +34,7 @@ RETURNS SETOF isoline AS $$
       result = []
 
       for isoline in resp:
-		range = isoline['range']
+	range = isoline['range']
         polyline = isoline['geom']
         multipolygon = cdb.here.types.geo_polyline_to_multipolygon(polyline)
         result.append([source_str, mode, range, multipolygon])
