@@ -29,12 +29,12 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
     if resp:
       result = []
-
       for isoline in resp:
         data_range_n = isoline['range']
         polyline = isoline['geom']
         multipolygon = geo_polyline_to_multipolygon(polyline)
         result.append([source, data_range_n, multipolygon])
+      quota_service.increment_success_geocoder_use()
       quota_service.increment_isolines_service_use(len(resp))
       return result
     else:
