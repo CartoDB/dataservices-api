@@ -24,17 +24,6 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION _cdb_configure_heremaps(app_id text, app_code text)
-RETURNS void AS $$
-DECLARE
-    conf json;
-BEGIN
-    conf := format('{"app_id": "%s", "app_code": "%s"}', app_id, app_code);
-    PERFORM cartodb.CDB_Conf_SetConf('heremaps', conf);
-END
-$$ LANGUAGE plpgsql;
-
-routing, key cambia, clase cambia, routingconfim routing_here
 -- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
 RETURNS boolean AS $$
