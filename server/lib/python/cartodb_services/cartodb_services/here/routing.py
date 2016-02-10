@@ -56,8 +56,10 @@ class HereMapsRoutingIsoline:
                             if k.lower() in self.OPTIONAL_PARAMS}
         filtered_options.update(source)
         filtered_options.update(mode)
-        filtered_options.update({'range': ",".join(data_range)})
+        filtered_options.update({'range': ",".join(map(str, data_range))})
         filtered_options.update({'rangetype': range_type})
+        filtered_options.update({'app_id': self._app_id})
+        filtered_options.update({'app_code': self._app_code})
 
         return filtered_options
 
