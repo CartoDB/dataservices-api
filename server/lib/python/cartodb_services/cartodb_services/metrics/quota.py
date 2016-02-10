@@ -28,6 +28,12 @@ class QuotaService:
         else:
             return False
 
+    # TODO
+    # We are going to change this class to be the generic one and
+    # create specific for routing and geocoding services but because
+    # this implies change all the extension functions, we are going to
+    # make the change in a minor release
+
     def increment_success_geocoder_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_geocoder_config.service_type, "success_responses",
@@ -46,4 +52,9 @@ class QuotaService:
     def increment_total_geocoder_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_geocoder_config.service_type, "total_requests",
+            amount=amount)
+
+    def increment_isolines_service_use(self, amount=1):
+        self._user_service.increment_service_use(
+            self._user_geocoder_config.service_type, "isolines_generated",
             amount=amount)
