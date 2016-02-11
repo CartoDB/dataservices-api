@@ -54,7 +54,11 @@ BEGIN
     RETURN result;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
---
+CREATE TYPE cdb_dataservices_client.isoline AS (
+    center geometry(Geometry,4326),
+    data_range integer,
+    the_geom geometry(Multipolygon,4326)
+);--
 -- Public geocoder API function
 --
 -- These are the only ones with permissions to publicuser role
@@ -75,8 +79,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_admin0_polygon(username, orgname, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_admin0_polygon(username, orgname, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -101,8 +107,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -127,8 +135,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -153,8 +163,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -179,8 +191,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -205,8 +219,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, admin1_name, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, admin1_name, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -231,8 +247,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_postalcode_polygon(username, orgname, postal_code, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_postalcode_polygon(username, orgname, postal_code, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -257,8 +275,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_postalcode_point(username, orgname, postal_code, country_name) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_postalcode_point(username, orgname, postal_code, country_name) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -283,8 +303,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_ipaddress_point(username, orgname, ip_address) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_ipaddress_point(username, orgname, ip_address) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -309,8 +331,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret;
-  RETURN ret;
+  
+    SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret;
+    RETURN ret;
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -321,9 +345,9 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- and should also be the only ones with SECURITY DEFINER
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isodistance (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
-RETURNS SETOF isoline AS $$
+RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
-  ret SETOF isoline;
+  
   username text;
   orgname text;
 BEGIN
@@ -335,8 +359,10 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_isodistance(username, orgname, source, mode, range, options) INTO ret;
-  RETURN ret;
+  
+    RETURN QUERY
+    SELECT * FROM cdb_dataservices_client._cdb_isodistance(username, orgname, source, mode, range, options);
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
@@ -347,9 +373,9 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- and should also be the only ones with SECURITY DEFINER
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isochrone (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
-RETURNS SETOF isoline AS $$
+RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
-  ret SETOF isoline;
+  
   username text;
   orgname text;
 BEGIN
@@ -361,81 +387,107 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT cdb_dataservices_client._cdb_isochrone(username, orgname, source, mode, range, options) INTO ret;
-  RETURN ret;
+  
+    RETURN QUERY
+    SELECT * FROM cdb_dataservices_client._cdb_isochrone(username, orgname, source, mode, range, options);
+  
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_admin0_polygon (username text, organization_name text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_admin0_polygon (username, organization_name, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_admin1_polygon (username text, organization_name text, admin1_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_admin1_polygon (username, organization_name, admin1_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_admin1_polygon (username text, organization_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_admin1_polygon (username, organization_name, admin1_name, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_namedplace_point (username text, organization_name text, city_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_namedplace_point (username, organization_name, city_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_namedplace_point (username text, organization_name text, city_name text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_namedplace_point (username, organization_name, city_name, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_namedplace_point (username text, organization_name text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_namedplace_point (username, organization_name, city_name, admin1_name, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_postalcode_polygon (username text, organization_name text, postal_code text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon (username, organization_name, postal_code, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_postalcode_point (username text, organization_name text, postal_code text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_point (username, organization_name, postal_code, country_name);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_ipaddress_point (username text, organization_name text, ip_address text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point (username, organization_name, ip_address);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_street_point (username text, organization_name text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
+  
   SELECT cdb_dataservices_server.cdb_geocode_street_point (username, organization_name, searchtext, city, state_province, country);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isodistance (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
-RETURNS SETOF isoline AS $$
+RETURNS SETOF cdb_dataservices_client.isoline AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
-  SELECT cdb_dataservices_server.cdb_isodistance (username, organization_name, source, mode, range, options);
+  
+  SELECT * FROM cdb_dataservices_server.cdb_isodistance (username, organization_name, source, mode, range, options);
+  
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isochrone (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
-RETURNS SETOF isoline AS $$
+RETURNS SETOF cdb_dataservices_client.isoline AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
-  SELECT cdb_dataservices_server.cdb_isochrone (username, organization_name, source, mode, range, options);
+  
+  SELECT * FROM cdb_dataservices_server.cdb_isochrone (username, organization_name, source, mode, range, options);
+  
 $$ LANGUAGE plproxy;
 
 -- Make sure by default there are no permissions for publicuser

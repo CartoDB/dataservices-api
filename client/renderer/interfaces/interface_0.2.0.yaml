@@ -60,7 +60,8 @@
     - { name: country,  type: text, default: 'NULL'}
 
 - name: cdb_isodistance
-  return_type: SETOF isoline
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -68,7 +69,8 @@
     - { name: options, type: "text[]", default: 'NULL' }
 
 - name: cdb_isochrone
-  return_type: SETOF isoline
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
