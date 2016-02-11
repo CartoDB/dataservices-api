@@ -344,7 +344,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isodistance (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isodistance (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
@@ -372,7 +372,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isochrone (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_isochrone (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
@@ -474,7 +474,7 @@ RETURNS Geometry AS $$
   
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isodistance (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isodistance (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
@@ -482,7 +482,7 @@ RETURNS SETOF cdb_dataservices_client.isoline AS $$
   
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isochrone (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_isochrone (username text, organization_name text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   

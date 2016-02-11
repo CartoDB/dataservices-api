@@ -66,7 +66,7 @@
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
-    - { name: options, type: "text[]", default: 'NULL' }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
 
 - name: cdb_isochrone
   return_type: SETOF cdb_dataservices_client.isoline
@@ -75,5 +75,5 @@
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
-    - { name: options, type: "text[]", default: 'NULL' }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
 
