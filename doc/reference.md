@@ -356,8 +356,8 @@ Name | Type | Description
 ##### Select
 
 ```bash
-SELECT * FROM cdb_isodistance('010100000000000000008006C00DEB9D3C72F44340', 'car', ARRAY[1000,2000]::integer[]);
-SELECT * FROM cdb_isodistance('010100000000000000008006C00DEB9D3C72F44340', 'walk', ARRAY[1000]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
+SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[1000,2000]::integer[]);
+SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[1000]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
 ```
 
 ### cdb_isochrone(_source geometry, mode text, range integer[], options text[]_)
@@ -369,6 +369,6 @@ This function uses the same parameters and info as the `cdb_isodistance` functio
 ##### Select
 
 ```bash
-SELECT * FROM cdb_isochrone('010100000000000000008006C00DEB9D3C72F44340', 'car', ARRAY[300,900,12000]::integer[]);
-SELECT * FROM cdb_isochrone('010100000000000000008006C00DEB9D3C72F44340', 'walk', ARRAY[300,900]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
+SELECT * FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300,900,12000]::integer[]);
+SELECT * FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300,900]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
 ```
