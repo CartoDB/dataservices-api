@@ -2,7 +2,9 @@
 
 The CartoDB Data Services API offers a set of location based services that can be used programatically to empower your geospatial applications. 
 
-The CartoDB Geocoder API allows you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses.
+The Geocoder functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses.
+
+The Routing functions ---
 
 ## Documentation
 
