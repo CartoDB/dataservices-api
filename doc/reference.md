@@ -323,7 +323,7 @@ This function provides an isolines generator sirves based on time or distance.
 #### Arguments
 
 Name | Type | Description | Accepted values
---- | --- | ---
+--- | --- | --- | ---
 `source` | `geometry` | Source point, in 4326 projection, taken as the start point
 `mode` | `geometry` | Type of transport used to calculate the isolines. | `car` and `walk`
 `range` | `integer[]` | Range of the isoline in meters
@@ -334,7 +334,7 @@ Name | Type | Description | Accepted values
 The options values must be pass in the following way: `option=value`.
 
 Name | Type | Description | Accepted values
---- | --- | ---
+--- | --- | --- | ---
 `is_destination` | `boolean` | If is true the source point is the destination instead of the starting one.
 `mode_type` | `text` | Type of route calculation | `shortest` or `fastest`. By default is `shortest`
 `mode_traffic` | `text` | Use the traffic data to calculate the route. | `enabled` or `disabled`. By default is `disabled`
@@ -345,7 +345,7 @@ Name | Type | Description | Accepted values
 
 #### Returns
 
-Name | Type | Description | Accepted values
+Name | Type | Description
 --- | --- | ---
 `center` | `geometry` | Source point, in 4326 projection, taken as the start point
 `data_range` | `integer` | The range that belongs to the generated isoline. 
@@ -355,8 +355,10 @@ Name | Type | Description | Accepted values
 
 ##### Select
 
+```bash
 SELECT cdb_isodistance('010100000000000000008006C00DEB9D3C72F44340', 'car', ARRAY[1000,2000]::integer[]);
 SELECT cdb_isodistance('010100000000000000008006C00DEB9D3C72F44340', 'walk', ARRAY[1000]::integer[], ARRAY['mode_traffic=enabled,quality=3']::text[]);
+```
 
 ### cdb_isochrone(_source geometry, mode text, range integer[], options text[]_)
 
@@ -366,5 +368,7 @@ This function uses the same parameters and info as the `cdb_isodistance` functio
 
 ##### Select
 
+```bash
 SELECT cdb_isochrone('010100000000000000008006C00DEB9D3C72F44340', 'car', ARRAY[300,900,12000]::integer[]);
 SELECT cdb_isodistance('010100000000000000008006C00DEB9D3C72F44340', 'walk', ARRAY[300,900]::integer[], ARRAY['mode_traffic=enabled,quality=3']::text[]);
+```
