@@ -11,6 +11,14 @@ class BadGeocodingParams(Exception):
         return repr('Bad geocoding params: ' + json.dumps(self.value))
 
 
+class WrongParams(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr('Wrong parameters passed: ' + json.dumps(self.value))
+
+
 class NoGeocodingParams(Exception):
     def __str__(self):
         return repr('No params for geocoding specified')

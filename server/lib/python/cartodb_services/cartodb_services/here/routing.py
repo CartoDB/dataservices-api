@@ -1,6 +1,8 @@
 import requests
 import json
 
+from exceptions import WrongParams
+
 
 class HereMapsRoutingIsoline:
     'A Here Maps Routing wrapper for python'
@@ -8,6 +10,11 @@ class HereMapsRoutingIsoline:
     PRODUCTION_ROUTING_BASE_URL = 'https://isoline.route.api.here.com'
     STAGING_ROUTING_BASE_URL = 'https://isoline.route.cit.api.here.com'
     ISOLINE_PATH = '/routing/7.2/calculateisoline.json'
+
+    ACCEPTED_MODES = {
+        "walk": "pedestrian",
+        "car": "car"
+    }
 
     OPTIONAL_PARAMS = [
         'departure',
@@ -81,6 +88,11 @@ class HereMapsRoutingIsoline:
         return {key: source}
 
     def __parse_mode_param(self, mode, options):
+        if mode in self.ACCEPTED_MODES:
+            mode_source = self.ACCEPTED_MODES[mode]
+        else:
+            raise WrongParams("{0} is not an accepted mode type".format(mode))
+
         if 'mode_type' in options:
             mode_type = options['mode_type']
         else:
@@ -97,7 +109,7 @@ class HereMapsRoutingIsoline:
         else:
             mode_feature = None
 
-        mode_param = "{0};{1}".format(mode_type, mode)
+        mode_param = "{0};{1}".format(mode_type, mode_source)
         if mode_traffic:
             mode_param = "{0};{1}".format(mode_param, mode_traffic)
 
