@@ -1,11 +1,11 @@
 
 # Routing functions
 
-The following rouging functions are available, grouped by categories.
+The following routing functions are available, grouped by categories.
 
 ## Isolines
 
-This function provides an isolines generator sirves based on time or distance.
+This function provides an isolines generator service based on time or distance.
 
 ### cdb_isodistance(_source geometry, mode text, range integer[], options text[]_)
 
@@ -14,7 +14,7 @@ This function provides an isolines generator sirves based on time or distance.
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
 `source` | `geometry` | Source point, in 4326 projection, taken as the start point
-`mode` | `geometry` | Type of transport used to calculate the isolines. | `car` and `walk`
+`mode` | `geometry` | Type of transport used to calculate the isolines. | `car` or `walk`
 `range` | `integer[]` | Range of the isoline in meters
 `options` | `text[]` | Multiple options to add more capabilities to the analysis. See the options section to know more.
 
@@ -51,7 +51,7 @@ SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRA
 
 ### cdb_isochrone(_source geometry, mode text, range integer[], options text[]_)
 
-This function uses the same parameters and info as the `cdb_isodistance` function with the difference that the range is measured in seconds instead of meters
+This function uses the same parameters and information as the `cdb_isodistance` function with the difference that the range is measured in seconds instead of meters.
 
 #### Example
 
