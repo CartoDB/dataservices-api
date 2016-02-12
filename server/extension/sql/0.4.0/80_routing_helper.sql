@@ -13,7 +13,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   quota_service = QuotaService(user_routing_config, redis_conn)
 
   try:
-    client = HereMapsRoutingIsoline(user_routing_config.heremaps_app_id, user_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.STAGING_ROUTING_BASE_URL )
+    client = HereMapsRoutingIsoline(user_routing_config.heremaps_app_id, user_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
