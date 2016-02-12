@@ -28,6 +28,28 @@ class ServiceConfig(object):
         return self._orgname
 
 
+class RoutingConfig(ServiceConfig):
+
+    def __init__(self, redis_connection, username, orgname=None,
+                 heremaps_app_id=None, heremaps_app_code=None):
+        super(RoutingConfig, self).__init__(redis_connection,
+                                                     username, orgname)
+        self._heremaps_app_id = heremaps_app_id
+        self._heremaps_app_code = heremaps_app_code
+
+    @property
+    def service_type(self):
+        return 'routing_here'
+
+    @property
+    def heremaps_app_id(self):
+        return self._heremaps_app_id
+
+    @property
+    def heremaps_app_code(self):
+        return self._heremaps_app_code
+
+
 class InternalGeocoderConfig(ServiceConfig):
 
     def __init__(self, redis_connection, username, orgname=None):

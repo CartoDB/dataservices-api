@@ -23,68 +23,81 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
         }
     }"""
 
-    GOOD_RESPONSE = """{
-        "Response": {
-            "MetaInfo": {
-                "Timestamp": "2015-11-04T16:30:32.187+0000"
-            },
-            "View": [{
-                "_type": "SearchResultsViewType",
-                "ViewId": 0,
-                "Result": {
-                    "Relevance": 0.89,
-                    "MatchLevel": "street",
-                    "MatchQuality": {
-                        "City": 1.0,
-                        "Street": [1.0]
-                    },
-                    "Location": {
-                        "LocationId": "NT_yyKB4r3mCWAX4voWgxPcuA",
-                        "LocationType": "address",
-                        "DisplayPosition": {
-                            "Latitude": 40.43433,
-                            "Longitude": -3.70126
-                        },
-                        "NavigationPosition": [{
-                            "Latitude": 40.43433,
-                            "Longitude": -3.70126
-                        }],
-                        "MapView": {
-                            "TopLeft": {
-                                "Latitude": 40.43493,
-                                "Longitude": -3.70404
-                            },
-                            "BottomRight": {
-                                "Latitude": 40.43373,
-                                "Longitude": -3.69873
-                            }
-                        },
-                        "Address": {
-                            "Label": "Calle de Eloy Gonzalo, Madrid, Espana",
-                            "Country": "ESP",
-                            "State": "Comunidad de Madrid",
-                            "County": "Madrid",
-                            "City": "Madrid",
-                            "District": "Trafalgar",
-                            "Street": "Calle de Eloy Gonzalo",
-                            "AdditionalData": [{
-                                "value": "Espana",
-                                "key": "CountryName"
-                            },
-                            {
-                                "value": "Comunidad de Madrid",
-                                "key": "StateName"
-                            },
-                            {
-                                "value": "Madrid",
-                                "key": "CountyName"
-                            }]
-                        }
+    GOOD_RESPONSE = unicode("""{
+      "Response": {
+        "MetaInfo": {
+          "Timestamp": "2016-02-10T14:17:33.792+0000",
+          "NextPageInformation": "2"
+        },
+        "View": [
+          {
+            "_type": "SearchResultsViewType",
+            "ViewId": 0,
+            "Result": [
+              {
+                "Relevance": 1,
+                "MatchLevel": "houseNumber",
+                "MatchQuality": {
+                  "Street": [
+                    1
+                  ],
+                  "HouseNumber": 1
+                },
+                "MatchType": "pointAddress",
+                "Location": {
+                  "LocationId": "NT_CKopMSB9JnBYAO11CMOrxB_zUD",
+                  "LocationType": "address",
+                  "DisplayPosition": {
+                    "Latitude": 37.70246,
+                    "Longitude": -5.2794
+                  },
+                  "NavigationPosition": [
+                    {
+                      "Latitude": 37.7024199,
+                      "Longitude": -5.27939
                     }
+                  ],
+                  "MapView": {
+                    "TopLeft": {
+                      "Latitude": 37.7035842,
+                      "Longitude": -5.2808208
+                    },
+                    "BottomRight": {
+                      "Latitude": 37.7013358,
+                      "Longitude": -5.2779792
+                    }
+                  },
+                  "Address": {
+                    "Label": "Calle Amor de Dios, 35, 14700 Palma del Río (Córdoba), España",
+                    "Country": "ESP",
+                    "State": "Andalucía",
+                    "County": "Córdoba",
+                    "City": "Palma del Río",
+                    "Street": "Calle Amor de Dios",
+                    "HouseNumber": "35",
+                    "PostalCode": "14700",
+                    "AdditionalData": [
+                      {
+                        "value": "España",
+                        "key": "CountryName"
+                      },
+                      {
+                        "value": "Andalucía",
+                        "key": "StateName"
+                      },
+                      {
+                        "value": "Córdoba",
+                        "key": "CountyName"
+                      }
+                    ]
+                  }
                 }
-            }]
-        }
-    }"""
+              }
+            ]
+          }
+        ]
+      }
+    }""", 'utf-8')
 
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
@@ -95,12 +108,12 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
         req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
                        text=self.GOOD_RESPONSE)
         response = self.geocoder.geocode(
-            searchtext='Calle Eloy Gonzalo 27',
-            city='Madrid',
+            searchtext='Calle amor de dios',
+            city='Cordoba',
             country='España')
 
-        self.assertEqual(response[0], -3.70126)
-        self.assertEqual(response[1], 40.43433)
+        self.assertEqual(response[0], -5.2794)
+        self.assertEqual(response[1], 37.70246)
 
     def test_geocode_address_with_invalid_params(self, req_mock):
         req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
@@ -127,6 +140,6 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
                        text=self.MALFORMED_RESPONSE)
         with self.assertRaises(MalformedResult):
             self.geocoder.geocode(
-                searchtext='Calle Eloy Gonzalo 27',
-                city='Madrid',
+                searchtext='Calle amor de dios',
+                city='Cordoba',
                 country='España')

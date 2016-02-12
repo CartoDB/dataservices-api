@@ -28,6 +28,10 @@ class SqlTemplateRenderer
     @function_signature['return_type']
   end
 
+  def multi_row
+    @function_signature['multi_row']
+  end
+
   def user_config_key
     @function_signature['user_config_key']
   end

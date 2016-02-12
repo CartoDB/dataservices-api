@@ -7,7 +7,7 @@
 CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
-  ret <%= return_type %>;
+  <% if not multi_row %>ret <%= return_type %>;<% end %>
   username text;
   orgname text;
 BEGIN
@@ -19,8 +19,13 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
-  RETURN ret;
+  <% if multi_row %>
+    RETURN QUERY
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>);
+  <% else %>
+    SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
+    RETURN ret;
+  <% end %>
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
