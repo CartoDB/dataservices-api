@@ -83,7 +83,7 @@ The optional value parameters must be passed with the format: `option=value`.
 
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
-`is_destination` | `boolean` | If true, the source point is the destination instead of the starting location | `true` or `false`
+`is_destination` | `boolean` | If true, the source point is the destination instead of the starting location | `true` or `false`. `false` by default
 `mode_type` | `text` | Type of route calculation | `shortest` or `fastest`. `shortest` by default
 `mode_traffic` | `text` | Use traffic data to calculate the route | `enabled` or `disabled`. `disabled` by default
 `singlecomponent` | `boolean` | If true, the isoline service will return a single polygon area, instead of creating a separate polygon for each reachable area separated of the main polygon (known as island). | `true` or `false`. `false` by default
