@@ -38,7 +38,7 @@ In this scenario, both client and server sides require to be edited/created.
 * Generate the **upgrade and downgrade files** for the extension for both client and server
 
 * Update the control files and the Makefiles to generate the complete SQL file for the new created version
-  * These new version files (`cdb_dataservices_client--X.Y.Z.sql and cdb_dataservices_server--X.Y.X.sql) must be pushed and frozen. You can add these to the `.gitignore` file.
+  * These new version files (`cdb_dataservices_client--X.Y.Z.sql and cdb_dataservices_server--X.Y.X.sql`) must be pushed and frozen. You can add these to the `.gitignore` file.
 
 * Update the public docs! ;-)
 
