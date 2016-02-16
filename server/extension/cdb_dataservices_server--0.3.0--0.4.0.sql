@@ -1,12 +1,12 @@
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
 RETURNS boolean AS $$
-  cache_key = "user_routing_config_{0}".format(username)
+  cache_key = "user_isolines_routing_config_{0}".format(username)
   if cache_key in GD:
     return False
   else:
     import json
-    from cartodb_services.metrics import RoutingConfig
+    from cartodb_services.metrics import IsolinesRoutingConfig
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
@@ -17,7 +17,7 @@ RETURNS boolean AS $$
       heremaps_conf = json.loads(heremaps_conf_json)
       heremaps_app_id = heremaps_conf['app_id']
       heremaps_app_code = heremaps_conf['app_code']
-    routing_config = RoutingConfig(redis_conn, username, orgname, heremaps_app_id, heremaps_app_code)
+    routing_config = IsolinesRoutingConfig(redis_conn, username, orgname, heremaps_app_id, heremaps_app_code)
     # --Think about the security concerns with this kind of global cache, it should be only available
     # --for this user session but...
     GD[cache_key] = routing_config
@@ -34,12 +34,15 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.here.types import geo_polyline_to_multipolygon
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  quota_service = QuotaService(user_routing_config, redis_conn)
+  # -- Check the quota
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reach the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_routing_config.heremaps_app_id, user_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
+    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, user_isolines_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -80,8 +83,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_isolines_config = GD["user_routing_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
   type = 'isodistance'
 
   here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
@@ -99,8 +102,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, 
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_isolines_config = GD["user_routing_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
   type = 'isochrone'
 
   here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
