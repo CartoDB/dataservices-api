@@ -1,8 +1,8 @@
 # General concepts
 
-The Data Services API offers geocoding and routing services on top of the CartoDB SQL API by means of a set of functions. Each one of these functions is oriented to one kind of operation and it will return the corresponding geometry (a `polygon` or a `point`) according to the input information.
+The Data Services API offers geocoding and routing services on top of the CartoDB SQL API by means of a set of functions. Each one of these functions is oriented to one kind of operation and returns the corresponding geometry (a `polygon` or a `point`), according to the input information.
 
-The Data Services API decouples the geocoding and routing services from the CartoDB Editor. The API allows to geocode data (being single rows, complete datasets or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically through authenticated requests.
+The Data Services API decouples the geocoding and routing services from the CartoDB Editor. The API allows you to geocode data (from single rows, complete datasets, or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically through authenticated requests.
 
 The geometries provided by this API are projected in the projection [WGS 84 SRID 4326](http://spatialreference.org/ref/epsg/wgs-84/).
 
