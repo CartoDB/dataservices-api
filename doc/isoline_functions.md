@@ -1,6 +1,14 @@
 # Isoline functions
 
-The following functions provide an isolines generator service based on time or distance.
+The following functions provide an isolines generator service based on time or distance. This service uses the isolines service defined for the user (currently, only the Here isolines service is available).
+
+This service is subject to quota limitations, and extra fees may apply. Please view our [terms and conditions](https://cartodb.com/terms/).
+
+Be mindful of the following when using this function:
+
+* One credit per function call will be consumed, and the results are not cached. If the query applies to a _N_ rows dataset, then _N_ credits will be used.
+* You are discouraged from using dynamic queries to the isoline functions in your maps. This can result in credits consumption per map view. Note: queries to the Data Services API and any of its functions in your maps may be forbidden in the future.
+* You are advised to store results of isoline queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
 
 ### cdb_isodistance(_source geometry, mode text, range integer[], options text[]_)
 
