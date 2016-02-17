@@ -275,9 +275,9 @@ This function provides a street-level geocoding service. This service uses the s
 
 Be mindful of the following when using this function:
 
-  - **One credit per function call will be consumed**, and the results are not cached. If the query applies to a N rows dataset, then N credits will be used.
-  - You are discouraged from using dynamic queries to the Geocoder API in your maps. This can result in credits consumption per map view. Note: **queries to the Geocoder API in your maps may be forbidden in the future**.
-  - You are advised to store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
+  - **One credit per function call will be consumed**, and the results are not cached. If the query applies to a _N_ rows dataset, then _N_ credits will be used.
+  - You are discouraged from using dynamic queries to the geocoding functions in your maps. This can result in credits consumption per map view. Note: **queries to the Data Services API and its functions in your maps may be forbidden in the future**.
+  - You are advised to store results of geocoding queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
