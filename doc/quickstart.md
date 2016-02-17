@@ -1,6 +1,6 @@
 # Quickstart
 
-If you are using the set of APIs and libraries that CartoDB offers, and you are handling your data with the SQL API, you can make your data visible in your maps by geocoding the dataset programatically. The set of routing functions allow you to calculate the area which can be reached by travelling a given distance or time, useful for geospatial analysis, such as Trade Area Analysis.
+If you are using the set of APIs and libraries that CartoDB offers, and you are handling your data with the SQL API, you can make your data visible in your maps by geocoding the dataset programatically. The set of isoline functions allow you to calculate the area which can be reached by travelling a given distance or time, useful for geospatial analysis, such as Trade Area Analysis.
 
 Here is an example of how to geocode a single country:
 
@@ -13,7 +13,7 @@ In order to geocode an existent CartoDB dataset, an SQL UPDATE statement must be
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})&api_key={Your API key}
 ```
-You can use the routing functions to retrieve. For example, retrieve isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
+You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
 
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300,600,900]::integer[])&api_key={Your API key}
