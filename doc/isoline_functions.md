@@ -1,11 +1,6 @@
+# Isoline functions
 
-# Routing functions
-
-The following routing functions are available.
-
-## Isolines
-
-This function provides an isolines generator service based on time or distance.
+The following functions provide an isolines generator service based on time or distance.
 
 ### cdb_isodistance(_source geometry, mode text, range integer[], options text[]_)
 
