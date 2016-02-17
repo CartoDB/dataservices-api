@@ -11,4 +11,4 @@ The isoline functions provide a way to generate isolines in terms of distance an
 * [Quickstart](quickstart.md)
 * [General concepts](general_concepts.md)
 * [Geocoding functions](geocoding_functions.md)
-* [Routing functions](routing_functions.md)
+* [Isoline functions](isoline_functions.md)
