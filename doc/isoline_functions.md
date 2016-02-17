@@ -4,7 +4,7 @@ The following functions provide an isolines generator service based on time or d
 
 This service is subject to quota limitations, and extra fees may apply. Please view our [terms and conditions](https://cartodb.com/terms/).
 
-Be mindful of the following when using this function:
+Be mindful of the following when using these functions:
 
 * One credit per function call will be consumed, and the results are not cached. If the query applies to a _N_ rows dataset, then _N_ credits will be used.
 * You are discouraged from using dynamic queries to the isoline functions in your maps. This can result in credits consumption per map view. Note: queries to the Data Services API and any of its functions in your maps may be forbidden in the future.
