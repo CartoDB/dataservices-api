@@ -1,3 +1,5 @@
+ALTER TYPE cdb_dataservices_server._redis_conf_params ADD ATTRIBUTE redis_host text;
+
 -- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_redis_conf_v2(config_key text)
 RETURNS cdb_dataservices_server._redis_conf_params AS $$
