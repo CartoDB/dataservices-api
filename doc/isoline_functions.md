@@ -17,7 +17,7 @@ Be mindful of the following when using these functions:
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
 `source` | `geometry` | Source point, in 4326 projection, which defines the start location. |
-`mode` | `geometry` | Type of transport used to calculate the isolines. | `car` or `walk`
+`mode` | `text` | Type of transport used to calculate the isolines. | `car` or `walk`
 `range` | `integer[]` | Range of the isoline, in meters. |
 `options` | `text[]` | Optional. Multiple options to add more capabilities to the analysis. See [Optional isolines parameters](#optional-isoline-parameters) for details.
 
@@ -58,7 +58,7 @@ This function uses the same parameters and information as the `cdb_isodistance` 
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
 `source` | `geometry` | Source point, in 4326 projection, which defines the start location. |
-`mode` | `geometry` | Type of transport used to calculate the isolines. | `car` or `walk`
+`mode` | `text` | Type of transport used to calculate the isolines. | `car` or `walk`
 `range` | `integer[]` | Range of the isoline, in seconds. |
 `options` | `text[]` | Optional. Multiple options to add more capabilities to the analysis. See [Optional isolines parameters](#optional-isoline-parameters) for details.
 
