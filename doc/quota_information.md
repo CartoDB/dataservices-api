@@ -1,6 +1,6 @@
 # Quota information
 
-This Data Services API provides functions which are subject to quota limitations, and extra fees may apply. Please check our [terms and conditions](https://cartodb.com/terms/) for detailed information about quotas.
+**This Data Services API provides functions which are subject to quota limitations, and extra fees may apply**. Please check our [terms and conditions](https://cartodb.com/terms/).
 
 The functions that require service credits to be used are as follows:
 
