@@ -1,7 +1,8 @@
 #!/bin/bash
 
 TARGET_DB=$1
-PGUSER=${2:-postgres}
+ADMIN_PGUSER="postgres"
+PGUSER=${2:-${ADMIN_PGUSER}}
 PYTHON_LIBRARY_NAME='cartodb_services'
 
 function usage {
@@ -32,4 +33,4 @@ CDB_DATASERVICES_SERVER_CREATE="${CREATE_EXTENSION_COMMAND} cdb_dataservices_ser
 echo "* Creating extension cdb_geocoder"
 psql -U ${PGUSER} -d ${TARGET_DB} -c "${CDB_GEOCODER_EXTENSION_CREATE}"
 echo "* Creating extension cdb_dataservices_server"
-psql -U ${PGUSER} -d ${TARGET_DB} -c "${CDB_DATASERVICES_SERVER_CREATE}"
+psql -U ${ADMIN_PGUSER} -d ${TARGET_DB} -c "${CDB_DATASERVICES_SERVER_CREATE}"
