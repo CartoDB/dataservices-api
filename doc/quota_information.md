@@ -2,7 +2,7 @@
 
 This Data Services API provides functions which are subject to quota limitations, and extra fees may apply. Please check our [terms and conditions](https://cartodb.com/terms/) for detailed information about quotas.
 
-The functions that require are as follows:
+The functions that require service credits to be used are as follows:
 
 * cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_); from [Geocoding functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/geocoding-functions/)
 * cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_); from [Isoline functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/isoline-functions/)
