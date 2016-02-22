@@ -6,16 +6,8 @@ class UserMetricsService:
     """ Class to manage all the user info """
 
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'
-    SERVICE_GEOCODER_GOOGLE = 'geocoder_google'
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
-
-    GEOCODING_QUOTA_KEY = "geocoding_quota"
-    GEOCODING_SOFT_LIMIT_KEY = "soft_geocoder_limit"
-
-    REDIS_CONNECTION_KEY = "redis_connection"
-    REDIS_CONNECTION_HOST = "redis_host"
-    REDIS_CONNECTION_PORT = "redis_port"
-    REDIS_CONNECTION_DB = "redis_db"
+    SERVICE_HERE_ISOLINES = 'here_isolines'
 
     def __init__(self, user_geocoder_config, redis_connection):
         self._user_geocoder_config = user_geocoder_config
@@ -24,6 +16,12 @@ class UserMetricsService:
         self._orgname = user_geocoder_config.organization
 
     def used_quota(self, service_type, date):
+        if service_type == self.SERVICE_HERE_ISOLINES:
+            return self.__used_isolines_quota(service_type, date)
+        else:
+            return self.__used_geocoding_quota(service_type, date)
+
+    def __used_geocoding_quota(self, service_type, date):
         """ Recover the used quota for the user in the current month """
         date_from, date_to = self.__current_billing_cycle()
         current_use = 0
@@ -41,6 +39,20 @@ class UserMetricsService:
             current_use += cache_hits
 
         return current_use
+
+    def __used_isolines_quota(self, service_type, date):
+        date_from, date_to = self.__current_billing_cycle()
+        current_use = 0
+        isolines_generated = self.get_metrics(service_type,
+                                             'isolines_generated', date_from,
+                                             date_to)
+        empty_responses = self.get_metrics(service_type,
+                                           'empty_responses', date_from,
+                                           date_to)
+        current_use += (isolines_generated + empty_responses)
+
+        return current_use
+
 
     def increment_service_use(self, service_type, metric, date=date.today(), amount=1):
         """ Increment the services uses in monthly and daily basis"""
