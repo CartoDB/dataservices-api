@@ -1,4 +1,7 @@
-ALTER TYPE cdb_dataservices_server._redis_conf_params DROP ATTRIBUTE IF EXISTS redis_host; 
+ALTER TYPE cdb_dataservices_server._redis_conf_params DROP ATTRIBUTE IF EXISTS redis_host,
+                                                      DROP ATTRIBUTE IF EXISTS redis_port,
+                                                      ADD ATTRIBUTE sentinel_host text,
+                                                      ADD ATTRIBUTE sentinel_port int; 
 
 -- Get the Redis configuration from the _conf table --
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_redis_conf_v2(config_key text)
