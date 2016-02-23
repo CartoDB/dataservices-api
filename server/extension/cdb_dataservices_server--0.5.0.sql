@@ -1,6 +1,79 @@
 --DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION cdb_dataservices_server" to load this file. \quit
+CREATE TYPE cdb_dataservices_server.simple_route AS (
+    shape geometry(LineString,4326),
+    length real,
+    duration integer
+);
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_point_to_point(
+  username TEXT,
+  orgname TEXT,
+  origin geometry(Point, 4326),
+  destination geometry(Point, 4326),
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
+RETURNS cdb_dataservices_server.simple_route AS $$
+  import json
+  from cartodb_services.mapzen import MapzenRouting, MapzenRoutingResponse
+  from cartodb_services.mapzen.types import polyline_to_linestring
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Coordinate
+
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  user_routing_config = GD["user_routing_config_{0}".format(username)]
+
+  quota_service = QuotaService(user_routing_config, redis_conn)
+
+  try:
+    client = MapzenRouting(user_routing_config.mapzen_app_key)
+
+    orig_lat = plpy.execute("SELECT ST_Y('%s') AS lat" % origin)[0]['lat']
+    orig_lon = plpy.execute("SELECT ST_X('%s') AS lon" % origin)[0]['lon']
+    origin_coordinates = Coordinate(orig_lon, orig_lat)
+    dest_lat = plpy.execute("SELECT ST_Y('%s') AS lat" % destination)[0]['lat']
+    dest_lon = plpy.execute("SELECT ST_X('%s') AS lon" % destination)[0]['lon']
+    dest_coordinates = Coordinate(dest_lon, dest_lat)
+
+    resp = client.calculate_route_point_to_point(origin_coordinates, dest_coordinates, mode, options, units)
+
+    if resp:
+      shape_linestring = polyline_to_linestring(resp.shape)
+      quota_service.increment_success_geocoder_use()
+      return [shape_linestring, resp.length, resp.duration]
+    else:
+      quota_service.increment_empty_geocoder_use()
+  except BaseException as e:
+    import sys, traceback
+    type_, value_, traceback_ = sys.exc_info()
+    quota_service.increment_failed_geocoder_use()
+    error_msg = 'There was an error trying to obtain route using mapzen provider: {0}'.format(e)
+    plpy.notice(traceback.format_tb(traceback_))
+    plpy.error(error_msg)
+  finally:
+    quota_service.increment_total_geocoder_use()
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
+  username TEXT,
+  orgname TEXT,
+  origin geometry(Point, 4326),
+  destination geometry(Point, 4326),
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
+RETURNS cdb_dataservices_server.simple_route AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_routing_config = GD["user_routing_config_{0}".format(username)]
+
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_point_to_point($1, $2, $3, $4, $5, $6, $7) as route;", ["text", "text", "geometry(Point, 4326)", "geometry(Point, 4326)", "text", "text[]", "text"])
+  result = plpy.execute(mapzen_plan, [username, orgname, origin, destination, mode, options, units])
+  return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+$$ LANGUAGE plpythonu;
 CREATE TYPE cdb_dataservices_server._redis_conf_params AS (
     sentinel_master_id text,
     redis_host text,
@@ -85,14 +158,14 @@ RETURNS boolean AS $$
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Get the Redis configuration from the _conf table --
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
 RETURNS boolean AS $$
-  cache_key = "user_routing_config_{0}".format(username)
+  cache_key = "user_isolines_routing_config_{0}".format(username)
   if cache_key in GD:
     return False
   else:
     import json
-    from cartodb_services.metrics import RoutingConfig
+    from cartodb_services.metrics import IsolinesRoutingConfig
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     heremaps_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as heremaps_conf", 1)[0]['heremaps_conf']
@@ -103,7 +176,31 @@ RETURNS boolean AS $$
       heremaps_conf = json.loads(heremaps_conf_json)
       heremaps_app_id = heremaps_conf['app_id']
       heremaps_app_code = heremaps_conf['app_code']
-    routing_config = RoutingConfig(redis_conn, username, orgname, heremaps_app_id, heremaps_app_code)
+    isolines_routing_config = IsolinesRoutingConfig(redis_conn, username, orgname, heremaps_app_id, heremaps_app_code)
+    # --Think about the security concerns with this kind of global cache, it should be only available
+    # --for this user session but...
+    GD[cache_key] = isolines_routing_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+-- Get the Redis configuration from the _conf table --
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_routing_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    import json
+    from cartodb_services.metrics import RoutingConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    mapzen_conf_json = plpy.execute("SELECT cartodb.CDB_Conf_GetConf('mapzen_conf') as mapzen_conf", 1)[0]['mapzen_conf']
+    if not mapzen_conf_json:
+      mapzen_app_key = None
+    else:
+      mapzen_conf = json.loads(mapzen_conf_json)
+      mapzen_app_key = mapzen_conf['routing_app_key']
+    routing_config = RoutingConfig(redis_conn, username, orgname, mapzen_app_key)
     # --Think about the security concerns with this kind of global cache, it should be only available
     # --for this user session but...
     GD[cache_key] = routing_config
@@ -814,12 +911,15 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.here.types import geo_polyline_to_multipolygon
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  quota_service = QuotaService(user_routing_config, redis_conn)
+  # -- Check the quota
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reach the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_routing_config.heremaps_app_id, user_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
+    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, user_isolines_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -859,8 +959,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_isolines_config = GD["user_routing_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
   type = 'isodistance'
 
   here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
@@ -877,8 +977,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, 
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_isolines_config = GD["user_routing_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
   type = 'isochrone'
 
   here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])

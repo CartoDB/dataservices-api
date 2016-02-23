@@ -19,6 +19,12 @@ SELECT cartodb.cdb_conf_setconf('redis_metadata_config', '{"redis_host": "localh
  
 (1 row)
 
+SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"app_key": "dummy_key"}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 -- Mock the varnish invalidation function
 -- (used by cdb_geocoder tests)
 CREATE OR REPLACE FUNCTION public.cdb_invalidate_varnish(table_name text) RETURNS void AS $$

@@ -11,6 +11,7 @@ CREATE EXTENSION cdb_dataservices_server;
 -- Mock the redis server connection to point to this very test db
 SELECT cartodb.cdb_conf_setconf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
 SELECT cartodb.cdb_conf_setconf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
+SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"app_key": "dummy_key"}');
 
 -- Mock the varnish invalidation function
 -- (used by cdb_geocoder tests)

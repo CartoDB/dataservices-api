@@ -52,3 +52,10 @@ RETURNS boolean AS $$
     }
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
+
+-- Mapzen integration
+
+DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_route_point_to_point(TEXT, TEXT, geometry(Point, 4326), geometry(Point, 4326), TEXT, text[], text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_mapzen_route_point_to_point(TEXT, TEXT, geometry(Point, 4326), geometry(Point, 4326), TEXT, text[], text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_routing_config(text, text);
+DROP TYPE IF EXISTS cdb_dataservices_server.simple_route;
