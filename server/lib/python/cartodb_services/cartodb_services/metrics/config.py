@@ -27,6 +27,27 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
+class RoutingConfig(ServiceConfig):
+
+    ROUTING_CONFIG_KEYS = ['username', 'orgname', 'mapzen_app_key']
+    MAPZEN_APP_KEY = 'mapzen_app_key'
+    USERNAME_KEY = 'username'
+    ORGNAME_KEY = 'orgname'
+
+    def __init__(self, redis_connection, username, orgname=None,
+                 mapzen_app_key=None):
+        super(RoutingConfig, self).__init__(redis_connection, username,
+                                             orgname)
+        self._mapzen_app_key = mapzen_app_key
+
+    @property
+    def service_type(self):
+        return 'routing_mapzen'
+
+    @property
+    def mapzen_app_key(self):
+        return self._mapzen_app_key
+
 
 class IsolinesRoutingConfig(ServiceConfig):
 

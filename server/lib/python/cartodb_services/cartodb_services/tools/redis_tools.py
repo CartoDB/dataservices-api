@@ -6,8 +6,6 @@ class RedisConnection:
 
     REDIS_DEFAULT_USER_DB = 5
     REDIS_DEFAULT_TIMEOUT = 2  #seconds
-    #REDIS_SENTINEL_DEFAULT_PORT = 26379
-    #REDIS_DEFAULT_PORT = 6379
 
     def __init__(self, sentinel_master_id, redis_host, redis_port,
                  redis_db=REDIS_DEFAULT_USER_DB, **kwargs):
