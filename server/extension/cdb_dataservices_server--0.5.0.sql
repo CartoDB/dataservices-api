@@ -92,13 +92,18 @@ RETURNS cdb_dataservices_server._redis_conf_params AS $$
     else:
       import json
       params = json.loads(conf)
-      return {
-        "sentinel_master_id": params['sentinel_master_id'],
+      redis_conf_params = {
         "redis_host": params['redis_host'],
         "redis_port": params['redis_port'],
         "timeout": params['timeout'],
         "redis_db": params['redis_db']
       }
+      if "sentinel_master_id" in params:
+        redis_conf_params["sentinel_master_id"] = params["sentinel_master_id"]
+      else:
+        redis_conf_params["sentinel_master_id"] = None
+
+      return redis_conf_params
 $$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
