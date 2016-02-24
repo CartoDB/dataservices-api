@@ -22,6 +22,9 @@ BEGIN
   <% if multi_row %>
     RETURN QUERY
     SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>);
+  <% elsif multi_field %>
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
+    RETURN ret;
   <% else %>
     SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
     RETURN ret;
