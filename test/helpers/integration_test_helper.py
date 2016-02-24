@@ -29,4 +29,4 @@ class IntegrationTestHelper:
             raise Exception(json.loads(query_response.text)['error'])
         query_response_data = json.loads(query_response.text)
 
-        return query_response_data['rows'][0]['geometry']
+        return query_response_data['rows'][0]
