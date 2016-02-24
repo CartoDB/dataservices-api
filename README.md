@@ -61,10 +61,10 @@ Steps to deploy a new Geocoder API version :
     # select CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
     
     # select CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE"}');
-    # select CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "geocoder"}')
+    # select CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
     ```
 
-- congigure plproxy to point to the same user database (you could do in a different one)
+- configure plproxy to point to the same user database (you could do in a different one)
 
     ```
      select CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=cartodb_dev_user_accf0647-d942-4e37-b129-8287c117e687_db user=postgres"}');
