@@ -69,3 +69,9 @@ Steps to deploy a new Geocoder API version :
     ```
      select CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=cartodb_dev_user_accf0647-d942-4e37-b129-8287c117e687_db user=postgres"}');
     ```
+
+- configure the search path in order to be able to execute the functions without use the schema:
+
+    ```
+    alter role "<USER_ROLE>" set search_path='"$user", public, cartodb, cdb_dataservices_client';
+    ```
