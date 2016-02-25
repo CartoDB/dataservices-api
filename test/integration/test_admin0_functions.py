@@ -16,16 +16,15 @@ class TestAdmin0Functions(TestCase):
 
     def test_if_select_with_admin0_is_ok(self):
         query = "SELECT cdb_geocode_admin0_polygon(country) as geometry " \
-            "FROM {0} LIMIT 1&api_key={1}".format(
-            self.env_variables['table_name'],
-            self.env_variables['api_key'])
+                "FROM {0} LIMIT 1&api_key={1}".format(
+                    self.env_variables['table_name'],
+                    self.env_variables['api_key'])
         geometry = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(geometry, None)
+        assert_not_equal(geometry['geometry'], None)
 
     def test_if_select_with_admin0_without_api_key_raise_error(self):
         query = "SELECT cdb_geocode_admin0_polygon(country) as geometry " \
-            "FROM {0} LIMIT 1".format(
-            self.env_variables['table_name'])
+            "FROM {0} LIMIT 1".format(self.env_variables['table_name'])
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:

@@ -20,7 +20,7 @@ class TestPostalcodeFunctions(TestCase):
             self.env_variables['table_name'],
             self.env_variables['api_key'])
         geometry = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(geometry, None)
+        assert_not_equal(geometry['geometry'], None)
 
     def test_if_select_with_postalcode_point_is_ok(self):
         query = "SELECT cdb_geocode_postalcode_point(postalcode, country) " \
@@ -28,7 +28,7 @@ class TestPostalcodeFunctions(TestCase):
             self.env_variables['table_name'],
             self.env_variables['api_key'])
         geometry = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(geometry, None)
+        assert_not_equal(geometry['geometry'], None)
 
     def test_if_select_with_postalcode_without_api_key_raise_error(self):
         query = "SELECT cdb_geocode_postalcode_polygon(postalcode, country) " \

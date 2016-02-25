@@ -8,12 +8,15 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.here.types import geo_polyline_to_multipolygon
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  quota_service = QuotaService(user_routing_config, redis_conn)
+  # -- Check the quota
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reach the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_routing_config.heremaps_app_id, user_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
+    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, user_isolines_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']

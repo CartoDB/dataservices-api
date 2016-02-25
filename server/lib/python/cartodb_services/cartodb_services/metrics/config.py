@@ -28,18 +28,76 @@ class ServiceConfig(object):
         return self._orgname
 
 
-class RoutingConfig(ServiceConfig):
+class IsolinesRoutingConfig(ServiceConfig):
+
+    ROUTING_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
+                           'period_end_date', 'username', 'orgname',
+                           'heremaps_app_id', 'heremaps_app_code']
+    NOKIA_APP_ID_KEY = 'heremaps_app_id'
+    NOKIA_APP_CODE_KEY = 'heremaps_app_code'
+    QUOTA_KEY = 'here_isolines_quota'
+    SOFT_LIMIT_KEY = 'soft_here_isolines_limit'
+    USERNAME_KEY = 'username'
+    ORGNAME_KEY = 'orgname'
+    PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_connection, username, orgname=None,
                  heremaps_app_id=None, heremaps_app_code=None):
-        super(RoutingConfig, self).__init__(redis_connection,
-                                                     username, orgname)
-        self._heremaps_app_id = heremaps_app_id
-        self._heremaps_app_code = heremaps_app_code
+        super(IsolinesRoutingConfig, self).__init__(redis_connection, username,
+                                             orgname)
+        config = self.__get_user_config(username, orgname, heremaps_app_id,
+                                        heremaps_app_code)
+        filtered_config = {key: config[key] for key in self.ROUTING_CONFIG_KEYS if key in config.keys()}
+        self.__parse_config(filtered_config)
+
+    def __get_user_config(self, username, orgname=None, heremaps_app_id=None,
+                          heremaps_app_code=None):
+        user_config = self._redis_connection.hgetall(
+            "rails:users:{0}".format(username))
+        if not user_config:
+            raise ConfigException("""There is no user config available. Please check your configuration.'""")
+        else:
+            user_config[self.NOKIA_APP_ID_KEY] = heremaps_app_id
+            user_config[self.NOKIA_APP_CODE_KEY] = heremaps_app_code
+            if orgname:
+                self.__get_organization_config(orgname, user_config)
+
+            return user_config
+
+    def __get_organization_config(self, orgname, user_config):
+        org_config = self._redis_connection.hgetall(
+            "rails:orgs:{0}".format(orgname))
+        if not org_config:
+            raise ConfigException("""There is no organization config available. Please check your configuration.'""")
+        else:
+            user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
+            user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
+
+    def __parse_config(self, filtered_config):
+        self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
+        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
+        if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_isolines_limit = True
+        else:
+            self._soft_isolines_limit = False
+        self._heremaps_app_id = filtered_config[self.NOKIA_APP_ID_KEY]
+        self._heremaps_app_code = filtered_config[self.NOKIA_APP_CODE_KEY]
 
     @property
     def service_type(self):
-        return 'routing_here'
+        return 'here_isolines'
+
+    @property
+    def isolines_quota(self):
+        return self._isolines_quota
+
+    @property
+    def soft_isolines_limit(self):
+        return self._soft_isolines_limit
+
+    @property
+    def period_end_date(self):
+        return self._period_end_date
 
     @property
     def heremaps_app_id(self):
