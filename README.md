@@ -1,8 +1,8 @@
-# geocoder-api
-The CartoDB Geocoder SQL API (server and client FTM)
+# Data Services API
+The CartoDB Data Services SQL API (server and client FTM)
 
 ### Deploy instructions
-Steps to deploy a new Geocoder API version :
+Steps to deploy a new Data Services API version :
 
 - Deploy new version of dataservices API to all servers
 - Update the server user using: ALTER EXTENSION cdb_dataservices_server UPDATE TO '<CURRENT_VERSION>';
