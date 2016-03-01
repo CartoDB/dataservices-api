@@ -1,1 +1,2 @@
 from redis_tools import RedisConnection
+from coordinates import Coordinate

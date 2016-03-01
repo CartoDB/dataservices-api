@@ -27,12 +27,33 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
+class RoutingConfig(ServiceConfig):
+
+    ROUTING_CONFIG_KEYS = ['username', 'orgname', 'mapzen_app_key']
+    MAPZEN_APP_KEY = 'mapzen_app_key'
+    USERNAME_KEY = 'username'
+    ORGNAME_KEY = 'orgname'
+
+    def __init__(self, redis_connection, username, orgname=None,
+                 mapzen_app_key=None):
+        super(RoutingConfig, self).__init__(redis_connection, username,
+                                             orgname)
+        self._mapzen_app_key = mapzen_app_key
+
+    @property
+    def service_type(self):
+        return 'routing_mapzen'
+
+    @property
+    def mapzen_app_key(self):
+        return self._mapzen_app_key
+
 
 class IsolinesRoutingConfig(ServiceConfig):
 
     ROUTING_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
                            'period_end_date', 'username', 'orgname',
-                           'heremaps_app_id', 'heremaps_app_code']
+                           'heremaps_app_id', 'heremaps_app_code', 'geocoder_type']
     NOKIA_APP_ID_KEY = 'heremaps_app_id'
     NOKIA_APP_CODE_KEY = 'heremaps_app_code'
     QUOTA_KEY = 'here_isolines_quota'
@@ -40,6 +61,8 @@ class IsolinesRoutingConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
+    GEOCODER_TYPE_KEY = 'geocoder_type'
+    GOOGLE_GEOCODER = 'google'
 
     def __init__(self, redis_connection, username, orgname=None,
                  heremaps_app_id=None, heremaps_app_code=None):
@@ -74,6 +97,7 @@ class IsolinesRoutingConfig(ServiceConfig):
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
 
     def __parse_config(self, filtered_config):
+        self._geocoder_type = filtered_config[self.GEOCODER_TYPE_KEY].lower()
         self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
@@ -106,6 +130,10 @@ class IsolinesRoutingConfig(ServiceConfig):
     @property
     def heremaps_app_code(self):
         return self._heremaps_app_code
+
+    @property
+    def google_services_user(self):
+        return self._geocoder_type == self.GOOGLE_GEOCODER
 
 
 class InternalGeocoderConfig(ServiceConfig):

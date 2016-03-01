@@ -13,10 +13,13 @@ NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
 DATA =  $(NEW_EXTENSION_ARTIFACT) \
   cdb_dataservices_client--0.0.1.sql \
   cdb_dataservices_client--0.1.0.sql \
+  cdb_dataservices_client--0.2.0.sql \
   cdb_dataservices_client--0.1.0--0.0.1.sql \
   cdb_dataservices_client--0.0.1--0.1.0.sql \
   cdb_dataservices_client--0.2.0--0.1.0.sql \
-  cdb_dataservices_client--0.1.0--0.2.0.sql
+  cdb_dataservices_client--0.1.0--0.2.0.sql \
+  cdb_dataservices_client--0.2.0--0.3.0.sql \
+  cdb_dataservices_client--0.3.0--0.2.0.sql
 
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))

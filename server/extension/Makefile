@@ -15,14 +15,17 @@ DATA =  $(NEW_EXTENSION_ARTIFACT) \
   cdb_dataservices_server--0.1.0.sql \
   cdb_dataservices_server--0.2.0.sql \
   cdb_dataservices_server--0.3.0.sql \
+  cdb_dataservices_server--0.4.0.sql \
   cdb_dataservices_server--0.1.0--0.0.1.sql \
   cdb_dataservices_server--0.0.1--0.1.0.sql \
-	cdb_dataservices_server--0.2.0--0.1.0.sql \
-	cdb_dataservices_server--0.1.0--0.2.0.sql \
-	cdb_dataservices_server--0.2.0--0.3.0.sql \
-	cdb_dataservices_server--0.3.0--0.2.0.sql \
-	cdb_dataservices_server--0.3.0--0.4.0.sql \
-	cdb_dataservices_server--0.4.0--0.3.0.sql
+  cdb_dataservices_server--0.2.0--0.1.0.sql \
+  cdb_dataservices_server--0.1.0--0.2.0.sql \
+  cdb_dataservices_server--0.2.0--0.3.0.sql \
+  cdb_dataservices_server--0.3.0--0.2.0.sql \
+  cdb_dataservices_server--0.3.0--0.4.0.sql \
+  cdb_dataservices_server--0.4.0--0.3.0.sql \
+  cdb_dataservices_server--0.5.0--0.4.0.sql \
+  cdb_dataservices_server--0.4.0--0.5.0.sql
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
 TEST_DIR = test/$(EXTVERSION)

@@ -1,0 +1,1 @@
+../../0.2.0/sql/00_installation_test.sql
