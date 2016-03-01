@@ -148,7 +148,6 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
                                                u'32.9699707,0.9462833'])
 
     def test_calculate_isochrone_with_valid_params(self, req_mock):
-        print self.isoline_url
         url = "{0}?start=geo%2133.0%2C1.0&mode=shortest%3Bcar".format(self.isoline_url)
         req_mock.register_uri('GET', url, text=self.GOOD_RESPONSE)
         response = self.routing.calculate_isochrone('geo!33.0,1.0', 'car',
