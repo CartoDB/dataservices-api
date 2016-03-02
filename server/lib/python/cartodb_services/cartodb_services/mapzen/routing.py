@@ -1,10 +1,9 @@
 import requests
 import json
 import re
-from polyline.codec import PolylineCodec
 
 from exceptions import WrongParams
-from cartodb_services.tools import Coordinate
+from cartodb_services.tools import Coordinate, PolyLine
 
 
 class MapzenRouting:
@@ -74,7 +73,7 @@ class MapzenRouting:
         try:
             parsed_json_response = json.loads(response)
             legs = parsed_json_response['trip']['legs'][0]
-            shape = PolylineCodec().decode(legs['shape'])
+            shape = PolyLine().decode(legs['shape'])
             length = legs['summary']['length']
             duration = legs['summary']['time']
             routing_response = MapzenRoutingResponse(shape, length, duration)
