@@ -5,27 +5,16 @@ EXTVERSION = $(shell grep default_version $(EXTENSION).control | sed -e "s/defau
 
 # The new version to be generated from templates
 NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
+OLD_VERSIONS = $(wildcard old_versions/*.sql)
 
 # DATA is a special variable used by postgres build infrastructure
 # These are the files to be installed in the server shared dir,
 # for installation from scratch, upgrades and downgrades.
 # @see http://www.postgresql.org/docs/current/static/extend-pgxs.html
 DATA =  $(NEW_EXTENSION_ARTIFACT) \
-  cdb_dataservices_server--0.0.1.sql \
-  cdb_dataservices_server--0.1.0.sql \
-  cdb_dataservices_server--0.2.0.sql \
-  cdb_dataservices_server--0.3.0.sql \
-  cdb_dataservices_server--0.4.0.sql \
-  cdb_dataservices_server--0.1.0--0.0.1.sql \
-  cdb_dataservices_server--0.0.1--0.1.0.sql \
-  cdb_dataservices_server--0.2.0--0.1.0.sql \
-  cdb_dataservices_server--0.1.0--0.2.0.sql \
-  cdb_dataservices_server--0.2.0--0.3.0.sql \
-  cdb_dataservices_server--0.3.0--0.2.0.sql \
-  cdb_dataservices_server--0.3.0--0.4.0.sql \
-  cdb_dataservices_server--0.4.0--0.3.0.sql \
-  cdb_dataservices_server--0.5.0--0.4.0.sql \
-  cdb_dataservices_server--0.4.0--0.5.0.sql
+  $(OLD_VERSIONS) \
+  cdb_dataservices_server--0.5.1--0.5.0.sql \
+  cdb_dataservices_server--0.5.0--0.5.1.sql
 
 REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
 TEST_DIR = test/$(EXTVERSION)
