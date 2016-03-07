@@ -4,26 +4,14 @@ CREATE EXTENSION schema_triggers;
 CREATE EXTENSION plpythonu;
 CREATE EXTENSION cartodb;
 CREATE EXTENSION cdb_geocoder;
+
 -- Install the extension
 CREATE EXTENSION cdb_dataservices_server;
+
 -- Mock the redis server connection to point to this very test db
 SELECT cartodb.cdb_conf_setconf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 6379, "timeout": 0.1, "redis_db": 5}');
- cdb_conf_setconf 
-------------------
- 
-(1 row)
-
 SELECT cartodb.cdb_conf_setconf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 6379, "timeout": 0.1, "redis_db": 5}');
- cdb_conf_setconf 
-------------------
- 
-(1 row)
-
 SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"app_key": "dummy_key"}');
- cdb_conf_setconf 
-------------------
- 
-(1 row)
 
 -- Mock the varnish invalidation function
 -- (used by cdb_geocoder tests)
@@ -33,10 +21,6 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
+
 -- Set user quota
 SELECT cartodb.CDB_SetUserQuotaInBytes(0);
- cdb_setuserquotainbytes 
--------------------------
-                       0
-(1 row)
-
