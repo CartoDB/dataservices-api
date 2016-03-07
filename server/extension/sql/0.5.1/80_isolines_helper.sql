@@ -37,18 +37,18 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
         polyline = isoline['geom']
         multipolygon = geo_polyline_to_multipolygon(polyline)
         result.append([source, data_range_n, multipolygon])
-      quota_service.increment_success_geocoder_use()
+      quota_service.increment_success_service_use()
       quota_service.increment_isolines_service_use(len(resp))
       return result
     else:
-      quota_service.increment_empty_geocoder_use()
+      quota_service.increment_empty_service_use()
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
+    quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to obtain isodistances using here maps geocoder: {0}'.format(e)
     plpy.notice(traceback.format_tb(traceback_))
     plpy.error(error_msg)
   finally:
-    quota_service.increment_total_geocoder_use()
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;

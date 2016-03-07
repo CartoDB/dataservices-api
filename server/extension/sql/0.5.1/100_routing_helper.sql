@@ -39,17 +39,17 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
     if resp:
       shape_linestring = polyline_to_linestring(resp.shape)
-      quota_service.increment_success_geocoder_use()
+      quota_service.increment_success_service_use()
       return [shape_linestring, resp.length, resp.duration]
     else:
-      quota_service.increment_empty_geocoder_use()
+      quota_service.increment_empty_service_use()
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
+    quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to obtain route using mapzen provider: {0}'.format(e)
     plpy.notice(traceback.format_tb(traceback_))
     plpy.error(error_msg)
   finally:
-    quota_service.increment_total_geocoder_use()
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;

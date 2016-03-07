@@ -18,28 +18,22 @@ class QuotaService:
     def check_user_quota(self):
         return self._quota_checker.check()
 
-    # TODO
-    # We are going to change this class to be the generic one and
-    # create specific for routing and geocoding services but because
-    # this implies change all the extension functions, we are going to
-    # make the change in a minor release
-
-    def increment_success_geocoder_use(self, amount=1):
+    def increment_success_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "success_responses",
             amount=amount)
 
-    def increment_empty_geocoder_use(self, amount=1):
+    def increment_empty_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "empty_responses",
             amount=amount)
 
-    def increment_failed_geocoder_use(self, amount=1):
+    def increment_failed_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "fail_responses",
             amount=amount)
 
-    def increment_total_geocoder_use(self, amount=1):
+    def increment_total_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "total_requests",
             amount=amount)

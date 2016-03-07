@@ -34,22 +34,22 @@ RETURNS Geometry AS $$
     geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_geocoder_use()
+      quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_geocoder_use()
+      quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
+    quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to geocode using here maps geocoder: {0}'.format(e)
     plpy.notice(traceback.format_tb(traceback_))
     plpy.error(error_msg)
   finally:
-    quota_service.increment_total_geocoder_use()
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -65,20 +65,20 @@ RETURNS Geometry AS $$
     geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_geocoder_use()
+      quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_geocoder_use()
+      quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
-    quota_service.increment_failed_geocoder_use()
+    quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to geocode using google maps geocoder: {0}'.format(e)
     plpy.notice(traceback.format_tb(traceback_))
     plpy.error(error_msg)
   finally:
-    quota_service.increment_total_geocoder_use()
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

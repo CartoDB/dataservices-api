@@ -63,18 +63,18 @@ class TestQuotaService(TestCase):
 
     def test_should_check_user_increment_and_quota_check_correctly(self):
         qs = self.__build_quota_service('test_user', quota=2)
-        qs.increment_success_geocoder_use()
+        qs.increment_success_service_use()
         assert qs.check_user_quota() is True
-        qs.increment_success_geocoder_use(amount=2)
+        qs.increment_success_service_use(amount=2)
         assert qs.check_user_quota() is False
         month = date.today().strftime('%Y%m')
 
     def test_should_check_org_increment_and_quota_check_correctly(self):
         qs = self.__build_quota_service('test_user', orgname='test_org',
                                         quota=2)
-        qs.increment_success_geocoder_use()
+        qs.increment_success_service_use()
         assert qs.check_user_quota() is True
-        qs.increment_success_geocoder_use(amount=2)
+        qs.increment_success_service_use(amount=2)
         assert qs.check_user_quota() is False
         month = date.today().strftime('%Y%m')
 

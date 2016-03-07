@@ -14,20 +14,20 @@ RETURNS Geometry AS $$
       rv = plpy.execute(plan, [admin1_name], 1)
       result = rv[0]["mypolygon"]
       if result:
-        quota_service.increment_success_geocoder_use()
+        quota_service.increment_success_service_use()
         return result
       else:
-        quota_service.increment_empty_geocoder_use()
+        quota_service.increment_empty_service_use()
         return None
     except BaseException as e:
       import sys, traceback
       type_, value_, traceback_ = sys.exc_info()
-      quota_service.increment_failed_geocoder_use()
+      quota_service.increment_failed_service_use()
       error_msg = 'There was an error trying to geocode using admin0 geocoder: {0}'.format(e)
       plpy.notice(traceback.format_tb(traceback_))
       plpy.error(error_msg)
     finally:
-      quota_service.increment_total_geocoder_use()
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
@@ -46,20 +46,20 @@ RETURNS Geometry AS $$
       rv = plpy.execute(plan, [admin1_name, country_name], 1)
       result = rv[0]["mypolygon"]
       if result:
-        quota_service.increment_success_geocoder_use()
+        quota_service.increment_success_service_use()
         return result
       else:
-        quota_service.increment_empty_geocoder_use()
+        quota_service.increment_empty_service_use()
         return None
     except BaseException as e:
       import sys, traceback
       type_, value_, traceback_ = sys.exc_info()
-      quota_service.increment_failed_geocoder_use()
+      quota_service.increment_failed_service_use()
       error_msg = 'There was an error trying to geocode using admin0 geocoder: {0}'.format(e)
       plpy.notice(traceback.format_tb(traceback_))
       plpy.error(error_msg)
     finally:
-      quota_service.increment_total_geocoder_use()
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
