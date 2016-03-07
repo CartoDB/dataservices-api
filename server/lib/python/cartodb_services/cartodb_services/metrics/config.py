@@ -146,6 +146,18 @@ class InternalGeocoderConfig(ServiceConfig):
     def service_type(self):
         return 'geocoder_internal'
 
+    @property
+    def is_high_resolution(self):
+        return False
+
+    @property
+    def cost_per_hit(self):
+        return 0
+
+    @property
+    def geocoding_quota(self):
+        return None
+
 
 class GeocoderConfig(ServiceConfig):
 
@@ -168,6 +180,7 @@ class GeocoderConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
+    LOG_PATH = '/var/log/postgresql/geocodings.log'
 
     def __init__(self, redis_connection, username, orgname=None,
                  heremaps_app_id=None, heremaps_app_code=None):
@@ -256,7 +269,10 @@ class GeocoderConfig(ServiceConfig):
 
     @property
     def geocoding_quota(self):
-        return self._geocoding_quota
+        if self.heremaps_geocoder:
+            return self._geocoding_quota
+        else:
+            return None
 
     @property
     def soft_geocoding_limit(self):
@@ -273,3 +289,18 @@ class GeocoderConfig(ServiceConfig):
     @property
     def heremaps_app_code(self):
         return self._heremaps_app_code
+
+    @property
+    def is_high_resolution(self):
+        return True
+
+    @property
+    def cost_per_hit(self):
+        if self.heremaps_geocoder:
+            return 1
+        else:
+            return 0
+
+    @property
+    def log_path(self):
+        return self.LOG_PATH

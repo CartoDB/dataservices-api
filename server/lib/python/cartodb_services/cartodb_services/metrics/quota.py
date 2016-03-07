@@ -1,19 +1,20 @@
 from user import UserMetricsService
+from log import LoggerFactory
 from datetime import date
 import re
 
 
 class QuotaService:
     """ Class to manage all the quota operation for
-    the Geocoder SQL API Extension """
+    the Dataservices SQL API Extension """
 
     def __init__(self, user_service_config, redis_connection):
         self._user_service_config = user_service_config
-        # TODO First step to extract to a factory if needed in the future
         self._quota_checker = QuotaChecker(user_service_config,
                                            redis_connection)
-        self._user_service = UserMetricsService(
-            self._user_service_config, redis_connection)
+        self._user_service = UserMetricsService(self._user_service_config,
+                                                redis_connection)
+        self._logger = LoggerFactory.build(user_service_config)
 
     def check_user_quota(self):
         return self._quota_checker.check()
@@ -22,16 +23,19 @@ class QuotaService:
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "success_responses",
             amount=amount)
+        self._log_service_process("success")
 
     def increment_empty_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "empty_responses",
             amount=amount)
+        self._log_service_process("empty")
 
     def increment_failed_service_use(self, amount=1):
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "fail_responses",
             amount=amount)
+        self._log_service_process("fail")
 
     def increment_total_service_use(self, amount=1):
         self._user_service.increment_service_use(
@@ -42,6 +46,13 @@ class QuotaService:
         self._user_service.increment_service_use(
             self._user_service_config.service_type, "isolines_generated",
             amount=amount)
+
+    def _log_service_process(self, event):
+        if self._logger:
+            if event is 'success' or event is 'empty':
+                self._logger.log(success=True)
+            elif event is 'empty':
+                self._logger.log(success=False)
 
 
 class QuotaChecker:
