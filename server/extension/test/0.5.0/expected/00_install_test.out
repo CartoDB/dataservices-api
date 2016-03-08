@@ -19,7 +19,19 @@ SELECT cartodb.cdb_conf_setconf('redis_metadata_config', '{"redis_host": "localh
  
 (1 row)
 
-SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"app_key": "dummy_key"}');
+SELECT cartodb.cdb_conf_setconf('heremaps_conf', '{"app_id": "dummy_id", "app_code": "dummy_code", "geocoder_cost_per_hit": 1}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing_app_key": "dummy_key"}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
  cdb_conf_setconf 
 ------------------
  

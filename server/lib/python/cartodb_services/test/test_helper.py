@@ -48,4 +48,4 @@ def _plpy_execute_side_effect(*args, **kwargs):
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('mapzen_conf') as conf":
         return [{'conf': '{"routing_app_key": "app_key"}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":
-        return [{'conf': '{"geocoder_log_path": "path"}'}]
+        return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]

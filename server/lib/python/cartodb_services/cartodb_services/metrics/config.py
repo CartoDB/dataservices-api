@@ -69,8 +69,8 @@ class IsolinesRoutingConfig(ServiceConfig):
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(IsolinesRoutingConfig, self).__init__(redis_connection, username,
                                              orgname)
-        db_config = ServicesDBConfig(db_conn)
         config = self.__get_user_config(username, orgname)
+        db_config = ServicesDBConfig(db_conn)
         filtered_config = {key: config[key] for key in self.ROUTING_CONFIG_KEYS if key in config.keys()}
         self.__parse_config(filtered_config, db_config)
 
@@ -136,9 +136,11 @@ class IsolinesRoutingConfig(ServiceConfig):
 
 class InternalGeocoderConfig(ServiceConfig):
 
-    def __init__(self, redis_connection, username, orgname=None):
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(InternalGeocoderConfig, self).__init__(redis_connection,
                                                      username, orgname)
+        db_config = ServicesDBConfig(db_conn)
+        self._log_path = db_config.geocoder_log_path
 
     @property
     def service_type(self):
@@ -155,6 +157,10 @@ class InternalGeocoderConfig(ServiceConfig):
     @property
     def geocoding_quota(self):
         return None
+
+    @property
+    def log_path(self):
+        return self._log_path
 
 
 class GeocoderConfig(ServiceConfig):
@@ -289,7 +295,7 @@ class GeocoderConfig(ServiceConfig):
 
     @property
     def cost_per_hit(self):
-        self._cost_per_hit
+        return self._cost_per_hit
 
     @property
     def log_path(self):
