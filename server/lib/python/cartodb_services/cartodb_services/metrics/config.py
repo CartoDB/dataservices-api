@@ -27,6 +27,7 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
+
 class RoutingConfig(ServiceConfig):
 
     ROUTING_CONFIG_KEYS = ['username', 'orgname', 'mapzen_app_key']
@@ -34,11 +35,11 @@ class RoutingConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
 
-    def __init__(self, redis_connection, username, orgname=None,
-                 mapzen_app_key=None):
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(RoutingConfig, self).__init__(redis_connection, username,
-                                             orgname)
-        self._mapzen_app_key = mapzen_app_key
+                                            orgname)
+        db_config = ServicesDBConfig(db_conn)
+        self._mapzen_app_key = db_config.mapzen_routing_app_key
 
     @property
     def service_type(self):
@@ -53,7 +54,8 @@ class IsolinesRoutingConfig(ServiceConfig):
 
     ROUTING_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
                            'period_end_date', 'username', 'orgname',
-                           'heremaps_app_id', 'heremaps_app_code', 'geocoder_type']
+                           'heremaps_app_id', 'heremaps_app_code',
+                           'geocoder_type']
     NOKIA_APP_ID_KEY = 'heremaps_app_id'
     NOKIA_APP_CODE_KEY = 'heremaps_app_code'
     QUOTA_KEY = 'here_isolines_quota'
@@ -64,24 +66,22 @@ class IsolinesRoutingConfig(ServiceConfig):
     GEOCODER_TYPE_KEY = 'geocoder_type'
     GOOGLE_GEOCODER = 'google'
 
-    def __init__(self, redis_connection, username, orgname=None,
-                 heremaps_app_id=None, heremaps_app_code=None):
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(IsolinesRoutingConfig, self).__init__(redis_connection, username,
                                              orgname)
-        config = self.__get_user_config(username, orgname, heremaps_app_id,
-                                        heremaps_app_code)
+        db_config = ServicesDBConfig(db_conn)
+        config = self.__get_user_config(username, orgname, db_config)
         filtered_config = {key: config[key] for key in self.ROUTING_CONFIG_KEYS if key in config.keys()}
         self.__parse_config(filtered_config)
 
-    def __get_user_config(self, username, orgname=None, heremaps_app_id=None,
-                          heremaps_app_code=None):
+    def __get_user_config(self, username, orgname, db_config):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
         else:
-            user_config[self.NOKIA_APP_ID_KEY] = heremaps_app_id
-            user_config[self.NOKIA_APP_CODE_KEY] = heremaps_app_code
+            user_config[self.NOKIA_APP_ID_KEY] = db_config.heremaps_app_id
+            user_config[self.NOKIA_APP_CODE_KEY] = db_config.heremaps_app_code
             if orgname:
                 self.__get_organization_config(orgname, user_config)
 
@@ -182,25 +182,23 @@ class GeocoderConfig(ServiceConfig):
     PERIOD_END_DATE = 'period_end_date'
     LOG_PATH = '/var/log/postgresql/geocodings.log'
 
-    def __init__(self, redis_connection, username, orgname=None,
-                 heremaps_app_id=None, heremaps_app_code=None):
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(GeocoderConfig, self).__init__(redis_connection, username,
                                              orgname)
-        config = self.__get_user_config(username, orgname, heremaps_app_id,
-                                        heremaps_app_code)
+        db_config = ServicesDBConfig(db_conn)
+        config = self.__get_user_config(username, orgname, db_config)
         filtered_config = {key: config[key] for key in self.GEOCODER_CONFIG_KEYS if key in config.keys()}
         self.__check_config(filtered_config)
         self.__parse_config(filtered_config)
 
-    def __get_user_config(self, username, orgname=None, heremaps_app_id=None,
-                          heremaps_app_code=None):
+    def __get_user_config(self, username, orgname, db_config):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
         else:
-            user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = heremaps_app_id
-            user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = heremaps_app_code
+            user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = db_config.heremaps_app_id
+            user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = db_config.heremaps_app_code
             if orgname:
                 self.__get_organization_config(orgname, user_config)
 
@@ -304,3 +302,51 @@ class GeocoderConfig(ServiceConfig):
     @property
     def log_path(self):
         return self.LOG_PATH
+
+
+class ServicesDBConfig:
+
+    def __init__(self, db_conn):
+        self._db_conn = db_conn
+        return self._build()
+
+    def _build(self):
+        self._get_here_config()
+        self._get_mapzen_config()
+
+    def _get_here_config(self):
+        heremaps_conf_json = self._get_conf('heremaps_conf')
+        if not heremaps_conf_json:
+            raise ConfigException('Here maps configuration missing')
+        else:
+            heremaps_conf = json.loads(heremaps_conf_json)
+            self._heremaps_app_id = heremaps_conf['app_id']
+            self._heremaps_app_code = heremaps_conf['app_code']
+
+    def _get_mapzen_config(self):
+        mapzen_conf_json = self._get_conf('mapzen_conf')
+        if not mapzen_conf_json:
+            raise ConfigException('Mapzen configuration missing')
+        else:
+            mapzen_conf = json.loads(mapzen_conf_json)
+            self._mapzen_routing_app_key = mapzen_conf['routing_app_key']
+
+    def _get_conf(self, key):
+        try:
+            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
+            conf = self._db_conn.execute(sql, 1)
+            return conf[0]['conf']
+        except:
+            raise ConfigException("Malformed config for {0}".format(key))
+
+    @property
+    def heremaps_app_id(self):
+        return self._heremaps_app_id
+
+    @property
+    def heremaps_app_code(self):
+        return self._heremaps_app_code
+
+    @property
+    def mapzen_routing_app_key(self):
+        return self._mapzen_routing_app_key

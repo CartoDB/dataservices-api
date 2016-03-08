@@ -88,9 +88,9 @@ class TestQuotaService(TestCase):
         if orgname:
             test_helper.build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, end_date=end_date)
-        geocoder_config = GeocoderConfig(self.redis_conn,
-                                         username, orgname,
-                                        'nokia_id', 'nokia_cod')
+        plpy_mock = test_helper.build_plpy_mock()
+        geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
+                                         username, orgname)
         return QuotaService(geocoder_config,
                              redis_connection = self.redis_conn)
 

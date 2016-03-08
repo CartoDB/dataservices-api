@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from mock import Mock
 
 
 def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
@@ -31,3 +32,18 @@ def increment_geocoder_uses(redis_conn, username, orgname=None,
     redis_name = "{0}:{1}:{2}:{3}:{4}".format(prefix, entity_name,
                                               service, metric, yearmonth)
     redis_conn.zincrby(redis_name, date.day, amount)
+
+
+def build_plpy_mock(empty=False):
+    plpy_mock = Mock()
+    if not empty:
+        plpy_mock.execute.side_effect = _plpy_execute_side_effect
+
+    return plpy_mock
+
+
+def _plpy_execute_side_effect(*args, **kwargs):
+    if args[0] == 'SELECT cartodb.CDB_Conf_GetConf(heremaps_conf) as conf':
+        return [{'conf': '{"app_id": "app_id", "app_code": "code"}'}]
+    elif args[0] == 'SELECT cartodb.CDB_Conf_GetConf(mapzen_conf) as conf':
+        return [{'conf': '{"routing_app_key": "app_key"}'}]

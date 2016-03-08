@@ -4,6 +4,7 @@ from cartodb_services.metrics import UserMetricsService
 from cartodb_services.metrics import GeocoderConfig
 from datetime import datetime, date
 from unittest import TestCase
+from mock import Mock
 from nose.tools import assert_raises
 from datetime import timedelta
 
@@ -84,7 +85,7 @@ class TestUserService(TestCase):
         if orgname:
             test_helper.build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, end_date=end_date)
-        geocoder_config = GeocoderConfig(self.redis_conn,
-                                         username, orgname,
-                                         'nokia_id', 'nokia_cod')
+        plpy_mock = test_helper.build_plpy_mock()
+        geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
+                                         username, orgname,)
         return UserMetricsService(geocoder_config, self.redis_conn)

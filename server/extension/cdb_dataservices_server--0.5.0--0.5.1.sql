@@ -1,3 +1,66 @@
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_redis_conf_v2(text);
+DROP TYPE IF EXISTS cdb_dataservices_server._redis_conf_params;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
+RETURNS boolean AS $$
+  cache_key = "redis_connection_{0}".format(user_id)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.tools import RedisConnection, RedisDBConfig
+    metadata_config = RedisDBConfig('redis_metadata_config', plpy)
+    metrics_config = RedisDBConfig('redis_metrics_config', plpy)
+    redis_metadata_connection = RedisConnection(metadata_config).redis_connection()
+    redis_metrics_connection = RedisConnection(metrics_config).redis_connection()
+    GD[cache_key] = {
+      'redis_metadata_connection': redis_metadata_connection,
+      'redis_metrics_connection': redis_metrics_connection,
+    }
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_geocoder_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import GeocoderConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = geocoder_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_isolines_routing_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import IsolinesRoutingConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    isolines_routing_config = IsolinesRoutingConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = isolines_routing_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_routing_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import RoutingConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    routing_config = RoutingConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = routing_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.here import HereMapsGeocoder
