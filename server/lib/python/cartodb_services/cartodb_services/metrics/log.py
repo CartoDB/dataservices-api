@@ -23,6 +23,7 @@ class Logger(object):
     def dump_to_file(self, data):
         with open(self._file_path, 'a') as logfile:
             json.dump(data, logfile)
+            logfile.write('\n')
 
     @abc.abstractproperty
     def log(self, **data):

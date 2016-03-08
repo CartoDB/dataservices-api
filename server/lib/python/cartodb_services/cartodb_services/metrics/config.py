@@ -70,18 +70,16 @@ class IsolinesRoutingConfig(ServiceConfig):
         super(IsolinesRoutingConfig, self).__init__(redis_connection, username,
                                              orgname)
         db_config = ServicesDBConfig(db_conn)
-        config = self.__get_user_config(username, orgname, db_config)
+        config = self.__get_user_config(username, orgname)
         filtered_config = {key: config[key] for key in self.ROUTING_CONFIG_KEYS if key in config.keys()}
-        self.__parse_config(filtered_config)
+        self.__parse_config(filtered_config, db_config)
 
-    def __get_user_config(self, username, orgname, db_config):
+    def __get_user_config(self, username, orgname):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
         else:
-            user_config[self.NOKIA_APP_ID_KEY] = db_config.heremaps_app_id
-            user_config[self.NOKIA_APP_CODE_KEY] = db_config.heremaps_app_code
             if orgname:
                 self.__get_organization_config(orgname, user_config)
 
@@ -96,7 +94,7 @@ class IsolinesRoutingConfig(ServiceConfig):
             user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
 
-    def __parse_config(self, filtered_config):
+    def __parse_config(self, filtered_config, db_config):
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE_KEY].lower()
         self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
@@ -104,8 +102,8 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._soft_isolines_limit = True
         else:
             self._soft_isolines_limit = False
-        self._heremaps_app_id = filtered_config[self.NOKIA_APP_ID_KEY]
-        self._heremaps_app_code = filtered_config[self.NOKIA_APP_CODE_KEY]
+        self._heremaps_app_id = db_config.heremaps_app_id
+        self._heremaps_app_code = db_config.heremaps_app_code
 
     @property
     def service_type(self):
@@ -166,8 +164,7 @@ class GeocoderConfig(ServiceConfig):
                             'geocoder_type', 'period_end_date',
                             'heremaps_app_id', 'heremaps_app_code', 'username',
                             'orgname']
-    NOKIA_GEOCODER_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit',
-                                     'heremaps_app_id', 'heremaps_app_code']
+    NOKIA_GEOCODER_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit']
     NOKIA_GEOCODER = 'heremaps'
     NOKIA_GEOCODER_APP_ID_KEY = 'heremaps_app_id'
     NOKIA_GEOCODER_APP_CODE_KEY = 'heremaps_app_code'
@@ -180,25 +177,22 @@ class GeocoderConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
-    LOG_PATH = '/var/log/postgresql/geocodings.log'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(GeocoderConfig, self).__init__(redis_connection, username,
                                              orgname)
         db_config = ServicesDBConfig(db_conn)
-        config = self.__get_user_config(username, orgname, db_config)
+        config = self.__get_user_config(username, orgname)
         filtered_config = {key: config[key] for key in self.GEOCODER_CONFIG_KEYS if key in config.keys()}
+        self.__parse_config(filtered_config, db_config)
         self.__check_config(filtered_config)
-        self.__parse_config(filtered_config)
 
-    def __get_user_config(self, username, orgname, db_config):
+    def __get_user_config(self, username, orgname):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
         else:
-            user_config[self.NOKIA_GEOCODER_APP_ID_KEY] = db_config.heremaps_app_id
-            user_config[self.NOKIA_GEOCODER_APP_CODE_KEY] = db_config.heremaps_app_code
             if orgname:
                 self.__get_organization_config(orgname, user_config)
 
@@ -219,28 +213,29 @@ class GeocoderConfig(ServiceConfig):
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
             if not set(self.NOKIA_GEOCODER_MANDATORY_KEYS).issubset(set(filtered_config.keys())):
                 raise ConfigException("""Some mandatory parameter/s for Nokia geocoder are missing. Check it please""")
-            if not filtered_config[self.NOKIA_GEOCODER_APP_ID_KEY] or not filtered_config[self.NOKIA_GEOCODER_APP_CODE_KEY]:
-                raise ConfigException("""Nokia geocoder configuration is missing. Check it please""")
         elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
                 raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
 
         return True
 
-    def __parse_config(self, filtered_config):
+    def __parse_config(self, filtered_config, db_config):
         self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
         self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
+        self._log_path = db_config.geocoder_log_path
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_geocoding_limit = True
         else:
             self._soft_geocoding_limit = False
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
-            self._heremaps_app_id = filtered_config[self.NOKIA_GEOCODER_APP_ID_KEY]
-            self._heremaps_app_code = filtered_config[self.NOKIA_GEOCODER_APP_CODE_KEY]
+            self._heremaps_app_id = db_config.heremaps_app_id
+            self._heremaps_app_code = db_config.heremaps_app_code
+            self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
         elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
+            self._cost_per_hit = 0
 
     @property
     def service_type(self):
@@ -294,14 +289,11 @@ class GeocoderConfig(ServiceConfig):
 
     @property
     def cost_per_hit(self):
-        if self.heremaps_geocoder:
-            return 1
-        else:
-            return 0
+        self._cost_per_hit
 
     @property
     def log_path(self):
-        return self.LOG_PATH
+        return self._log_path
 
 
 class ServicesDBConfig:
@@ -313,6 +305,7 @@ class ServicesDBConfig:
     def _build(self):
         self._get_here_config()
         self._get_mapzen_config()
+        self._get_logger_config()
 
     def _get_here_config(self):
         heremaps_conf_json = self._get_conf('heremaps_conf')
@@ -322,6 +315,8 @@ class ServicesDBConfig:
             heremaps_conf = json.loads(heremaps_conf_json)
             self._heremaps_app_id = heremaps_conf['app_id']
             self._heremaps_app_code = heremaps_conf['app_code']
+            self._heremaps_geocoder_cost_per_hit = heremaps_conf[
+                'geocoder_cost_per_hit']
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
@@ -330,6 +325,14 @@ class ServicesDBConfig:
         else:
             mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_routing_app_key = mapzen_conf['routing_app_key']
+
+    def _get_logger_config(self):
+        logger_conf_json = self._get_conf('logger_conf')
+        if not logger_conf_json:
+            raise ConfigException('Logger configuration missing')
+        else:
+            logger_conf = json.loads(logger_conf_json)
+            self._geocoder_log_path = logger_conf['geocoder_log_path']
 
     def _get_conf(self, key):
         try:
@@ -348,5 +351,13 @@ class ServicesDBConfig:
         return self._heremaps_app_code
 
     @property
+    def heremaps_geocoder_cost_per_hit(self):
+        return self._heremaps_geocoder_cost_per_hit
+
+    @property
     def mapzen_routing_app_key(self):
         return self._mapzen_routing_app_key
+
+    @property
+    def geocoder_log_path(self):
+        return self._geocoder_log_path
