@@ -2,7 +2,8 @@ import requests
 import json
 import re
 
-from exceptions import WrongParams
+from exceptions import WrongParams, MalformedResult
+from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
 
 
@@ -31,6 +32,7 @@ class MapzenRouting:
         self._app_key = app_key
         self._url = base_url
 
+    @qps_retry
     def calculate_route_point_to_point(self, origin, destination, mode,
                                        options=[], units=METRICS_UNITS):
         parsed_options = self.__parse_options(options)

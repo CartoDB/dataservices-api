@@ -14,3 +14,8 @@ class WrongParams(Exception):
 class MalformedResult(Exception):
     def __str__(self):
             return repr('Result structure is malformed')
+
+
+class TimeoutException(Exception):
+    def __str__(self):
+            return repr('Timeout requesting to mapzen server')
