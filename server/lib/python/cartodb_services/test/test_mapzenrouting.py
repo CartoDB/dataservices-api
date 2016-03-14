@@ -60,18 +60,24 @@ class MapzenRoutingTestCase(unittest.TestCase):
         self.url = MapzenRouting.PRODUCTION_ROUTING_BASE_URL
 
     def test_calculate_simple_routing_with_valid_params(self, req_mock):
-        req_mock.register_uri('GET', requests_mock.ANY, text=self.GOOD_RESPONSE)
-        origin = Coordinate('-120.2','38.5')
-        destination = Coordinate('-126.4','43.2')
-        response = self.routing.calculate_route_point_to_point(origin, destination,'car')
+        req_mock.register_uri('GET', requests_mock.ANY,
+                              text=self.GOOD_RESPONSE)
+        origin = Coordinate('-120.2', '38.5')
+        destination = Coordinate('-126.4', '43.2')
+        response = self.routing.calculate_route_point_to_point(origin,
+                                                               destination,
+                                                               'car')
 
         self.assertEqual(response.shape, self.GOOD_SHAPE)
         self.assertEqual(response.length, 444.59)
         self.assertEqual(response.duration, 16969)
 
     def test_uknown_mode_raise_exception(self, req_mock):
-        req_mock.register_uri('GET', requests_mock.ANY, text=self.GOOD_RESPONSE)
-        origin = Coordinate('-120.2','38.5')
-        destination = Coordinate('-126.4','43.2')
+        req_mock.register_uri('GET', requests_mock.ANY,
+                              text=self.GOOD_RESPONSE)
+        origin = Coordinate('-120.2', '38.5')
+        destination = Coordinate('-126.4', '43.2')
 
-        assert_raises(WrongParams, self.routing.calculate_route_point_to_point, origin, destination, 'unknown')
+        assert_raises(WrongParams,
+                      self.routing.calculate_route_point_to_point,
+                      origin, destination, 'unknown')
