@@ -41,7 +41,7 @@ SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRA
 ```bash
 SELECT the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[1000]::integer[]);
 
-##### Calculate and insert the generated points from the `points_table` table to another table where they're going to be stored
+##### Calculate and insert the generated isolines from `points_table` table to another table
 
 ```bash
 INSERT INTO {table} (the_geom) SELECT (cdb_isodistance(the_geom, 'walk', string_to_array(distance, ',')::integer[])).the_geom FROM {points_table}
@@ -78,7 +78,7 @@ SELECT * FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[
 SELECT the_geom FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
 
 
-##### Calculate and insert the generated points from the `points_table` table to another table where they're going to be stored
+##### Calculate and insert the generated isolines from `points_table` table to another table
 
 ```bash
 INSERT INTO {table} (the_geom) SELECT (cdb_isochrone(the_geom, 'walk', string_to_array(time_distance, ',')::integer[])).the_geom FROM {points_table}
