@@ -1,3 +1,6 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.5.1'" to load this file. \quit
 DROP FUNCTION IF EXISTS cdb_dataservices_server._get_redis_conf_v2(text);
 DROP TYPE IF EXISTS cdb_dataservices_server._redis_conf_params;
 

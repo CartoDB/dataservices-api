@@ -1,3 +1,6 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.5.0'" to load this file. \quit
 CREATE TYPE cdb_dataservices_server._redis_conf_params AS (
     sentinel_master_id text,
     redis_host text,
