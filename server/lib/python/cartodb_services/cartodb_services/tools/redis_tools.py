@@ -17,7 +17,7 @@ class RedisConnection:
                                   self._config.port)],
                                 socket_timeout=self._config.timeout)
             return sentinel.master_for(
-                self.sentinel_master_id,
+                self._config.sentinel_master_id,
                 socket_timeout=self.timeout,
                 db=self.redis_db
             )
