@@ -37,7 +37,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
     resp = client.calculate_route_point_to_point(origin_coordinates, dest_coordinates, mode, options, units)
 
-    if resp:
+    if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
       quota_service.increment_success_service_use()
       return [shape_linestring, resp.length, resp.duration]

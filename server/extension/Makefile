@@ -16,8 +16,8 @@ DATA =  $(NEW_EXTENSION_ARTIFACT) \
   cdb_dataservices_server--0.5.1--0.5.0.sql \
   cdb_dataservices_server--0.5.0--0.5.1.sql
 
-REGRESS = $(notdir $(basename $(wildcard test/$(EXTVERSION)/sql/*test.sql)))
-TEST_DIR = test/$(EXTVERSION)
+REGRESS = $(notdir $(basename $(wildcard test/sql/*test.sql)))
+TEST_DIR = test/
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
 
 # postgres build stuff
@@ -25,9 +25,9 @@ PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
-SOURCES_DATA_DIR = sql/$(EXTVERSION)
+SOURCES_DATA_DIR = sql/
 
-SOURCES_DATA = $(wildcard sql/$(EXTVERSION)/*.sql)
+SOURCES_DATA = $(wildcard sql/*.sql)
 
 $(NEW_EXTENSION_ARTIFACT): $(SOURCES_DATA)
 	rm -f $@
