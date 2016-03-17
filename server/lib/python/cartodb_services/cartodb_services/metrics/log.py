@@ -69,7 +69,6 @@ class GeocoderLogger(Logger):
             "real_rows": successful_rows,
             "success": data['success'],
             "successful_rows": successful_rows,
-            "used_credits": 0,
             "username": self._service_config.username,
             "organization": self._service_config.organization
         }
