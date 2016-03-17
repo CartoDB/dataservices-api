@@ -18,8 +18,8 @@ class RedisConnection:
                                 socket_timeout=self._config.timeout)
             return sentinel.master_for(
                 self._config.sentinel_id,
-                socket_timeout=self.timeout,
-                db=self.redis_db
+                socket_timeout=self._config.timeout,
+                db=self._config.db
             )
         else:
             conn = StrictRedis(host=self._config.host, port=self._config.port,
