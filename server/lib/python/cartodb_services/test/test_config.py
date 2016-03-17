@@ -10,12 +10,12 @@ class TestConfig(TestCase):
 
     def setUp(self):
         self.redis_conn = MockRedis()
+        self.plpy_mock = test_helper.build_plpy_mock()
 
     def test_should_return_list_of_nokia_geocoder_config_if_its_ok(self):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
-        geocoder_config = GeocoderConfig(self.redis_conn,
-                                                       'test_user', None,
-                                                       'nokia_id', 'nokia_cod')
+        geocoder_config = GeocoderConfig(self.redis_conn, self.plpy_mock,
+                                         'test_user', None)
         assert geocoder_config.heremaps_geocoder is True
         assert geocoder_config.geocoding_quota == 100
         assert geocoder_config.soft_geocoding_limit is False
@@ -25,17 +25,17 @@ class TestConfig(TestCase):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
         test_helper.build_redis_org_config(self.redis_conn, 'test_org',
                                            quota=200, end_date=yesterday)
-        geocoder_config = GeocoderConfig(self.redis_conn,
-                                                       'test_user', 'test_org',
-                                                       'nokia_id', 'nokia_cod')
+        geocoder_config = GeocoderConfig(self.redis_conn, self.plpy_mock,
+                                         'test_user', 'test_org')
         assert geocoder_config.heremaps_geocoder is True
         assert geocoder_config.geocoding_quota == 200
         assert geocoder_config.soft_geocoding_limit is False
         assert geocoder_config.period_end_date.date() == yesterday.date()
 
-    def test_should_raise_configuration_exception_when_missing_nokia_geocoder_parameters(self):
+    def test_should_raise_exception_when_missing_parameters(self):
+        plpy_mock = test_helper.build_plpy_mock(empty=True)
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
         assert_raises(ConfigException,
                       GeocoderConfig,
-                      self.redis_conn, 'test_user',
-                      None, None, None)
+                      self.redis_conn, plpy_mock, 'test_user',
+                      None)

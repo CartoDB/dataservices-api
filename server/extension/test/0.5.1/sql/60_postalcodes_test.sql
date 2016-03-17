@@ -1,0 +1,1 @@
+../../0.4.0/sql/60_postalcodes_test.sql
