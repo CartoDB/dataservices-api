@@ -345,8 +345,8 @@ class ServicesDBConfig:
             sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
             conf = self._db_conn.execute(sql, 1)
             return conf[0]['conf']
-        except:
-            raise ConfigException("Malformed config for {0}".format(key))
+        except Exception as e:
+            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
     def heremaps_app_id(self):
