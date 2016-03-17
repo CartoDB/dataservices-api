@@ -6,7 +6,8 @@ RETURNS Geometry AS $$
 
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    user_geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
+    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
     quota_service = QuotaService(user_geocoder_config, redis_conn)
     try:
@@ -38,7 +39,8 @@ RETURNS Geometry AS $$
 
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    user_geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
+    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
     quota_service = QuotaService(user_geocoder_config, redis_conn)
     try:
@@ -70,7 +72,8 @@ RETURNS Geometry AS $$
 
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    user_geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
+    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
     quota_service = QuotaService(user_geocoder_config, redis_conn)
     try:
