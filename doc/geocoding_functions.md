@@ -271,13 +271,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 
 This function provides a street-level geocoding service. This service uses the street level geocoder defined for the user.
 
-**This service is subject to quota limitations, and extra fees may apply.** Please view our [terms and conditions](https://cartodb.com/terms/)
-
-Be mindful of the following when using this function:
-
-  - **One credit per function call will be consumed**, and the results are not cached. If the query applies to a N rows dataset, then N credits will be used.
-  - You are discouraged from using dynamic queries to the Geocoder API in your maps. This can result in credits consumption per map view. Note: **queries to the Geocoder API in your maps may be forbidden in the future**.
-  - You are advised to store results of Geocoder API queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
+**This service is subject to quota limitations, and extra fees may apply**. Please view our [terms and conditions](https://cartodb.com/terms/) and check out the [Quota information section](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations related with quota usage.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
