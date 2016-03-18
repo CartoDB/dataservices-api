@@ -1,4 +1,4 @@
-# Isoline functions
+# Isoline Functions
 
 The following functions provide an isolines generator service based on time or distance. This service uses the isolines service defined for the user (currently, only the Here isolines service is available).
 

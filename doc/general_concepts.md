@@ -1,4 +1,4 @@
-# General concepts
+# General Concepts
 
 The Data Services API offers geocoding and isoline services on top of the CartoDB SQL API by means of a set of functions. Each one of these functions is oriented to one kind of operation and returns the corresponding geometry (a `polygon` or a `point`), according to the input information.
 
