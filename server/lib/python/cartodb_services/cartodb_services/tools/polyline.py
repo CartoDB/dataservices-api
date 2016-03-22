@@ -11,13 +11,10 @@ class PolyLine:
         for chunk in chunks:
             coordinate = self._process_chunk(chunk)
             coordinate /= 1e5
-            print coordinate
             if len(coordinates) > 1:
                 # We have to sum the previous with the offset in this chunk
                 coordinate += coordinates[-2]
             coordinates.append(round(coordinate, 5))
-
-        print coordinates
 
         return zip(coordinates, coordinates[1:])[::2]
 

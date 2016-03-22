@@ -17,3 +17,5 @@ class Coordinate:
     def to_json(self):
         return "{{\"lon\": {0},\"lat\": {1}}}".format(self._longitude,
                                                       self._latitude)
+    def __str__(self):
+        return "{0}, {1}".format(self._longitude, self._latitude)

@@ -28,6 +28,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   try:
     client = MapzenRouting(user_routing_config.mapzen_app_key)
 
+    if not origin or not destination:
+      plpy.notice("Empty origin or destination")
+      quota_service.increment_empty_service_use()
+      return [None, None, None]
+
     orig_lat = plpy.execute("SELECT ST_Y('%s') AS lat" % origin)[0]['lat']
     orig_lon = plpy.execute("SELECT ST_X('%s') AS lon" % origin)[0]['lon']
     origin_coordinates = Coordinate(orig_lon, orig_lat)
@@ -39,10 +44,15 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
     if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
-      quota_service.increment_success_service_use()
-      return [shape_linestring, resp.length, resp.duration]
+      if shape_linestring:
+        quota_service.increment_success_service_use()
+        return [shape_linestring, resp.length, resp.duration]
+      else:
+        quota_service.increment_empty_service_use()
+        return [None, None, None]
     else:
       quota_service.increment_empty_service_use()
+      return [None, None, None]
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
