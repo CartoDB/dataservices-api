@@ -168,15 +168,17 @@ class GeocoderConfig(ServiceConfig):
     GEOCODER_CONFIG_KEYS = ['google_maps_client_id', 'google_maps_api_key',
                             'geocoding_quota', 'soft_geocoding_limit',
                             'geocoder_type', 'period_end_date',
-                            'heremaps_app_id', 'heremaps_app_code', 'username',
-                            'orgname']
-    NOKIA_GEOCODER_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit']
+                            'heremaps_app_id', 'heremaps_app_code',
+                            'mapzen_geocoder_app_key', 'username', 'orgname']
+    NOKIA_GEOCODER_REDIS_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit']
     NOKIA_GEOCODER = 'heremaps'
     NOKIA_GEOCODER_APP_ID_KEY = 'heremaps_app_id'
     NOKIA_GEOCODER_APP_CODE_KEY = 'heremaps_app_code'
     GOOGLE_GEOCODER = 'google'
     GOOGLE_GEOCODER_API_KEY = 'google_maps_api_key'
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
+    MAPZEN_GEOCODER = 'mapzen'
+    MAPZEN_GEOCODER_API_KEY = 'mapzen_geocoder_app_key'
     GEOCODER_TYPE = 'geocoder_type'
     QUOTA_KEY = 'geocoding_quota'
     SOFT_LIMIT_KEY = 'soft_geocoding_limit'
@@ -217,11 +219,15 @@ class GeocoderConfig(ServiceConfig):
 
     def __check_config(self, filtered_config):
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
-            if not set(self.NOKIA_GEOCODER_MANDATORY_KEYS).issubset(set(filtered_config.keys())):
+            if not set(self.NOKIA_GEOCODER_REDIS_MANDATORY_KEYS).issubset(set(filtered_config.keys())) or \
+            not self.heremaps_app_id or not self.heremaps_app_code:
                 raise ConfigException("""Some mandatory parameter/s for Nokia geocoder are missing. Check it please""")
         elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
                 raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
+        elif filtered_config[self.GEOCODER_TYPE].lower() == self.MAPZEN_GEOCODER:
+            if not self.mapzen_app_key:
+                raise ConfigException("""Mapzen config is not setted up""")
 
         return True
 
@@ -242,11 +248,16 @@ class GeocoderConfig(ServiceConfig):
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             self._cost_per_hit = 0
+        elif filtered_config[self.GEOCODER_TYPE].lower() == self.MAPZEN_GEOCODER:
+            self._mapzen_app_key = db_config.mapzen_geocoder_app_key
+            self._cost_per_hit = 0
 
     @property
     def service_type(self):
         if self._geocoder_type == self.GOOGLE_GEOCODER:
             return 'geocoder_google'
+        elif self._geocoder_type == self.MAPZEN_GEOCODER:
+            return 'geocoder_mapzen'
         else:
             return 'geocoder_here'
 
@@ -257,6 +268,10 @@ class GeocoderConfig(ServiceConfig):
     @property
     def google_geocoder(self):
         return self._geocoder_type == self.GOOGLE_GEOCODER
+
+    @property
+    def mapzen_geocoder(self):
+        return self._geocoder_type == self.MAPZEN_GEOCODER
 
     @property
     def google_client_id(self):
@@ -288,6 +303,10 @@ class GeocoderConfig(ServiceConfig):
     @property
     def heremaps_app_code(self):
         return self._heremaps_app_code
+
+    @property
+    def mapzen_app_key(self):
+        return self._mapzen_app_key
 
     @property
     def is_high_resolution(self):
@@ -331,6 +350,7 @@ class ServicesDBConfig:
         else:
             mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_routing_app_key = mapzen_conf['routing_app_key']
+            self._mapzen_geocoder_app_key = mapzen_conf['geocoder_app_key']
 
     def _get_logger_config(self):
         logger_conf_json = self._get_conf('logger_conf')
@@ -363,6 +383,10 @@ class ServicesDBConfig:
     @property
     def mapzen_routing_app_key(self):
         return self._mapzen_routing_app_key
+
+    @property
+    def mapzen_geocoder_app_key(self):
+        return self._mapzen_geocoder_app_key
 
     @property
     def geocoder_log_path(self):
