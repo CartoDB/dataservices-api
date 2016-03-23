@@ -132,7 +132,6 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
                                      HereMapsRoutingIsoline.ISOLINE_PATH)
 
     def test_calculate_isodistance_with_valid_params(self, req_mock):
-        print self.isoline_url
         url = "{0}?start=geo%2133.0%2C1.0&mode=shortest%3Bcar".format(self.isoline_url)
         req_mock.register_uri('GET', url, text=self.GOOD_RESPONSE)
         response = self.routing.calculate_isodistance('geo!33.0,1.0', 'car',
