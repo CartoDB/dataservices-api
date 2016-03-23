@@ -45,6 +45,8 @@ class MapzenRouting:
         response = requests.get(self._url, params=request_params)
         if response.status_code == requests.codes.ok:
             return self.__parse_routing_response(response.text)
+        elif response.status_code == requests.codes.bad_request:
+            return MapzenRoutingResponse(None, None, None)
         else:
             response.raise_for_status()
 
@@ -78,9 +80,7 @@ class MapzenRouting:
             shape = PolyLine().decode(legs['shape'])
             length = legs['summary']['length']
             duration = legs['summary']['time']
-            routing_response = MapzenRoutingResponse(shape, length, duration)
-
-            return routing_response
+            return MapzenRoutingResponse(shape, length, duration)
         except IndexError:
             return []
         except KeyError:

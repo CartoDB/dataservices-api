@@ -1,1 +1,0 @@
-../../0.4.0/sql/50_namedplaces_test.sql

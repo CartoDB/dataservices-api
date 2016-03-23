@@ -10,7 +10,11 @@ def polyline_to_linestring(polyline):
         coordinates.append("%s %s" % (point[1]/10, point[0]/10))
     wkt_coordinates = ','.join(coordinates)
 
-    sql = "SELECT ST_GeomFromText('LINESTRING({0})', 4326) as geom".format(wkt_coordinates)
-    geometry = plpy.execute(sql, 1)[0]['geom']
+    try:
+        sql = "SELECT ST_GeomFromText('LINESTRING({0})', 4326) as geom".format(wkt_coordinates)
+        geometry = plpy.execute(sql, 1)[0]['geom']
+    except BaseException as e:
+        plpy.warning("Can't generate LINESTRING from polyline: {0}".format(e))
+        geometry = None
 
     return geometry
