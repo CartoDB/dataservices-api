@@ -9,6 +9,7 @@ The isoline functions provide a way to generate isolines in terms of distance an
 ## Documentation
 
 * [Quickstart](quickstart.md)
-* [General concepts](general_concepts.md)
-* [Geocoding functions](geocoding_functions.md)
-* [Isoline functions](isoline_functions.md)
+* [General Concepts](general_concepts.md)
+* [Geocoding Functions](geocoding_functions.md)
+* [Isoline Functions](isoline_functions.md)
+* [Quota Information](quota_information.md)

@@ -1,4 +1,4 @@
-# Quota information
+# Quota Information
 
 **This Data Services API provides functions which are subject to quota limitations, and extra fees may apply**. Please check our [terms and conditions](https://cartodb.com/terms/).
 
