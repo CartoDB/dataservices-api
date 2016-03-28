@@ -87,5 +87,5 @@ class TestUserService(TestCase):
                                                quota=quota, end_date=end_date)
         plpy_mock = test_helper.build_plpy_mock()
         geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
-                                         username, orgname,)
+                                         username, orgname)
         return UserMetricsService(geocoder_config, self.redis_conn)

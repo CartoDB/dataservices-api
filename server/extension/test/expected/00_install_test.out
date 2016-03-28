@@ -25,7 +25,7 @@ SELECT cartodb.cdb_conf_setconf('heremaps_conf', '{"app_id": "dummy_id", "app_co
  
 (1 row)
 
-SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing_app_key": "dummy_key"}');
+SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing_app_key": "dummy_key", "geocoder_app_key": "dummy_key"}');
  cdb_conf_setconf 
 ------------------
  
