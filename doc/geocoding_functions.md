@@ -280,10 +280,10 @@ This function provides a street-level geocoding service. This service uses the s
 
 Name | Type | Description | Provider
 --- | --- | --- | ---
-`searchtext` | `text` | searchtext contains free-form text containing address elements. You can specify the searchtext parameter by itself, or you can specify it with other parameters to narrow your search. For example, you can specify the state or country parameters, along with a free-form address in the searchtext field. | Here, Google, Mapzen
+`searchtext` | `text` | searchtext contains free-form text containing address elements. You can specify the searchtext parameter by itself, or with other parameters, to narrow your search. For example, you can specify the state or country parameters, along with a free-form address in the searchtext field. | Here, Google, Mapzen
 `city` | `text` | (Optional) Name of the city. | Here and Google
-`state` | `text` | (Optional) Name of the state | Here and Google
-`country` | `text` | (Optional) Name of the country. *If you're using **Mapzen** as provider you must use alpha-2 or alpha-3 [ISO-3166](https://en.wikipedia.org/wiki/ISO_3166-1) country codes* | Here, Google and Mapzen
+`state` | `text` | (Optional) Name of the state. | Here and Google
+`country` | `text` | (Optional) Name of the country. *If you are using **Mapzen** as the geocoder provider, you must use alpha-2 or alpha-3 [ISO-3166](https://en.wikipedia.org/wiki/ISO_3166-1) country codes* | Here, Google and Mapzen
 
 #### Returns
 
@@ -293,7 +293,7 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-Using **Here** or **Google** as providers
+Using **Here** or **Google** as the geocoder provider
 
 ```bash
 SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
@@ -302,7 +302,7 @@ SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'Californ
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
 ```
 
-Using **Mapzen** as provider
+Using **Mapzen** as the geocoder provider
 
 ```bash
 SELECT cdb_geocode_street_point('651 Lombard Street San Francisco California', NULL, NULL, 'USA')
