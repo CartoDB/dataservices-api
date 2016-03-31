@@ -57,13 +57,13 @@ Steps to deploy a new Data Services API version :
 
 
     ```
-    # SELECT CDB_Conf_SetConf('redis_metadata_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-    # SELECT CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
+    # SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
+    # SELECT CDB_Conf_SetConf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
     
-    # SELECT CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE"}');
+    # SELECT CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE", "geocoder_cost_per_hit": "COST_PER_HIT"}');
     # SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
     # SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing_app_key": "ROUTING_API_KEY", "geocoder_app_key": "GEOCODER_API_KEY"}');
-
+    # SELECT CDB_Conf_SetConf('logger_con', '{"geocoder_log_path": "/tmp/geocodings.log"}')
     ```
 
 - configure plproxy to point to the same user database (you could do in a different one)
