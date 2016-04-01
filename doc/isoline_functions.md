@@ -1,6 +1,6 @@
 # Isoline functions
 
-The following functions provide an isolines generator service based on time or distance. This service uses the isolines service defined for the user (currently, only the Here isolines service is available).
+The following functions provide an isolines generator service based on time or distance. This service uses the isolines service defined for the user (currently, only the [HERE](https://developer.here.com/coverage-info) isolines service is available).
 
 **This service is subject to quota limitations, and extra fees may apply**. Please view our [terms and conditions](https://cartodb.com/terms/) and check out the [Quota information section](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations related with quota usage.
 
