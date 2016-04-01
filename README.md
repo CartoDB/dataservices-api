@@ -23,11 +23,11 @@ Steps to deploy a new Data Services API version :
 
 ### Local install instructions
 
-- install data services extension 
+- install data services geocoder extension 
 
     ```
     git clone git@github.com:CartoDB/data-services.git
-    data-services/geocoder/extension
+    cd data-services/geocoder/extension
     sudo make install
     ```
 
@@ -35,7 +35,7 @@ Steps to deploy a new Data Services API version :
     
     ```
     cd client && sudo make install
-    cd server && sudo make install
+    cd server/extension && sudo make install
     ```
 
 - install python library
@@ -57,21 +57,28 @@ Steps to deploy a new Data Services API version :
 
 
     ```
-    # select CDB_Conf_SetConf('redis_metadata_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-    # select CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-    
-    # select CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE"}');
-    # select CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
+    # If sentinel is used:
+      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
+      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
+      
+    # If sentinel is not used
+      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
+      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
+  
+    SELECT CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE", "geocoder_cost_per_hit": "COST_PER_HIT"}');
+    SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
+    SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing_app_key": "ROUTING_API_KEY", "geocoder_app_key": "GEOCODER_API_KEY"}');
+    SELECT CDB_Conf_SetConf('logger_con', '{"geocoder_log_path": "/tmp/geocodings.log"}')
     ```
 
-- configure plproxy to point to the same user database (you could do in a different one)
+- configure plproxy to point to the a database (you can use a specific database for the server or your same user)
 
     ```
-     select CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=cartodb_dev_user_accf0647-d942-4e37-b129-8287c117e687_db user=postgres"}');
+     SELECT CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}');
     ```
 
-- configure the search path in order to be able to execute the functions without use the schema:
+- configure the search path in order to be able to execute the functions without using the schema:
 
     ```
-    alter role "<USER_ROLE>" set search_path='"$user", public, cartodb, cdb_dataservices_client';
+    ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservices_client;
     ```
