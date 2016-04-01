@@ -44,7 +44,7 @@ def build_plpy_mock(empty=False):
 
 def _plpy_execute_side_effect(*args, **kwargs):
     if args[0] == "SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as conf":
-        return [{'conf': '{"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}'}]
+        return [{'conf': '{"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('mapzen_conf') as conf":
         return [{'conf': '{"routing_app_key": "app_key", "geocoder_app_key": "app_key"}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":

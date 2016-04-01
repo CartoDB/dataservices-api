@@ -54,10 +54,10 @@ class IsolinesRoutingConfig(ServiceConfig):
 
     ROUTING_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
                            'period_end_date', 'username', 'orgname',
-                           'heremaps_app_id', 'heremaps_app_code',
+                           'heremaps_isolines_app_id', 'heremaps_isolines_app_code',
                            'geocoder_type']
-    NOKIA_APP_ID_KEY = 'heremaps_app_id'
-    NOKIA_APP_CODE_KEY = 'heremaps_app_code'
+    NOKIA_APP_ID_KEY = 'heremaps_isolines_app_id'
+    NOKIA_APP_CODE_KEY = 'heremaps_isolines_app_code'
     QUOTA_KEY = 'here_isolines_quota'
     SOFT_LIMIT_KEY = 'soft_here_isolines_limit'
     USERNAME_KEY = 'username'
@@ -102,8 +102,8 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._soft_isolines_limit = True
         else:
             self._soft_isolines_limit = False
-        self._heremaps_app_id = db_config.heremaps_app_id
-        self._heremaps_app_code = db_config.heremaps_app_code
+        self._heremaps_app_id = db_config.heremaps_isolines_app_id
+        self._heremaps_app_code = db_config.heremaps_isolines_app_code
 
     @property
     def service_type(self):
@@ -168,12 +168,12 @@ class GeocoderConfig(ServiceConfig):
     GEOCODER_CONFIG_KEYS = ['google_maps_client_id', 'google_maps_api_key',
                             'geocoding_quota', 'soft_geocoding_limit',
                             'geocoder_type', 'period_end_date',
-                            'heremaps_app_id', 'heremaps_app_code',
+                            'heremaps_geocoder_app_id', 'heremaps_geocoder_app_code',
                             'mapzen_geocoder_app_key', 'username', 'orgname']
     NOKIA_GEOCODER_REDIS_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit']
     NOKIA_GEOCODER = 'heremaps'
-    NOKIA_GEOCODER_APP_ID_KEY = 'heremaps_app_id'
-    NOKIA_GEOCODER_APP_CODE_KEY = 'heremaps_app_code'
+    NOKIA_GEOCODER_APP_ID_KEY = 'heremaps_geocoder_app_id'
+    NOKIA_GEOCODER_APP_CODE_KEY = 'heremaps_geocoder_app_code'
     GOOGLE_GEOCODER = 'google'
     GOOGLE_GEOCODER_API_KEY = 'google_maps_api_key'
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
@@ -241,8 +241,8 @@ class GeocoderConfig(ServiceConfig):
         else:
             self._soft_geocoding_limit = False
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
-            self._heremaps_app_id = db_config.heremaps_app_id
-            self._heremaps_app_code = db_config.heremaps_app_code
+            self._heremaps_app_id = db_config.heremaps_geocoder_app_id
+            self._heremaps_app_code = db_config.heremaps_geocoder_app_code
             self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
         elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
@@ -338,10 +338,12 @@ class ServicesDBConfig:
             raise ConfigException('Here maps configuration missing')
         else:
             heremaps_conf = json.loads(heremaps_conf_json)
-            self._heremaps_app_id = heremaps_conf['app_id']
-            self._heremaps_app_code = heremaps_conf['app_code']
-            self._heremaps_geocoder_cost_per_hit = heremaps_conf[
+            self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
+            self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
+            self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
                 'geocoder_cost_per_hit']
+            self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
+            self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
@@ -369,12 +371,20 @@ class ServicesDBConfig:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
-    def heremaps_app_id(self):
-        return self._heremaps_app_id
+    def heremaps_isolines_app_id(self):
+        return self._heremaps_isolines_app_id
 
     @property
-    def heremaps_app_code(self):
-        return self._heremaps_app_code
+    def heremaps_isolines_app_code(self):
+        return self._heremaps_isolines_app_code
+
+    @property
+    def heremaps_geocoder_app_id(self):
+        return self._heremaps_geocoder_app_id
+
+    @property
+    def heremaps_geocoder_app_code(self):
+        return self._heremaps_geocoder_app_code
 
     @property
     def heremaps_geocoder_cost_per_hit(self):
