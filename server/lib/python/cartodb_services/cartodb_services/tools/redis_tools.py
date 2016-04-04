@@ -16,14 +16,13 @@ class RedisConnection:
             sentinel = Sentinel([(self._config.host,
                                   self._config.port)],
                                 socket_timeout=self._config.timeout)
-            return sentinel.master_for(
-                self._config.sentinel_id,
-                socket_timeout=self._config.timeout,
-                db=self._config.db
-            )
+            return sentinel.master_for(self._config.sentinel_id,
+                                       socket_timeout=self._config.timeout,
+                                       db=self._config.db,
+                                       retry_on_timeout=True)
         else:
             conn = StrictRedis(host=self._config.host, port=self._config.port,
-                               db=self._config.db,
+                               db=self._config.db, retry_on_timeout=True,
                                socket_timeout=self._config.timeout)
             return conn
 
