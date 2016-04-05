@@ -1,6 +1,6 @@
-# Routing functions
+# Routing Functions
 
-The following functions provide routing capabilities to calculate the route from one point to another using differents modes like car or bicycle for example. This service uses the routing service defined for the user (currently, only the Mapzen routing service is available).
+The following functions provide turn-by-turn capabilities to calculate the route from one point to another using different modes, such as a car or bicycle. Currently, only the [Mapzen routing provider](https://mapzen.com/documentation/turn-by-turn/api-reference/#mapzen-turn-by-turn-routing-service-api-reference) is available through CartoDB.
 
 ### cdb_route_point_to_point(_origin geometry(Point), destination geometry(Point), mode text, [options text[], units text]_)
 
@@ -42,4 +42,4 @@ The optional value parameters must be passed using the format: `option=value`.
 
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
-`mode_type` | `text` | Type of route calculation | `shortest` (this option only apply to the car mode)
+`mode_type` | `text` | Type of route calculation | `shortest` (this option only applies to the car transport mode)
