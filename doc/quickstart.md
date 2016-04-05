@@ -24,3 +24,7 @@ Notice that you can make use of Postgres or PostGIS functions in your Data Servi
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=SELECT ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={Your API key}
 ```
+
+## Using Mapzen for Geocoding and Routing
+
+You can use Mapzen as the [geocoder service provider](http://cartodb-platform/dataservices-api/geocoding-functions/#geocoding-functions) with CartoDB. You can also use the [Mapzen API](https://mapzen.com/documentation/search/) directly, to geocode your data. Additionally, the Mapzen routing service is built into the [routing functions](http://cartodb-platform/dataservices-api/routing-functions/#routing-functions) of CartoDB.
