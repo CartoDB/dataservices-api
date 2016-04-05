@@ -94,7 +94,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, 
 
 ## City geocoder
 
-The following functions provide a city geocoder service. It is recommended to use the more specific geocoding function -- the one that requires more parameters — in order for the result to be as accurate as possible when several cities share their name. In case of coincidence, the point for the city with the most population will be returned.
+The following functions provide a city geocoder service. It is recommended to use the more specific geocoding function -- the one that requires more parameters — in order for the result to be as accurate as possible when several cities share their name. If there are duplicate results for a city name, the city name with the highest population will be returned.
 
 ### cdb_geocode_namedplace_point(_city_name text_)
 
