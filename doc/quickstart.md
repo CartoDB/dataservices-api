@@ -11,9 +11,9 @@ https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_geocode_admin0_polygon('U
 In order to geocode an existent CartoDB dataset, an SQL UPDATE statement must be used to populate the geometry column in the dataset with the results of the Geocoding API. For example, if the column where you are storing the country names for each one of our rows is called `country_column`, run the following statement in order to geocode the dataset:
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})&api_key={Your API key}
+https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
+polygon({country_column})&api_key={Your API key}
 ```
-You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
 
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300,600,900]::integer[])&api_key={Your API key}
@@ -27,4 +27,10 @@ https://{username}.cartodb.com/api/v2/sql?q=SELECT ST_Centroid(cdb_geocode_admin
 
 ## Using Mapzen for Geocoding and Routing
 
-You can use Mapzen as the [geocoder service provider](http://docs.cartodb.com/cartodb-platform/dataservices-api/#geocoding-functions) with CartoDB. You can also use the [Mapzen API](https://mapzen.com/documentation/search/) directly, to geocode your data. Additionally, the Mapzen routing service is built into the [routing functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/#routing-functions) of CartoDB.
+You can use Mapzen as the service provider for [geocoding](http://docs.cartodb.com/cartodb-platform/dataservices-api/#geocoding-functions) and [routing](http://docs.cartodb.com/cartodb-platform/dataservices-api/#routing-functions) with CartoDB. This enables you to take advantage of the [geocoding search](https://mapzen.com/documentation/search/) features, and the [turn-by-turn routing](https://mapzen.com/documentation/turn-by-turn/) service that Mapzen offers. To use these features through CartoDB, all you need is a Mapzen API Key. 
+
+Integration with Mapzen varies, depending on your account plan:
+
+- Enterprise account users will receive a Mapzen API Key through CartoDB
+- All other account plans can go to the [Mapzen Developers page](https://mapzen.com/developers/sign_in) to retrieve an API key. This is a free integration that allows you to access the Mapzen services by connecting your GitHub account
+
