@@ -1,6 +1,6 @@
 # Routing Functions
 
-The following functions provide turn-by-turn capabilities to calculate the route from one point to another using different modes, such as a car or bicycle. Currently, only the [Mapzen routing service](http://docs.cartodb.com/cartodb-platform/dataservices-api/quickstart/#using-mapzen-for-geocoding-and-routing) is available.
+The following functions provide turn-by-turn capabilities to calculate the route from one point to another using different modes, such as a car or bicycle. Currently, only the [Mapzen routing service](http://docs.cartodb.com/cartodb-platform/dataservices-api/quickstart/#using-mapzen-services) is available.
 
 ### cdb_route_point_to_point(_origin geometry(Point), destination geometry(Point), mode text, [options text[], units text]_)
 
