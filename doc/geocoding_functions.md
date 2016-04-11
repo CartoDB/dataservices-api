@@ -308,7 +308,7 @@ Using **Mapzen** as the geocoder provider
 SELECT cdb_geocode_street_point('651 Lombard Street San Francisco California', NULL, NULL, 'USA')
 ```
 
-**Tip:** If you are using the Mapzen API for geocoding, see the integration details in the [Quickstart](http://docs.cartodb.com/cartodb-platform/dataservices-api/quickstart/#using-mapzen-for-geocoding-and-routing) section.
+**Tip:** If you are using the Mapzen API for geocoding, see the integration details in the [Quickstart](http://docs.cartodb.com/cartodb-platform/dataservices-api/quickstart/#using-mapzen-services) section.
 
 ##### Update
 

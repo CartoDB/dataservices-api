@@ -25,7 +25,7 @@ Notice that you can make use of Postgres or PostGIS functions in your Data Servi
 https://{username}.cartodb.com/api/v2/sql?q=SELECT ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={Your API key}
 ```
 
-## Using Mapzen for Geocoding and Routing
+## Using Mapzen Services
 
 You can use Mapzen as the service provider for [geocoding](http://docs.cartodb.com/cartodb-platform/dataservices-api/#geocoding-functions) and [routing](http://docs.cartodb.com/cartodb-platform/dataservices-api/#routing-functions) with CartoDB. This enables you to take advantage of the [geocoding search](https://mapzen.com/documentation/search/) features, and the [turn-by-turn routing](https://mapzen.com/documentation/turn-by-turn/) service that Mapzen offers. To use these features through CartoDB, all you need is a Mapzen API Key. 
 
@@ -34,3 +34,4 @@ Integration with Mapzen varies, depending on your account plan:
 - Enterprise account users will receive a Mapzen API Key through CartoDB
 - All other account plans can go to the [Mapzen Developers page](https://mapzen.com/developers/sign_in) to retrieve an API key. This is a free integration that allows you to access the Mapzen services by connecting your GitHub account
 
+**Tip** You can also use [Mapzen basemaps](https://mapzen.com/documentation/vector-tiles/) by integrating with their API. This is useful is you want to include a vector tile service basemap with your CartoDB map. To include their external basemaps, define the URL and Mapzen attributions in the [HTTP data layer of your MapConfig](http://docs.cartodb.com/cartodb-platform/maps-api/mapconfig/#http-layer-options) file. Currently, Mapzen vector tile basemaps are only supported via the API, and are not available through the CartoDB Editor.
