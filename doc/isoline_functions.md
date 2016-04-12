@@ -2,7 +2,7 @@
 
 [Isolines](https://cartodb.com/data/isolines/) are contoured lines that display calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline functions through CartoDB are available by requesting a single function in the Data Services API.
 
-	**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption.
+_**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption._
 
 You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
 polygon({country_column})&api_key={api_key}
