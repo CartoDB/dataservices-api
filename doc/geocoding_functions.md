@@ -1,6 +1,6 @@
 # Geocoding Functions
 
-The geocoder functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. Geocoding functions through CartoDB are available by requesting a single function in the Data Services API.
+The [geocoder](https://cartodb.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CartoDB provides functions for several different categories of geocoding through the Data Services API.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption.
 
@@ -21,9 +21,9 @@ https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cd
 
 The following geocoding functions are available, grouped by categories.
 
-## Country geocoder
+## Country Geocoder
 
-This function provides a country geocoding service. It recognizes the names of the different countries from different synonyms, such as their English name, their endonym, or their ISO2 or ISO3 codes.
+This function geocodes country names by transforming them into country border geometries. It recognizes the names of the different countries either by different synonyms (such as their English name or their endonym), or by ISO (ISO2 or ISO3) codes.
 
 ### cdb_geocode_admin0_polygon(_country_name text_)
 
@@ -52,9 +52,9 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ```
 
 
-## Level-1 Administrative regions geocoder
+## Level-1 Administrative Regions Geocoder
 
-The following functions provide a geocoding service for administrative regions of level 1 (or NUTS-1) such as states for the United States, regions in France or autonomous communities in Spain.
+This function geocodes the [Level 1](https://en.wikipedia.org/wiki/Table_of_administrative_divisions_by_country), or [NUTS-1](https://en.wikipedia.org/wiki/NUTS_1_statistical_regions_of_England), administrative divisions (or units) of countries and transforms them into polygon geometries. For example, a "state" in the United States, a region in France, or an autonomous community in Spain.
 
 ### cdb_geocode_admin1_polygon(_admin1_name text_)
 
@@ -110,9 +110,9 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, 
 ```
 
 
-## City geocoder
+## City Geocoder
 
-The following functions provide a city geocoder service. It is recommended to use the more specific geocoding function -- the one that requires more parameters — in order for the result to be as accurate as possible when several cities share their name.
+This fuction geocodes the names of cities and transforms them to a point geometries. It is recommended to use geocoding functions that require more parameters — in order for the result to be as accurate as possible when several cities share their name. If there are duplicate results for a city name, the city name with the highest population will be returned.
 
 ### cdb_geocode_namedplace_point(_city_name text_)
 
@@ -195,9 +195,9 @@ SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
 ```
 
-## Postal codes geocoder
+## Postal Code Geocoder
 
-The following functions provide a postal code geocoding service that can be used to obtain points or polygon results. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
+This function geocodes postal codes and country names and transforms them to points or polygon geometries. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
@@ -255,9 +255,9 @@ SELECT cdb_geocode_postalcode_point('11211', 'USA')
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'USA')
 ```
 
-## IP addresses geocoder
+## IP Addresses Geocoder
 
-This function provides an IP address geocoding service, for both IPv4 and IPv6 addresses.
+This function geocodes both IPv4, and IPv6, IP addresses and transforms them into point geometries. This is useful if you are analyzing location based data, based on a set of user's IP addresses.
 
 ### cdb_geocode_ipaddress_point(_ip_address text_)
 
@@ -286,11 +286,11 @@ SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 
-## Street-level geocoder
+## Street-Level Geocoder
 
-This function provides a street-level geocoding service. This service uses the street level geocoder defined for the user.
+This function geocodes street addresses and transforms them into point geometries. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will implemented in the future.
 
-**This service is subject to quota limitations, and extra fees may apply**. Please view our [terms and conditions](https://cartodb.com/terms/) and check out the [Quota information section](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations related with quota usage.
+**This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
