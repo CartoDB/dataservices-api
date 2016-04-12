@@ -1,7 +1,25 @@
 # Geocoding Functions
 
-The following geocoding functions are available, grouped by categories.
+The geocoder functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. Geocoding functions through CartoDB are available by requesting a single function in the Data Services API.
 
+**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption.
+
+
+## Quickstart
+
+Here is an example of how to geocode a single country:
+
+```bash
+https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_geocode_admin0_polygon('USA')&api_key={api_key}
+```
+
+In order to geocode an existent CartoDB dataset, an SQL UPDATE statement must be used to populate the geometry column in the dataset with the results of the Geocoding API. For example, if the column where you are storing the country names for each one of our rows is called `country_column`, run the following statement in order to geocode the dataset:
+
+```bash
+https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_
+```
+
+The following geocoding functions are available, grouped by categories.
 
 ## Country geocoder
 
@@ -278,12 +296,12 @@ This function provides a street-level geocoding service. This service uses the s
 
 #### Arguments
 
-Name | Type | Description | Provider
+Name | Type | Description
 --- | --- | --- | ---
-`searchtext` | `text` | searchtext contains free-form text containing address elements. You can specify the searchtext parameter by itself, or with other parameters, to narrow your search. For example, you can specify the state or country parameters, along with a free-form address in the searchtext field. | Here, Google, Mapzen
-`city` | `text` | (Optional) Name of the city. | Here and Google
-`state` | `text` | (Optional) Name of the state. | Here and Google
-`country` | `text` | (Optional) Name of the country. *If you are using **Mapzen** as the geocoder provider, you must use alpha-2 or alpha-3 [ISO-3166](https://en.wikipedia.org/wiki/ISO_3166-1) country codes* | Here, Google and Mapzen
+`searchtext` | `text` | searchtext contains free-form text containing address elements. You can specify the searchtext parameter by itself, or with other parameters, to narrow your search. For example, you can specify the state or country parameters, along with a free-form address in the searchtext field.
+`city` | `text` | (Optional) Name of the city.
+`state` | `text` | (Optional) Name of the state.
+`country` | `text` | (Optional) Name of the country.
 
 #### Returns
 
@@ -293,22 +311,15 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-Using **Here** or **Google** as the geocoder provider
+Using SELECT for geocoding functions
 
 ```bash
 SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
-```
-
-Using **Mapzen** as the geocoder provider
-
-```bash
 SELECT cdb_geocode_street_point('651 Lombard Street San Francisco California', NULL, NULL, 'USA')
 ```
-
-**Tip:** If you are using the Mapzen API for geocoding, see the integration details in the [Quickstart](http://docs.cartodb.com/cartodb-platform/dataservices-api/quickstart/#using-mapzen-services) section.
 
 ##### Update
 
