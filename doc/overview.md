@@ -6,7 +6,7 @@ By using CartoDB libraries and the SQL API, you can apply location data services
 
 _The Data Services API is collaborating with Mapzen, and several other geospatial service providers, in order to supply the best location data services from within our CartoDB Platform._
 
-## General Concepts
+## Data Services Integration
 
 By using the SQL API to query the Data Services API functions, you can manage specific operations and the corresponding geometries (a `polygon` or a `point`), according to the input information.
 
@@ -14,7 +14,7 @@ The Data Services API decouples the geocoding and isoline services from the Cart
 
 The geometries provided by this API are projected in the projection [WGS 84 SRID 4326](http://spatialreference.org/ref/epsg/wgs-84/).
 
-**Note:** The Data Services API [geocoding functions]((http://docs.cartodb.com/cartodb-platform/dataservices-api/geocoding-functions/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The CartoDB Platform does not support multi-geometry layers or datasets, therefore you must confirm that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
+**Note:** The Data Services API [geocoding functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/geocoding-functions/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The CartoDB Platform does not support multi-geometry layers or datasets, therefore you must confirm that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
 
 ## Authentication
 
