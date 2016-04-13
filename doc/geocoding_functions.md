@@ -24,6 +24,8 @@ This function geocodes country names by transforming them into country border ge
 
 ### cdb_geocode_admin0_polygon(_country_name text_)
 
+Geocodes a country name into a polygon data.
+
 #### Arguments
 
 Name | Type | Description
@@ -55,6 +57,8 @@ This function geocodes the [Level 1](https://en.wikipedia.org/wiki/Table_of_admi
 
 ### cdb_geocode_admin1_polygon(_admin1_name text_)
 
+Geocodes Level-1 administrative regions into polygon data.
+
 #### Arguments
 
 Name | Type | Description
@@ -80,6 +84,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 ```
 
 ### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
+
+Geocodes Level-1 administrative regions, and country names, into polygon data.
 
 #### Arguments
 
@@ -109,9 +115,11 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, 
 
 ## City Geocoder
 
-This fuction geocodes the names of cities and transforms them to a point geometries. It is recommended to use geocoding functions that require more parameters — in order for the result to be as accurate as possible when several cities share their name. If there are duplicate results for a city name, the city name with the highest population will be returned.
+This function geocodes the names of cities and transforms them to a point geometries. It is recommended to use geocoding functions that require more defined parameters — this returns more accurate results when several cities have the same name. _If there are duplicate results for a city name, the city name with the highest population will be returned._
 
 ### cdb_geocode_namedplace_point(_city_name text_)
+
+Geocodes city names into point data.
 
 #### Arguments
 
@@ -138,6 +146,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
 ```
 
 ### cdb_geocode_namedplace_point(_city_name text, country_name text_)
+
+Geocodes city names, and country names, into point data.
 
 #### Arguments
 
@@ -166,6 +176,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'S
 
 ### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
+Geocodes city names, level-1 administrative regions, and country names into point data. This is recommended for the most accurate geocoding of city data. 
+
 #### Arguments
 
 Name | Type | Description
@@ -189,7 +201,7 @@ SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ##### Update
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {provinhttps://team.cartodb.com/u/matallo/viz/3ed93c04-0038-11e6-b597-0ea31932ec1d/embed_mapce_column}, 'USA')
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
 ```
 
 ## Postal Code Geocoder
@@ -197,6 +209,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {p
 This function geocodes postal codes and country names and transforms them to points or polygon geometries. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
+
+Geocodes the postal code, and country name, into polygon data.
 
 #### Arguments
 
@@ -226,6 +240,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_co
 **Note:** For the USA, US Census ZCTAs are considered.
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
+
+Geocodes postal codes, and country names, into point data.
 
 #### Arguments
 
@@ -257,6 +273,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_colu
 This function geocodes both IPv4, and IPv6, IP addresses and transforms them into point geometries. This is useful if you are analyzing location based data, based on a set of user's IP addresses.
 
 ### cdb_geocode_ipaddress_point(_ip_address text_)
+
+Geocodes IP addresses, and country names into point data.
 
 #### Arguments
 
@@ -290,6 +308,8 @@ This function geocodes street addresses and transforms them into point geometrie
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
+
+Geocodes a complete street address into point data.
 
 #### Arguments
 
