@@ -1,6 +1,6 @@
 # Isoline Functions
 
-[Isolines](https://cartodb.com/data/isolines/) are contoured lines that display calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline functions through CartoDB are available by requesting a single function in the Data Services API.
+[Isolines](https://cartodb.com/data/isolines/) are contoured lines that display equally calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline services through CartoDB are available by requesting a single function in the Data Services API.
 
 _**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption._
 
@@ -20,6 +20,8 @@ https://{username}.cartodb.com/api/v2/sql?q=SELECT ST_Centroid(cdb_geocode_admin
 The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [HERE](https://developer.here.com/coverage-info) maps.
 
 ## cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_)
+
+Displays a contoured line on a map, connecting points to a defined area, measured by an equal range of distance (in meters).
 
 #### Arguments
 
@@ -64,6 +66,8 @@ INSERT INTO {table} (the_geom) SELECT (cdb_isodistance(the_geom, 'walk', string_
 ```
 
 ## cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_)
+
+Displays a contoured line on a map, connecting points to a defined area, measured by an equal range of time (in seconds).
 
 #### Arguments
 
