@@ -21,7 +21,7 @@ The following functions provide an isoline generator service, based on time or d
 
 ## cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_)
 
-Displays a contoured line on a map, connecting points to a defined area, measured by an equal range of distance (in meters).
+Displays a contoured line on a map, connecting geometries to a defined area, measured by an equal range of distance (in meters).
 
 #### Arguments
 
@@ -67,7 +67,7 @@ INSERT INTO {table} (the_geom) SELECT (cdb_isodistance(the_geom, 'walk', string_
 
 ## cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_)
 
-Displays a contoured line on a map, connecting points to a defined area, measured by an equal range of time (in seconds).
+Displays a contoured line on a map, connecting geometries to a defined area, measured by an equal range of time (in seconds).
 
 #### Arguments
 
