@@ -189,7 +189,7 @@ SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ##### Update
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
+UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {provinhttps://team.cartodb.com/u/matallo/viz/3ed93c04-0038-11e6-b597-0ea31932ec1d/embed_mapce_column}, 'USA')
 ```
 
 ## Postal Code Geocoder
@@ -285,7 +285,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 
 ## Street-Level Geocoder
 
-This function geocodes street addresses and transforms them into point geometries. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will implemented in the future.
+This function geocodes street addresses and transforms them into point geometries. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
