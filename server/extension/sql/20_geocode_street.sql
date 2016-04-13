@@ -97,7 +97,10 @@ RETURNS Geometry AS $$
 
   try:
     geocoder = MapzenGeocoder(user_geocoder_config.mapzen_app_key)
-    coordinates = geocoder.geocode(searchtext=searchtext, country=country)
+    country_iso3 = None
+    if country:
+      country_iso3 = country_to_iso3(country)
+    coordinates = geocoder.geocode(searchtext=searchtext, country=country_iso3)
     if coordinates:
       quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
