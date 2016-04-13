@@ -4,7 +4,7 @@ By using CartoDB libraries and the SQL API, you can apply location data services
 
 **Note:** Based on your account plan, some of these data services are subject to different [quota limitations](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/#quota-information).
 
-_The Data Services API is collaborating with Mapzen, and several other geospatial service providers, in order to supply the best location data services from within our CartoDB Platform._
+_The Data Services API is collaborating with [Mapzen](https://mapzen.com/), and several other geospatial service providers, in order to supply the best location data services from within our CartoDB Platform._
 
 ## Data Services Integration
 
