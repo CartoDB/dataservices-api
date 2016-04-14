@@ -17,8 +17,8 @@ class MapzenGeocoder:
         self._url = base_url
 
     @qps_retry
-    def geocode(self, searchtext, country=None):
-        request_params = self._build_requests_parameters(searchtext, country)
+    def geocode(self, searchtext, city=None, state_province=None, country=None):
+        request_params = self._build_requests_parameters(searchtext, city, state_province, country)
         response = requests.get(self._url, params=request_params)
         if response.status_code == requests.codes.ok:
             return self.__parse_response(response.text)
@@ -27,14 +27,25 @@ class MapzenGeocoder:
         else:
             response.raise_for_status()
 
-    def _build_requests_parameters(self, searchtext, country=None):
+    def _build_requests_parameters(self, searchtext, city=None,
+                                   state_province=None, country=None):
         request_params = {}
-        request_params['text'] = searchtext
+        search_string = self._build_search_text(searchtext, city, state_province)
+        request_params['text'] = search_string
         request_params['layers'] = 'address'
         request_params['api_key'] = self._app_key
         if country:
             request_params['boundary.country'] = country
         return request_params
+
+    def _build_search_text(self, searchtext, city, state_province):
+        search_string = searchtext
+        if city:
+            search_string = "{0}, {1}".format(search_string, city)
+        if state_province:
+            search_string = "{0}, {1}".format(search_string, state_province)
+
+        return search_string
 
     def __parse_response(self, response):
         try:
