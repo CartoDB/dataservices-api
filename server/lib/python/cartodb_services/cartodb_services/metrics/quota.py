@@ -70,6 +70,9 @@ class QuotaChecker:
         elif re.match('here_isolines',
                       self._user_service_config.service_type) is not None:
             return self.__check_isolines_quota()
+        elif re.match('routing_mapzen',
+                      self._user_service_config.service_type) is not None:
+            return self.__check_routing_quota()
         else:
             return False
 
@@ -97,6 +100,17 @@ class QuotaChecker:
         soft_isolines_limit = self._user_service_config.soft_isolines_limit
 
         if soft_isolines_limit or (user_quota > 0 and current_used <= user_quota):
+            return True
+        else:
+            return False
+
+    def __check_routing_quota(self):
+        user_quota = self._user_service_config.monthly_quota
+        today = date.today()
+        service_type = self._user_service_config.service_type
+        current_used = self._user_service.used_quota(service_type, today)
+
+        if (user_quota > 0 and current_used <= user_quota):
             return True
         else:
             return False

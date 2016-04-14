@@ -24,9 +24,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   user_routing_config = GD["user_routing_config_{0}".format(username)]
 
   quota_service = QuotaService(user_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reach the limit of your quota')
 
   try:
-    client = MapzenRouting(user_routing_config.mapzen_app_key)
+    client = MapzenRouting(user_routing_config.mapzen_api_key)
 
     if not origin or not destination:
       plpy.notice("Empty origin or destination")
