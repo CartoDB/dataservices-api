@@ -89,18 +89,23 @@ $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.mapzen import MapzenGeocoder
+  from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
   quota_service = QuotaService(user_geocoder_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reach the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_app_key)
+    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
-    coordinates = geocoder.geocode(searchtext=searchtext, country=country_iso3)
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city,
+                                   state_province=state_province,
+                                   country=country_iso3)
     if coordinates:
       quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
