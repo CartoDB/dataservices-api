@@ -382,7 +382,7 @@ class ServicesDBConfig:
 
     @property
     def mapzen_routing_monthly_quota(self):
-        return self._mapzen_geocoder_quota
+        return self._mapzen_routing_quota
 
     @property
     def mapzen_geocoder_api_key(self):
