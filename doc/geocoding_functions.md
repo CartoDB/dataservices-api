@@ -24,7 +24,7 @@ This function geocodes country names by transforming them into country border ge
 
 ### cdb_geocode_admin0_polygon(_country_name text_)
 
-Geocodes a country name into a polygon data.
+Geocodes the text name of a country into a country_name geometry, displayed as polygon data.
 
 #### Arguments
 
@@ -57,7 +57,7 @@ This function geocodes the [Level 1](https://en.wikipedia.org/wiki/Table_of_admi
 
 ### cdb_geocode_admin1_polygon(_admin1_name text_)
 
-Geocodes Level-1 administrative regions into polygon data.
+Geocodes the name of the province/state into a Level-1 administrative region, displayed as a polygon geometry.
 
 #### Arguments
 
@@ -85,7 +85,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 
 ### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
 
-Geocodes Level-1 administrative regions, and country names, into polygon data.
+Geocodes the name of the province/state for a specified country into a Level-1 administrative region, displayed as a polygon geometry.
 
 #### Arguments
 
@@ -119,7 +119,7 @@ This function geocodes the names of cities and transforms them to a point geomet
 
 ### cdb_geocode_namedplace_point(_city_name text_)
 
-Geocodes city names into point data.
+Geocodes the text name of a city into a named place geometry, displayed as point data.
 
 #### Arguments
 
@@ -147,7 +147,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
 
 ### cdb_geocode_namedplace_point(_city_name text, country_name text_)
 
-Geocodes city names, and country names, into point data.
+Geocodes the text name of a city for a specified country into a named place point geometry.
 
 #### Arguments
 
@@ -176,8 +176,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'S
 
 ### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
-Geocodes city names, level-1 administrative regions, and country names into point data. This is recommended for the most accurate geocoding of city data. 
-
+Geocodes the text name of a city, for a specified province/state and country, into a named place point geometry. This is recommended for the most accurate geocoding of city data. 
 #### Arguments
 
 Name | Type | Description
@@ -212,7 +211,7 @@ This function geocodes postal codes and country names and transforms them to poi
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
-Geocodes the postal code, and country name, into polygon data.
+Goecodes the postal code for a specified country into a **polygon** geometry.
 
 #### Arguments
 
@@ -241,7 +240,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_co
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
 
-Geocodes postal codes, and country names, into point data.
+Goecodes the postal code for a specified country into a **point** geometry.
 
 #### Arguments
 
@@ -274,7 +273,7 @@ This function geocodes both IPv4, and IPv6, IP addresses and transforms them int
 
 ### cdb_geocode_ipaddress_point(_ip_address text_)
 
-Geocodes IP addresses, and country names into point data.
+Geocodes a postal code from a specified country into an IP address, displayed as a point geometry.
 
 #### Arguments
 
@@ -309,7 +308,7 @@ This function geocodes street addresses and transforms them into point geometrie
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
-Geocodes a complete street address into point data.
+Geocodes a complete address into a single street geometry, displayed as point data.
 
 #### Arguments
 
