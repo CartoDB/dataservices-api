@@ -36,7 +36,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 
 ## Level-1 Administrative regions geocoder
 
-The following functions provide a geocoding service for administrative regions of level 1 (or NUTS-1) such as states for the United States, regions in France or autonomous communities in Spain.
+The following functions provide a geocoding service for administrative regions of level 1 (or NUTS-1) such as states for the United States, *départements* in France or autonomous communities in Spain.
 
 ### cdb_geocode_admin1_polygon(_admin1_name text_)
 
