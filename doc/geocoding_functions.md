@@ -208,6 +208,8 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {p
 
 This function geocodes postal codes and country names and transforms them to points or polygon geometries. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
+**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](http://docs.cartodb.com/faqs/datasets-and-data/#why-does-cartodb-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
+
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
 Geocodes the postal code, and country name, into polygon data.
@@ -236,8 +238,6 @@ SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'USA')
 ```
-
-**Note:** For the USA, US Census ZCTAs are considered.
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
 

@@ -16,21 +16,21 @@ class RedisConnection:
             sentinel = Sentinel([(self._config.host,
                                   self._config.port)],
                                 socket_timeout=self._config.timeout)
-            return sentinel.master_for(
-                self._config.sentinel_id,
-                socket_timeout=self._config.timeout,
-                db=self._config.db
-            )
+            return sentinel.master_for(self._config.sentinel_id,
+                                       socket_timeout=self._config.timeout,
+                                       db=self._config.db,
+                                       retry_on_timeout=True)
         else:
             conn = StrictRedis(host=self._config.host, port=self._config.port,
-                               db=self._config.db)
+                               db=self._config.db, retry_on_timeout=True,
+                               socket_timeout=self._config.timeout)
             return conn
 
 
 class RedisDBConfig:
 
     DEFAULT_USER_DB = 5
-    DEFAULT_TIMEOUT = 2  # seconds
+    DEFAULT_TIMEOUT = 1.5  # seconds
 
     def __init__(self, key, db_conn):
         self._db_conn = db_conn
@@ -63,8 +63,9 @@ class RedisDBConfig:
                 self._sentinel_id = None
 
     def __str__(self):
-        return "Host: {0}, Port: {1}, Sentinel id: {2}, DB: {3}".format(
-            self.host, self.port, self.sentinel_id, self.db)
+        return "Host: {0}, Port: {1}, Sentinel id: {2}, DB: {3}, " \
+               "Timeout: {4}".format(self.host, self.port, self.sentinel_id,
+                                     self.db, self.timeout)
 
     @property
     def host(self):
