@@ -41,11 +41,12 @@ class UserMetricsService:
         return current_use
 
     def __used_isolines_quota(self, service_type, date):
+        """ Recover the used quota for the user in the current month """
         date_from, date_to = self.__current_billing_cycle()
         current_use = 0
         isolines_generated = self.get_metrics(service_type,
-                                             'isolines_generated', date_from,
-                                             date_to)
+                                              'isolines_generated', date_from,
+                                              date_to)
         empty_responses = self.get_metrics(service_type,
                                            'empty_responses', date_from,
                                            date_to)
@@ -53,12 +54,27 @@ class UserMetricsService:
 
         return current_use
 
+    def __used_routing_quota(self, service_type, date):
+        """ Recover the used quota for the user in the current month """
+        date_from, date_to = self.__current_billing_cycle()
+        current_use = 0
+        success_responses = self.get_metrics(service_type,
+                                             'success_responses', date_from,
+                                             date_to)
+        empty_responses = self.get_metrics(service_type,
+                                           'empty_responses', date_from,
+                                           date_to)
+        current_use += (success_responses + empty_responses)
 
-    def increment_service_use(self, service_type, metric, date=date.today(), amount=1):
+        return current_use
+
+    def increment_service_use(self, service_type, metric, date=date.today(),
+                              amount=1):
         """ Increment the services uses in monthly and daily basis"""
         self.__increment_user_uses(service_type, metric, date, amount)
         if self._orgname:
-            self.__increment_organization_uses(service_type, metric, date, amount)
+            self.__increment_organization_uses(service_type, metric, date,
+                                               amount)
 
     def get_metrics(self, service, metric, date_from, date_to):
         aggregated_metric = 0
@@ -83,11 +99,12 @@ class UserMetricsService:
                                                  service_type, metric, date)
         self._redis_connection.zincrby(redis_prefix, date.day, amount)
 
-    def __parse_redis_prefix(self, prefix, entity_name, service_type, metric, date):
+    def __parse_redis_prefix(self, prefix, entity_name, service_type, metric,
+                             date):
         yearmonth_key = date.strftime('%Y%m')
         redis_name = "{0}:{1}:{2}:{3}:{4}".format(prefix, entity_name,
-                                              service_type, metric,
-                                              yearmonth_key)
+                                                  service_type, metric,
+                                                  yearmonth_key)
 
         return redis_name
 
