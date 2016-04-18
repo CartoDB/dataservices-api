@@ -20,7 +20,7 @@ The following geocoding functions are available, grouped by categories.
 
 ## Country Geocoder
 
-This function geocodes country names by transforming them into country border geometries. It recognizes the names of the different countries either by different synonyms (such as their English name or their endonym), or by ISO (ISO2 or ISO3) codes.
+This function geocodes your data into country border geometries. It recognizes the names of the different countries either by different synonyms (such as their English name or their endonym), or by ISO (ISO2 or ISO3) codes.
 
 ### cdb_geocode_admin0_polygon(_country_name text_)
 
@@ -53,7 +53,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 
 ## Level-1 Administrative Regions Geocoder
 
-This function geocodes the [Level 1](https://en.wikipedia.org/wiki/Table_of_administrative_divisions_by_country), or [NUTS-1](https://en.wikipedia.org/wiki/NUTS_1_statistical_regions_of_England), administrative divisions (or units) of countries and transforms them into polygon geometries. For example, a "state" in the United States, "départements" in France, or an autonomous community in Spain.
+This function geocodes your data into polygon geometries for [Level 1](https://en.wikipedia.org/wiki/Table_of_administrative_divisions_by_country), or [NUTS-1](https://en.wikipedia.org/wiki/NUTS_1_statistical_regions_of_England), administrative divisions (or units) of countries. For example, a "state" in the United States, "départements" in France, or an autonomous community in Spain.
 
 ### cdb_geocode_admin1_polygon(_admin1_name text_)
 
@@ -115,7 +115,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, 
 
 ## City Geocoder
 
-This function geocodes the names of cities and transforms them to a point geometries. It is recommended to use geocoding functions that require more defined parameters — this returns more accurate results when several cities have the same name. _If there are duplicate results for a city name, the city name with the highest population will be returned._
+This function geocodes your data into point geometries for names of cities. It is recommended to use geocoding functions that require more defined parameters — this returns more accurate results when several cities have the same name. _If there are duplicate results for a city name, the city name with the highest population will be returned._
 
 ### cdb_geocode_namedplace_point(_city_name text_)
 
@@ -176,7 +176,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'S
 
 ### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
-Geocodes the text name of a city, for a specified province/state and country, into a named place point geometry. This is recommended for the most accurate geocoding of city data. 
+Geocodes your data into a named place point geometry, containing the text name of a city, for a specified province/state and country. This is recommended for the most accurate geocoding of city data. 
 #### Arguments
 
 Name | Type | Description
@@ -205,7 +205,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {p
 
 ## Postal Code Geocoder
 
-This function geocodes postal codes and country names and transforms them to points or polygon geometries. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
+This function geocodes your data into point, or polygon, geometries for postal codes. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
 **Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](http://docs.cartodb.com/faqs/datasets-and-data/#why-does-cartodb-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
 
@@ -269,7 +269,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_colu
 
 ## IP Addresses Geocoder
 
-This function geocodes both IPv4, and IPv6, IP addresses and transforms them into point geometries. This is useful if you are analyzing location based data, based on a set of user's IP addresses.
+This function geocodes your data into point geometries for IP addresses. This is useful if you are analyzing location based data, based on a set of user's IP addresses.
 
 ### cdb_geocode_ipaddress_point(_ip_address text_)
 
@@ -302,7 +302,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 
 ## Street-Level Geocoder
 
-This function geocodes street addresses and transforms them into point geometries. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
+This function geocodes your data into a point geometry for a street address. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
