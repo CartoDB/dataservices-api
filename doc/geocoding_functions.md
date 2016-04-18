@@ -334,7 +334,6 @@ SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, 
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California')
 SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
-SELECT cdb_geocode_street_point('651 Lombard Street San Francisco California', NULL, NULL, 'USA')
 ```
 
 ##### Update
