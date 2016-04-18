@@ -402,6 +402,7 @@ class ServicesRedisConfig:
     GOOGLE_GEOCODER_API_KEY = 'google_maps_api_key'
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
     QUOTA_KEY = 'geocoding_quota'
+    ISOLINES_QUOTA_KEY = 'here_isolines_quota'
     PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_conn):
@@ -428,6 +429,7 @@ class ServicesRedisConfig:
             raise ConfigException("""There is no organization config available. Please check your configuration.'""")
         else:
             user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
+            user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
             user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
