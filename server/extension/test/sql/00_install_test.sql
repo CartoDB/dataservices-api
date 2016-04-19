@@ -4,6 +4,7 @@ CREATE EXTENSION schema_triggers;
 CREATE EXTENSION plpythonu;
 CREATE EXTENSION cartodb;
 CREATE EXTENSION cdb_geocoder;
+CREATE EXTENSION observatory VERSION 'dev';
 
 -- Install the extension
 CREATE EXTENSION cdb_dataservices_server;
@@ -14,6 +15,7 @@ SELECT cartodb.cdb_conf_setconf('redis_metadata_config', '{"redis_host": "localh
 SELECT cartodb.cdb_conf_setconf('heremaps_conf', '{"geocoder": {"app_id": "dummy_id", "app_code": "dummy_code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "dummy_id", "app_code": "dummy_code"}}');
 SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing": {"api_key": "routing_dummy_api_key", "monthly_quota": 1500000}, "geocoder": {"api_key": "geocoder_dummy_api_key", "monthly_quota": 1500000}}');
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
+SELECT cartodb.cdb_conf_setconf('data_observatory_conf', '{"monthly_quota": 10000}');
 
 -- Mock the varnish invalidation function
 -- (used by cdb_geocoder tests)
