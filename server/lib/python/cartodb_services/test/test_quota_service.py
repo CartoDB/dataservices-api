@@ -1,7 +1,7 @@
 import test_helper
 from mockredis import MockRedis
 from cartodb_services.metrics import QuotaService
-from cartodb_services.metrics import GeocoderConfig, RoutingConfig
+from cartodb_services.metrics import GeocoderConfig, RoutingConfig, DataObservatoryConfig
 from unittest import TestCase
 from nose.tools import assert_raises
 from datetime import datetime, date
@@ -109,6 +109,20 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
+    def test_should_check_user_data_observatory_quota_correctly(self):
+        qs = self.__build_data_observatory_quota_service('test_user')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=100000)
+        assert qs.check_user_quota() is False
+
+    def test_should_check_org_data_observatory_quota_correctly(self):
+        qs = self.__build_data_observatory_quota_service('test_user', orgname='testorg')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=100000)
+        assert qs.check_user_quota() is False
+
     def __prepare_quota_service(self, username, quota, service, orgname,
                                 soft_limit, end_date):
         test_helper.build_redis_user_config(self.redis_conn, username,
@@ -139,3 +153,13 @@ class TestQuotaService(TestCase):
         routing_config = RoutingConfig(self.redis_conn, self._plpy_mock,
                                        username, orgname)
         return QuotaService(routing_config, redis_connection=self.redis_conn)
+
+    def __build_data_observatory_quota_service(self, username, quota=100,
+                                               service='data_observatory', orgname=None,
+                                               soft_limit=False,
+                                               end_date=datetime.today()):
+        self.__prepare_quota_service(username, quota, service, orgname,
+                                     soft_limit, end_date)
+        do_config = DataObservatoryConfig(self.redis_conn, self._plpy_mock,
+                                          username, orgname)
+        return QuotaService(do_config, redis_connection=self.redis_conn)

@@ -32,6 +32,28 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
+class DataObservatoryConfig(ServiceConfig):
+
+    PERIOD_END_DATE = 'period_end_date'
+
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
+        super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
+                                            username, orgname)
+        self._monthly_quota = self._db_config.data_observatory_monthly_quota
+        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+
+    @property
+    def service_type(self):
+        return 'data_observatory'
+
+    @property
+    def monthly_quota(self):
+        return self._monthly_quota
+
+    @property
+    def period_end_date(self):
+        return self._period_end_date
+
 
 class RoutingConfig(ServiceConfig):
 
@@ -315,6 +337,7 @@ class ServicesDBConfig:
         self._get_here_config()
         self._get_mapzen_config()
         self._get_logger_config()
+        self._get_data_observatory_config()
 
     def _get_here_config(self):
         heremaps_conf_json = self._get_conf('heremaps_conf')
@@ -339,6 +362,14 @@ class ServicesDBConfig:
             self._mapzen_routing_quota = mapzen_conf['routing']['monthly_quota']
             self._mapzen_geocoder_api_key = mapzen_conf['geocoder']['api_key']
             self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
+
+    def _get_data_observatory_config(self):
+        do_conf_json = self._get_conf('data_observatory_conf')
+        if not do_conf_json:
+            raise ConfigException('Data Observatory configuration missing')
+        else:
+            do_conf = json.loads(do_conf_json)
+            self._data_observatory_monthly_quota = do_conf['monthly_quota']
 
     def _get_logger_config(self):
         logger_conf_json = self._get_conf('logger_conf')
@@ -395,6 +426,10 @@ class ServicesDBConfig:
     @property
     def geocoder_log_path(self):
         return self._geocoder_log_path
+
+    @property
+    def data_observatory_monthly_quota(self):
+        return self._data_observatory_monthly_quota
 
 
 class ServicesRedisConfig:
