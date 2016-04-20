@@ -51,3 +51,5 @@ def _plpy_execute_side_effect(*args, **kwargs):
         return [{'conf': '{"routing": {"api_key": "valhalla-Z61FWEs", "monthly_quota": 1500000}, "geocoder": {"api_key": "search-d744tp0", "monthly_quota": 1500000}}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":
         return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]
+    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('data_observatory_conf') as conf":
+        return [{'conf': '{"monthly_quota": 100000}'}]

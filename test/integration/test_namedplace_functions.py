@@ -8,7 +8,7 @@ class TestNameplaceFunctions(TestCase):
 
     def setUp(self):
         self.env_variables = IntegrationTestHelper.get_environment_variables()
-        self.sql_api_url = "https://{0}.{1}/api/v2/sql".format(
+        self.sql_api_url = "https://{0}.{1}/api/v1/sql".format(
             self.env_variables['username'],
             self.env_variables['host'],
             self.env_variables['api_key']
