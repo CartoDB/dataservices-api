@@ -25,9 +25,9 @@ BEGIN
         FROM pg_namespace s
         LEFT JOIN pg_roles r ON s.nspowner = r.oid
         WHERE r.rolname = session_user INTO username;
-        SELECT cartodb.cdb_conf_getconf('user_config')->'entity_name' INTO organization_name;
+        SELECT cartodb.cdb_conf_getconf('user_config')->>'entity_name' INTO organization_name;
     ELSE
-        SELECT cartodb.cdb_conf_getconf('user_config')->'entity_name' INTO username;
+        SELECT cartodb.cdb_conf_getconf('user_config')->>'entity_name' INTO username;
         organization_name = NULL;
     END IF;
     result.username = username;
