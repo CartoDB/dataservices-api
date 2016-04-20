@@ -1,1 +1,0 @@
-../../0.2.0/sql/60_street_test.sql
