@@ -1,1 +1,0 @@
-../../0.2.0/sql/20_admin1_test.sql
