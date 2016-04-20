@@ -15,7 +15,7 @@ RETURNS json AS $$
 
   quota_service = QuotaService(user_data_observatory_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+    plpy.error('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT cdb_observatory.OBS_GetDemographicSnapshot($1, $2, $3) as snapshot;", ["geometry(Geometry, 4326)", "text", "text"])
@@ -53,7 +53,7 @@ RETURNS json AS $$
 
   quota_service = QuotaService(user_data_observatory_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+    plpy.error('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT cdb_observatory.OBS_GetSegmentSnapshot($1, $2) as snapshot;", ["geometry(Geometry, 4326)", "text"])

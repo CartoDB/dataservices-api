@@ -31,7 +31,7 @@ RETURNS Geometry AS $$
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+    plpy.error('You have reached the limit of your quota')
 
   try:
     geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
@@ -96,7 +96,7 @@ RETURNS Geometry AS $$
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+    plpy.error('You have reached the limit of your quota')
 
   try:
     geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key)
