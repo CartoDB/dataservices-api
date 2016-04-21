@@ -1,17 +1,11 @@
 # Quota Information
 
-**This Data Services API provides functions which are subject to quota limitations, and extra fees may apply**. Please check our [terms and conditions](https://cartodb.com/terms/).
+**Based on your account plan, some of the Data Services API functions are subject to quota limitations and extra fees may apply.** View our [terms and conditions](https://cartodb.com/terms/), or [contact us](mailto:sales@cartodb.com) for details about which functions require service credits to your account.
 
-The functions that require service credits to be used are as follows:
+## Quota Consumption
 
-* cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_); from [Geocoding functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/geocoding-functions/)
-* cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_); from [Isoline functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/isoline-functions/)
-* cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_); from [Isoline functions](http://docs.cartodb.com/cartodb-platform/dataservices-api/isoline-functions/)
+Quota consumption is calculated based on the number of request made for each function. Be mindful of the following usage recommendations when using the Data Services API functions:
 
-## Quota consumption information and usage recommendations
-
-Be mindful of the following when using the abovementioned functions:
-
-* One credit per function call will be consumed, and the results are not cached. If the query is applied to a _N_ rows dataset, then _N_ credits will be used.
-* You are discouraged from using dynamic queries to these functions in your maps. This can result in credits consumption per map view. **Note:** Queries to the Data Services API and any of its functions in your maps may be forbidden in the future.
-* You are advised to store results of these queries into your datasets and refresh them as needed, so that you can have finer control on your credits' usage.
+* One credit per function call will be consumed. The results are not cached. If the query is applied to a _N_ rows dataset, then _N_ credits are consumed
+* Avoid running dynamic queries to these functions in your maps. This can result in credit consumption per map view. **Note:** Queries to the Data Services API, and any of its functions in your maps, may be forbidden in the future
+* It is advised to store results of these queries into your datasets, and refresh them as needed. This ensure more control of quota credits for your account

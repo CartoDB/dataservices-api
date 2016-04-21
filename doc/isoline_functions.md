@@ -1,10 +1,27 @@
 # Isoline Functions
 
-The following functions provide an isolines generator service based on time or distance. This service uses the isolines service defined for the user (currently, only the [HERE](https://developer.here.com/coverage-info) isolines service is available).
+[Isolines](https://cartodb.com/data/isolines/) are contoured lines that display equally calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline services through CartoDB are available by requesting a single function in the Data Services API.
 
-**This service is subject to quota limitations, and extra fees may apply**. Please view our [terms and conditions](https://cartodb.com/terms/) and check out the [Quota information section](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations related with quota usage.
+_**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption._
 
-### cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_)
+You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing.
+polygon({country_column})&api_key={api_key}
+
+```bash
+https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300,600,900]::integer[])&api_key={api_key}
+```
+
+Notice that you can make use of Postgres or PostGIS functions in your Data Services API requests, as the result is a geometry that can be handled by the system. For example, suppose you need to retrieve the centroid of a specific country, you can wrap the resulting geometry from the geocoder functions inside the PostGIS `ST_Centroid` function:
+
+```bash
+https://{username}.cartodb.com/api/v2/sql?q=SELECT ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={api_key}
+```
+
+The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [HERE](https://developer.here.com/coverage-info) maps.
+
+## cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_)
+
+Displays a contoured line on a map, connecting geometries to a defined area, measured by an equal range of distance (in meters).
 
 #### Arguments
 
@@ -48,7 +65,9 @@ SELECT the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk
 INSERT INTO {table} (the_geom) SELECT (cdb_isodistance(the_geom, 'walk', string_to_array(distance, ',')::integer[])).the_geom FROM {points_table}
 ```
 
-### cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_)
+## cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_)
+
+Displays a contoured line on a map, connecting geometries to a defined area, measured by an equal range of time (in seconds).
 
 #### Arguments
 
