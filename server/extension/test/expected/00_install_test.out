@@ -4,6 +4,7 @@ CREATE EXTENSION schema_triggers;
 CREATE EXTENSION plpythonu;
 CREATE EXTENSION cartodb;
 CREATE EXTENSION cdb_geocoder;
+CREATE EXTENSION observatory VERSION 'dev';
 -- Install the extension
 CREATE EXTENSION cdb_dataservices_server;
 -- Mock the redis server connection to point to this very test db
@@ -32,6 +33,12 @@ SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing": {"api_key": "routing
 (1 row)
 
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cartodb.cdb_conf_setconf('data_observatory_conf', '{"monthly_quota": 10000}');
  cdb_conf_setconf 
 ------------------
  

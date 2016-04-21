@@ -1,0 +1,103 @@
+---
+- name: cdb_geocode_admin0_polygon
+  return_type: Geometry
+  params:
+    - { name: country_name, type: text }
+
+- name: cdb_geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name, type: text }
+
+- name: cdb_geocode_admin1_polygon
+  return_type: Geometry
+  params:
+    - { name: admin1_name,  type: text }
+    - { name: country_name, type: text }
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name, type: text}
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_namedplace_point
+  return_type: Geometry
+  params:
+    - { name: city_name,    type: text}
+    - { name: admin1_name,  type: text}
+    - { name: country_name, type: text}
+
+
+- name: cdb_geocode_postalcode_polygon
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_postalcode_point
+  return_type: Geometry
+  params:
+    - { name: postal_code,  type: text}
+    - { name: country_name, type: text}
+
+- name: cdb_geocode_ipaddress_point
+  return_type: Geometry
+  params:
+    - { name: ip_address,  type: text}
+
+- name: cdb_geocode_street_point
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
+- name: cdb_isodistance
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
+- name: cdb_isochrone
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
+- name: cdb_route_point_to_point
+  return_type: cdb_dataservices_client.simple_route
+  multi_field: true
+  params:
+    - { name: origin,  type: "geometry(Point, 4326)" }
+    - { name: destination,  type: "geometry(Point, 4326)" }
+    - { name: mode, type: text }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+    - { name: units, type: "text", default: "'kilometers'"}
+
+- name: obs_get_demographic_snapshot
+  return_type: json
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
+    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".block_group'::text" }
+
+- name: obs_get_segment_snapshot
+  return_type: json
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".census_tract'::text" }

@@ -13,7 +13,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reach the limit of your quota')
+    plpy.error('You have reached the limit of your quota')
 
   try:
     client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, user_isolines_routing_config.heremaps_app_code, base_url = HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL)

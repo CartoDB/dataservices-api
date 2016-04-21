@@ -13,8 +13,8 @@ OLD_VERSIONS = $(wildcard old_versions/*.sql)
 # @see http://www.postgresql.org/docs/current/static/extend-pgxs.html
 DATA =  $(NEW_EXTENSION_ARTIFACT) \
   $(OLD_VERSIONS) \
-  cdb_dataservices_server--0.6.2--0.6.1.sql \
-  cdb_dataservices_server--0.6.1--0.6.2.sql
+  cdb_dataservices_server--0.6.2--0.7.0.sql \
+  cdb_dataservices_server--0.7.0--0.6.2.sql
 
 REGRESS = $(notdir $(basename $(wildcard test/sql/*test.sql)))
 TEST_DIR = test/
