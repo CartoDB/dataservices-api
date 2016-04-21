@@ -16,14 +16,14 @@ class TestDataObservatoryFunctions(TestCase):
 
     def test_if_get_demographic_snapshot_is_ok(self):
         query = "SELECT duration, length, shape as the_geom " \
-                "FROM cdb_do_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669))".format(
+                "FROM obs_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669))".format(
                     self.env_variables['api_key'])
         routing = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(routing['the_geom'], None)
 
     def test_if_get_demographic_snapshot_without_api_key_raise_error(self):
         query = "SELECT duration, length, shape as the_geom " \
-                "FROM cdb_do_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669))"
+                "FROM obs_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669))"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
@@ -31,14 +31,14 @@ class TestDataObservatoryFunctions(TestCase):
 
     def test_if_get_segment_snapshot_is_ok(self):
         query = "SELECT duration, length, shape as the_geom " \
-                "FROM cdb_do_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669))".format(
+                "FROM obs_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669))".format(
                     self.env_variables['api_key'])
         routing = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(routing['the_geom'], None)
 
     def test_if_get_segment_snapshot_without_api_key_raise_error(self):
         query = "SELECT duration, length, shape as the_geom " \
-                "FROM cdb_do_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669))"
+                "FROM obs_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669))"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
