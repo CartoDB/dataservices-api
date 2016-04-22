@@ -32,19 +32,31 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
-class DataObservatoryConfig(ServiceConfig):
 
+class ObservatorySnapshotConfig(ServiceConfig):
+
+    SOFT_LIMIT_KEY = 'soft_obs_snapshot_limit'
+    QUOTA_KEY = 'obs_snapshot_quota'
     PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
+        super(ObservatorySnapshotConfig, self).__init__(redis_connection, db_conn,
                                             username, orgname)
-        self._monthly_quota = self._db_config.data_observatory_monthly_quota
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_limit = True
+        else:
+            self._soft_limit = False
+        # Mixed config between db and redis. If we don't update all the users
+        # in redis, we could use the db value as default
+        if self.QUOTA_KEY in self._redis_config:
+            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
+        else:
+            self._monthly_quota = float(self._db_config.data_observatory_monthly_quota)
 
     @property
     def service_type(self):
-        return 'data_observatory'
+        return 'obs_snapshot'
 
     @property
     def monthly_quota(self):
@@ -53,6 +65,10 @@ class DataObservatoryConfig(ServiceConfig):
     @property
     def period_end_date(self):
         return self._period_end_date
+
+    @property
+    def soft_limit(self):
+        return self._soft_limit
 
 
 class RoutingConfig(ServiceConfig):
@@ -199,28 +215,6 @@ class GeocoderConfig(ServiceConfig):
         filtered_config = {key: self._redis_config[key] for key in self.GEOCODER_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config)
         self.__check_config(filtered_config)
-
-    def __get_user_config(self, username, orgname):
-        user_config = self._redis_connection.hgetall(
-            "rails:users:{0}".format(username))
-        if not user_config:
-            raise ConfigException("""There is no user config available. Please check your configuration.'""")
-        else:
-            if orgname:
-                self.__get_organization_config(orgname, user_config)
-
-            return user_config
-
-    def __get_organization_config(self, orgname, user_config):
-        org_config = self._redis_connection.hgetall(
-            "rails:orgs:{0}".format(orgname))
-        if not org_config:
-            raise ConfigException("""There is no organization config available. Please check your configuration.'""")
-        else:
-            user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
-            user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
-            user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
-            user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
 
     def __check_config(self, filtered_config):
         if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
@@ -438,24 +432,24 @@ class ServicesRedisConfig:
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
     QUOTA_KEY = 'geocoding_quota'
     ISOLINES_QUOTA_KEY = 'here_isolines_quota'
+    OBS_SNAPSHOT_QUOTA_KEY = 'obs_snapshot_quota'
     PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_conn):
         self._redis_connection = redis_conn
 
-    def build(self, username, password):
-        return self.__get_user_config(username, password)
+    def build(self, username, orgname):
+        return self.__get_user_config(username, orgname)
 
     def __get_user_config(self, username, orgname):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
-        else:
-            if orgname:
-                self.__get_organization_config(orgname, user_config)
+        elif orgname:
+            self.__get_organization_config(orgname, user_config)
 
-            return user_config
+        return user_config
 
     def __get_organization_config(self, orgname, user_config):
         org_config = self._redis_connection.hgetall(
@@ -465,6 +459,8 @@ class ServicesRedisConfig:
         else:
             user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
             user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
+            if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
+                user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
             user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]

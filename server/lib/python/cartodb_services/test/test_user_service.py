@@ -18,15 +18,15 @@ class TestUserService(TestCase):
 
     def test_user_used_quota_for_a_day(self):
         us = self.__build_user_service('test_user')
-        test_helper.increment_geocoder_uses(self.redis_conn, 'test_user',
-                                            amount=400)
+        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+                                           amount=400)
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_org_used_quota_for_a_day(self):
         us = self.__build_user_service('test_user', orgname='test_org')
-        test_helper.increment_geocoder_uses(self.redis_conn, 'test_user',
-                                            orgname='test_org',
-                                            amount=400)
+        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+                                           orgname='test_org',
+                                           amount=400)
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_user_not_amount_in_used_quota_for_month_should_be_0(self):

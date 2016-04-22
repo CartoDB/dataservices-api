@@ -1,5 +1,5 @@
 import test_helper
-from cartodb_services.metrics import GeocoderConfig, ConfigException
+from cartodb_services.metrics import GeocoderConfig, ObservatorySnapshotConfig, ConfigException
 from unittest import TestCase
 from nose.tools import assert_raises
 from mockredis import MockRedis
@@ -32,10 +32,29 @@ class TestConfig(TestCase):
         assert geocoder_config.soft_geocoding_limit is False
         assert geocoder_config.period_end_date.date() == yesterday.date()
 
+    def test_should_return_config_for_obs_snapshot(self):
+        yesterday = datetime.today() - timedelta(days=1)
+        test_helper.build_redis_user_config(self.redis_conn, 'test_user',
+                                            do_quota=100, soft_do_limit=True,
+                                            end_date=yesterday)
+        do_config = ObservatorySnapshotConfig(self.redis_conn, self.plpy_mock,
+                                          'test_user')
+        assert do_config.monthly_quota == 100
+        assert do_config.soft_limit is True
+        assert do_config.period_end_date.date() == yesterday.date()
+
+    def test_should_return_db_quota_if_not_redis_quota_config_obs_snapshot(self):
+        yesterday = datetime.today() - timedelta(days=1)
+        test_helper.build_redis_user_config(self.redis_conn, 'test_user',
+                                            end_date=yesterday)
+        do_config = ObservatorySnapshotConfig(self.redis_conn, self.plpy_mock,
+                                          'test_user')
+        assert do_config.monthly_quota == 100000
+        assert do_config.soft_limit is False
+        assert do_config.period_end_date.date() == yesterday.date()
+
     def test_should_raise_exception_when_missing_parameters(self):
         plpy_mock = test_helper.build_plpy_mock(empty=True)
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
-        assert_raises(ConfigException,
-                      GeocoderConfig,
-                      self.redis_conn, plpy_mock, 'test_user',
-                      None)
+        assert_raises(ConfigException, GeocoderConfig, self.redis_conn,
+                      plpy_mock, 'test_user', None)
