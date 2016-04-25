@@ -1,3 +1,21 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.7.1'" to load this file. \quit
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_data_observatory_config(text, text);
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_snapshot_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_obs_snapshot_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import ObservatorySnapshotConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    obs_snapshot_config = ObservatorySnapshotConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = obs_snapshot_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
   orgname TEXT,

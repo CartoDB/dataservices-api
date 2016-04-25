@@ -54,16 +54,16 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_data_observatory_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_snapshot_config(username text, orgname text)
 RETURNS boolean AS $$
-  cache_key = "user_data_observatory_config_{0}".format(username)
+  cache_key = "user_obs_snapshot_config_{0}".format(username)
   if cache_key in GD:
     return False
   else:
-    from cartodb_services.metrics import DataObservatoryConfig
+    from cartodb_services.metrics import ObservatorySnapshotConfig
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
-    data_observatory_config = DataObservatoryConfig(redis_conn, plpy, username, orgname)
-    GD[cache_key] = data_observatory_config
+    obs_snapshot_config = ObservatorySnapshotConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = obs_snapshot_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
