@@ -73,9 +73,9 @@ class QuotaChecker:
         elif re.match('routing_mapzen',
                       self._user_service_config.service_type) is not None:
             return self.__check_routing_quota()
-        elif re.match('data_observatory',
+        elif re.match('obs_snapshot',
                       self._user_service_config.service_type) is not None:
-            return self.__check_data_observatory_quota()
+            return self.__check_obs_snapshot_quota()
         else:
             return False
 
@@ -118,7 +118,7 @@ class QuotaChecker:
         else:
             return False
 
-    def __check_data_observatory_quota(self):
+    def __check_obs_snapshot_quota(self):
         user_quota = self._user_service_config.monthly_quota
         today = date.today()
         service_type = self._user_service_config.service_type

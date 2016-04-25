@@ -4,6 +4,7 @@ from mock import Mock
 
 def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
                             service="heremaps", isolines_quota=0,
+                            do_quota=None, soft_do_limit=None,
                             end_date=datetime.today()):
     user_redis_name = "rails:users:{0}".format(username)
     redis_conn.hset(user_redis_name, 'soft_geocoding_limit', soft_limit)
@@ -11,23 +12,31 @@ def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
     redis_conn.hset(user_redis_name, 'here_isolines_quota', isolines_quota)
     redis_conn.hset(user_redis_name, 'geocoder_type', service)
     redis_conn.hset(user_redis_name, 'period_end_date', end_date)
+    if do_quota:
+        redis_conn.hset(user_redis_name, 'obs_snapshot_quota', do_quota)
+    if soft_do_limit:
+        redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit',
+                        soft_do_limit)
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(user_redis_name, 'google_maps_api_key', '')
 
 
-def build_redis_org_config(redis_conn, orgname, quota=100, isolines_quota=0,
+def build_redis_org_config(redis_conn, orgname, quota=100, service="heremaps",
+                           isolines_quota=0, do_quota=None,
                            end_date=datetime.today()):
     org_redis_name = "rails:orgs:{0}".format(orgname)
     redis_conn.hset(org_redis_name, 'geocoding_quota', quota)
     redis_conn.hset(org_redis_name, 'here_isolines_quota', isolines_quota)
+    if do_quota:
+        redis_conn.hset(org_redis_name, 'obs_snapshot_quota', do_quota)
     redis_conn.hset(org_redis_name, 'period_end_date', end_date)
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(org_redis_name, 'google_maps_api_key', '')
 
 
-def increment_geocoder_uses(redis_conn, username, orgname=None,
-                            date=date.today(), service='geocoder_here',
-                            metric='success_responses', amount=20):
+def increment_service_uses(redis_conn, username, orgname=None,
+                           date=date.today(), service='geocoder_here',
+                           metric='success_responses', amount=20):
     prefix = 'org' if orgname else 'user'
     entity_name = orgname if orgname else username
     yearmonth = date.strftime('%Y%m')
