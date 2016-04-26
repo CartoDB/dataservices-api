@@ -1,6 +1,6 @@
 # Overview
 
-By using CartoDB libraries and the SQL API, you can apply location data services to your maps with select functions. These functions are integrated with a number of internal and external services, enabling you to programatically customize subsets of data for your visualizations. These features are useful for geospatial analysis and the results can be saved, and stored, for additional location data service operations.
+By using CartoDB libraries and the SQL API, you can apply location data services to your maps with unique data services functions. These functions are integrated with a number of internal and external services, enabling you to programatically customize subsets of data for your visualizations. These features are useful for geospatial analysis and the results can be saved, and stored, for additional location data service operations.
 
 **Note:** Based on your account plan, some of these data services are subject to different [quota limitations](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/#quota-information).
 
@@ -20,9 +20,9 @@ The geometries provided by this API are projected in the projection [WGS 84 SRID
 
 _Be mindful of the following usage notes when using the Data Services functions with the SQL API:_
 
-If you are using SELECT functions with the Data Services API, these queries consume quota when rendering tiles for your live map views. Additionally, it requires that you need an API Key and can slow down sync performance, due to executing multiple requests to the API each time your map is viewed. See details about [Quota Consumption](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/#quota-consumption).
+It is discouraged to use the SELECT operation with the Data Services API functions, as these type of queries consume quota when rendering tiles for your live map views. It may also result in sync performance issues, due to executing multiple requests to the API each time your map is viewed. See details about [Quota Consumption](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/#quota-consumption).
 
-The Data Services API is **recommended** to be used with INSERT or UPDATE. While SELECT (retrieve) is standard for SQL API requests, be mindful of quota consumption and use INSERT (to insert a new record) or UPDATE (to update an existing record), for best practices.
+The Data Services API is **recommended** to be used with INSERT or UPDATE operations. While SELECT (retrieve) is standard for SQL API requests, be mindful of quota consumption and use INSERT (to insert a new record) or UPDATE (to update an existing record), for best practices.
 
 ## Authentication
 
