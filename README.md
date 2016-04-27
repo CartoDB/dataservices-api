@@ -65,9 +65,9 @@ Steps to deploy a new Data Services API version :
       SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
       SELECT CDB_Conf_SetConf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
   
-    SELECT CDB_Conf_SetConf('heremaps_conf', '{"app_id": "APP_ID", "app_code": "APP_CODE", "geocoder_cost_per_hit": "COST_PER_HIT"}');
+    SELECT CDB_Conf_SetConf('heremaps_conf', '{"geocoder": {"app_id": "here_geocoder_app_id", "app_code": "here_geocoder_app_code", "geocoder_cost_per_hit": "1"}, "isolines" : {"app_id": "here_isolines_app_id", "app_code": "here_geocoder_app_code"}}');
     SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
-    SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing_app_key": "ROUTING_API_KEY", "geocoder_app_key": "GEOCODER_API_KEY"}');
+    SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing": {"api_key": "valhalla_app_key", "monthly_quota": 999999}, "geocoder": {"api_key": "search_app_key", "monthly_quota": 999999}}');
     SELECT CDB_Conf_SetConf('logger_con', '{"geocoder_log_path": "/tmp/geocodings.log"}')
     ```
 
