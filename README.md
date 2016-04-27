@@ -30,6 +30,14 @@ Steps to deploy a new Data Services API version :
     cd data-services/geocoder/extension
     sudo make install
     ```
+    
+- install observatory extension 
+
+    ```
+    git clone git@github.com:CartoDB/observatory-extension.git
+    cd observatory
+    sudo make install
+    ```
 
 - install server and client extensions
     
@@ -49,6 +57,7 @@ Steps to deploy a new Data Services API version :
     ```
     create extension cdb_geocoder;
     create extension plproxy;
+    create extension observatory;
     create extension cdb_dataservices_server;
     create extension cdb_dataservices_client;
     ```
