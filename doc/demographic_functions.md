@@ -52,7 +52,7 @@ OBS_GetDemographicSnapshot(CDB_LatLng(40.80, -73.960))
 This list contains the demographic measures and reponse names for results from the ```OBS_GetDemographicSnapshot``` function.
 
  Measure name | Measure Description | Response Mame | Response Units
----	|---	|--- |--- 
+--- | --- | --- | ---
 Total Population | The total number of all people living in a given geographic area. This is a very useful catch-all denominator when calculating rates. | total_pop | Count per sq. km 
 Male Population | The number of people within each geography who are male. | male_pop | Count per sq. km
 Female Population | The number of people within each geography who are female.| female_pop | Count per sq. km
