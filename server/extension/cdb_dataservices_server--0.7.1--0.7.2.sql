@@ -1,12 +1,12 @@
---
--- Observatory connection config
---
--- The purpose of this function is provide to the PL/Proxy functions
--- the connection string needed to connect with the current production database
-
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.7.2'" to load this file. \quit
+DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_get_demographic_snapshot(text, text, geometry(Geometry, 4326), text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_get_segment_snapshot(text, text, geometry(Geometry, 4326), text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_server_conn_str(
   username TEXT,
-  orgname TEXT)
+  orgname TEXT
+)
 RETURNS text AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']

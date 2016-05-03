@@ -14,9 +14,10 @@ class ServiceConfig(object):
         self._redis_connection = redis_connection
         self._username = username
         self._orgname = orgname
-        self._db_config = ServicesDBConfig(db_conn)
+        self._db_config = ServicesDBConfig(db_conn, username, orgname)
         if redis_connection:
-            self._redis_config = ServicesRedisConfig(redis_connection).build(username, orgname)
+            self._redis_config = ServicesRedisConfig(redis_connection).build(
+                username, orgname)
         else:
             self._redis_config = None
 
@@ -53,6 +54,7 @@ class ObservatorySnapshotConfig(ServiceConfig):
             self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
         else:
             self._monthly_quota = float(self._db_config.data_observatory_monthly_quota)
+        self._connection_str = self._db_config.data_observatory_connection_str
 
     @property
     def service_type(self):
@@ -70,6 +72,9 @@ class ObservatorySnapshotConfig(ServiceConfig):
     def soft_limit(self):
         return self._soft_limit
 
+    @property
+    def connection_str(self):
+        return self._connection_str
 
 class RoutingConfig(ServiceConfig):
 
@@ -323,8 +328,10 @@ class GeocoderConfig(ServiceConfig):
 
 class ServicesDBConfig:
 
-    def __init__(self, db_conn):
+    def __init__(self, db_conn, username, orgname):
         self._db_conn = db_conn
+        self._username = username
+        self._orgname = orgname
         return self._build()
 
     def _build(self):
@@ -364,6 +371,12 @@ class ServicesDBConfig:
         else:
             do_conf = json.loads(do_conf_json)
             self._data_observatory_monthly_quota = do_conf['monthly_quota']
+            if self._orgname and self._orgname in do_conf['connection']['whitelist']:
+                self._data_observatory_connection_str = do_conf['connection']['staging']
+            elif self._username in do_conf['connection']['whitelist']:
+                self._data_observatory_connection_str = do_conf['connection']['staging']
+            else:
+                self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_logger_config(self):
         logger_conf_json = self._get_conf('logger_conf')
@@ -424,6 +437,10 @@ class ServicesDBConfig:
     @property
     def data_observatory_monthly_quota(self):
         return self._data_observatory_monthly_quota
+
+    @property
+    def data_observatory_connection_str(self):
+        return self._data_observatory_connection_str
 
 
 class ServicesRedisConfig:
