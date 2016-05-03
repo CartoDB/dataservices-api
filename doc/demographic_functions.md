@@ -1,6 +1,6 @@
 # Demographic Functions
 
-The Demographic Snapshot API function enables you to collect demographic details around a point location. For example, you can take the coordinates of a bus stop and find the average population characteristics in that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
+The Demographic Snapshot API function enables you to collect demographic details around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
 
 _**Note:** The Demographic Snapshot API is currently only available for the United States._
 
