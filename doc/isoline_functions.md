@@ -43,20 +43,16 @@ Name | Type | Description
 
 #### Examples
 
-##### Select the results of the isodistance function
+##### Calculate and insert isodistance polygons from a point into another table
 
 ```bash
-SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[1000,2000]::integer[]);
+INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300, 600, 900]::integer[])
 ```
 
-```bash
-SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[1000]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
-```
-
-##### Select the geometric results of the isodistance function
+or equivalently:
 
 ```bash
-SELECT the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[1000]::integer[]);
+INSERT INTO {table} (the_geom) SELECT (cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300, 600, 900]::integer[])).the_geom
 ```
 
 ##### Calculate and insert the generated isolines from `points_table` table to another table
@@ -64,6 +60,7 @@ SELECT the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'walk
 ```bash
 INSERT INTO {table} (the_geom) SELECT (cdb_isodistance(the_geom, 'walk', string_to_array(distance, ',')::integer[])).the_geom FROM {points_table}
 ```
+
 
 ## cdb_isochrone(_source geometry, mode text, range integer[], [options text[]]_)
 
@@ -82,23 +79,19 @@ Name | Type | Description | Accepted values
 
 #### Examples
 
-##### Select the results of the isochrone function
+##### Calculate and insert isochrone polygons from a point into another table
 
 ```bash
-SELECT * FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300,900,12000]::integer[]);
+INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 900, 12000]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[])
 ```
+
+or equivalently:
 
 ```bash
-SELECT * FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300,900]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[]);
+INSERT INTO {table} (the_geom) SELECT (cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 900, 12000]::integer[], ARRAY['mode_traffic=enabled','quality=3']::text[])).the_geom
 ```
 
-##### Select the geometric results of the isochrone function
-
-```bash
-SELECT the_geom FROM cdb_isochrone('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
-```
-
-##### Calculate and insert the generated isolines from `points_table` table to another table
+##### Calculate and insert the generated isolines from `points_table` table into another table
 
 ```bash
 INSERT INTO {table} (the_geom) SELECT (cdb_isochrone(the_geom, 'walk', string_to_array(time_distance, ',')::integer[])).the_geom FROM {points_table}
