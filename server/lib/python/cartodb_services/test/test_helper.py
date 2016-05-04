@@ -61,4 +61,4 @@ def _plpy_execute_side_effect(*args, **kwargs):
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":
         return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('data_observatory_conf') as conf":
-        return [{'conf': '{"monthly_quota": 100000}'}]
+        return [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}, "monthly_quota": 100000}'}]

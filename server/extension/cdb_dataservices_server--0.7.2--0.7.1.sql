@@ -1,33 +1,12 @@
---
--- Observatory connection config
---
--- The purpose of this function is provide to the PL/Proxy functions
--- the connection string needed to connect with the current production database
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_server_conn_str(
-  username TEXT,
-  orgname TEXT)
-RETURNS text AS $$
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
-
-  return user_obs_snapshot_config.connection_str
-$$ LANGUAGE plpythonu;
-
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.7.1'" to load this file. \quit
+DROP FUNCTION IF EXISTS cdb_dataservices_server._obs_server_conn_str(text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_get_demographic_snapshot(text, text, geometry(Geometry, 4326), text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_get_segment_snapshot(text, text, geometry(Geometry, 4326), text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._obs_get_demographic_snapshot(text, text, geometry(Geometry, 4326), text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._obs_get_segment_snapshot(text, text, geometry(Geometry, 4326), text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
-  username TEXT,
-  orgname TEXT,
-  geom geometry(Geometry, 4326),
-  time_span TEXT DEFAULT '2009 - 2013',
-  geometry_level TEXT DEFAULT '"us.census.tiger".block_group')
-RETURNS json AS $$
-  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_dataservices_server._obs_get_demographic_snapshot (username, orgname, geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_get_demographic_snapshot(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
@@ -67,16 +46,6 @@ RETURNS json AS $$
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
-  username TEXT,
-  orgname TEXT,
-  geom geometry(Geometry, 4326),
-  geometry_level TEXT DEFAULT '"us.census.tiger".block_group')
-RETURNS json AS $$
-  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_dataservices_server._obs_get_segment_snapshot (username, orgname, geom, geometry_level);
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_get_segment_snapshot(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
