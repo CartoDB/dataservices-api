@@ -2,7 +2,7 @@
 
 The [geocoder](https://cartodb.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CartoDB provides functions for several different categories of geocoding through the Data Services API.
 
-_**This service is subject to quota limitations, and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details, and recommendations, about to quota consumption._
+_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
 
 Here is an example of how to geocode a single country:
 
@@ -15,6 +15,13 @@ In order to geocode an existent CartoDB dataset, an SQL UPDATE statement must be
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_
 ```
+
+Notice that you can make use of Postgres or PostGIS functions in your Data Services API requests, as the result is a geometry that can be handled by the system. For example, suppose you need to retrieve the centroid of a specific country, you can wrap the resulting geometry from the geocoder functions inside the PostGIS `ST_Centroid` function:
+
+```bash
+https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={api_key}
+```
+
 
 The following geocoding functions are available, grouped by categories.
 
@@ -38,18 +45,17 @@ Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_admin0_polygon('France')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ```
 
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin0_polygon('France')
+```
 
 ## Level-1 Administrative Regions Geocoder
 
@@ -71,17 +77,18 @@ Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_admin1_polygon('Alicante')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 ```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin1_polygon('Alicante')
+```
+
 
 ### cdb_geocode_admin1_polygon(_admin1_name text, country_name text_)
 
@@ -100,16 +107,15 @@ Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, {country_column})
+```
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 ```
 
 
@@ -135,15 +141,18 @@ Geometry (point, EPSG 4326) or null
 
 ##### Select
 
-```bash
-SELECT cdb_geocode_namedplace_point('Barcelona')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
 ```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('Barcelona')
+```
+
 
 ### cdb_geocode_namedplace_point(_city_name text, country_name text_)
 
@@ -162,17 +171,18 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'Spain')
 ```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
+```
+
 
 ### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
@@ -191,16 +201,16 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {province_column}, 'USA')
+```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ```
 
 ## Postal Code Geocoder
@@ -226,16 +236,16 @@ Geometry (polygon, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_column}, 'USA')
+```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ```
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
@@ -255,17 +265,18 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_postalcode_point('11211', 'USA')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_column}, 'USA')
 ```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_postalcode_point('11211', 'USA')
+```
+
 
 ## IP Addresses Geocoder
 
@@ -288,16 +299,16 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-```bash
-SELECT cdb_geocode_ipaddress_point('102.23.34.1')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
+```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 
 ## Street-Level Geocoder
@@ -325,19 +336,14 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-Using SELECT for geocoding functions
-
-```bash
-SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_street_point({street_name_column})
+```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
 ```
