@@ -54,7 +54,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon('France')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin0_polygon('France')
 ```
 
 ## Level-1 Administrative Regions Geocoder
@@ -86,7 +86,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column})
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon('Alicante')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin1_polygon('Alicante')
 ```
 
 
@@ -115,7 +115,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon({province_column}, 
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_admin1_polygon('Alicante', 'Spain')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin1_polygon('Alicante', 'Spain')
 ```
 
 
@@ -150,7 +150,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column})
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point('Barcelona')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('Barcelona')
 ```
 
 
@@ -180,7 +180,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, 'S
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point('Barcelona', 'Spain')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('Barcelona', 'Spain')
 ```
 
 
@@ -210,7 +210,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point({city_column}, {p
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_namedplace_point('New York', 'New York', 'USA')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('New York', 'New York', 'USA')
 ```
 
 ## Postal Code Geocoder
@@ -245,7 +245,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon({postal_code_co
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_polygon('11211', 'USA')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_postalcode_polygon('11211', 'USA')
 ```
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
@@ -274,7 +274,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point({postal_code_colu
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_postalcode_point('11211', 'USA')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_postalcode_point('11211', 'USA')
 ```
 
 
@@ -308,7 +308,7 @@ UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
 ##### Insert a geocoded row into a table
 
 ```bash
-UPDATE {tablename} SET the_geom = cdb_geocode_ipaddress_point('102.23.34.1')
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34.1')
 ```
 
 ## Street-Level Geocoder
@@ -336,19 +336,14 @@ Geometry (point, EPSG 4326) or null
 
 #### Example
 
-##### Select
-
-Using SELECT for geocoding functions
-
-```bash
-SELECT cdb_geocode_street_point('651 Lombard Street, San Francisco, California, United States')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California')
-SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
-```
-
-##### Update
+##### Update the geometry of a table to geocode it
 
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_street_point({street_name_column})
+```
+
+##### Insert a geocoded row into a table
+
+```bash
+INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
 ```
