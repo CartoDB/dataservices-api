@@ -1,8 +1,6 @@
---
--- Observatory connection config
---
--- The purpose of this function is provide to the PL/Proxy functions
--- the connection string needed to connect with the current production database
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.7.3'" to load this file. \quit
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_server_conn_str(
   username TEXT,
