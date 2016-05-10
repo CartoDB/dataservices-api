@@ -93,11 +93,168 @@
   return_type: json
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
-    - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
-    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".block_group'::text" }
+    - { name: time_span,  type: "text", default: 'NULL' }
+    - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_get_segment_snapshot
   return_type: json
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
-    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".census_tract'::text" }
+    - { name: geometry_level, type: text, default: 'NULL' }
+
+- name: obs_getdemographicsnapshot
+  return_type: json
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: time_span,  type: "text", default: 'NULL' }
+    - { name: geometry_level, type: text, default: 'NULL' }
+
+- name: obs_getsegmentsnapshot
+  return_type: json
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geometry_level, type: text, default: 'NULL' }
+
+- name: obs_getboundary
+  return_type: Geometry
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getboundaryid
+  return_type: text
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getboundarybyid
+  return_type: Geometry
+  params:
+    - { name: geometry_id,  type: text }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getboundariesbygeometry
+  return_type: TABLE(the_geom geometry, geom_refs text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: the_geom, type: geometry }
+    - { name: geom_refs, type: text }
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+    - { name: overlap_type, type: text, default: "'intersects'"}
+
+- name: obs_getboundariesbypointandradius
+  return_type: TABLE(the_geom geometry, geom_refs text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: the_geom, type: geometry }
+    - { name: geom_refs, type: text }
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: radius, type: numeric }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+    - { name: overlap_type, type: text, default: "'intersects'"}
+
+- name: obs_getpointsbygeometry
+  return_type: TABLE(the_geom geometry, geom_refs text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: the_geom, type: geometry }
+    - { name: geom_refs, type: text }
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+    - { name: overlap_type, type: text, default: "'intersects'"}
+
+- name: obs_getpointsbypointandradius
+  return_type: TABLE(the_geom geometry, geom_refs text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: the_geom, type: geometry }
+    - { name: geom_refs, type: text }
+  params:
+    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: radius, type: numeric }
+    - { name: boundary_id, type: text }
+    - { name: time_span, type: text, default: 'NULL'}
+    - { name: overlap_type, type: text, default: "'intersects'"}
+
+- name: obs_getmeasure
+  return_type: numeric
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: measure_id, type: text }
+    - { name: normalize, type: text, default: "'area'"}
+    - { name: boundary_id, type: text, default: 'NULL' }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getcategory
+  return_type: text
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: category_id, type: text }
+    - { name: boundary_id, type: text, default: 'NULL' }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getuscensusmeasure
+  return_type: numeric
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: name, type: text }
+    - { name: normalize, type: text, default: "'area'"}
+    - { name: boundary_id, type: text, default: 'NULL' }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getuscensuscategory
+  return_type: text
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: name, type: text }
+    - { name: boundary_id, type: text, default: 'NULL' }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_getpopulation
+  return_type: numeric
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: normalize, type: text, default: "'area'"}
+    - { name: boundary_id, type: text, default: 'NULL' }
+    - { name: time_span, type: text, default: 'NULL'}
+
+- name: obs_search
+  return_type: TABLE(id text, description text, name text, aggregate text, source text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: id, type: text }
+    - { name: description, type: text }
+    - { name: name, type: text }
+    - { name: aggregate, type: text }
+    - { name: source, type: text }
+  params:
+    - { name: search_term, type: text }
+    - { name: relevant_boundary, type: text, default: 'NULL' }
+
+- name: obs_getavailableboundaries
+  return_type: TABLE(boundary_id text, description text, time_span text, tablename text)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: boundary_id, type: text }
+    - { name: description, type: text }
+    - { name: time_span, type: text }
+    - { name: tablename, type: text }
+  params:
+    - { name: geom,  type: Geometry }
+    - { name: timespan, type: text, default: 'NULL'}
