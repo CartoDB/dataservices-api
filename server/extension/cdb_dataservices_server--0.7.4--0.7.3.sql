@@ -1,4 +1,6 @@
-CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), data_range integer, the_geom geometry(Multipolygon,4326));
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.7.3'" to load this file. \quit
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -42,7 +44,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return result
     else:
       quota_service.increment_empty_service_use()
-      return []
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()

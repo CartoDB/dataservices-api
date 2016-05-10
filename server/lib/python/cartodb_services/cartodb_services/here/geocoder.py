@@ -87,6 +87,8 @@ class HereMapsGeocoder:
         response = requests.get(self.host, params=request_params)
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
+        elif response.status_code == requests.codes.bad_request:
+            return []
         else:
             response.raise_for_status()
 
