@@ -51,6 +51,8 @@ class HereMapsRoutingIsoline:
         response = requests.get(self._url, params=request_params)
         if response.status_code == requests.codes.ok:
             return self.__parse_isolines_response(response.text)
+        elif response.status_code == requests.codes.bad_request:
+            return []
         else:
             response.raise_for_status()
 
