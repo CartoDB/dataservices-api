@@ -1,10 +1,10 @@
 # Demographic Functions
 
-The Demographic Snapshot functions enable you to collect demographic details around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
+The Demographic Snapshot enables you to collect demographic report around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CartoDB's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
 
 _**Note:** The Demographic Snapshot functions are only available for the United States._
 
-## OBS_GetDemographicSnapshot( Point Geometry );
+## OBS_GetDemographicSnapshot( point geometry );
 
 Fields returned include information about income, education, transportation, race, and more. Not all fields will have information for every coordinate queried.
 
@@ -17,7 +17,9 @@ point geometry | A WKB point geometry. You can use the helper function, `CDB_Lat
 
 ### Returns
 
-The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. **For details, see [Glossary of Demographic Measures](#glossary-of-demographic-measures).
+The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. *
+
+**For details, see [Glossary of Demographic Measures](#glossary-of-demographic-measures) below.**
 
 ### Examples
 
@@ -50,11 +52,11 @@ This list contains the demographic measures and reponse names for results from t
 
  Measure name | Measure Description | Response Mame | Response Units
 --- | --- | --- | ---
-Total Population | The total number of all people living in a given geographic area. This is a very useful catch-all denominator when calculating rates. | total_pop | Count per sq. km 
+Total Population | The total number of all people living in a given geographic area. This is a very useful catch-all denominator when calculating rates. | total_pop | Count per sq. km
 Male Population | The number of people within each geography who are male. | male_pop | Count per sq. km
 Female Population | The number of people within each geography who are female.| female_pop | Count per sq. km
 Population not Hispanic	| The number of people not identifying as Hispanic or Latino in each geography. | not_hispanic_pop | Count per sq. km
-White Population | The number of people identifying as white, non-Hispanic in each geography. | white_pop | Count per sq. km 
+White Population | The number of people identifying as white, non-Hispanic in each geography. | white_pop | Count per sq. km
 Black or African American Population| The number of people identifying as black or African American, non-Hispanic in each geography. | black_pop | Count per sq. km
 American Indian and Alaska Native Population | The number of people identifying as American Indian or Alaska native in each geography.| amerindian_pop| Count per sq. km
 Asian Population | The number of people identifying as Asian, non-Hispanic in each geography.| asian_pop | Count per sq. km

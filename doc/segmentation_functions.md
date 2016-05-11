@@ -1,8 +1,8 @@
 # Segmentation Functions
 
-The Segmentation Snapshot functions enable you to determine the pre-calculated population segment for a location. Segmentation is a method that divides a target market into subgroups based on shared common traits. For example, you can take the location of a store location and determine what classification of population exists around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
+The Segmentation Snapshot functions enable you to determine the pre-calculated population segment for a location. Segmentation is a method that divides a populations into subclassifications based on common traits. For example, you can take the a store location and determine what classification of population exists around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
 
-_**Note:** The Segmentation Snapshot functions are only available for the United States. CartoDB includes the segmentation profile defined in the Output Data: US_tract_clusters_new_, as detailed in the _[Understanding America's Neighborhoods Using Uncertain Data from the American Community Survey](http://www.tandfonline.com/doi/pdf/10.1080/00045608.2015.1052335) contextual approach. Subsequent releases will include additional segmentation profiles._
+_**Note:** The Segmentation Snapshot functions are only available for the United States. Our first release (May 18, 2016) is derived from Census 2010 variables. Our next release will be based on Census 2014 data. For the latest information, see the [Open Segments](https://github.com/CartoDB/open-segments) project repository._
 
 ## OBS_GetSegmentationSnapshot( Point Geometry );
 
