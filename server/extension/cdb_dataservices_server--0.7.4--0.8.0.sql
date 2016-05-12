@@ -1,6 +1,8 @@
 --DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.8.0'" to load this file. \quit
+DROP FUNCTION IF EXISTS cdb_dataservices_server._OBS_GetDemographicSnapshot(text, text, geometry(Geometry, 4326), text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._OBS_GetSegmentSnapshot(text, text, geometry(Geometry, 4326), text);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -16,17 +18,16 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
   time_span TEXT DEFAULT NULL,
   geometry_level TEXT DEFAULT NULL)
-RETURNS json AS $$
-  obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetDemographicSnapshot($1, $2, $3, $4, $5) as snapshot;", ["text", "text", "geometry(Geometry, 4326)", "text", "text"])
-  result = plpy.execute(obs_plan, [username, orgname, geom, time_span, geometry_level])
-  return result
-$$ LANGUAGE plpythonu;
+RETURNS SETOF json AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
+$$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -34,7 +35,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   geom geometry(Geometry, 4326),
   time_span TEXT DEFAULT NULL,
   geometry_level TEXT DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
   from cartodb_services.metrics import QuotaService
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -50,11 +51,15 @@ RETURNS json AS $$
       obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetDemographicSnapshot($1, $2, $3, $4, $5) as snapshot;", ["text", "text", "geometry(Geometry, 4326)", "text", "text"])
       result = plpy.execute(obs_plan, [username, orgname, geom, time_span, geometry_level])
       if result:
+        resp = []
+        for element in result:
+          value = element['snapshot']
+          resp.append(value)
         quota_service.increment_success_service_use()
-        return result[0]['snapshot']
+        return resp
       else:
         quota_service.increment_empty_service_use()
-        return None
+        return []
   except BaseException as e:
       import sys, traceback
       type_, value_, traceback_ = sys.exc_info()
@@ -66,23 +71,22 @@ RETURNS json AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
   geometry_level TEXT DEFAULT NULL)
-RETURNS json AS $$
-  obs_plan = plpy.prepare("SELECT cdb_dataservices_server.OBS_GetSegmentSnapshot($1, $2, $3, $4) as snapshot;", ["text", "text", "geometry(Geometry, 4326)", "text"])
-  result = plpy.execute(obs_plan, [username, orgname, geom, geometry_level])
-  return result
-$$ LANGUAGE plpythonu;
+RETURNS SETOF json AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
+$$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
   geometry_level TEXT DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
   from cartodb_services.metrics import QuotaService
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -95,14 +99,18 @@ RETURNS json AS $$
     plpy.error('You have reached the limit of your quota')
 
   try:
-      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetSegmentSnapshot($1, $2, $3, $4) as snapshot;", ["text", "text", "geometry(Geometry, 4326)", "text"])
+      obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetSegmentSnapshot($1, $2, $3, $4) as snapshot;", ["text", "text", "geometry(Geometry, 4326)", "text"])
       result = plpy.execute(obs_plan, [username, orgname, geom, geometry_level])
       if result:
+        resp = []
+        for element in result:
+          value = element['snapshot']
+          resp.append(value)
         quota_service.increment_success_service_use()
-        return result[0]['snapshot']
+        return resp
       else:
         quota_service.increment_empty_service_use()
-        return None
+        return []
   except BaseException as e:
       import sys, traceback
       type_, value_, traceback_ = sys.exc_info()

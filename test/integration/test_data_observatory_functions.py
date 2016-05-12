@@ -15,19 +15,11 @@ class TestDataObservatoryFunctions(TestCase):
         )
 
     def test_if_get_demographic_snapshot_is_ok(self):
-        query = "SELECT obs_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669)) as snapshot;&api_key={0}".format(self.env_variables['api_key'])
-        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(result['snapshot'], None)
         query = "SELECT obs_GetDemographicSnapshot(CDB_LatLng(40.704512, -73.936669)) as snapshot;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['snapshot'], None)
 
     def test_if_get_demographic_snapshot_without_api_key_raise_error(self):
-        query = "SELECT obs_get_demographic_snapshot(CDB_LatLng(40.704512, -73.936669));"
-        try:
-            IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
         query = "SELECT obs_GetDemographicSnapshot(CDB_LatLng(40.704512, -73.936669));"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
@@ -35,19 +27,11 @@ class TestDataObservatoryFunctions(TestCase):
             assert_equal(e.message[0], "The api_key must be provided")
 
     def test_if_get_segment_snapshot_is_ok(self):
-        query = "SELECT obs_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669)) as snapshot;&api_key={0}".format(self.env_variables['api_key'])
-        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(result['snapshot'], None)
         query = "SELECT OBS_GetSegmentSnapshot(CDB_LatLng(40.704512, -73.936669)) as snapshot;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['snapshot'], None)
 
     def test_if_get_segment_snapshot_without_api_key_raise_error(self):
-        query = "SELECT obs_get_segment_snapshot(CDB_LatLng(40.704512, -73.936669));"
-        try:
-            IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
         query = "SELECT OBS_GetSegmentSnapshot(CDB_LatLng(40.704512, -73.936669));"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)

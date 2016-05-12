@@ -103,14 +103,16 @@
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getdemographicsnapshot
-  return_type: json
+  return_type: SETOF JSON
+  multi_row: true
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: 'NULL' }
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getsegmentsnapshot
-  return_type: json
+  return_type: SETOF JSON
+  multi_row: true
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }

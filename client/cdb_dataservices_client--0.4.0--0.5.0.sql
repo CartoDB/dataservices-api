@@ -9,9 +9,9 @@
 -- and should also be the only ones with SECURITY DEFINER
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.obs_getdemographicsnapshot (geom geometry(Geometry, 4326), time_span text DEFAULT NULL, geometry_level text DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
 DECLARE
-  ret json;
+  
   username text;
   orgname text;
 BEGIN
@@ -24,8 +24,8 @@ BEGIN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
   
-    SELECT cdb_dataservices_client._obs_getdemographicsnapshot(username, orgname, geom, time_span, geometry_level) INTO ret;
-    RETURN ret;
+    RETURN QUERY
+    SELECT * FROM cdb_dataservices_client._obs_getdemographicsnapshot(username, orgname, geom, time_span, geometry_level);
   
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
@@ -37,9 +37,9 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- and should also be the only ones with SECURITY DEFINER
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.obs_getsegmentsnapshot (geom geometry(Geometry, 4326), geometry_level text DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
 DECLARE
-  ret json;
+  
   username text;
   orgname text;
 BEGIN
@@ -52,8 +52,8 @@ BEGIN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
   
-    SELECT cdb_dataservices_client._obs_getsegmentsnapshot(username, orgname, geom, geometry_level) INTO ret;
-    RETURN ret;
+    RETURN QUERY
+    SELECT * FROM cdb_dataservices_client._obs_getsegmentsnapshot(username, orgname, geom, geometry_level);
   
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
@@ -452,7 +452,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getdemographicsnapshot (username text, organization_name text, geom geometry(Geometry, 4326), time_span text DEFAULT NULL, geometry_level text DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
   SELECT cdb_dataservices_server.obs_getdemographicsnapshot (username, organization_name, geom, time_span, geometry_level);
@@ -460,7 +460,7 @@ RETURNS json AS $$
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getsegmentsnapshot (username text, organization_name text, geom geometry(Geometry, 4326), geometry_level text DEFAULT NULL)
-RETURNS json AS $$
+RETURNS SETOF JSON AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
   SELECT cdb_dataservices_server.obs_getsegmentsnapshot (username, organization_name, geom, geometry_level);
