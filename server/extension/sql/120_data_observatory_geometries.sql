@@ -55,7 +55,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
   time_span TEXT DEFAULT NULL)
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_observatory.OBS_OBS_GetBoundaryId(geom, boundary_id, time_span);
+  SELECT cdb_observatory.OBS_GetBoundaryId(geom, boundary_id, time_span);
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(

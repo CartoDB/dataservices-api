@@ -47,7 +47,6 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS json AS $$
   from cartodb_services.metrics import QuotaService
-  import json
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -106,7 +105,6 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS json AS $$
   from cartodb_services.metrics import QuotaService
-  import json
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
