@@ -79,81 +79,70 @@ The possible segments are
 <table>
   <tr><th> X10 segment</th> <th> X55 Segment </th></tr>
   <tr><td> Hispanic and kids</td><td></td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #99C945'></div> Middle Class, Educated, Suburban, Mixed Race </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #a3ce57'></div> Low Income on Urban Periphery</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #add468'></div> Suburban, Young and Low-income  </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #b7d978'></div> low-income, urban, young, unmarried  </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #c1df88'></div> Low education, mainly suburban </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #cbe598'></div> Young, working class and rural  </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #d5eba8'></div> Low-Income with gentrification  </td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #99C945'></div> Middle class, educated, suburban, mixed race</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #a3ce57'></div> Low income on urban periphery</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #add468'></div> Suburban, young and low-income</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #b7d978'></div> Low-income, urban, young, unmarried</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #c1df88'></div>Low education, mainly suburban</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #cbe598'></div> Young, working class and rural</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #d5eba8'></div> Low income with gentrification  </td></tr>
   <tr><td>Low Income and Diverse</td><td></td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #52BCA3'></div> High school education Long Commuters, Black, White Hispanic mix</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #66c5ae'></div> Rural, Bachelors or college degree, Rent owned mix</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #79cdb7'></div> Rural,High School Education, Owns property</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #8bd5c1'></div> Young, City based renters in Sparse neighborhoods, Low poverty   </td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #52BCA3'></div> High school education, long commuters, black, white, hispanic mix</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #66c5ae'></div> Non-urban, bachelors or college degree, rent owned mix</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #79cdb7'></div> Rural, high school education, owns property</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #8bd5c1'></div> Young, city based renters in sparse neighborhoods, low poverty  </td></tr>
   <tr><td>LOW INCOME, MINORITY MIX</td><td></td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #5D69B1'></div> Predominantly black, high high school attainment, home owners </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #7b83c6'></div> White and minority mix multilingual, mixed income / education. Married </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #9095d2'></div> Hispanic Black mix multilingual, high poverty, renters, uses public transport</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #a3a7df'></div>  Predominantly black renters, rent own mix </td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #5D69B1'></div> Predominantly black, high school attainment, home owners </td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #7b83c6'></div> White and minority mix, multilingual, mixed income / education. Married </td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #9095d2'></div> Hispanic black mix, multilingual, high poverty, renters, uses public transport</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #a3a7df'></div>Predominantly black renters, rent own mix </td></tr>
   <tr><td>MIDDLE INCOME, SINGLE FAMILY HOMES</td><td></td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #E58606'></div> Lower Middle Income with higher rent burden </td></tr>
+    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #E58606'></div> Lower middle income with higher rent burden </td></tr>
     <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #f0983b'></div> Black and mixed community with rent burden</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #f4a24e'></div> Lower Middle Income with affordable housing</td></tr>
+    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #f4a24e'></div> Lower middle income with affordable housing</td></tr>
     <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #f8ab5f'></div> Relatively affordable, satisfied lower middle class</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #fcb470'></div> Satisfied Lower Middle Income Higher Rent Costs</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #ffbe81'></div> Suburban/Rural Satisfied, decently educated lower middle class</td></tr>
+    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #fcb470'></div> Satisfied lower middle income higher rent costs</td></tr>
+    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #ffbe81'></div> Suburban/rural satisfied, decently educated lower middle class</td></tr>
     <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #ffc792'></div> Struggling lower middle class with rent burden</td></tr>
     <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #ffd0a3'></div> Older white home owners, less comfortable financially </td></tr>
     <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #ffdab4'></div> Older home owners, more financially comfortable, some diversity</td></tr>
   <tr><td>Native American</td><td></td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #2F8AC4'></div>Younger, poorer,single parent family Native Americans</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #77b8ee'></div>Older, middle income Native Americans once married and Educated </td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background: #77b8ee'></div>Older, middle income Native Americans once married and educated </td></tr>
   <tr><td>Old Wealthy, White</td><td></td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#24796C'></div> Older, mixed race professionals</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#388d7e'></div> Works from home, Highly Educated, Super Wealthy </td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#4ca191'></div> Retired Grandparents</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#60b5a5'></div> Wealthy and Rural Living</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#73c9b8'></div> Wealthy, Retired Mountains/Coasts</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#87decc'></div> Wealthy Diverse Suburbanites On the Coasts</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#9bf3e1'></div> Retirement Communitties</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#388d7e'></div> Works from home, highly hducated, super wealthy </td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#4ca191'></div> Retired grandparents</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#60b5a5'></div> Wealthy and rural living</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#73c9b8'></div> Wealthy, retired mountains/coasts</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#87decc'></div> Wealthy diverse suburbanites on the coasts</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#9bf3e1'></div> communities</td></tr>
   <tr><td>Low Income African American</td><td></td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#c23a7e'></div>Urban - Inner city</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#c23a7e'></div>Urban - inner city</td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#d86298'></div>Rural families</td></tr>
   <tr><td>Residential institutions, young people</td><td></td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#764e9f'></div>College towns</td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#8a64b1'></div>College town with poverty</td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#9e7ac3'></div>University campus wider area</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#b491d5'></div>City Outskirt University Campuses</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#c9a8e8'></div>City Center University Campuses</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#b491d5'></div>City outskirt university cumpuses</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#c9a8e8'></div>City center university campuses</td></tr>
   <tr><td>Wealthy Nuclear Families</td><td></td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ed645a'></div>Lower educational attainment, Homeowner, Low rent</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ee7655'></div>Younger, Long Commuter in dense neighborhood</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#f38060'></div>Long commuters White black mix</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ed645a'></div>Lower educational attainment, homeowner, low rent</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ee7655'></div>Younger, long commuter in dense neighborhood</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#f38060'></div>Long commuters white black mix</td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#f98a6b'></div>Low rent in built up neighborhoods</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#fe9576'></div>Renters within cities, mixed income areas, White/Hispanic mix, Unmarried</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ff9f82'></div>Older Home owners with high income</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#fe9576'></div>Renters within cities, mixed income areas, white/hispanic mix, unmarried</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ff9f82'></div>Mix of older home owners with middle income and farmers</td></tr>
     <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffa98d'></div>Older home owners and very high income</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffb399'></div>White Asian Mix Big City Burbs Dwellers</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffbda5'></div>Bachelors degree Mid income With Mortgages</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffc8b1'></div>Asian Hispanic Mix, Mid income</td></tr>
-    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffd2bd'></div>Bachelors degree Higher income Home Owners</td></tr>
-  <tr><td>Wealthy Nuclear Families</td><td></td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ed645a'></div>Lower educational attainment, Homeowner, Low rent</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ee7655'></div>Younger, Long Commuter in dense neighborhood</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#f38060'></div>Long commuters White black mix</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#f98a6b'></div>Low rent in built up neighborhoods</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#fe9576'></div>Renters within cities, mixed income areas, White/Hispanic mix, Unmarried</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ff9f82'></div>Older Home owners with high income</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffa98d'></div>Older home owners and very high income</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffb399'></div>White Asian Mix Big City Burbs Dwellers</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffbda5'></div>Bachelors degree Mid income With Mortgages</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffc8b1'></div>Asian Hispanic Mix, Mid income</td></tr>
-    <tr><td></td> <td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffd2bd'></div>Bachelors degree Higher income Home Owners</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffb399'></div>White, asian mix big city burbs dwellers</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffbda5'></div>Bachelors degree, mid income with mortgages</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffc8b1'></div>Asian hispanic mix, mid income</td></tr>
+    <tr><td></td><td><div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ffd2bd'></div>Bachelors degree higher income home owners</td></tr>
+
   <tr><td>Wealthy, urban, and kid-free</td><td></td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#CC61B0'></div>Wealthy city commuters </td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#d975bd'></div>New Developments</td></tr>
-    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#e488c9'></div>Very wealthy, multiple million dollar homes</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#CC61B0'></div>Wealthy city commuters</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#d975bd'></div>New developments</td></tr>
+    <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#e488c9'></div>Wealthy transplants displacing long-term local residents</td></tr>
     <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ee9ad4'></div>High rise, dense urbanites</td></tr>
 </table>
 
