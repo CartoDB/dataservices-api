@@ -17,7 +17,26 @@ point geometry | A WKB point geometry. You can use the helper function, `CDB_Lat
 
 ### Returns
 
-The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. *
+The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. 
+
+For each demographic measure the API will return 
+
+Value | Name | Tablename | Aggregate | Type | Description
+----- | ---- | --------- | --------- | ---- |------------
+The value of the measure at the point you requested | The name of the measure | The table it was drawn from | Indicated if the measure is a count or median. | The posgresql type | A description of the measure
+
+For example the "Female Population" measure returns
+
+```json
+obs_getdemographicsnapshot: {
+   "value": 32.5395066379175,
+   "name": "Female Population",
+   "tablename": "obs_1a098da56badf5f32e336002b0a81708c40d29cd",
+   "aggregate": "sum",
+   "type": "Numeric",
+   "description": "The number of people within each geography who are female."
+}
+```
 
 **For details, see [Glossary of Demographic Measures](#glossary-of-demographic-measures) below.**
 
