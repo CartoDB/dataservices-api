@@ -93,14 +93,14 @@
   return_type: json
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
-    - { name: time_span,  type: "text", default: 'NULL' }
-    - { name: geometry_level, type: text, default: 'NULL' }
+    - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
+    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".block_group'::text" }
 
 - name: obs_get_segment_snapshot
   return_type: json
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
-    - { name: geometry_level, type: text, default: 'NULL' }
+    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".census_tract'::text" }
 
 - name: obs_getdemographicsnapshot
   return_type: SETOF JSON
