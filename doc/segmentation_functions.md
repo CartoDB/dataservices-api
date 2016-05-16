@@ -10,12 +10,17 @@ _**Note:** The Segmentation Snapshot functions are only available for the United
 
 Name | Type | Description | Example Values
 --- | --- | --- | ---
-username | The username of your CartoDB account where the Data Observatory has been enabled  | `example_account`
+username | The username of your CartoDB account where the Data Observatory has been enabled  | `username`
 point geometry | A WKB point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
 ### Returns
 
-The segmentation function returns two segment names for the point you requests, the x10\_segment and x55\_segment. These describe the population at that point at a high level x10, and a sublevel which is more sepecific x55. The function also returns the quantile of a number of census varaibles. So for example if total_poulation is at 90% quantile level then this tract has a higher total population than 90% of the other tracts. An exmple response looks like this:
+The segmentation function returns two segment levels for the point you requests, the x10\_segment and x55\_segment. These segmentation levels contain different classifications of population within with each segment:
+
+- x10\_segments contain populations at high-levels, broken down into 10 broad categories
+- x55\_segments contain more granular sub-levels to categorize the population
+
+The function also returns the quantile of a number of census variables. For example, if total_poulation is at 90% quantile level then this tract has a higher total population than 90% of the other tracts. An example response appears as follows:
 
 ```json 
 obs_getsegmentsnapshot: {
@@ -67,14 +72,13 @@ obs_getsegmentsnapshot: {
   "us.census.acs.B25075025_quantile": "0.891702702702703"
 }
 ```
-__todo__
 
 Name | Type | Description
 ---- | ---- | -----------
 x10\_segment | text | The demographic segment this location belongs at the 10 segment level 
 x55\_segment | text | The demographic segment this location belongs at the 55 segment level 
 
-The possible segments are 
+The possible segments are:
 
 <table>
   <tr><th> X10 segment</th> <th> X55 Segment </th></tr>
@@ -149,7 +153,7 @@ The possible segments are
 ### Examples
 
 ```bash
-https://{{username}}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot({{point geometry}})
 ```
 

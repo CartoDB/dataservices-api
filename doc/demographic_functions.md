@@ -1,6 +1,6 @@
 # Demographic Functions
 
-The Demographic Snapshot enables you to collect demographic report around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CartoDB's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
+The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CartoDB's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
 
 _**Note:** The Demographic Snapshot functions are only available for the United States._
 
@@ -17,9 +17,7 @@ point geometry | A WKB point geometry. You can use the helper function, `CDB_Lat
 
 ### Returns
 
-The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. 
-
-For each demographic measure the API will return 
+The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. For each demographic measure, the API returns the following values.
 
 Value | Name | Tablename | Aggregate | Type | Description
 ----- | ---- | --------- | --------- | ---- |------------
@@ -38,7 +36,7 @@ obs_getdemographicsnapshot: {
 }
 ```
 
-**For details, see [Glossary of Demographic Measures](#glossary-of-demographic-measures) below.**
+**For details, see the [Glossary of Demographic Measures](#glossary-of-demographic-measures).**
 
 ### Examples
 
@@ -51,14 +49,12 @@ OBS_GetDemographicSnapshot({{point geometry}})
 
 __Get the Demographic Snapshot at Camp David__
 
-
-```text
+```bash
 https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(39.648333, -77.465))
 ```
 
 __Get the Demographic Snapshot in the Upper West Side__
-
 
 ```bash
 https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
@@ -67,7 +63,7 @@ OBS_GetDemographicSnapshot(CDB_LatLng(40.80, -73.960))
 
 ## Glossary of Demographic Measures
 
-This list contains the demographic measures and reponse names for results from the ```OBS_GetDemographicSnapshot``` function.
+This list contains the demographic measures and response names for results from the ```OBS_GetDemographicSnapshot``` function.
 
  Measure name | Measure Description | Response Mame | Response Units
 --- | --- | --- | ---
