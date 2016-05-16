@@ -41,7 +41,7 @@ obs_getdemographicsnapshot: {
 ### Examples
 
 ```bash
-https://{{username}}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot({{point geometry}})
 ```
 
