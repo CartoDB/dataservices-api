@@ -106,7 +106,7 @@ class TestDataObservatoryFunctions(TestCase):
         query = "SELECT OBS_GetPopulation(CDB_LatLng(40.704512, -73.936669)) as population;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['population'], None)
-        assert_equal(result['population'], 9514.592429469)
+        assert_equal(result['population'], 9514.5924294695)
 
     def test_if_get_population_without_api_key_raise_error(self):
         query = "SELECT OBS_GetPopulation(CDB_LatLng(40.704512, -73.936669));"
