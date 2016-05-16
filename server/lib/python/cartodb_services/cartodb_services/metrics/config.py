@@ -33,32 +33,11 @@ class ServiceConfig(object):
     def organization(self):
         return self._orgname
 
-
-class ObservatorySnapshotConfig(ServiceConfig):
-
-    SOFT_LIMIT_KEY = 'soft_obs_snapshot_limit'
-    QUOTA_KEY = 'obs_snapshot_quota'
-    PERIOD_END_DATE = 'period_end_date'
+class DataObservatoryConfig(ServiceConfig):
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(ObservatorySnapshotConfig, self).__init__(redis_connection, db_conn,
+        super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
                                             username, orgname)
-        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
-            self._soft_limit = True
-        else:
-            self._soft_limit = False
-        # Mixed config between db and redis. If we don't update all the users
-        # in redis, we could use the db value as default
-        if self.QUOTA_KEY in self._redis_config:
-            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
-        else:
-            self._monthly_quota = float(self._db_config.data_observatory_monthly_quota)
-        self._connection_str = self._db_config.data_observatory_connection_str
-
-    @property
-    def service_type(self):
-        return 'obs_snapshot'
 
     @property
     def monthly_quota(self):
@@ -75,6 +54,52 @@ class ObservatorySnapshotConfig(ServiceConfig):
     @property
     def connection_str(self):
         return self._connection_str
+
+class ObservatorySnapshotConfig(DataObservatoryConfig):
+
+    SOFT_LIMIT_KEY = 'soft_obs_snapshot_limit'
+    QUOTA_KEY = 'obs_snapshot_quota'
+    PERIOD_END_DATE = 'period_end_date'
+
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
+        super(ObservatorySnapshotConfig, self).__init__(redis_connection, db_conn,
+                                            username, orgname)
+        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_limit = True
+        else:
+            self._soft_limit = False
+        self._monthly_quota = 0
+        if self.QUOTA_KEY in self._redis_config:
+            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
+        self._connection_str = self._db_config.data_observatory_connection_str
+
+    @property
+    def service_type(self):
+        return 'obs_snapshot'
+
+class ObservatoryConfig(DataObservatoryConfig):
+
+    SOFT_LIMIT_KEY = 'soft_obs_general_limit'
+    QUOTA_KEY = 'obs_general_quota'
+    PERIOD_END_DATE = 'period_end_date'
+
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
+        super(ObservatoryConfig, self).__init__(redis_connection, db_conn,
+                                            username, orgname)
+        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_limit = True
+        else:
+            self._soft_limit = False
+        self._monthly_quota = 0
+        if self.QUOTA_KEY in self._redis_config:
+            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
+        self._connection_str = self._db_config.data_observatory_connection_str
+
+    @property
+    def service_type(self):
+        return 'obs_general'
 
 class RoutingConfig(ServiceConfig):
 
@@ -370,7 +395,6 @@ class ServicesDBConfig:
             raise ConfigException('Data Observatory configuration missing')
         else:
             do_conf = json.loads(do_conf_json)
-            self._data_observatory_monthly_quota = do_conf['monthly_quota']
             if self._orgname and self._orgname in do_conf['connection']['whitelist']:
                 self._data_observatory_connection_str = do_conf['connection']['staging']
             elif self._username in do_conf['connection']['whitelist']:
@@ -433,10 +457,6 @@ class ServicesDBConfig:
     @property
     def geocoder_log_path(self):
         return self._geocoder_log_path
-
-    @property
-    def data_observatory_monthly_quota(self):
-        return self._data_observatory_monthly_quota
 
     @property
     def data_observatory_connection_str(self):

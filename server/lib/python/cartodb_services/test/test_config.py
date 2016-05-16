@@ -49,7 +49,7 @@ class TestConfig(TestCase):
                                             end_date=yesterday)
         do_config = ObservatorySnapshotConfig(self.redis_conn, self.plpy_mock,
                                           'test_user')
-        assert do_config.monthly_quota == 100000
+        assert do_config.monthly_quota == 0
         assert do_config.soft_limit is False
         assert do_config.period_end_date.date() == yesterday.date()
 
