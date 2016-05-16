@@ -5,6 +5,7 @@ from mock import Mock
 def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
                             service="heremaps", isolines_quota=0,
                             do_quota=None, soft_do_limit=None,
+                            do_general_quota=None, soft_do_general_limit=None,
                             end_date=datetime.today()):
     user_redis_name = "rails:users:{0}".format(username)
     redis_conn.hset(user_redis_name, 'soft_geocoding_limit', soft_limit)
@@ -17,17 +18,24 @@ def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
     if soft_do_limit:
         redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit',
                         soft_do_limit)
+    if do_general_quota:
+        redis_conn.hset(user_redis_name, 'obs_general_quota', do_general_quota)
+    if soft_do_general_limit:
+        redis_conn.hset(user_redis_name, 'soft_obs_general_limit',
+                        soft_do_general_limit)
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(user_redis_name, 'google_maps_api_key', '')
 
 
 def build_redis_org_config(redis_conn, orgname, quota=100, service="heremaps",
                            isolines_quota=0, do_quota=None,
-                           end_date=datetime.today()):
+                           do_general_quota=None, end_date=datetime.today()):
     org_redis_name = "rails:orgs:{0}".format(orgname)
     redis_conn.hset(org_redis_name, 'geocoding_quota', quota)
     redis_conn.hset(org_redis_name, 'here_isolines_quota', isolines_quota)
     if do_quota:
+        redis_conn.hset(org_redis_name, 'obs_snapshot_quota', do_quota)
+    if do_general_quota:
         redis_conn.hset(org_redis_name, 'obs_snapshot_quota', do_quota)
     redis_conn.hset(org_redis_name, 'period_end_date', end_date)
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')

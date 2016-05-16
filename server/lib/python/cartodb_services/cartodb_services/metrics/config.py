@@ -470,6 +470,7 @@ class ServicesRedisConfig:
     QUOTA_KEY = 'geocoding_quota'
     ISOLINES_QUOTA_KEY = 'here_isolines_quota'
     OBS_SNAPSHOT_QUOTA_KEY = 'obs_snapshot_quota'
+    OBS_GENERAL_QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_conn):
@@ -498,6 +499,8 @@ class ServicesRedisConfig:
             user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
             if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
                 user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
+            if self.OBS_GENERAL_QUOTA_KEY in org_config:
+                user_config[self.OBS_GENERAL_QUOTA_KEY] = org_config[self.OBS_GENERAL_QUOTA_KEY]
             user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
             user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
