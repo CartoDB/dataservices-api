@@ -27,6 +27,8 @@ This whole information is managed by the CartoDB Rails App too so we could make 
 }
 ```
 
+  Note: the remaining credits left can be computed as: `remaining_quota = quota - monthly_use`.
+
 - How can I set a new quota for a user:
 
   This operation could be done through the rails console:
