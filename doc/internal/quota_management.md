@@ -18,6 +18,7 @@ This whole information is managed by the CartoDB Rails App too so we could make 
 
 You could use the following endpoint to know it: https://<username>.cartodb.com/api/v1/users/<user_id>?api_key=<api_key>
 In the result of this endpoint you can see blocks with all the information. Eg:
+
 ```
 "geocoding": {
     "quota": 1000,
@@ -30,31 +31,33 @@ In the result of this endpoint you can see blocks with all the information. Eg:
 ### How can I set a new quota for a user###
 
 This operation could be done through the rails console:
-    - First you have to connect to the rails console: `bundle exec rails c`
-    - Once in the console you have to get the target user/organization:
-        - `u = User.find(username: '<username>')`
-        - `o = Organization.find(name: '<orgname>')`
-    - After we have the user/organization, we could change the quota or the hard limit flag for the desired service. I'm going to use geocoding as an example but it could be done with all the services:
-        - ```
-            u.geocoding_quota = 2000
-            [u.soft_geocoding_limit = true|false]
-            u.save
-        ```
-        - ```
-            o.geocoding_quota = 2000
-            o.save
-        ```
-    - This way the user now has 2000 requests as their current quota
-    - We can only change the hard limit flag for users, not for organizations
+
+- First you have to connect to the rails console: `bundle exec rails c`
+- Once in the console you have to get the target user/organization:
+  - `u = User.find(username: '<username>')`
+  - `o = Organization.find(name: '<orgname>')`
+- After we have the user/organization, we could change the quota or the hard limit flag for the desired service. I'm going to use geocoding as an example but it could be done with all the services:
+
+  ```
+     u.geocoding_quota = 2000
+     [u.soft_geocoding_limit = true|false]
+     u.save
+     ```
+  ```
+     o.geocoding_quota = 2000
+     o.save
+    ```
+- This way the user now has 2000 requests as their current quota
+- We can only change the hard limit flag for users, not for organizations
 
 ### What services we could change?###
 
   The following list numbers all the current services but this is a living list so it could keep growing in the future:
 
-    - Geocoding (street level): `geocoding_quota`, `soft_geocoding_limit`
-    - Isolines: `here_isolines_quota`, `soft_here_isolines_limit`
-    - Data observatory snapshot: `obs_snapshot_quota`, `soft_obs_snapshot_limit`
-    - Data observatory general: `obs_general_quota`, `soft_obs_general_limit`
+  - Geocoding (street level): `geocoding_quota`, `soft_geocoding_limit`
+  - Isolines: `here_isolines_quota`, `soft_here_isolines_limit`
+  - Data observatory snapshot: `obs_snapshot_quota`, `soft_obs_snapshot_limit`
+  - Data observatory general: `obs_general_quota`, `soft_obs_general_limit`
 
 ### How is the quota spent?###
 
