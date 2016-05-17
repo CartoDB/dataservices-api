@@ -3,7 +3,7 @@ All the services from Dataservices API are subject to quota management: check, l
 There are three main fields in the quota management:
 
 - **Quota**: Number of requests of this kind the user could make, eg. Number of street geocoding requests
-- **Soft limit**: This flag enables the user to surpass their assigned quota. When this flag is activated, there is no quota check so the user could make all the requests that they want.
+- **Soft limit**: This flag enables the user to surpass their assigned quota. When this flag is activated, there is no quota check so the user could make all the requests that they want. Consequently, the `hard_limit` flag, when enabled, indicates that the user cannot surpass the assigned quota.
 - **Block price**: Price for every 1000 requests
 
 
