@@ -53,7 +53,7 @@ This whole information is managed by the CartoDB Rails App too so we could make 
 
   The following list numbers all the current services but this is a living list so it could keep growing in the future:
 
-    - Geocoding: `geocoding_quota`, `soft_geocoding_limit`
+    - Geocoding (street level): `geocoding_quota`, `soft_geocoding_limit`
     - Isolines: `here_isolines_quota`, `soft_here_isolines_limit`
     - Data observatory snapshot: `obs_snapshot_quota`, `soft_obs_snapshot_limit`
     - Data observatory general: `obs_general_quota`, `soft_obs_general_limit`
