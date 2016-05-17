@@ -10,7 +10,6 @@ _**Note:** The Segmentation Snapshot functions are only available for the United
 
 Name | Description | Example Values
 --- |  --- | ---
-username | The username of your CartoDB account where the Data Observatory has been enabled  | `username`
 point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
 ### Returns
