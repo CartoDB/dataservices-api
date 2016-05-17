@@ -4,14 +4,14 @@ The Segmentation Snapshot functions enable you to determine the pre-calculated p
 
 _**Note:** The Segmentation Snapshot functions are only available for the United States. Our first release (May 18, 2016) is derived from Census 2010 variables. Our next release will be based on Census 2014 data. For the latest information, see the [Open Segments](https://github.com/CartoDB/open-segments) project repository._
 
-## OBS_GetSegmentSnapshot( Point Geometry );
+## OBS_GetSegmentSnapshot( Point Geometry )
 
 ### Arguments
 
 Name | Description | Example Values
 --- |  --- | ---
 username | The username of your CartoDB account where the Data Observatory has been enabled  | `username`
-point geometry | A WKB point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
+point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
 ### Returns
 

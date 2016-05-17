@@ -4,7 +4,7 @@ The Demographic Snapshot enables you to collect demographic reports around a poi
 
 _**Note:** The Demographic Snapshot functions are only available for the United States._
 
-## OBS_GetDemographicSnapshot( point geometry );
+## OBS_GetDemographicSnapshot( point geometry )
 
 Fields returned include information about income, education, transportation, race, and more. Not all fields will have information for every coordinate queried.
 
@@ -13,7 +13,7 @@ Fields returned include information about income, education, transportation, rac
 Name | Description | Example Values
 --- | --- | ---
 username | The username of your CartoDB account where the Data Observatory has been enabled  | `username`
-point geometry | A WKB point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
+point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
 ### Returns
 
@@ -21,7 +21,7 @@ The Demographic Snapshot contains a broad subset of demographic measures in the 
 
 Value | Name | Tablename | Aggregate | Type | Description
 ----- | ---- | --------- | --------- | ---- |------------
-The value of the measure at the point you requested | The name of the measure | The table it was drawn from | Indicated if the measure is a count or median. | The posgresql type | A description of the measure
+The value of the measure at the point you requested | The name of the measure | The table it was drawn from | Indicated if the measure is a count or median. | postgresql | A description of the measure
 
 For example the "Female Population" measure returns
 
