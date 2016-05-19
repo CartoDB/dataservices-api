@@ -153,6 +153,8 @@ The possible segments are:
     <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#e488c9'></div>Very wealthy, multiple million dollar homes</td></tr>
     <tr><td></td> <td> <div  style='float:left;margin-right:10px;width:20px; height:20px; border-radius:20px;background:#ee9ad4'></div>High rise, dense urbanites</td></tr>
 </table>
+
+
 ### Examples
 
 ```bash
