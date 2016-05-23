@@ -78,6 +78,7 @@ Steps to deploy a new Data Services API version :
     SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
     SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing": {"api_key": "valhalla_app_key", "monthly_quota": 999999}, "geocoder": {"api_key": "search_app_key", "monthly_quota": 999999}}');
     SELECT CDB_Conf_SetConf('logger_con', '{"geocoder_log_path": "/tmp/geocodings.log"}')
+    SELECT CDB_Conf_SetConf('data_observatory_conf', '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}')
     ```
 
 - configure plproxy to point to the a database (you can use a specific database for the server or your same user)
