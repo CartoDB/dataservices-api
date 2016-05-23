@@ -4,12 +4,10 @@ CREATE TYPE cdb_dataservices_server.simple_route AS (
     duration integer
 );
 
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_point_to_point(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_with_waypoints(
   username TEXT,
   orgname TEXT,
-  origin geometry(Point, 4326),
-  destination geometry(Point, 4326),
+  waypoints geometry(Point, 4326)[],
   mode TEXT,
   options text[] DEFAULT ARRAY[]::text[],
   units text DEFAULT 'kilometers')
@@ -30,20 +28,18 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   try:
     client = MapzenRouting(user_routing_config.mapzen_api_key)
 
-    if not origin or not destination:
+    if not waypoints or len(waypoints) < 2:
       plpy.notice("Empty origin or destination")
       quota_service.increment_empty_service_use()
       return [None, None, None]
 
-    orig_lat = plpy.execute("SELECT ST_Y('%s') AS lat" % origin)[0]['lat']
-    orig_lon = plpy.execute("SELECT ST_X('%s') AS lon" % origin)[0]['lon']
-    origin_coordinates = Coordinate(orig_lon, orig_lat)
-    dest_lat = plpy.execute("SELECT ST_Y('%s') AS lat" % destination)[0]['lat']
-    dest_lon = plpy.execute("SELECT ST_X('%s') AS lon" % destination)[0]['lon']
-    dest_coordinates = Coordinate(dest_lon, dest_lat)
+    waypoint_coords = []
+    for waypoint in waypoints:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % waypoint)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
+      waypoint_coords.append(Coordinate(lon,lat))
 
-    resp = client.calculate_route_point_to_point(origin_coordinates, dest_coordinates, mode, options, units)
-
+    resp = client.calculate_route_point_to_point(waypoint_coords, mode, options, units)
     if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
       if shape_linestring:

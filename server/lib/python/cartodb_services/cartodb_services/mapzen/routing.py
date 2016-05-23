@@ -33,11 +33,11 @@ class MapzenRouting:
         self._url = base_url
 
     @qps_retry
-    def calculate_route_point_to_point(self, origin, destination, mode,
+    def calculate_route_point_to_point(self, waypoints, mode,
                                        options=[], units=METRICS_UNITS):
         parsed_options = self.__parse_options(options)
         mode_param = self.__parse_mode_param(mode, parsed_options)
-        directions = self.__parse_directions(origin, destination)
+        directions = self.__parse_directions(waypoints)
         json_request_params = self.__parse_json_parameters(directions,
                                                            mode_param,
                                                            units)
@@ -67,11 +67,16 @@ class MapzenRouting:
 
         return json.dumps(json_options)
 
-    def __parse_directions(self, origin, destination):
-        return {"locations": [
-                {"lon": origin.longitude, "lat": origin.latitude},
-                {"lon": destination.longitude, "lat": destination.latitude}
-                ]}
+    def __parse_directions(self, waypoints):
+        path = []
+        for idx, point in enumerate(waypoints):
+            if idx == 0 or idx == len(waypoints) - 1:
+              point_type = 'break'
+            else:
+              point_type = 'through'
+            path.append({"lon": str(point.longitude), "lat": str(point.latitude), "type": point_type})
+
+        return {"locations": path}
 
     def __parse_routing_response(self, response):
         try:

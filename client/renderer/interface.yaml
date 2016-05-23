@@ -89,6 +89,15 @@
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
     - { name: units, type: "text", default: "'kilometers'"}
 
+- name: cdb_route_with_waypoints
+  return_type: cdb_dataservices_client.simple_route
+  multi_field: true
+  params:
+    - { name: waypoints,  type: "geometry(Point, 4326)[]" }
+    - { name: mode, type: text }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+    - { name: units, type: "text", default: "'kilometers'"}
+
 - name: obs_get_demographic_snapshot
   return_type: json
   params:
