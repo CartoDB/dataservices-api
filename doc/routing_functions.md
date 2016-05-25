@@ -38,7 +38,7 @@ INSERT INTO <TABLE> (duration, length, the_geom) SELECT duration, length, shape 
 UPDATE <TABLE> SET the_geom = (SELECT shape FROM cdb_route_point_to_point('POINT(-3.70237112 40.41706163)'::geometry,'POINT(-3.69909883 40.41236875)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]))
 ```
 
-### cdb_route_with_waypoints(_origin geometry(Point), destination geometry(Point), mode text, [options text[], units text]_)
+### cdb_route_with_waypoints(_waypoints geometry(Point)[], mode text, [options text[], units text]_)
 
 Returns a route that goes from origin to destination and whose path travels through the defined locations.
 
