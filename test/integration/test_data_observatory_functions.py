@@ -119,7 +119,7 @@ class TestDataObservatoryFunctions(TestCase):
         query = "SELECT id FROM OBS_Search('total_pop') LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['id'], None)
-        assert_equal(result['id'], 'us.census.acs.B01003001_quantile')
+        assert_equal(result['id'], 'es.ine.t1_1')
 
     def test_if_obs_search_without_api_key_raise_error(self):
         query = "SELECT id FROM OBS_Search('total_pop') LIMIT 1;"
