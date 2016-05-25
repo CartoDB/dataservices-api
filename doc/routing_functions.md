@@ -60,6 +60,8 @@ Name | Type | Description
 `length` | `real` | Length in the defined unit in the `units` field. `kilometers` by default .
 `the_geom` | `geometry(LineString)` | LineString geometry of the calculated route in the 4326 projection.
 
+*Note*: A request to the function _cdb\_route\_with\_waypoints(waypoints geometry(Point)[], mode text, [options text[], units text])_ with only two points in the geometry array (automatically defined as origin and destination) is equivalent to performing a request to _cdb\_route\_point\_to\_point(origin geometry(Point), destination geometry(Point), mode text, [options text[], units text])_ with these two locations as parameters.
+
 #### Examples
 
 ##### Insert the values from the calculated route in your table
