@@ -32,3 +32,24 @@ class TestRoutingFunctions(TestCase):
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
             assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_select_with_routing_with_waypoints_is_ok(self):
+        query = "SELECT duration, length, shape as the_geom " \
+                "FROM cdb_route_with_waypoints('Array['POINT(-3.7109 40.4234)'::GEOMETRY, "\
+                "'POINT(-3.7059 40.4203)'::geometry, 'POINT(-3.7046 40.4180)'::geometry]" \
+                "::geometry[], 'car', " \
+                "ARRAY['mode_type=shortest']::text[])&api_key={0}".format(
+                    self.env_variables['api_key'])
+        routing = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(routing['the_geom'], None)
+
+    def test_if_select_with_routing_with_waypoints_without_api_key_raise_error(self):
+        query = "SELECT duration, length, shape as the_geom " \
+                "FROM cdb_route_with_waypoints('Array['POINT(-3.7109 40.4234)'::GEOMETRY, "\
+                "'POINT(-3.7059 40.4203)'::geometry, 'POINT(-3.7046 40.4180)'::geometry]" \
+                "::geometry[], 'car', " \
+                "ARRAY['mode_type=shortest']::text[])&api_key={0}"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")

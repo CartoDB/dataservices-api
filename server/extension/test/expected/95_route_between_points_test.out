@@ -10,3 +10,15 @@ SELECT exists(SELECT *
  t
 (1 row)
 
+-- Check for routing waypoint route signatures
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'cdb_route_with_waypoints'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry[], text, text[], text');
+ exists 
+--------
+ t
+(1 row)
+
