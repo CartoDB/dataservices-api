@@ -1,6 +1,6 @@
 # Data Services API
 
-The CartoDB Data Services API offers a set of location based services that can be used programatically to empower your geospatial applications.
+The Carto Data Services API offers a set of location based services that can be used programatically to empower your geospatial applications.
 
 ## Documentation
 

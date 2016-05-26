@@ -1,6 +1,6 @@
 # Quota Information
 
-**Based on your account plan, some of the Data Services API functions are subject to quota limitations and extra fees may apply.** View our [terms and conditions](https://cartodb.com/terms/), or [contact us](mailto:sales@cartodb.com) for details about which functions require service credits to your account.
+**Based on your account plan, some of the Data Services API functions are subject to quota limitations and extra fees may apply.** View our [terms and conditions](https://carto.com/terms/), or [contact us](mailto:sales@carto.com) for details about which functions require service credits to your account.
 
 ## Quota Consumption
 
