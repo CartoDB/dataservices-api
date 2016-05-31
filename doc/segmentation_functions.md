@@ -10,7 +10,7 @@ _**Note:** The Segmentation Snapshot functions are only available for the United
 
 Name | Description | Example Values
 --- |  --- | ---
-point geometry | A point geometry. You can use the helper function, `carto_LatLng` to quickly generate one from latitude and longitude | `carto_LatLng(40.760410,-73.964242)`
+point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
 ### Returns
 
@@ -158,7 +158,7 @@ The possible segments are:
 ### Examples
 
 ```bash
-https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
+https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot({{point geometry}})
 ```
 
@@ -168,14 +168,14 @@ __Get the Segmentation Snapshot around the MGM Grand__
 
 
 ```bash
-https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
-OBS_GetSegmentSnapshot(carto_LatLng(36.10222, -115.169516))
+https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+OBS_GetSegmentSnapshot(CDB_LatLng(36.10222, -115.169516))
 ```
 
-__Get the Segmentation Snapshot at Carto's NYC HQ__
+__Get the Segmentation Snapshot at CARTO's NYC HQ__
 
 
 ```bash
-https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
-OBS_GetSegmentSnapshot(carto_LatLng(40.704512, -73.936669))
+https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+OBS_GetSegmentSnapshot(CDB_LatLng(40.704512, -73.936669))
 ```

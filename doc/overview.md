@@ -1,20 +1,20 @@
 # Overview
 
-By using Carto libraries and the SQL API, you can apply location data services to your maps with unique data services functions. These functions are integrated with a number of internal and external services, enabling you to programatically customize subsets of data for your visualizations. These features are useful for geospatial analysis and the results can be saved, and stored, for additional location data service operations.
+By using CARTO libraries and the SQL API, you can apply location data services to your maps with unique data services functions. These functions are integrated with a number of internal and external services, enabling you to programatically customize subsets of data for your visualizations. These features are useful for geospatial analysis and the results can be saved, and stored, for additional location data service operations.
 
 **Note:** Based on your account plan, some of these data services are subject to different [quota limitations](http://docs.carto.com/carto-engine/dataservices-api/quota-information/#quota-information).
 
-_The Data Services API is collaborating with [Mapzen](https://mapzen.com/), and several other geospatial service providers, in order to supply the best location data services from within our Carto Engine._
+_The Data Services API is collaborating with [Mapzen](https://mapzen.com/), and several other geospatial service providers, in order to supply the best location data services from within our CARTO Engine._
 
 ## Data Services Integration
 
 By using the SQL API to query the Data Services API functions, you can manage specific operations and the corresponding geometries (a `polygon` or a `point`), according to the input information.
 
-The Data Services API decouples the geocoding and isoline services from the Carto Editor. The API allows you to geocode data (from single rows, complete datasets, or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically, through authenticated requests.
+The Data Services API decouples the geocoding and isoline services from the CARTO Editor. The API allows you to geocode data (from single rows, complete datasets, or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically, through authenticated requests.
 
 The geometries provided by this API are projected in the projection [WGS 84 SRID 4326](http://spatialreference.org/ref/epsg/wgs-84/).
 
-**Note:** The Data Services API [geocoding functions](http://docs.carto.com/carto-engine/dataservices-api/geocoding-functions/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The Carto Engine does not support multi-geometry layers or datasets, therefore you must confirm that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
+**Note:** The Data Services API [geocoding functions](http://docs.carto.com/carto-engine/dataservices-api/geocoding-functions/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The CARTO Engine does not support multi-geometry layers or datasets, therefore you must confirm that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
 
 ### Best Practices
 
@@ -26,7 +26,7 @@ The Data Services API is **recommended** to be used with INSERT or UPDATE operat
 
 ## Authentication
 
-All requests performed to the Carto Data Services API must be authenticated with the user API Key. For more information about where to find your API Key, and how to authenticate your SQL API requests, view the [SQL API authentication](/carto-engine/sql-api/authentication/) documentation.
+All requests performed to the CARTO Data Services API must be authenticated with the user API Key. For more information about where to find your API Key, and how to authenticate your SQL API requests, view the [SQL API authentication](/carto-engine/sql-api/authentication/) documentation.
 
 ## Errors
 
@@ -40,10 +40,10 @@ Errors are described in the response of the request. An example is as follows:
 }
 ```
 
-Since the Data Services API is used on top of the Carto SQL API, you can refer to the [Making calls to the SQL API](/carto-engine/sql-api/making-calls/) documentation for help debugging your SQL errors.
+Since the Data Services API is used on top of the CARTO SQL API, you can refer to the [Making calls to the SQL API](/carto-engine/sql-api/making-calls/) documentation for help debugging your SQL errors.
 
-If the requested information is not in the Carto geocoding database, or if Carto is unable to recognize your input and match it with a result, the geocoding function returns `null` as a result.
+If the requested information is not in the CARTO geocoding database, or if CARTO is unable to recognize your input and match it with a result, the geocoding function returns `null` as a result.
 
 ## Limits
 
-Usage of the Data Services API is subject to the Carto SQL API limits, stated in our [Terms of Service](https://carto.com/terms/#excessive).
+Usage of the Data Services API is subject to the CARTO SQL API limits, stated in our [Terms of Service](https://carto.com/terms/#excessive).
