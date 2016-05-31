@@ -210,6 +210,14 @@
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
 
+- name: obs_getmeasurebyid
+  return_type: numeric
+  params:
+    - { name: geom_ref,  type: text }
+    - { name: measure_id, type: text }
+    - { name: boundary_id, type: text}
+    - { name: time_span, type: text, default: 'NULL'}
+
 - name: obs_getcategory
   return_type: text
   params:

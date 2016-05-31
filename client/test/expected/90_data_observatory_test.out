@@ -102,6 +102,16 @@ BEGIN
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasurebyid (username text, orgname text, geom_ref text, measure_id text, boundary_id text, time_span text DEFAULT NULL)
+RETURNS numeric AS $$
+DECLARE
+  ret numeric;
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getmeasurebyid invoked with params (%, %, %, %, %, %)', username, orgname, geom_ref, measure_id, boundary_id, time_span;
+  SELECT 10923.093200390833950::numeric INTO ret;
+  RETURN ret;
+END;
+$$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getcategory (username text, orgname text, geom Geometry, category_id text, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS text AS $$
 DECLARE
@@ -262,6 +272,15 @@ NOTICE:  cdb_dataservices_client._obs_getmeasure(7): [contrib_regression] REMOTE
 CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeasure(username, orgname, geom, measure_id, normalize, boundary_id, time_span)"
 PL/pgSQL function obs_getmeasure(geometry,text,text,text,text) line 16 at SQL statement
     obs_getmeasure     
+-----------------------
+ 10923.093200390833950
+(1 row)
+
+SELECT obs_getmeasurebyid('36047'::text, 'us.census.acs.B01001001'::text, 'us.census.tiger.county'::text);
+NOTICE:  cdb_dataservices_client._obs_getmeasurebyid(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeasurebyid invoked with params (test_user, <NULL>, 36047, us.census.acs.B01001001, us.census.tiger.county, <NULL>)
+CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeasurebyid(username, orgname, geom_ref, measure_id, boundary_id, time_span)"
+PL/pgSQL function obs_getmeasurebyid(text,text,text,text) line 16 at SQL statement
+  obs_getmeasurebyid   
 -----------------------
  10923.093200390833950
 (1 row)
