@@ -115,6 +115,17 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasurebyid (username text, orgname text, geom_ref text, measure_id text, boundary_id text, time_span text DEFAULT NULL)
+RETURNS numeric AS $$
+DECLARE
+  ret numeric;
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getmeasurebyid invoked with params (%, %, %, %, %, %)', username, orgname, geom_ref, measure_id, boundary_id, time_span;
+  SELECT 10923.093200390833950::numeric INTO ret;
+  RETURN ret;
+END;
+$$ LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getcategory (username text, orgname text, geom Geometry, category_id text, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS text AS $$
 DECLARE
@@ -196,6 +207,7 @@ SELECT obs_getboundariesbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704
 SELECT obs_getpointsbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
 SELECT obs_getpointsbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500::numeric, 'us.census.tiger.census_tract'::text);
 SELECT obs_getmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.acs.B01001001'::text);
+SELECT obs_getmeasurebyid('36047'::text, 'us.census.acs.B01001001'::text, 'us.census.tiger.county'::text);
 SELECT obs_getcategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.spielman_singleton_segments.X10'::text);
 SELECT obs_getuscensusmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'male population'::text);
 SELECT obs_getuscensuscategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'Spielman-Singleton Segments: 10 Clusters'::text);

@@ -57,6 +57,19 @@ class TestDataObservatoryFunctions(TestCase):
         except Exception as e:
             assert_equal(e.message[0], "The api_key must be provided")
 
+    def test_if_get_measure_by_id_ok(self):
+        query = "SELECT OBS_GetMeasureById('36047048500', 'us.census.acs.B01003001', 'us.census.tiger.census_tract', '2010 - 2014') as measure;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['measure'], None)
+        assert_equal(result['measure'], 3241)
+
+    def test_if_get_measure_without_api_key_raise_error(self):
+        query = "SELECT OBS_GetMeasureById('36047048500', 'us.census.acs.B01003001', 'us.census.tiger.census_tract', '2010 - 2014') as measure"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
     def test_if_get_category_is_ok(self):
         query = "SELECT OBS_GetCategory(CDB_LatLng(40.704512, -73.936669), 'us.census.spielman_singleton_segments.X10', 'us.census.tiger.census_tract', '2010 - 2014') as category;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
