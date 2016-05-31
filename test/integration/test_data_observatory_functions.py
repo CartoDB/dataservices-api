@@ -63,7 +63,7 @@ class TestDataObservatoryFunctions(TestCase):
         assert_not_equal(result['measure'], None)
         assert_equal(result['measure'], 3241)
 
-    def test_if_get_measure_without_api_key_raise_error(self):
+    def test_if_get_measure_by_id_without_api_key_raise_error(self):
         query = "SELECT OBS_GetMeasureById('36047048500', 'us.census.acs.B01003001', 'us.census.tiger.census_tract', '2010 - 2014') as measure"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
