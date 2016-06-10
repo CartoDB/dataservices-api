@@ -14,7 +14,7 @@ setup(
 
     description='CartoDB Services API Python Library',
 
-    url='https://github.com/CartoDB/geocoder-api',
+    url='https://github.com/CartoDB/dataservices-api',
 
     author='Data Services Team - CartoDB',
     author_email='dataservices@cartodb.com',
