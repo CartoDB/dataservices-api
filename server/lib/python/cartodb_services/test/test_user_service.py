@@ -77,8 +77,11 @@ class TestUserService(TestCase):
         us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
 
+    @freeze_time("2015-06-01")
     def test_should_account_for_zero_paddded_keys(self):
-        raise nose.SkipTest('not implemented yet')
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '01', 400)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 400
 
     @freeze_time("2015-06-01")
     def test_should_account_for_wrongly_stored_non_padded_keys(self):
