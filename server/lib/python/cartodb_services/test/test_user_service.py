@@ -8,6 +8,7 @@ from mock import Mock
 from nose.tools import assert_raises
 from datetime import timedelta
 import nose #TODO remove
+from freezegun import freeze_time
 
 
 class TestUserService(TestCase):
@@ -79,10 +80,11 @@ class TestUserService(TestCase):
     def test_should_account_for_zero_paddded_keys(self):
         raise nose.SkipTest('not implemented yet')
 
+    @freeze_time("2015-06-01")
     def test_should_account_for_wrongly_stored_non_padded_keys(self):
-        us = self.__build_user_service('test_user', end_date = date(2016, 6, 1))
-        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201606', '1', 400)
-        assert us.used_quota(self.NOKIA_GEOCODER, date(2016, 6,1)) == 400
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '1', 400)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 400
 
     def test_should_sum_amounts_from_both_key_formats(self):
         raise nose.SkipTest('not implemented yet')
