@@ -10,11 +10,11 @@ from setuptools import setup, find_packages
 setup(
     name='cartodb_services',
 
-    version='0.6.2',
+    version='0.6.3',
 
     description='CartoDB Services API Python Library',
 
-    url='https://github.com/CartoDB/geocoder-api',
+    url='https://github.com/CartoDB/dataservices-api',
 
     author='Data Services Team - CartoDB',
     author_email='dataservices@cartodb.com',

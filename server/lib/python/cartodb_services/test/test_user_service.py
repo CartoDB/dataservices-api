@@ -7,6 +7,7 @@ from unittest import TestCase
 from mock import Mock
 from nose.tools import assert_raises
 from datetime import timedelta
+from freezegun import freeze_time
 
 
 class TestUserService(TestCase):
@@ -75,9 +76,50 @@ class TestUserService(TestCase):
         us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
 
+    @freeze_time("2015-06-01")
+    def test_should_account_for_zero_paddded_keys(self):
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '01', 400)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 400
+
+    @freeze_time("2015-06-01")
+    def test_should_account_for_wrongly_stored_non_padded_keys(self):
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '1', 400)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 400
+
+    @freeze_time("2015-06-01")
+    def test_should_sum_amounts_from_both_key_formats(self):
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506',  '1', 400)
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '01', 300)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 700
+
+    @freeze_time("2015-06-15")
+    def test_should_not_request_redis_twice_when_unneeded(self):
+        class MockRedisWithCounter(MockRedis):
+            def __init__(self):
+                super(MockRedisWithCounter, self).__init__()
+                self._zscore_counter = 0
+            def zscore(self, *args):
+                print args
+                self._zscore_counter += 1
+                return super(MockRedisWithCounter, self).zscore(*args)
+            def zscore_counter(self):
+                return self._zscore_counter
+        self.redis_conn = MockRedisWithCounter()
+        us = self.__build_user_service('test_user', end_date=date.today())
+        us.used_quota(self.NOKIA_GEOCODER, date(2015, 6, 15))
+
+        #('user:test_user:geocoder_here:success_responses:201506', 15)
+        #('user:test_user:geocoder_here:empty_responses:201506', 15)
+        #('user:test_user:geocoder_cache:success_responses:201506', 15)
+        assert self.redis_conn.zscore_counter() == 3
+
+
     def __build_user_service(self, username, quota=100, service='heremaps',
                              orgname=None, soft_limit=False,
-                             end_date=datetime.today()):
+                             end_date=date.today()):
         test_helper.build_redis_user_config(self.redis_conn, username,
                                             quota=quota, service=service,
                                             soft_limit=soft_limit,
