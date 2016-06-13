@@ -7,6 +7,7 @@ from unittest import TestCase
 from mock import Mock
 from nose.tools import assert_raises
 from datetime import timedelta
+import nose #TODO remove
 
 
 class TestUserService(TestCase):
@@ -74,6 +75,19 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
         us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
+
+    def test_should_account_for_zero_paddded_keys(self):
+        raise nose.SkipTest('not implemented yet')
+
+    def test_should_account_for_wrongly_stored_non_padded_keys(self):
+        raise nose.SkipTest('not implemented yet')
+
+    def test_should_sum_amounts_from_both_key_formats(self):
+        raise nose.SkipTest('not implemented yet')
+
+    def test_should_not_request_redis_twice_when_unneeded(self):
+        raise nose.SkipTest('not implemented yet')
+
 
     def __build_user_service(self, username, quota=100, service='heremaps',
                              orgname=None, soft_limit=False,
