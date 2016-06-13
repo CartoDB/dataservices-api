@@ -40,7 +40,11 @@ OK
 ```
 
 ## Running the integration tests
-TBD
+See the [[../../../../test/README.md]]. Basically, move to the `/test` directory at the top level of this repo and execute the `run_tests.py` script:
+```sh
+cd $(git rev-parse --show-toplevel)/test
+python run_tests.py --host=$YOUR_HOST $YOUR_USERNAME $YOUR_API_KEY
+```
 
 ## TODO
 - Move dependencies expressed in `requirements.txt` to `setup.py`
