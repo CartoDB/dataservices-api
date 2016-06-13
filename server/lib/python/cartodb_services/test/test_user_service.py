@@ -89,8 +89,12 @@ class TestUserService(TestCase):
         self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '1', 400)
         assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 400
 
+    @freeze_time("2015-06-01")
     def test_should_sum_amounts_from_both_key_formats(self):
-        raise nose.SkipTest('not implemented yet')
+        us = self.__build_user_service('test_user')
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506',  '1', 400)
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201506', '01', 300)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2015, 6,1)) == 700
 
     def test_should_not_request_redis_twice_when_unneeded(self):
         raise nose.SkipTest('not implemented yet')
