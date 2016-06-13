@@ -80,7 +80,9 @@ class TestUserService(TestCase):
         raise nose.SkipTest('not implemented yet')
 
     def test_should_account_for_wrongly_stored_non_padded_keys(self):
-        raise nose.SkipTest('not implemented yet')
+        us = self.__build_user_service('test_user', end_date = date(2016, 6, 1))
+        self.redis_conn.zincrby('user:test_user:geocoder_here:success_responses:201606', '1', 400)
+        assert us.used_quota(self.NOKIA_GEOCODER, date(2016, 6,1)) == 400
 
     def test_should_sum_amounts_from_both_key_formats(self):
         raise nose.SkipTest('not implemented yet')
