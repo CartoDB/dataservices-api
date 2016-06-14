@@ -86,7 +86,7 @@ class UserMetricsService:
                                                      service, metric, date)
             score = self._redis_connection.zscore(redis_prefix, date.day)
             aggregated_metric += score if score else 0
-            zero_padded_day = date.strftime('%d')
+            zero_padded_day = date.strftime(self.DAY_OF_MONTH_ZERO_PADDED)
             if str(date.day) != zero_padded_day:
                 score = self._redis_connection.zscore(redis_prefix, zero_padded_day)
                 aggregated_metric += score if score else 0
