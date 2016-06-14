@@ -105,7 +105,9 @@ class UserMetricsService:
     def __increment_organization_uses(self, service_type, metric, date, amount):
         redis_prefix = self.__parse_redis_prefix("org", self._orgname,
                                                  service_type, metric, date)
-        self._redis_connection.zincrby(redis_prefix, date.day, amount)
+        self._redis_connection.zincrby(redis_prefix,
+                                       date.strftime(self.DAY_OF_MONTH_ZERO_PADDED),
+                                       amount)
 
     def __parse_redis_prefix(self, prefix, entity_name, service_type, metric,
                              date):
