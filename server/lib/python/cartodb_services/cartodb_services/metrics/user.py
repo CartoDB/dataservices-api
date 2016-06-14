@@ -8,6 +8,7 @@ class UserMetricsService:
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
     SERVICE_HERE_ISOLINES = 'here_isolines'
+    DAY_OF_MONTH_ZERO_PADDED = '%d'
 
     def __init__(self, user_geocoder_config, redis_connection):
         self._user_geocoder_config = user_geocoder_config
@@ -97,7 +98,9 @@ class UserMetricsService:
     def __increment_user_uses(self, service_type, metric, date, amount):
         redis_prefix = self.__parse_redis_prefix("user", self._username,
                                                  service_type, metric, date)
-        self._redis_connection.zincrby(redis_prefix, date.day, amount)
+        self._redis_connection.zincrby(redis_prefix,
+                                       date.strftime(self.DAY_OF_MONTH_ZERO_PADDED),
+                                       amount)
 
     def __increment_organization_uses(self, service_type, metric, date, amount):
         redis_prefix = self.__parse_redis_prefix("org", self._orgname,
