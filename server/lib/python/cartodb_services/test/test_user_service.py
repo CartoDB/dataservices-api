@@ -116,6 +116,21 @@ class TestUserService(TestCase):
         #('user:test_user:geocoder_cache:success_responses:201506', 15)
         assert self.redis_conn.zscore_counter() == 3
 
+    def test_should_write_zero_padded_dates(self):
+        us = self.__build_user_service('test_user')
+        us.increment_service_use(self.NOKIA_GEOCODER, 'success_responses',
+                                 date=date(2015,6,1))
+        assert self.redis_conn.zscore('user:test_user:geocoder_here:success_responses:201506', '01') == 1
+        assert self.redis_conn.zscore('user:test_user:geocoder_here:success_responses:201506',  '1') == None
+
+    def test_orgs_should_write_zero_padded_dates(self):
+        us = self.__build_user_service('test_user', orgname='test_org')
+        us.increment_service_use(self.NOKIA_GEOCODER, 'success_responses',
+                                 amount=400,
+                                 date=date(2015,6,1))
+        assert self.redis_conn.zscore('org:test_org:geocoder_here:success_responses:201506', '01') == 400
+        assert self.redis_conn.zscore('org:test_org:geocoder_here:success_responses:201506',  '1') == None
+
 
     def __build_user_service(self, username, quota=100, service='heremaps',
                              orgname=None, soft_limit=False,
