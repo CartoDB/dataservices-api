@@ -129,7 +129,9 @@ class TestDataObservatoryFunctions(TestCase):
             assert_equal(e.message[0], "The api_key must be provided")
 
     def test_if_obs_search_is_ok(self):
-        query = "SELECT id FROM OBS_Search('total_pop') LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        sql = "SELECT id FROM OBS_Search('total_pop') WHERE id LIKE 'es.ine%' LIMIT 1;"
+        import urllib
+        query = "{0}&api_key={1}".format(urllib.quote(sql), self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['id'], None)
         assert_equal(result['id'], 'es.ine.t1_1')
