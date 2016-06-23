@@ -33,7 +33,7 @@ BEGIN
 
   SELECT cdb_dataservices_client._OBS_ProcessTable(username, useruuid, input_schema, dbname, table_name, output_table_name, params) INTO result;
 
-  RETURN true;
+  RETURN result;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
