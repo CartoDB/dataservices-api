@@ -31,7 +31,7 @@ BEGIN
 
   SELECT current_database() INTO dbname;
 
-  SELECT cdb_dataservices_client._OBS_ProcessTable(username::text, useruuid::text, input_schema::text, dbname::text,table_name::text, output_table_name::text, params::json) INTO result;
+  SELECT cdb_dataservices_client._OBS_ProcessTable(username, useruuid, input_schema, dbname, table_name, output_table_name, params) INTO result;
 
   RETURN true;
 END;
