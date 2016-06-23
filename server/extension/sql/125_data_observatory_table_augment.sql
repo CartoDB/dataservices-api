@@ -1,5 +1,5 @@
-CREATE TYPE ds_fdw_metadata as (schemaname text, tabname text, servername text);
-CREATE TYPE ds_return_metadata as (colnames text[], coltypes text[]);
+CREATE TYPE cdb_dataservices_server.ds_fdw_metadata as (schemaname text, tabname text, servername text);
+CREATE TYPE cdb_dataservices_server.ds_return_metadata as (colnames text[], coltypes text[]);
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_ConnectUserTable(username text, useruuid text, input_schema text, dbname text, table_name text)
