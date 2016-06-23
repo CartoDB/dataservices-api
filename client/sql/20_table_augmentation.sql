@@ -32,6 +32,7 @@ BEGIN
   SELECT current_database() INTO dbname;
 
   SELECT cdb_dataservices_client._OBS_ProcessTable(username, useruuid, input_schema, dbname, table_name, output_table_name, params) INTO result;
+  
 
   RETURN result;
 END;
@@ -101,7 +102,7 @@ $$ LANGUAGE plproxy;
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_GetProcessedData(table_schema text, table_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT _server_conn_str();
-    SELECT cdb_dataservices_server.OBS_GetProcessedData(table_schema text, table_name text, params json);
+    TARGET cdb_dataservices_server._OBS_GetProcessedData;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(table_schema text, table_name text, server_name text)
