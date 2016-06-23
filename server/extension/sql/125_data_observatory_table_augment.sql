@@ -40,7 +40,7 @@ RETURNS ds_return_metadata AS $$
     SELECT cdb_observatory._OBS_GetReturnMetadata(params json);
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAugmentedColumns(table_schema text, table_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetProcessedData(table_schema text, table_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     SELECT cdb_observatory._OBS_GetReturnMetadata(params json);

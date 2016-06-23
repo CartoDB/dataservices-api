@@ -102,7 +102,7 @@ $$ LANGUAGE plproxy;
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_GetProcessedData(table_schema text, table_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT _server_conn_str();
-    TARGET cdb_dataservices_server._OBS_GetProcessedData;
+    TARGET cdb_dataservices_server.OBS_GetProcessedData;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(table_schema text, table_name text, server_name text)
