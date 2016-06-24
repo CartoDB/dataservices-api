@@ -49,7 +49,7 @@ Steps to deploy a new Data Services API version :
 - install python library
 
     ```
-    cd server/lib/python/cartodb_services && python setup.py install
+    cd server/lib/python/cartodb_services && sudo pip install --upgrade .
     ```
 
 - install extensions in user database
