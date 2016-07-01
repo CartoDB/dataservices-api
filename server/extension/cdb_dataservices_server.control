@@ -1,5 +1,5 @@
 comment = 'CartoDB dataservices server extension'
-default_version = '0.10.0'
-requires = 'plpythonu, plproxy, postgis, cdb_geocoder'
+default_version = '0.11.0'
+requires = 'plpythonu, plproxy, postgis, cdb_geocoder, observatory'
 superuser = true
 schema = cdb_dataservices_server
