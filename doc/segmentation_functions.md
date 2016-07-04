@@ -158,7 +158,7 @@ The possible segments are:
 ### Examples
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot({{point geometry}})
 ```
 
@@ -168,7 +168,7 @@ __Get the Segmentation Snapshot around the MGM Grand__
 
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot(CDB_LatLng(36.10222, -115.169516))
 ```
 
@@ -176,6 +176,6 @@ __Get the Segmentation Snapshot at CARTO's NYC HQ__
 
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot(CDB_LatLng(40.704512, -73.936669))
 ```

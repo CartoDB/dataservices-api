@@ -7,7 +7,7 @@ _**This service is subject to quota limitations and extra fees may apply**. View
 You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing and inserts them into a table.
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 600, 900]::integer[])&api_key={api_key}
+https://{username}.carto.com/api/v2/sql?q=INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 600, 900]::integer[])&api_key={api_key}
 ```
 
 The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [HERE](https://developer.here.com/coverage-info) maps.

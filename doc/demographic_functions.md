@@ -40,7 +40,7 @@ obs_getdemographicsnapshot: {
 ### Examples
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot({{point geometry}})
 ```
 
@@ -49,14 +49,14 @@ OBS_GetDemographicSnapshot({{point geometry}})
 __Get the Demographic Snapshot at Camp David__
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(39.648333, -77.465))
 ```
 
 __Get the Demographic Snapshot in the Upper West Side__
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(40.80, -73.960))
 ```
 
