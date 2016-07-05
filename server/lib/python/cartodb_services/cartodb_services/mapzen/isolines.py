@@ -31,29 +31,49 @@ class MapzenIsolines:
             # TODO move this restriction to the appropriate place
             raise NotImplementedError('walk is the only supported mode for the moment')
 
-        bearings = self._get_bearings(self.NUMBER_OF_ANGLES)
-        location_estimates = [self._get_dest_location_estimate(origin, b, isorange) for b in bearings]
+        # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
+        # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
+
+        # Initial setup
+        angles = self._get_angles(self.NUMBER_OF_ANGLES) # array of angles
+        upper_rmax = 3.3333333 * isorange # an upper bound for the radius, assuming 12km/h walking speed
+        rmax = [upper_rmax] * self.NUMBER_OF_ANGLES
+        rmin = [0.0] * self.NUMBER_OF_ANGLES
+        location_estimates = [self._calculate_dest_location(origin, a, upper_rmax / 2.0) for a in angles]
 
         # calculate the "actual" cost for each location estimate as first iteration
         resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
-        costs = resp['one_to_many'][0][1:]
+        costs = [c['time'] for c in resp['one_to_many'][0][1:]]
         #import pdb; pdb.set_trace()
+
+        # iterate to refine the first solution, if needed
+        for i in xrange(0, self.MAX_ITERS):
+            errors = [(cost - isorange) / float(isorange) for cost in costs]
+            max_abs_error = [abs(e) for e in errors]
+            if max_abs_error <= self.TOLERANCE:
+                # good enough, stop there
+                break
+
+            # let's refine the solution, binary search
+            for j in xrange(0, self.NUMBER_OF_ANGLES):
+                if errors[j] > 0:
+                    rmax[j] = (rmax[j] - rmin[j]) / 2.0
+                else:
+                    rmin[j] = (rmax[j] - rmin[j]) / 2.0
+                location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]-rmin[j])/2.0)
+
+            # and check "actual" costs again
+            resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
+            costs = [c['time'] for c in resp['one_to_many'][0][1:]]
+
+        return location_estimates
+
 
 
     # NOTE: all angles in calculations are in radians
-    def _get_bearings(self, number_of_angles):
+    def _get_angles(self, number_of_angles):
         step = (2.0 * pi) / number_of_angles
         return [(x * step) for x in xrange(0, number_of_angles)]
-
-    # TODO: this just works for walk isochrone
-    # TODO: split this into two
-    def _get_dest_location_estimate(self, origin, bearing, trange):
-        # my rule of thumb: normal walk speed is about 1km in 10 minutes = 6 km/h
-        # use 12 km/h as an upper bound
-        speed = 3.333333 # in m/s
-        distance = speed * trange
-
-        return self._calculate_dest_location(origin, bearing, distance)
 
     def _calculate_dest_location(self, origin, angle, radius):
         origin_lat_radians = radians(origin['lat'])
