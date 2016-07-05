@@ -49,7 +49,7 @@ class MapzenIsolines:
         # iterate to refine the first solution, if needed
         for i in xrange(0, self.MAX_ITERS):
             errors = [(cost - isorange) / float(isorange) for cost in costs]
-            max_abs_error = [abs(e) for e in errors]
+            max_abs_error = max([abs(e) for e in errors])
             if max_abs_error <= self.TOLERANCE:
                 # good enough, stop there
                 break
