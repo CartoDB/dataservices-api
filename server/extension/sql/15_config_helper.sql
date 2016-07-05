@@ -12,6 +12,20 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_mapzen_geocoder_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_mapzen_geocoder_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import MapzenGeocoderConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    mapzen_geocoder_config = MapzenGeocoderConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = mapzen_geocoder_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_internal_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_internal_geocoder_config_{0}".format(username)

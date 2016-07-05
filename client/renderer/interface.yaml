@@ -59,6 +59,30 @@
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: cdb_here_geocode_street_point
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
+- name: cdb_google_geocode_street_point
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
+- name: cdb_mapzen_geocode_street_point
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
 - name: cdb_isodistance
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
