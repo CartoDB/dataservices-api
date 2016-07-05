@@ -1,4 +1,5 @@
 from math import cos, sin, tan, sqrt, pi, radians, degrees, asin, atan2
+import logging
 
 class MapzenIsolines:
 
@@ -27,6 +28,14 @@ class MapzenIsolines:
         Array of {lon: x, lat: y} as a representation of the isoline
     """
     def calculate_isochrone(self, origin, transport_mode, isorange):
+
+        # NOTE: not for production
+        #logging.basicConfig(level=logging.DEBUG, filename='/tmp/isolines.log')
+        logging.debug('origin = %s' % origin)
+        logging.debug('transport_mode = %s' % transport_mode)
+        logging.debug('isorange = %d' % isorange)
+
+
         if transport_mode != 'walk':
             # TODO move this restriction to the appropriate place
             raise NotImplementedError('walk is the only supported mode for the moment')
@@ -42,12 +51,14 @@ class MapzenIsolines:
         location_estimates = [self._calculate_dest_location(origin, a, upper_rmax / 2.0) for a in angles]
 
         # calculate the "actual" cost for each location estimate as first iteration
+        # NOTE: sometimes it cannot calculate the cost and returns None. Just assume isorange and stop the calculations there
         resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
-        costs = [c['time'] for c in resp['one_to_many'][0][1:]]
+        costs = [(c['time'] or isorange) for c in resp['one_to_many'][0][1:]]
         #import pdb; pdb.set_trace()
 
         # iterate to refine the first solution, if needed
         for i in xrange(0, self.MAX_ITERS):
+            logging.debug('costs = %s' % costs)
             errors = [(cost - isorange) / float(isorange) for cost in costs]
             max_abs_error = max([abs(e) for e in errors])
             if max_abs_error <= self.TOLERANCE:
@@ -66,7 +77,7 @@ class MapzenIsolines:
 
             # and check "actual" costs again
             resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
-            costs = [c['time'] for c in resp['one_to_many'][0][1:]]
+            costs = [(c['time'] or isorange) for c in resp['one_to_many'][0][1:]]
 
         return location_estimates
 
