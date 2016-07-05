@@ -55,7 +55,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_routing_isolines(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isolines(
    username TEXT,
    orgname TEXT,
    isotype TEXT,
@@ -65,6 +65,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_routing_isolines(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
+  from cartodb_services.mapzen import MatrixClient
   from cartodb_services.mapzen import MapzenIsolines
   from cartodb_services.metrics import QuotaService
   from cartodb_services.here.types import geo_polyline_to_multipolygon # TODO do we use the same types?
@@ -82,24 +83,34 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     mapzen_conf_str = plpy.execute("SELECT * FROM CDB_Conf_Getconf('mapzen_conf') AS mapzen_conf")[0]['mapzen_conf']
     mapzen_conf = json.loads(mapzen_conf_str)
 
-    client = MapzenIsolines(mapzen_conf['routing']['api_key'])
+
+    client = MatrixClient(mapzen_conf['matrix']['api_key'])
+    mapzen_isolines = MapzenIsolines(client)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
       lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
-      source_str = 'geo!%f,%f' % (lat, lon)
+      origin = {'lat': lat, 'lon': lon}
     else:
-      source_str = None
+      raise Exception('source is NULL')
 
     # -- TODO Support options properly
+    isolines = []
     if isotype == 'isodistance':
-      resp = client.calculate_isodistance(source_str, mode, data_range)
+      # -- TODO implement
+      raise 'not implemented'
+      resp = mapzen_isolines.calculate_isodistance(origin, mode, data_range)
     elif isotype == 'isochrone':
-      resp = client.calculate_isochrone(source_str, mode, data_range)
+      for r in data_range:
+          isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
+          isolines.append(isoline)
 
-    if resp:
+    return [] # -- TODO delete this
+
+    # -- TODO rewrite this block
+    if isolines:
       result = []
-      for isoline in resp:
+      for isoline in isolines:
         data_range_n = isoline['range']
         polyline = isoline['geom']
         multipolygon = geo_polyline_to_multipolygon(polyline)

@@ -34,7 +34,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   #if user_isolines_config.google_services_user:
   #  plpy.error('This service is not available for google service users.')
 
-  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
+  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
   isolines = []
   for element in result:
