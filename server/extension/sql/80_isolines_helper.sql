@@ -91,10 +91,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       source_str = None
 
+    # -- TODO Support options properly
     if isotype == 'isodistance':
-      resp = client.calculate_isodistance(source_str, mode, data_range, options)
+      resp = client.calculate_isodistance(source_str, mode, data_range)
     elif isotype == 'isochrone':
-      resp = client.calculate_isochrone(source_str, mode, data_range, options)
+      resp = client.calculate_isochrone(source_str, mode, data_range)
 
     if resp:
       result = []
@@ -114,7 +115,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     type_, value_, traceback_ = sys.exc_info()
     #quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to obtain isolines using mapzen: {0}'.format(e)
-    #plpy.notice(traceback.format_tb(traceback_))
+    plpy.debug(traceback.format_tb(traceback_))
     raise e
     #plpy.error(error_msg)
   finally:

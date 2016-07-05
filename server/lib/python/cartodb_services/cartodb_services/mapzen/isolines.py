@@ -60,7 +60,14 @@ class MapzenIsolines:
             destination_matrix = self._calculate_destination_matrix(origin, destination_points, mode, units)
 
     def _calculate_radius(self, init_radius, mode, mode_type, units):
+        import logging
+        #logging.basicConfig(filename='/tmp/isolines.log',level=logging.DEBUG)
+        logging.debug(mode_type)
         if mode_type is 'time':
+            logging.debug(init_radius)
+            logging.debug(self.METERS_PER_SECOND[mode])
+            logging.debug("units = %s", units)
+            logging.debug(self.UNIT_MULTIPLIER[units])
             radius_meters = init_radius * self.METERS_PER_SECOND[mode] * self.UNIT_MULTIPLIER[units]
         else:
             radius_meters = init_radius
