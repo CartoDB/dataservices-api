@@ -57,10 +57,10 @@ class MapzenIsolines:
             # let's refine the solution, binary search
             for j in xrange(0, self.NUMBER_OF_ANGLES):
                 if errors[j] > 0:
-                    rmax[j] = (rmax[j] - rmin[j]) / 2.0
+                    rmax[j] = (rmax[j] + rmin[j]) / 2.0
                 else:
-                    rmin[j] = (rmax[j] - rmin[j]) / 2.0
-                location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]-rmin[j])/2.0)
+                    rmin[j] = (rmax[j] + rmin[j]) / 2.0
+                location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]+rmin[j])/2.0)
 
             # and check "actual" costs again
             resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
