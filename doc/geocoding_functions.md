@@ -2,7 +2,7 @@
 
 The [geocoder](https://carto.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CARTO SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CARTO provides functions for several different categories of geocoding through the Data Services API.
 
-_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](http://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
+_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
 
 Here is an example of how to geocode a single country:
 
@@ -217,7 +217,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('New York
 
 This function geocodes your data into point, or polygon, geometries for postal codes. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
-**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](http://carto.com/docs/faqs/datasets-and-data/#why-does-carto-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
+**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](https://carto.com/docs/faqs/datasets-and-data/#why-does-carto-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
@@ -315,7 +315,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34
 
 This function geocodes your data into a point geometry for a street address. CARTO uses several different service providers for street-level geocoding, depending on your platform. If you access CARTO on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
 
-**This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://carto.com/docs/carto-engine/dataservices-api/quota-information/) for details and recommendations about quota consumption.
+**This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
