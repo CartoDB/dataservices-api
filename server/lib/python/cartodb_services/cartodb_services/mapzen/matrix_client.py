@@ -38,4 +38,6 @@ class MatrixClient:
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params)
 
+        response.raise_for_status() # raise exception if not 200 OK
+
         return response.json()
