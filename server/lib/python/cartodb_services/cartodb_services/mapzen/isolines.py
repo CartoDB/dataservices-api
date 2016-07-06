@@ -3,7 +3,7 @@ import logging
 
 class MapzenIsolines:
 
-    NUMBER_OF_ANGLES = 12
+    NUMBER_OF_ANGLES = 24
     MAX_ITERS = 5
     TOLERANCE = 0.1
 
@@ -77,7 +77,13 @@ class MapzenIsolines:
 
                     location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]+rmin[j])/2.0)
 
-        return location_estimates
+        # delete points that got None
+        location_estimates_filtered = []
+        for i, c in enumerate(costs):
+            if c <> isorange:
+                location_estimates_filtered.append(location_estimates[i])
+
+        return location_estimates_filtered
 
 
 
