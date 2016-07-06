@@ -31,6 +31,7 @@ class MapzenIsolines:
 
         # NOTE: not for production
         #logging.basicConfig(level=logging.DEBUG, filename='/tmp/isolines.log')
+        #logging.basicConfig(level=logging.DEBUG)
         logging.debug('origin = %s' % origin)
         logging.debug('transport_mode = %s' % transport_mode)
         logging.debug('isorange = %d' % isorange)
@@ -50,15 +51,15 @@ class MapzenIsolines:
         rmin = [0.0] * self.NUMBER_OF_ANGLES
         location_estimates = [self._calculate_dest_location(origin, a, upper_rmax / 2.0) for a in angles]
 
-        # calculate the "actual" cost for each location estimate as first iteration
-        # NOTE: sometimes it cannot calculate the cost and returns None. Just assume isorange and stop the calculations there
-        resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
-        costs = [(c['time'] or isorange) for c in resp['one_to_many'][0][1:]]
-        #import pdb; pdb.set_trace()
-
-        # iterate to refine the first solution, if needed
+        # Iterate to refine the first solution
         for i in xrange(0, self.MAX_ITERS):
-            logging.debug('costs = %s' % costs)
+            # Calculate the "actual" cost for each location estimate.
+            # NOTE: sometimes it cannot calculate the cost and returns None.
+            #   Just assume isorange and stop the calculations there
+            response = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
+            costs = [(c['time'] or isorange) for c in response['one_to_many'][0][1:]]
+            logging.debug('i = %d, costs = %s' % (i, costs))
+
             errors = [(cost - isorange) / float(isorange) for cost in costs]
             max_abs_error = max([abs(e) for e in errors])
             if max_abs_error <= self.TOLERANCE:
@@ -73,11 +74,8 @@ class MapzenIsolines:
                         rmax[j] = (rmax[j] + rmin[j]) / 2.0
                     else:
                         rmin[j] = (rmax[j] + rmin[j]) / 2.0
-                    location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]+rmin[j])/2.0)
 
-            # and check "actual" costs again
-            resp = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
-            costs = [(c['time'] or isorange) for c in resp['one_to_many'][0][1:]]
+                    location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]+rmin[j])/2.0)
 
         return location_estimates
 

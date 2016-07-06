@@ -65,7 +65,7 @@ class MatrixClientMock():
 class MapzenIsolinesTestCase(unittest.TestCase):
 
     def setUp(self):
-        speed = 6 # in km/h
+        speed = 4 # in km/h
         matrix_client = MatrixClientMock(speed)
         self.mapzen_isolines = MapzenIsolines(matrix_client)
 
