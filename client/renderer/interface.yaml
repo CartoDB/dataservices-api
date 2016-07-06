@@ -113,7 +113,7 @@
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
 
-- name: cdb_mapzen_distance
+- name: cdb_mapzen_isodistance
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
