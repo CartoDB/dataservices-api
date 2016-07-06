@@ -107,7 +107,12 @@ class MapzenIsolines:
             #   Just assume isorange and stop the calculations there
 
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
-            costs = [(c[cost_variable]*unit_factor or isorange) for c in response['one_to_many'][0][1:]]
+            costs = [None] * self.NUMBER_OF_ANGLES
+            for idx, c in enumerate(response['one_to_many'][0][1:]):
+                if c[cost_variable]:
+                    costs[idx] = c[cost_variable]*unit_factor
+                else:
+                    costs[idx] = isorange
 
             logging.debug('i = %d, costs = %s' % (i, costs))
 
