@@ -27,24 +27,45 @@ class MapzenIsolines:
     Returns:
         Array of {lon: x, lat: y} as a representation of the isoline
     """
-    def calculate_isochrone(self, origin, transport_mode, isorange):
+    def calculate_isochrone(self, origin, transport_mode, time_range):
+        if transport_mode == 'walk':
+            max_speed = 3.3333333 # In m/s, assuming 12km/h walking speed
+            costing_model = 'pedestrian'
+        elif transport_mode == 'car':
+            max_speed = 41.67 # In m/s, assuming 140km/h max speed
+            costing_model = 'auto'
+        else:
+            raise NotImplementedError('car and walk are the only supported modes for the moment')
+
+        upper_rmax = max_speed * time_range # an upper bound for the radius
+
+        return self.calculate_isoline(origin, costing_model, time_range, upper_rmax, 'time')
+
+    """Get an isoline using mapzen API.
+
+    The implementation tries to sick close to the SQL API:
+    cdb_isochrone(source geometry, mode text, range integer[], [options text[]]) -> SETOF isoline
+
+    But this calculates just one isoline.
+
+    Args:
+        origin dict containing {lat: y, lon: x}
+        costing_model string "auto" or "pedestrian"
+        isorange int Range of the isoline in seconds
+        upper_rmax float An upper bound for the binary search
+        cost_variable string Variable to optimize "time" or "distance"
+
+    Returns:
+        Array of {lon: x, lat: y} as a representation of the isoline
+    """
+    def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable):
 
         # NOTE: not for production
         #logging.basicConfig(level=logging.DEBUG, filename='/tmp/isolines.log')
         #logging.basicConfig(level=logging.DEBUG)
         logging.debug('origin = %s' % origin)
-        logging.debug('transport_mode = %s' % transport_mode)
+        logging.debug('costing_model = %s' % costing_model)
         logging.debug('isorange = %d' % isorange)
-
-        if transport_mode == 'walk':
-            upper_rmax = 3.3333333 * isorange # an upper bound for the radius, assuming 12km/h walking speed
-            costing_model = 'pedestrian'
-        elif transport_mode == 'car':
-            upper_rmax = 41.67 * isorange # assuming 140km/h max speed
-            costing_model = 'auto'
-        else:
-            raise NotImplementedError('car and walk are the only supported modes for the moment')
-
 
         # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
         # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
@@ -62,7 +83,7 @@ class MapzenIsolines:
             #   Just assume isorange and stop the calculations there
 
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
-            costs = [(c['time'] or isorange) for c in response['one_to_many'][0][1:]]
+            costs = [(c[cost_variable] or isorange) for c in response['one_to_many'][0][1:]]
 
             logging.debug('i = %d, costs = %s' % (i, costs))
 
