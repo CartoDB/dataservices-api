@@ -252,7 +252,6 @@ class MapzenIsolinesRoutingConfig(ServiceConfig):
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
             self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
             self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-            self._cost_per_hit = 0
         except Exception as e:
             raise ConfigException("Malformed config for Mapzen isolines: {0}".format(e))
 
