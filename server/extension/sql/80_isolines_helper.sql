@@ -68,7 +68,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.mapzen import MatrixClient
   from cartodb_services.mapzen import MapzenIsolines
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.here.types import geo_polyline_to_multipolygon # TODO do we use the same types?
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_mapzen_isolines_routing_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
@@ -92,9 +91,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     # -- TODO Support options properly
     isolines = {}
     if isotype == 'isodistance':
-      # -- TODO implement
-      raise 'not implemented'
-      resp = mapzen_isolines.calculate_isodistance(origin, mode, data_range)
+      for r in data_range:
+          isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
+          isolines[r] = (isoline)
     elif isotype == 'isochrone':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)

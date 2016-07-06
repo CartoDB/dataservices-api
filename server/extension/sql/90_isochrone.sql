@@ -30,17 +30,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   user_isolines_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
   type = 'isochrone'
 
-  # If we were to add a config check, it'll go here
-  #if user_isolines_config.google_services_user:
-  #  plpy.error('This service is not available for google service users.')
-
   mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
-  isolines = []
-  for element in result:
-    isoline = element['isoline']
-    isoline = isoline.translate(None, "()").split(',')
-    isolines.append(isoline)
 
-  return isolines
+  return result
 $$ LANGUAGE plpythonu;
