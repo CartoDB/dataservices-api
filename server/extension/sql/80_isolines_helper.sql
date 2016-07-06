@@ -71,20 +71,15 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.here.types import geo_polyline_to_multipolygon # TODO do we use the same types?
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+  user_mapzen_isolines_routing_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
 
   # -- Check the quota
-  #quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  #if not quota_service.check_user_quota():
-  #  plpy.error('You have reached the limit of your quota')
+  quota_service = QuotaService(user_mapzen_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    plpy.error('You have reached the limit of your quota')
 
   try:
-    # --TODO: encapsulate or refactor this ugly code
-    mapzen_conf_str = plpy.execute("SELECT * FROM CDB_Conf_Getconf('mapzen_conf') AS mapzen_conf")[0]['mapzen_conf']
-    mapzen_conf = json.loads(mapzen_conf_str)
-
-
-    client = MatrixClient(mapzen_conf['matrix']['api_key'])
+    client = MatrixClient(user_mapzen_isolines_routing_config.mapzen_matrix_api_key)
     mapzen_isolines = MapzenIsolines(client)
 
     if source:
@@ -115,19 +110,18 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       multipolygon = plpy.execute(sql, 1)[0]['geom']
 
       result.append([source, r, multipolygon])
-    # --TODO take care of this quota/usage stuff
-    #quota_service.increment_success_service_use()
-    #quota_service.increment_isolines_service_use(len(resp))
+
+    quota_service.increment_success_service_use()
+    quota_service.increment_isolines_service_use(len(isolines))
     return result
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
-    #quota_service.increment_failed_service_use()
+    quota_service.increment_failed_service_use()
     error_msg = 'There was an error trying to obtain isolines using mapzen: {0}'.format(e)
     plpy.debug(traceback.format_tb(traceback_))
     raise e
     #plpy.error(error_msg)
   finally:
-    pass
-    #quota_service.increment_total_service_use()
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;

@@ -241,6 +241,41 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._geocoder_type == self.GOOGLE_GEOCODER
 
 
+class MapzenIsolinesRoutingConfig(ServiceConfig):
+
+    PERIOD_END_DATE = 'period_end_date'
+
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
+        super(MapzenIsolinesRoutingConfig, self).__init__(redis_connection, db_conn,
+                                                    username, orgname)
+        try:
+            self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
+            self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
+            self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+            self._cost_per_hit = 0
+        except Exception as e:
+            raise ConfigException("Malformed config for Mapzen isolines: {0}".format(e))
+
+    @property
+    def service_type(self):
+        return 'mapzen_isolines'
+
+    @property
+    def isolines_quota(self):
+        return self._isolines_quota
+
+    @property
+    def soft_isolines_limit(self):
+        return False
+
+    @property
+    def period_end_date(self):
+        return self._period_end_date
+
+    @property
+    def mapzen_matrix_api_key(self):
+        return self._mapzen_matrix_api_key
+
 class InternalGeocoderConfig(ServiceConfig):
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
@@ -438,6 +473,8 @@ class ServicesDBConfig:
             raise ConfigException('Mapzen configuration missing')
         else:
             mapzen_conf = json.loads(mapzen_conf_json)
+            self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
+            self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
             self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
             self._mapzen_routing_quota = mapzen_conf['routing']['monthly_quota']
             self._mapzen_geocoder_api_key = mapzen_conf['geocoder']['api_key']
@@ -491,6 +528,14 @@ class ServicesDBConfig:
     @property
     def heremaps_geocoder_cost_per_hit(self):
         return self._heremaps_geocoder_cost_per_hit
+
+    @property
+    def mapzen_matrix_api_key(self):
+        return self._mapzen_matrix_api_key
+
+    @property
+    def mapzen_matrix_monthly_quota(self):
+        return self._mapzen_matrix_quota
 
     @property
     def mapzen_routing_api_key(self):
