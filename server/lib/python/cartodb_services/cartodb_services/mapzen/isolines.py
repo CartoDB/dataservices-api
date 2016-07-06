@@ -41,6 +41,29 @@ class MapzenIsolines:
 
         return self.calculate_isoline(origin, costing_model, time_range, upper_rmax, 'time')
 
+    """Get an isodistance using mapzen API.
+
+    Args:
+        origin dict containing {lat: y, lon: x}
+        transport_mode string, for the moment just "car" or "walk"
+        isorange int range of the isoline in seconds
+
+    Returns:
+        Array of {lon: x, lat: y} as a representation of the isoline
+    """
+    def calculate_isodistance(self, origin, transport_mode, distance_range):
+        if transport_mode == 'walk':
+            costing_model = 'pedestrian'
+        elif transport_mode == 'car':
+            costing_model = 'auto'
+        else:
+            raise NotImplementedError('car and walk are the only supported modes for the moment')
+
+        upper_rmax = distance_range # an upper bound for the radius, going in a straight line
+
+        return self.calculate_isoline(origin, costing_model, time_range, upper_rmax, 'distance', 1000.0)
+
+
     """Get an isoline using mapzen API.
 
     The implementation tries to sick close to the SQL API:
@@ -54,11 +77,12 @@ class MapzenIsolines:
         isorange int Range of the isoline in seconds
         upper_rmax float An upper bound for the binary search
         cost_variable string Variable to optimize "time" or "distance"
+        unit_factor float A factor to adapt units of isorange (meters) and units of distance (km)
 
     Returns:
         Array of {lon: x, lat: y} as a representation of the isoline
     """
-    def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable):
+    def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable, unit_factor=1.0):
 
         # NOTE: not for production
         #logging.basicConfig(level=logging.DEBUG, filename='/tmp/isolines.log')
@@ -83,7 +107,7 @@ class MapzenIsolines:
             #   Just assume isorange and stop the calculations there
 
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
-            costs = [(c[cost_variable] or isorange) for c in response['one_to_many'][0][1:]]
+            costs = [(c[cost_variable]*unit_factor or isorange) for c in response['one_to_many'][0][1:]]
 
             logging.debug('i = %d, costs = %s' % (i, costs))
 
