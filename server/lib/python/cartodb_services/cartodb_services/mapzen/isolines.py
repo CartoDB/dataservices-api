@@ -7,7 +7,7 @@ class MapzenIsolines:
     MAX_ITERS = 5
     TOLERANCE = 0.1
 
-    EARTH_RADIUS_METERS = 6371000
+    EARTH_RADIUS_METERS = 6367444
 
     def __init__(self, matrix_client):
         self._matrix_client = matrix_client
