@@ -36,17 +36,21 @@ class MapzenIsolines:
         logging.debug('transport_mode = %s' % transport_mode)
         logging.debug('isorange = %d' % isorange)
 
+        if transport_mode == 'walk':
+            upper_rmax = 3.3333333 * isorange # an upper bound for the radius, assuming 12km/h walking speed
+            costing_model = 'pedestrian'
+        elif transport_mode == 'car':
+            upper_rmax = 41.67 * isorange # assuming 140km/h max speed
+            costing_model = 'auto'
+        else:
+            raise NotImplementedError('car and walk are the only supported modes for the moment')
 
-        if transport_mode != 'walk':
-            # TODO move this restriction to the appropriate place
-            raise NotImplementedError('walk is the only supported mode for the moment')
 
         # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
         # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
 
         # Initial setup
         angles = self._get_angles(self.NUMBER_OF_ANGLES) # array of angles
-        upper_rmax = 3.3333333 * isorange # an upper bound for the radius, assuming 12km/h walking speed
         rmax = [upper_rmax] * self.NUMBER_OF_ANGLES
         rmin = [0.0] * self.NUMBER_OF_ANGLES
         location_estimates = [self._calculate_dest_location(origin, a, upper_rmax / 2.0) for a in angles]
@@ -56,8 +60,10 @@ class MapzenIsolines:
             # Calculate the "actual" cost for each location estimate.
             # NOTE: sometimes it cannot calculate the cost and returns None.
             #   Just assume isorange and stop the calculations there
-            response = self._matrix_client.one_to_many([origin] + location_estimates,  'pedestrian')
+
+            response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
             costs = [(c['time'] or isorange) for c in response['one_to_many'][0][1:]]
+
             logging.debug('i = %d, costs = %s' % (i, costs))
 
             errors = [(cost - isorange) / float(isorange) for cost in costs]
