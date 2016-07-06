@@ -11,7 +11,7 @@ requests_mock.Mocker.TEST_PREFIX = 'test_'
 
 
 @requests_mock.Mocker()
-class GoogleGeocoderTestCase(unittest.TestCase):
+class MapzenGeocoderTestCase(unittest.TestCase):
     MAPZEN_GEOCODER_URL = 'https://search.mapzen.com/v1/search'
 
     EMPTY_RESPONSE = """{
