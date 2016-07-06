@@ -61,7 +61,7 @@ class MapzenIsolines:
 
         upper_rmax = distance_range # an upper bound for the radius, going in a straight line
 
-        return self.calculate_isoline(origin, costing_model, time_range, upper_rmax, 'distance', 1000.0)
+        return self.calculate_isoline(origin, costing_model, distance_range, upper_rmax, 'distance', 1000.0)
 
 
     """Get an isoline using mapzen API.
