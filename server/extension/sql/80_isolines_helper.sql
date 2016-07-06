@@ -79,7 +79,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   #  plpy.error('You have reached the limit of your quota')
 
   try:
-    # TODO: encapsulate or refactor this ugly code
+    # --TODO: encapsulate or refactor this ugly code
     mapzen_conf_str = plpy.execute("SELECT * FROM CDB_Conf_Getconf('mapzen_conf') AS mapzen_conf")[0]['mapzen_conf']
     mapzen_conf = json.loads(mapzen_conf_str)
 
@@ -95,7 +95,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       raise Exception('source is NULL')
 
     # -- TODO Support options properly
-    isolines = []
+    isolines = {}
     if isotype == 'isodistance':
       # -- TODO implement
       raise 'not implemented'
@@ -103,24 +103,22 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     elif isotype == 'isochrone':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
-          isolines.append(isoline)
+          isolines[r] = (isoline)
 
-    return [] # -- TODO delete this
+    result = []
+    for r in data_range:
 
-    # -- TODO rewrite this block
-    if isolines:
-      result = []
-      for isoline in isolines:
-        data_range_n = isoline['range']
-        polyline = isoline['geom']
-        multipolygon = geo_polyline_to_multipolygon(polyline)
-        result.append([source, data_range_n, multipolygon])
-      #quota_service.increment_success_service_use()
-      #quota_service.increment_isolines_service_use(len(resp))
-      return result
-    else:
-      #quota_service.increment_empty_service_use()
-      return []
+      # -- TODO encapsulate this block into a func/method
+      locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+      wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
+      sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
+      multipolygon = plpy.execute(sql, 1)[0]['geom']
+
+      result.append([source, r, multipolygon])
+    # --TODO take care of this quota/usage stuff
+    #quota_service.increment_success_service_use()
+    #quota_service.increment_isolines_service_use(len(resp))
+    return result
   except BaseException as e:
     import sys, traceback
     type_, value_, traceback_ = sys.exc_info()
