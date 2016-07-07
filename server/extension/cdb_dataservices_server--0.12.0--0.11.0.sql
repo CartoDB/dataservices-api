@@ -5,3 +5,4 @@
 DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_mapzen_isolines(text, text, text, geometry(Geometry, 4326), text, integer[], text[]);
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_mapzen_isodistance(TEXT, TEXT, geometry(Geometry, 4326), TEXT, integer[], text[]);
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_mapzen_isochrone(TEXT, TEXT, geometry(Geometry, 4326), TEXT, integer[], text[]);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_mapzen_isolines_config(text, text);
