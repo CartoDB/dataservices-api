@@ -1,25 +1,25 @@
 # Geocoding Functions
 
-The [geocoder](https://cartodb.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CartoDB SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CartoDB provides functions for several different categories of geocoding through the Data Services API.
+The [geocoder](https://carto.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CARTO SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CARTO provides functions for several different categories of geocoding through the Data Services API.
 
-_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
+_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
 
 Here is an example of how to geocode a single country:
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT cdb_geocode_admin0_polygon('USA')&api_key={api_key}
+https://{username}.carto.com/api/v2/sql?q=SELECT cdb_geocode_admin0_polygon('USA')&api_key={api_key}
 ```
 
-In order to geocode an existent CartoDB dataset, an SQL UPDATE statement must be used to populate the geometry column in the dataset with the results of the Data Services API. For example, if the column where you are storing the country names for each one of our rows is called `country_column`, run the following statement in order to geocode the dataset:
+In order to geocode an existent CARTO dataset, an SQL UPDATE statement must be used to populate the geometry column in the dataset with the results of the Data Services API. For example, if the column where you are storing the country names for each one of our rows is called `country_column`, run the following statement in order to geocode the dataset:
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon('USA')&api_key={api_key}
+https://{username}.carto.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon('USA')&api_key={api_key}
 ```
 
 Notice that you can make use of Postgres or PostGIS functions in your Data Services API requests, as the result is a geometry that can be handled by the system. For example, suppose you need to retrieve the centroid of a specific country, you can wrap the resulting geometry from the geocoder functions inside the PostGIS `ST_Centroid` function:
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={api_key}
+https://{username}.carto.com/api/v2/sql?q=UPDATE {tablename} SET the_geom = ST_Centroid(cdb_geocode_admin0_polygon('USA'))&api_key={api_key}
 ```
 
 
@@ -217,7 +217,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('New York
 
 This function geocodes your data into point, or polygon, geometries for postal codes. The postal code polygon geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
-**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](http://docs.cartodb.com/faqs/datasets-and-data/#why-does-cartodb-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
+**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](https://carto.com/docs/faqs/datasets-and-data/#why-does-carto-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
@@ -313,9 +313,9 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34
 
 ## Street-Level Geocoder
 
-This function geocodes your data into a point geometry for a street address. CartoDB uses several different service providers for street-level geocoding, depending on your platform. If you access CartoDB on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
+This function geocodes your data into a point geometry for a street address. CARTO uses several different service providers for street-level geocoding, depending on your platform. If you access CARTO on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
 
-**This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) for details and recommendations about quota consumption.
+**This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
 ### cdb_geocode_street_point(_search_text text, [city text], [state text], [country text]_)
 
