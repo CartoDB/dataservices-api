@@ -144,7 +144,7 @@ class MapzenGeocoderConfig(ServiceConfig):
             self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
             self._cost_per_hit = 0
         except Exception as e:
-            raise ConfigException("Malformed config for Mapzen geocoder: {1}".format(key, e))
+            raise ConfigException("Malformed config for Mapzen geocoder: {0}".format(e))
 
     @property
     def service_type(self):
