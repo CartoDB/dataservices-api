@@ -65,7 +65,7 @@ def _plpy_execute_side_effect(*args, **kwargs):
     if args[0] == "SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as conf":
         return [{'conf': '{"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('mapzen_conf') as conf":
-        return [{'conf': '{"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}}'}]
+        return [{'conf': '{"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":
         return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('data_observatory_conf') as conf":
