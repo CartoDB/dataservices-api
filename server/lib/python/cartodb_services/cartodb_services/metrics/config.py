@@ -128,6 +128,60 @@ class RoutingConfig(ServiceConfig):
     def period_end_date(self):
         return self._period_end_date
 
+# Explicit class for the geocoder configuration for Mapzen
+# which does not require users to be configured to use the service
+class MapzenGeocoderConfig(ServiceConfig):
+
+    PERIOD_END_DATE = 'period_end_date'
+
+    def __init__(self, redis_connection, db_conn, username, orgname=None):
+        super(MapzenGeocoderConfig, self).__init__(redis_connection, db_conn,
+                                            username, orgname)
+        self._log_path = self._db_config.geocoder_log_path
+        try:
+            self._mapzen_api_key = self._db_config.mapzen_geocoder_api_key
+            self._monthly_quota = self._db_config.mapzen_geocoder_monthly_quota
+            self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
+            self._cost_per_hit = 0
+        except Exception as e:
+            raise ConfigException("Malformed config for Mapzen geocoder: {1}".format(key, e))
+
+    @property
+    def service_type(self):
+        return 'geocoder_mapzen'
+
+    @property
+    def mapzen_api_key(self):
+        return self._mapzen_api_key
+
+    @property
+    def period_end_date(self):
+        return self._period_end_date
+
+    @property
+    def cost_per_hit(self):
+        return self._cost_per_hit
+
+    @property
+    def google_geocoder(self):
+        return None
+
+    @property
+    def geocoding_quota(self):
+        return self._monthly_quota
+
+    @property
+    def soft_geocoding_limit(self):
+        return False
+
+    @property
+    def is_high_resolution(self):
+        return True
+
+    @property
+    def log_path(self):
+        return self._log_path
+
 
 class IsolinesRoutingConfig(ServiceConfig):
 
