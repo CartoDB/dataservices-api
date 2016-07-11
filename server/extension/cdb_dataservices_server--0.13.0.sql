@@ -1166,7 +1166,11 @@ RETURNS boolean AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_DisconnectUserTable;
 $$ LANGUAGE plproxy;
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_dumpversion(username text, orgname text)
+RETURNS text AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT cdb_observatory.obs_dumpversion();
+$$ LANGUAGE plproxy;CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
   if cache_key in GD:
@@ -2164,20 +2168,23 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     if isotype == 'isodistance':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
-          isolines[r] = (isoline)
+          isolines[r] = isoline
     elif isotype == 'isochrone':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
-          isolines[r] = (isoline)
+          isolines[r] = isoline
 
     result = []
     for r in data_range:
 
-      # -- TODO encapsulate this block into a func/method
-      locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
-      wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
-      sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
-      multipolygon = plpy.execute(sql, 1)[0]['geom']
+      if len(isolines[r]) >= 3:
+        # -- TODO encapsulate this block into a func/method
+        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+        wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
+        sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
+        multipolygon = plpy.execute(sql, 1)[0]['geom']
+      else:
+        multipolygon = None
 
       result.append([source, r, multipolygon])
 
@@ -2226,15 +2233,10 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   user_isolines_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
   type = 'isodistance'
 
-  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
-  isolines = []
-  for element in result:
-    isoline = element['isoline']
-    isoline = isoline.translate(None, "()").split(',')
-    isolines.append(isoline)
 
-  return isolines
+  return result
 $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -2268,15 +2270,10 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   user_isolines_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
   type = 'isochrone'
 
-  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
-  isolines = []
-  for element in result:
-    isoline = element['isoline']
-    isoline = isoline.translate(None, "()").split(',') #--TODO what is this for?
-    isolines.append(isoline)
 
-  return isolines
+  return result
 $$ LANGUAGE plpythonu;
 DO $$
 BEGIN
