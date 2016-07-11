@@ -1131,41 +1131,6 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
-CREATE TYPE cdb_dataservices_server.ds_fdw_metadata as (schemaname text, tabname text, servername text);
-
-CREATE TYPE cdb_dataservices_server.ds_return_metadata as (colnames text[], coltypes text[]);
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, table_name text)
-RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
-    return plpy.execute("SELECT * FROM cdb_dataservices_server.__OBS_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {schema}::text, {dbname}::text, {table_name}::text)"
-        .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), schema=plpy.quote_literal(input_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name))
-        )[0]
-$$ LANGUAGE plpythonu;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.__OBS_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, table_name text)
-RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
-    CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-    TARGET cdb_observatory._OBS_ConnectUserTable;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetReturnMetadata(username text, orgname text, function_name text, params json)
-RETURNS cdb_dataservices_server.ds_return_metadata AS $$
-    CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-    TARGET cdb_observatory._OBS_GetReturnMetadata;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
-RETURNS SETOF record AS $$
-    CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-    TARGET cdb_observatory._OBS_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
-
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, servername text)
-RETURNS boolean AS $$
-    CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-    TARGET cdb_observatory._OBS_DisconnectUserTable;
-$$ LANGUAGE plproxy;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
@@ -1177,6 +1142,20 @@ RETURNS boolean AS $$
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_mapzen_geocoder_config(username text, orgname text)
+RETURNS boolean AS $$
+  cache_key = "user_mapzen_geocoder_config_{0}".format(username)
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.metrics import MapzenGeocoderConfig
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    mapzen_geocoder_config = MapzenGeocoderConfig(redis_conn, plpy, username, orgname)
+    GD[cache_key] = mapzen_geocoder_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
@@ -1271,6 +1250,50 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu;
 
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  if user_geocoder_config.heremaps_geocoder:
+    here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  else:
+    plpy.error('Here geocoder is not available for your account.')
+
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  if user_geocoder_config.google_geocoder:
+    google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  else:
+    plpy.error('Google geocoder is not available for your account.')
+
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  # The configuration is retrieved but no checks are performed on it
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_mapzen_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_mapzen_geocoder_config_{0}".format(username)]
+
+  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+  return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+
+$$ LANGUAGE plpythonu;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.here import HereMapsGeocoder
@@ -1344,13 +1367,13 @@ RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  user_mapzen_geocoder_config = GD["user_mapzen_geocoder_config_{0}".format(username)]
+  quota_service = QuotaService(user_mapzen_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
     plpy.error('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key)
+    geocoder = MapzenGeocoder(user_mapzen_geocoder_config.mapzen_api_key)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)

@@ -1131,7 +1131,6 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
