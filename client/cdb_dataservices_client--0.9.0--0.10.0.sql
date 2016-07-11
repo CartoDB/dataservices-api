@@ -266,5 +266,38 @@ RETURNS boolean AS $$
     TARGET cdb_dataservices_server._OBS_DisconnectUserTable;
 $$ LANGUAGE plproxy;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.obs_dumpversion ()
+RETURNS text AS $$
+DECLARE
+  ret text;
+  username text;
+  orgname text;
+BEGIN
+  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
+    RAISE EXCEPTION 'The api_key must be provided';
+  END IF;
+  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
+  
+    SELECT * FROM cdb_dataservices_client._obs_dumpversion(username, orgname) INTO ret;
+    RETURN ret;
+  
+END;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_dumpversion (username text, organization_name text)
+
+RETURNS text AS $$
+  CONNECT cdb_dataservices_client._server_conn_str();
+  
+  SELECT * FROM cdb_dataservices_server.obs_dumpversion (username, organization_name);
+  
+$$ LANGUAGE plproxy;
+
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._OBS_AugmentTable(text, text, json) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._OBS_GetTable(text, text, text, json) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client.OBS_DumpVersion() TO publicuser;

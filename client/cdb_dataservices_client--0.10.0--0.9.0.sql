@@ -9,6 +9,8 @@ DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_ConnectUserTable(text, text
 DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_GetReturnMetadata(text, text, text, json);
 DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_FetchJoinFdwTableData(text, text, text, text, text, json);
 DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_DisconnectUserTable(text, text, text, text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_client.OBS_DumpVersion();
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_DumpVersion(text, text);
 
 DROP TYPE IF EXISTS cdb_dataservices_client.ds_fdw_metadata;
 DROP TYPE IF EXISTS cdb_dataservices_client.ds_return_metadata;
