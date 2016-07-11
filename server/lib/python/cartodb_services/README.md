@@ -1,6 +1,6 @@
 # CartoDB dataservices API python module
 
-This directory contains the python library used by the server side of CartoDB LDS (Location Data Services).
+This directory contains the python library used by the server side of CARTO LDS (Location Data Services).
 
 It is used from pl/python functions contained in the `cdb_dataservices_server` extension. It goes hand in hand with the extension so please consider running the integration tests.
 
