@@ -1,10 +1,15 @@
+<% if no_params %>
+CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (username text, organization_name text)
+<% else %>
 CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (username text, organization_name text, <%= params_with_type_and_default %>)
+<% end %>
 RETURNS <%= return_type %> AS $$
   CONNECT <%= DATASERVICES_CLIENT_SCHEMA %>._server_conn_str();
   <% if multi_field %>
   SELECT * FROM <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (username, organization_name, <%= params %>);
+  <% elsif no_params %>
+  SELECT * FROM <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (username, organization_name);
   <% else %>
   SELECT <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (username, organization_name, <%= params %>);
   <% end %>
 $$ LANGUAGE plproxy;
-

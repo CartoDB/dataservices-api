@@ -36,6 +36,10 @@ class SqlTemplateRenderer
     @function_signature['multi_row']
   end
 
+  def no_params
+    @function_signature['no_params']
+  end
+
   def user_config_key
     @function_signature['user_config_key']
   end
@@ -45,15 +49,15 @@ class SqlTemplateRenderer
   end
 
   def params
-    @function_signature['params'].map { |p| p['name'] }.join(', ')
+    @function_signature['params'].reject(&:empty?).map { |p| "#{p['name']}"}.join(', ')
   end
 
   def params_with_type
-    @function_signature['params'].map { |p| "#{p['name']} #{p['type']}" }.join(', ')
+    @function_signature['params'].reject(&:empty?).map { |p| "#{p['name']} #{p['type']}" }.join(', ')
   end
 
   def params_with_type_and_default
-    parameters = @function_signature['params'].map do |p|
+    parameters = @function_signature['params'].reject(&:empty?).map do |p|
       if not p['default'].nil?
         "#{p['name']} #{p['type']} DEFAULT #{p['default']}"
       else

@@ -25,10 +25,12 @@ BEGIN
   <% elsif multi_field %>
     SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
     RETURN ret;
+  <% elsif no_params %>
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname) INTO ret;
+    RETURN ret;
   <% else %>
     SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
     RETURN ret;
   <% end %>
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-
