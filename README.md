@@ -1,5 +1,5 @@
-# Data Services API
-The CARTO Data Services SQL API (server and client FTM)
+# CARTO Data Services API
+The CARTO Data Services SQL API
 
 ### Deploy instructions
 Steps to deploy a new Data Services API version :
