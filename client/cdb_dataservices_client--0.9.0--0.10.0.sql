@@ -265,3 +265,6 @@ RETURNS boolean AS $$
     CONNECT _server_conn_str();
     TARGET cdb_dataservices_server._OBS_DisconnectUserTable;
 $$ LANGUAGE plproxy;
+
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._OBS_AugmentTable(text, text, json) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._OBS_GetTable(text, text, text, json) TO publicuser;
