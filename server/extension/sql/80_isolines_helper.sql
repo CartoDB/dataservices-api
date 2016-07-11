@@ -93,20 +93,23 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     if isotype == 'isodistance':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
-          isolines[r] = (isoline)
+          isolines[r] = isoline
     elif isotype == 'isochrone':
       for r in data_range:
           isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
-          isolines[r] = (isoline)
+          isolines[r] = isoline
 
     result = []
     for r in data_range:
 
-      # -- TODO encapsulate this block into a func/method
-      locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
-      wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
-      sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
-      multipolygon = plpy.execute(sql, 1)[0]['geom']
+      if len(isolines[r]) >= 3:
+        # -- TODO encapsulate this block into a func/method
+        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+        wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
+        sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
+        multipolygon = plpy.execute(sql, 1)[0]['geom']
+      else:
+        multipolygon = None
 
       result.append([source, r, multipolygon])
 
