@@ -1,6 +1,6 @@
 # Demographic Functions
 
-The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CartoDB's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](/cartodb-platform/dataservices-api/geocoding-functions/) documentation.
+The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CARTO's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](/carto-engine/dataservices-api/geocoding-functions/) documentation.
 
 _**Note:** The Demographic Snapshot functions are only available for the United States._
 
@@ -40,7 +40,7 @@ obs_getdemographicsnapshot: {
 ### Examples
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot({{point geometry}})
 ```
 
@@ -49,14 +49,14 @@ OBS_GetDemographicSnapshot({{point geometry}})
 __Get the Demographic Snapshot at Camp David__
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(39.648333, -77.465))
 ```
 
 __Get the Demographic Snapshot in the Upper West Side__
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=SELECT * FROM
+https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(40.80, -73.960))
 ```
 

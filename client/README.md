@@ -1,5 +1,5 @@
-# CartoDB dataservices API client extension
-Postgres extension for the CartoDB dataservices API, client side.
+# CARTO Data Services API client extension
+Postgres extension for the CARTO Data Services API, client side.
 
 ## Dependencies
 This extension is thought to be used on top of CartoDB geocoder extension, for the multiples available geocoders (internal, nokia, etc). 
@@ -9,7 +9,7 @@ The following is a non-comprehensive list of dependencies:
 - Postgres 9.3+
 - Postgis extension
 - Schema triggers extension
-- CartoDB extension
+- cartodb-postgresql CARTO extension
 
 ## Installation into the db cluster
 This requires root privileges
@@ -28,7 +28,7 @@ One-liner:
 sudo PGUSER=postgres make all install installcheck
 ```
 
-## Install onto a cartodb user's database
+## Install onto a CARTO user's database
 
 ```
 psql -U postgres cartodb_dev_user_fe3b850a-01c0-48f9-8a26-a82f09e9b53f_db
