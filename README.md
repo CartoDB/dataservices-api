@@ -49,7 +49,7 @@ Steps to deploy a new Data Services API version :
 - install python library
 
     ```
-    cd server/lib/python/cartodb_services && python setup.py install
+    cd server/lib/python/cartodb_services && sudo pip install --upgrade .
     ```
 
 - install extensions in user database
@@ -62,16 +62,16 @@ Steps to deploy a new Data Services API version :
     create extension cdb_dataservices_client;
     ```
 
-- add configuration for different services in user database
+- add configuration for different services in server database
 
 
     ```
     # If sentinel is used:
       SELECT CDB_Conf_SetConf('redis_metadata_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
+      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
       
     # If sentinel is not used
-      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 26379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
+      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
       SELECT CDB_Conf_SetConf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
   
     SELECT CDB_Conf_SetConf('heremaps_conf', '{"geocoder": {"app_id": "here_geocoder_app_id", "app_code": "here_geocoder_app_code", "geocoder_cost_per_hit": "1"}, "isolines" : {"app_id": "here_isolines_app_id", "app_code": "here_geocoder_app_code"}}');
@@ -81,10 +81,13 @@ Steps to deploy a new Data Services API version :
     SELECT CDB_Conf_SetConf('data_observatory_conf', '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}')
     ```
 
-- configure plproxy to point to the a database (you can use a specific database for the server or your same user)
+- configure the user DB:
 
-    ```
-     SELECT CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}');
+    ```sql
+    -- Point to the dataservices server DB (you can use a specific database for the server or your same user's):
+    SELECT CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}');
+
+    SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}');
     ```
 
 - configure the search path in order to be able to execute the functions without using the schema:
