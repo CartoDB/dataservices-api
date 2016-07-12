@@ -321,3 +321,9 @@
   params:
     - { name: geom,  type: Geometry }
     - { name: timespan, type: text, default: 'NULL'}
+
+- name: obs_dumpversion
+  return_type: text
+  no_params: true
+  params:
+    - {}

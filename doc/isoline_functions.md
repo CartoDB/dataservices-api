@@ -1,13 +1,13 @@
 # Isoline Functions
 
-[Isolines](https://cartodb.com/data/isolines/) are contoured lines that display equally calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline services through CartoDB are available by requesting a single function in the Data Services API.
+[Isolines](https://carto.com/data/isolines/) are contoured lines that display equally calculated levels over a given surface area. This enables you to view polygon dimensions by forward or reverse measurements. Isoline functions are calculated as the intersection of areas from the origin point, measured by distance (isodistance) or time (isochrone). For example, the distance of a road from a sidewalk. Isoline services through CARTO are available by requesting a single function in the Data Services API.
 
-_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](http://docs.cartodb.com/cartodb-platform/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
+_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
 
 You can use the isoline functions to retrieve, for example, isochrone lines from a certain location, specifying the mode and the ranges that will define each of the isolines. The following query calculates isolines for areas that are 5, 10 and 15 minutes (300, 600 and 900 seconds, respectively) away from the location by following a path defined by car routing and inserts them into a table.
 
 ```bash
-https://{username}.cartodb.com/api/v2/sql?q=INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 600, 900]::integer[])&api_key={api_key}
+https://{username}.carto.com/api/v2/sql?q=INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 600, 900]::integer[])&api_key={api_key}
 ```
 
 The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [HERE](https://developer.here.com/coverage-info) maps.

@@ -1,6 +1,6 @@
 # Routing Functions
 
-Routing is the navigation from a defined start location to a defined end location. The calculated results are displayed as turn-by-turn directions on your map, based on the transportation mode that you specified. Routing services through CartoDB are available by using the available functions in the Data Services API.
+Routing is the navigation from a defined start location to a defined end location. The calculated results are displayed as turn-by-turn directions on your map, based on the transportation mode that you specified. Routing services through CARTO are available by using the available functions in the Data Services API.
 
 ## cdb_route_point_to_point(_origin geometry(Point), destination geometry(Point), mode text, [options text[], units text]_)
 
