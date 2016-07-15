@@ -221,7 +221,7 @@ This function geocodes your data into point, or polygon, geometries for postal c
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 
-Goecodes the postal code for a specified country into a **polygon** geometry.
+Geocodes the postal code for a specified country into a **polygon** geometry.
 
 #### Arguments
 
@@ -250,7 +250,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_postalcode_polygon('11211'
 
 ### cdb_geocode_postalcode_point(_code text, country_name text_)
 
-Goecodes the postal code for a specified country into a **point** geometry.
+Geocodes the postal code for a specified country into a **point** geometry.
 
 #### Arguments
 
