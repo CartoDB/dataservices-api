@@ -128,7 +128,7 @@ RETURNS boolean AS $$
 
         # Add index to cartodb_id
         plpy.execute('CREATE UNIQUE INDEX {temp_table_name}_pkey ON "{user_schema}".{temp_table_name} (cartodb_id)'
-            .format(user_schema=user_schema, table_name=table_name)
+            .format(user_schema=user_schema, temp_table_name=temporary_table_name)
             )
 
         # Prepare table to receive augmented results in new columns
