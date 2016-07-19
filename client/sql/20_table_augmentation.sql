@@ -126,6 +126,11 @@ RETURNS boolean AS $$
             .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
             )
 
+        # Add index to cartodb_id
+        plpy.execute('CREATE UNIQUE INDEX {table_name}_pkey ON "{user_schema}".{table_name} (cartodb_id)'
+            .format(user_schema=user_schema, table_name=table_name)
+            )
+
         # Prepare table to receive augmented results in new columns
         for idx, column in enumerate(colnames_arr):
             if colnames_arr[idx] is not 'the_geom':
