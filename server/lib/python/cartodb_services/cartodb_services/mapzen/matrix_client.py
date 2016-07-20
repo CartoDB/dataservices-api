@@ -45,7 +45,7 @@ class MatrixClient:
         if response.status_code == requests.codes.ok:
             return response.json()
         elif response.status_code == requests.codes.bad_request:
-            return []
+            return None
         else:
             self._logger.error('Error trying to get matrix distance from mapzen',
                                data={"response_status": response.status_code,
