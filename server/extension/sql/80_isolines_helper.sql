@@ -70,15 +70,15 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.metrics import QuotaService
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_mapzen_isolines_routing_config = GD["user_mapzen_isolines_routing_config_{0}".format(username)]
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
   # -- Check the quota
-  quota_service = QuotaService(user_mapzen_isolines_routing_config, redis_conn)
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
     plpy.error('You have reached the limit of your quota')
 
   try:
-    client = MatrixClient(user_mapzen_isolines_routing_config.mapzen_matrix_api_key)
+    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key)
     mapzen_isolines = MapzenIsolines(client)
 
     if source:

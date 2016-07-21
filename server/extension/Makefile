@@ -8,7 +8,7 @@ ERB = erb
 REPLACEMENTS = -i 's/$(EXTVERSION)/$(NEW_VERSION)/g'
 NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
 
-REGRESS = $(notdir $(basename $(wildcard test/sql/*test.sql)))
+REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 TEST_DIR = test/
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
 

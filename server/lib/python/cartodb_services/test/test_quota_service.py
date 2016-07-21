@@ -1,7 +1,7 @@
 import test_helper
 from mockredis import MockRedis
 from cartodb_services.metrics import QuotaService
-from cartodb_services.metrics import GeocoderConfig, RoutingConfig, ObservatorySnapshotConfig
+from cartodb_services.metrics import GeocoderConfig, RoutingConfig, ObservatorySnapshotConfig, IsolinesRoutingConfig
 from unittest import TestCase
 from nose.tools import assert_raises
 from datetime import datetime, date
@@ -109,6 +109,20 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
+    def test_should_check_user_isolines_quota_correctly(self):
+        qs = self.__build_isolines_quota_service('test_user')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is False
+
+    def test_should_check_org_isolines_quota_correctly(self):
+        qs = self.__build_isolines_quota_service('test_user', orgname='testorg')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is False
+
     def test_should_check_user_obs_snapshot_quota_correctly(self):
         qs = self.__build_obs_snapshot_quota_service('test_user')
         qs.increment_success_service_use()
@@ -149,7 +163,7 @@ class TestQuotaService(TestCase):
                                          username, orgname)
         return QuotaService(geocoder_config, redis_connection=self.redis_conn)
 
-    def __build_routing_quota_service(self, username, service='routing_mapzen',
+    def __build_routing_quota_service(self, username, service='mapzen',
                                       orgname=None, soft_limit=False,
                                       quota=100, end_date=datetime.today()):
         self.__prepare_quota_service(username, quota, service, orgname,
@@ -157,6 +171,15 @@ class TestQuotaService(TestCase):
         routing_config = RoutingConfig(self.redis_conn, self._plpy_mock,
                                        username, orgname)
         return QuotaService(routing_config, redis_connection=self.redis_conn)
+
+    def __build_isolines_quota_service(self, username, service='mapzen',
+                                      orgname=None, soft_limit=False,
+                                      quota=100, end_date=datetime.today()):
+        self.__prepare_quota_service(username, quota, service, orgname,
+                                     soft_limit, 0, False, end_date)
+        isolines_config = IsolinesRoutingConfig(self.redis_conn, self._plpy_mock,
+                                               username, orgname)
+        return QuotaService(isolines_config, redis_connection=self.redis_conn)
 
     def __build_obs_snapshot_quota_service(self, username, quota=100,
                                                service='obs_snapshot',

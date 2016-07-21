@@ -7,12 +7,15 @@ RETURNS Geometry AS $$
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   if user_geocoder_config.heremaps_geocoder:
+    plpy.notice('Requested geocoder is heremaps')
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.google_geocoder:
+    plpy.notice('Requested geocoder is google')
     google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.mapzen_geocoder:
+    plpy.notice('Requested geocoder is mapzen')
     mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
@@ -56,8 +59,8 @@ RETURNS Geometry AS $$
   # The configuration is retrieved but no checks are performed on it
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_mapzen_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_mapzen_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
   return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
@@ -137,13 +140,13 @@ RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_mapzen_geocoder_config = GD["user_mapzen_geocoder_config_{0}".format(username)]
-  quota_service = QuotaService(user_mapzen_geocoder_config, redis_conn)
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
     plpy.error('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_mapzen_geocoder_config.mapzen_api_key)
+    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
