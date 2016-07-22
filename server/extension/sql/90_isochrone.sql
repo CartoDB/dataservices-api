@@ -9,15 +9,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.google_services_user:
     plpy.error('This service is not available for google service users.')
 
-  here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
+  here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
-  isolines = []
-  for element in result:
-    isoline = element['isoline']
-    isoline = isoline.translate(None, "()").split(',')
-    isolines.append(isoline)
-
-  return isolines
+  return result
 $$ LANGUAGE plpythonu;
 
 
