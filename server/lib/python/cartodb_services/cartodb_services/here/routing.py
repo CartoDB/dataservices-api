@@ -77,8 +77,12 @@ class HereMapsRoutingIsoline:
         isolines_response = parsed_response['response']['isoline']
         isolines = []
         for isoline in isolines_response:
+            if not isoline['component']:
+                geom_value = []
+            else:
+                geom_value = isoline['component'][0]['shape']
             isolines.append({'range': isoline['range'],
-                             'geom': isoline['component'][0]['shape']})
+                             'geom': geom_value})
 
         return isolines
 

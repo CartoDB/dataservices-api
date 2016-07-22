@@ -16,8 +16,10 @@ REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
 # These are the files to be installed in the server shared dir,
 # for installation from scratch, upgrades and downgrades.
 # @see http://www.postgresql.org/docs/current/static/extend-pgxs.html
-DATA = $(EXTENSION)--*.sql
 OLD_VERSIONS = $(wildcard old_versions/*.sql)
+DATA = $(NEW_EXTENSION_ARTIFACT) \
+		 $(EXTENSION)--*--*.sql \
+		 $(OLD_VERSIONS)
 SOURCES_DATA_DIR = sql/
 SOURCES_DATA = $(wildcard sql/*.sql)
 
