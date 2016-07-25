@@ -11,7 +11,9 @@ def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
     redis_conn.hset(user_redis_name, 'soft_geocoding_limit', soft_limit)
     redis_conn.hset(user_redis_name, 'geocoding_quota', quota)
     redis_conn.hset(user_redis_name, 'here_isolines_quota', isolines_quota)
-    redis_conn.hset(user_redis_name, 'geocoder_type', service)
+    redis_conn.hset(user_redis_name, 'geocoder_provider', service)
+    redis_conn.hset(user_redis_name, 'isolines_provider', service)
+    redis_conn.hset(user_redis_name, 'routing_provider', service)
     redis_conn.hset(user_redis_name, 'period_end_date', end_date)
     if do_quota:
         redis_conn.hset(user_redis_name, 'obs_snapshot_quota', do_quota)
