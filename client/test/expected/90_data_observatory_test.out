@@ -92,7 +92,7 @@ BEGIN
   RETURN QUERY SELECT '0101000020E610000037CB75821A7C52C0BA8784EFFD594440'::geometry as the_geom, '36047048900'::text as geom_refs;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasure (username text, orgname text, geom Geometry, measure_id text, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasure (username text, orgname text, geom Geometry, measure_id text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;
@@ -122,7 +122,7 @@ BEGIN
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getuscensusmeasure (username text, orgname text, geom Geometry, name text, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getuscensusmeasure (username text, orgname text, geom Geometry, name text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;
@@ -142,7 +142,7 @@ BEGIN
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpopulation (username text, orgname text, geom Geometry, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpopulation (username text, orgname text, geom Geometry, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;
@@ -268,7 +268,7 @@ CONTEXT:  PL/pgSQL function obs_getpointsbypointandradius(geometry,numeric,text,
 (1 row)
 
 SELECT obs_getmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.acs.B01001001'::text);
-NOTICE:  cdb_dataservices_client._obs_getmeasure(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeasure invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, us.census.acs.B01001001, area, <NULL>, <NULL>)
+NOTICE:  cdb_dataservices_client._obs_getmeasure(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeasure invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, us.census.acs.B01001001, <NULL>, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeasure(username, orgname, geom, measure_id, normalize, boundary_id, time_span)"
 PL/pgSQL function obs_getmeasure(geometry,text,text,text,text) line 16 at SQL statement
     obs_getmeasure     
@@ -295,7 +295,7 @@ PL/pgSQL function obs_getcategory(geometry,text,text,text) line 16 at SQL statem
 (1 row)
 
 SELECT obs_getuscensusmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'male population'::text);
-NOTICE:  cdb_dataservices_client._obs_getuscensusmeasure(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getuscensusmeasure invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, male population, area, <NULL>, <NULL>)
+NOTICE:  cdb_dataservices_client._obs_getuscensusmeasure(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getuscensusmeasure invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, male population, <NULL>, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getuscensusmeasure(username, orgname, geom, name, normalize, boundary_id, time_span)"
 PL/pgSQL function obs_getuscensusmeasure(geometry,text,text,text,text) line 16 at SQL statement
  obs_getuscensusmeasure 
@@ -313,7 +313,7 @@ PL/pgSQL function obs_getuscensuscategory(geometry,text,text,text) line 16 at SQ
 (1 row)
 
 SELECT obs_getpopulation(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
-NOTICE:  cdb_dataservices_client._obs_getpopulation(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpopulation invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, area, <NULL>, <NULL>)
+NOTICE:  cdb_dataservices_client._obs_getpopulation(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpopulation invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, <NULL>, <NULL>, <NULL>)
 CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getpopulation(username, orgname, geom, normalize, boundary_id, time_span)"
 PL/pgSQL function obs_getpopulation(geometry,text,text,text) line 16 at SQL statement
    obs_getpopulation   

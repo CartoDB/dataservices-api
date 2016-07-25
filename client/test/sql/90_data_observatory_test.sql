@@ -104,7 +104,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasure (username text, orgname text, geom Geometry, measure_id text, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeasure (username text, orgname text, geom Geometry, measure_id text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;
@@ -137,7 +137,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getuscensusmeasure (username text, orgname text, geom Geometry, name text, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getuscensusmeasure (username text, orgname text, geom Geometry, name text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;
@@ -159,7 +159,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpopulation (username text, orgname text, geom Geometry, normalize text DEFAULT 'area', boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpopulation (username text, orgname text, geom Geometry, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
 DECLARE
   ret numeric;

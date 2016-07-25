@@ -250,7 +250,7 @@
   params:
     - { name: geom,  type: Geometry }
     - { name: measure_id, type: text }
-    - { name: normalize, type: text, default: "'area'"}
+    - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
 
@@ -275,7 +275,7 @@
   params:
     - { name: geom,  type: Geometry }
     - { name: name, type: text }
-    - { name: normalize, type: text, default: "'area'"}
+    - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
 
@@ -291,7 +291,7 @@
   return_type: numeric
   params:
     - { name: geom,  type: Geometry }
-    - { name: normalize, type: text, default: "'area'"}
+    - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
 
