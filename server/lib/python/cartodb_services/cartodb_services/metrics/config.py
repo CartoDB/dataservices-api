@@ -104,17 +104,24 @@ class ObservatoryConfig(DataObservatoryConfig):
 class RoutingConfig(ServiceConfig):
 
     PERIOD_END_DATE = 'period_end_date'
+    ROUTING_PROVIDER_KEY = 'routing_provider'
+    MAPZEN_PROVIDER = 'mapzen'
+    DEFAULT_PROVIDER = 'mapzen'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(RoutingConfig, self).__init__(redis_connection, db_conn,
                                             username, orgname)
+        self._routing_provider = self._redis_config[self.ROUTING_PROVIDER_KEY]
+        if not self._routing_provider:
+            self._routing_provider = self.DEFAULT_PROVIDER
         self._mapzen_api_key = self._db_config.mapzen_routing_api_key
         self._monthly_quota = self._db_config.mapzen_routing_monthly_quota
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
 
     @property
     def service_type(self):
-        return 'routing_mapzen'
+        if self._routing_provider == self.MAPZEN_PROVIDER:
+            return 'routing_mapzen'
 
     @property
     def mapzen_api_key(self):
@@ -128,93 +135,57 @@ class RoutingConfig(ServiceConfig):
     def period_end_date(self):
         return self._period_end_date
 
-# Explicit class for the geocoder configuration for Mapzen
-# which does not require users to be configured to use the service
-class MapzenGeocoderConfig(ServiceConfig):
-
-    PERIOD_END_DATE = 'period_end_date'
-
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(MapzenGeocoderConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
-        self._log_path = self._db_config.geocoder_log_path
-        try:
-            self._mapzen_api_key = self._db_config.mapzen_geocoder_api_key
-            self._monthly_quota = self._db_config.mapzen_geocoder_monthly_quota
-            self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-            self._cost_per_hit = 0
-        except Exception as e:
-            raise ConfigException("Malformed config for Mapzen geocoder: {0}".format(e))
-
-    @property
-    def service_type(self):
-        return 'geocoder_mapzen'
-
-    @property
-    def mapzen_api_key(self):
-        return self._mapzen_api_key
-
-    @property
-    def period_end_date(self):
-        return self._period_end_date
-
-    @property
-    def cost_per_hit(self):
-        return self._cost_per_hit
-
-    @property
-    def google_geocoder(self):
-        return None
-
-    @property
-    def geocoding_quota(self):
-        return self._monthly_quota
-
-    @property
-    def soft_geocoding_limit(self):
-        return False
-
-    @property
-    def is_high_resolution(self):
-        return True
-
-    @property
-    def log_path(self):
-        return self._log_path
-
 
 class IsolinesRoutingConfig(ServiceConfig):
 
-    ROUTING_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
+    ISOLINES_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
                            'period_end_date', 'username', 'orgname',
-                           'heremaps_isolines_app_id', 'heremaps_isolines_app_code',
-                           'geocoder_type']
+                           'heremaps_isolines_app_id', 'geocoder_provider',
+                           'heremaps_isolines_app_code', 'isolines_provider']
     QUOTA_KEY = 'here_isolines_quota'
     SOFT_LIMIT_KEY = 'soft_here_isolines_limit'
     PERIOD_END_DATE = 'period_end_date'
-    GEOCODER_TYPE_KEY = 'geocoder_type'
-    GOOGLE_GEOCODER = 'google'
+    ISOLINES_PROVIDER_KEY = 'isolines_provider'
+    GEOCODER_PROVIDER_KEY = 'geocoder_provider'
+    MAPZEN_PROVIDER = 'mapzen'
+    HEREMAPS_PROVIDER = 'heremaps'
+    DEFAULT_PROVIDER = 'heremaps'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(IsolinesRoutingConfig, self).__init__(redis_connection, db_conn,
                                                     username, orgname)
-        filtered_config = {key: self._redis_config[key] for key in self.ROUTING_CONFIG_KEYS if key in self._redis_config.keys()}
+        filtered_config = {key: self._redis_config[key] for key in self.ISOLINES_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config)
 
     def __parse_config(self, filtered_config, db_config):
-        self._geocoder_type = filtered_config[self.GEOCODER_TYPE_KEY].lower()
-        self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
-        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
-        if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
-            self._soft_isolines_limit = True
-        else:
+        self._isolines_provider = filtered_config[self.ISOLINES_PROVIDER_KEY].lower()
+        if not self._isolines_provider:
+            self._isolines_provider = self.DEFAULT_PROVIDER
+        self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER_KEY].lower()
+        if self._isolines_provider == self.HEREMAPS_PROVIDER:
+            self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
+            self._heremaps_app_id = db_config.heremaps_isolines_app_id
+            self._heremaps_app_code = db_config.heremaps_isolines_app_code
+            if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+                self._soft_isolines_limit = True
+            else:
+                self._soft_isolines_limit = False
+        elif self._isolines_provider == self.MAPZEN_PROVIDER:
+            self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
+            self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
             self._soft_isolines_limit = False
-        self._heremaps_app_id = db_config.heremaps_isolines_app_id
-        self._heremaps_app_code = db_config.heremaps_isolines_app_code
+        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
 
     @property
     def service_type(self):
-        return 'here_isolines'
+        if self._isolines_provider == self.HEREMAPS_PROVIDER:
+            return 'here_isolines'
+        elif self._isolines_provider == self.MAPZEN_PROVIDER:
+            return 'mapzen_isolines'
+
+    @property
+    def google_services_user(self):
+        return self._geocoder_provider == 'google'
 
     @property
     def isolines_quota(self):
@@ -237,43 +208,21 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._heremaps_app_code
 
     @property
-    def google_services_user(self):
-        return self._geocoder_type == self.GOOGLE_GEOCODER
-
-
-class MapzenIsolinesRoutingConfig(ServiceConfig):
-
-    PERIOD_END_DATE = 'period_end_date'
-
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(MapzenIsolinesRoutingConfig, self).__init__(redis_connection, db_conn,
-                                                    username, orgname)
-        try:
-            self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
-            self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
-            self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-        except Exception as e:
-            raise ConfigException("Malformed config for Mapzen isolines: {0}".format(e))
-
-    @property
-    def service_type(self):
-        return 'mapzen_isolines'
-
-    @property
-    def isolines_quota(self):
-        return self._isolines_quota
-
-    @property
-    def soft_isolines_limit(self):
-        return False
-
-    @property
-    def period_end_date(self):
-        return self._period_end_date
-
-    @property
     def mapzen_matrix_api_key(self):
         return self._mapzen_matrix_api_key
+
+    @property
+    def mapzen_provider(self):
+        return self._isolines_provider == self.MAPZEN_PROVIDER
+
+    @property
+    def heremaps_provider(self):
+        return self._isolines_provider == self.HEREMAPS_PROVIDER
+
+    @property
+    def provider(self):
+        return self._isolines_provider
+
 
 class InternalGeocoderConfig(ServiceConfig):
 
@@ -308,7 +257,7 @@ class GeocoderConfig(ServiceConfig):
 
     GEOCODER_CONFIG_KEYS = ['google_maps_client_id', 'google_maps_api_key',
                             'geocoding_quota', 'soft_geocoding_limit',
-                            'geocoder_type', 'period_end_date',
+                            'geocoder_provider', 'period_end_date',
                             'heremaps_geocoder_app_id', 'heremaps_geocoder_app_code',
                             'mapzen_geocoder_api_key', 'username', 'orgname']
     NOKIA_GEOCODER_REDIS_MANDATORY_KEYS = ['geocoding_quota', 'soft_geocoding_limit']
@@ -320,12 +269,13 @@ class GeocoderConfig(ServiceConfig):
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
     MAPZEN_GEOCODER = 'mapzen'
     MAPZEN_GEOCODER_API_KEY = 'mapzen_geocoder_api_key'
-    GEOCODER_TYPE = 'geocoder_type'
+    GEOCODER_PROVIDER = 'geocoder_provider'
     QUOTA_KEY = 'geocoding_quota'
     SOFT_LIMIT_KEY = 'soft_geocoding_limit'
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
+    DEFAULT_PROVIDER = 'mapzen'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(GeocoderConfig, self).__init__(redis_connection, db_conn,
@@ -335,21 +285,23 @@ class GeocoderConfig(ServiceConfig):
         self.__check_config(filtered_config)
 
     def __check_config(self, filtered_config):
-        if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
+        if self._geocoder_provider == self.NOKIA_GEOCODER:
             if not set(self.NOKIA_GEOCODER_REDIS_MANDATORY_KEYS).issubset(set(filtered_config.keys())) or \
             not self.heremaps_app_id or not self.heremaps_app_code:
                 raise ConfigException("""Some mandatory parameter/s for Nokia geocoder are missing. Check it please""")
-        elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
+        elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
                 raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
-        elif filtered_config[self.GEOCODER_TYPE].lower() == self.MAPZEN_GEOCODER:
+        elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             if not self.mapzen_api_key:
                 raise ConfigException("""Mapzen config is not setted up""")
 
         return True
 
     def __parse_config(self, filtered_config, db_config):
-        self._geocoder_type = filtered_config[self.GEOCODER_TYPE].lower()
+        self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER].lower()
+        if not self._geocoder_provider:
+            self._geocoder_provider = self.DEFAULT_PROVIDER
         self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         self._log_path = db_config.geocoder_log_path
@@ -357,39 +309,39 @@ class GeocoderConfig(ServiceConfig):
             self._soft_geocoding_limit = True
         else:
             self._soft_geocoding_limit = False
-        if filtered_config[self.GEOCODER_TYPE].lower() == self.NOKIA_GEOCODER:
+        if self._geocoder_provider == self.NOKIA_GEOCODER:
             self._heremaps_app_id = db_config.heremaps_geocoder_app_id
             self._heremaps_app_code = db_config.heremaps_geocoder_app_code
             self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
-        elif filtered_config[self.GEOCODER_TYPE].lower() == self.GOOGLE_GEOCODER:
+        elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
             self._cost_per_hit = 0
-        elif filtered_config[self.GEOCODER_TYPE].lower() == self.MAPZEN_GEOCODER:
+        elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             self._mapzen_api_key = db_config.mapzen_geocoder_api_key
             self._geocoding_quota = db_config.mapzen_geocoder_monthly_quota
             self._cost_per_hit = 0
 
     @property
     def service_type(self):
-        if self._geocoder_type == self.GOOGLE_GEOCODER:
+        if self._geocoder_provider == self.GOOGLE_GEOCODER:
             return 'geocoder_google'
-        elif self._geocoder_type == self.MAPZEN_GEOCODER:
+        elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             return 'geocoder_mapzen'
-        else:
+        elif self._geocoder_provider == self.NOKIA_GEOCODER:
             return 'geocoder_here'
 
     @property
     def heremaps_geocoder(self):
-        return self._geocoder_type == self.NOKIA_GEOCODER
+        return self._geocoder_provider == self.NOKIA_GEOCODER
 
     @property
     def google_geocoder(self):
-        return self._geocoder_type == self.GOOGLE_GEOCODER
+        return self._geocoder_provider == self.GOOGLE_GEOCODER
 
     @property
     def mapzen_geocoder(self):
-        return self._geocoder_type == self.MAPZEN_GEOCODER
+        return self._geocoder_provider == self.MAPZEN_GEOCODER
 
     @property
     def google_client_id(self):
@@ -570,6 +522,9 @@ class ServicesRedisConfig:
     OBS_SNAPSHOT_QUOTA_KEY = 'obs_snapshot_quota'
     OBS_GENERAL_QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
+    GEOCODER_PROVIDER_KEY = 'geocoder_provider'
+    ISOLINES_PROVIDER_KEY = 'isolines_provider'
+    ROUTING_PROVIDER_KEY = 'routing_provider'
 
     def __init__(self, redis_conn):
         self._redis_connection = redis_conn
@@ -599,6 +554,15 @@ class ServicesRedisConfig:
                 user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
             if self.OBS_GENERAL_QUOTA_KEY in org_config:
                 user_config[self.OBS_GENERAL_QUOTA_KEY] = org_config[self.OBS_GENERAL_QUOTA_KEY]
-            user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
-            user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
-            user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
+            if self.PERIOD_END_DATE in org_config:
+                user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
+            if self.GOOGLE_GEOCODER_CLIENT_ID in org_config:
+                user_config[self.GOOGLE_GEOCODER_CLIENT_ID] = org_config[self.GOOGLE_GEOCODER_CLIENT_ID]
+            if self.GOOGLE_GEOCODER_API_KEY in org_config:
+                user_config[self.GOOGLE_GEOCODER_API_KEY] = org_config[self.GOOGLE_GEOCODER_API_KEY]
+            if self.GEOCODER_PROVIDER_KEY in org_config:
+                user_config[self.GEOCODER_PROVIDER_KEY] = org_config[self.GEOCODER_PROVIDER_KEY]
+            if self.ISOLINES_PROVIDER_KEY in org_config:
+                user_config[self.ISOLINES_PROVIDER_KEY] = org_config[self.ISOLINES_PROVIDER_KEY]
+            if self.ROUTING_PROVIDER_KEY in org_config:
+                user_config[self.ROUTING_PROVIDER_KEY] = org_config[self.ROUTING_PROVIDER_KEY]
