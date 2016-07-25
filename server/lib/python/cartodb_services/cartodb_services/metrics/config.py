@@ -541,9 +541,9 @@ class ServicesRedisConfig:
         # Not all the users have the provider key yet
         if self.GEOCODER_PROVIDER_KEY not in user_config:
             user_config[self.GEOCODER_PROVIDER_KEY] = ''
-        if not self.ISOLINES_PROVIDER_KEY not in user_config:
+        if self.ISOLINES_PROVIDER_KEY not in user_config:
             user_config[self.ISOLINES_PROVIDER_KEY] = ''
-        if not self.ROUTING_PROVIDER_KEY not in user_config:
+        if self.ROUTING_PROVIDER_KEY not in user_config:
             user_config[self.ROUTING_PROVIDER_KEY] = ''
 
         if orgname:
