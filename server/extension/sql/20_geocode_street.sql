@@ -7,15 +7,15 @@ RETURNS Geometry AS $$
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   if user_geocoder_config.heremaps_geocoder:
-    plpy.notice('Requested geocoder is heremaps')
+    plpy.debug('Requested geocoder is heremaps')
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.google_geocoder:
-    plpy.notice('Requested geocoder is google')
+    plpy.debug('Requested geocoder is google')
     google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.mapzen_geocoder:
-    plpy.notice('Requested geocoder is mapzen')
+    plpy.debug('Requested geocoder is mapzen')
     mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:

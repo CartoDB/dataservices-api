@@ -535,16 +535,18 @@ class ServicesRedisConfig:
     def __get_user_config(self, username, orgname):
         user_config = self._redis_connection.hgetall(
             "rails:users:{0}".format(username))
-        # Not all the users have the provider key yet
-        if not self.GEOCODER_PROVIDER_KEY in user_config:
-            user_config[self.GEOCODER_PROVIDER_KEY] = ''
-        if not self.ISOLINES_PROVIDER_KEY in user_config:
-            user_config[self.ISOLINES_PROVIDER_KEY] = ''
-        if not self.ROUTING_PROVIDER_KEY in user_config:
-            user_config[self.ROUTING_PROVIDER_KEY] = ''
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
-        elif orgname:
+
+        # Not all the users have the provider key yet
+        if self.GEOCODER_PROVIDER_KEY not in user_config:
+            user_config[self.GEOCODER_PROVIDER_KEY] = ''
+        if not self.ISOLINES_PROVIDER_KEY not in user_config:
+            user_config[self.ISOLINES_PROVIDER_KEY] = ''
+        if not self.ROUTING_PROVIDER_KEY not in user_config:
+            user_config[self.ROUTING_PROVIDER_KEY] = ''
+
+        if orgname:
             self.__get_organization_config(orgname, user_config)
 
         return user_config

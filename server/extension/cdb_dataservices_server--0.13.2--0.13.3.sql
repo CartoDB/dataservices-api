@@ -69,11 +69,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     plpy.error('This service is not available for google service users.')
 
   if user_isolines_config.heremaps_provider:
-    plpy.notice('Requested isolines provider is heremaps')
+    plpy.debug('Requested isolines provider is heremaps')
     here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(here_plan, [username, orgname, source, mode, range, options], 1)
   elif user_isolines_config.mapzen_provider:
-    plpy.notice('Requested isolines provider is mapzen')
+    plpy.debug('Requested isolines provider is mapzen')
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options], 1)
   else:
@@ -124,11 +124,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     plpy.error('This service is not available for google service users.')
 
   if user_isolines_config.heremaps_provider:
-    plpy.notice('Requested isolines provider is heremaps')
+    plpy.debug('Requested isolines provider is heremaps')
     here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(here_plan, [username, orgname, source, mode, range, options], 1)
   elif user_isolines_config.mapzen_provider:
-    plpy.notice('Requested isolines provider is mapzen')
+    plpy.debug('Requested isolines provider is mapzen')
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options], 1)
   else:
