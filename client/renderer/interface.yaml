@@ -147,13 +147,13 @@
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
-    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".block_group'::text" }
+    - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_get_segment_snapshot
   return_type: json
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
-    - { name: geometry_level, type: text, default: "'\"us.census.tiger\".census_tract'::text" }
+    - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getdemographicsnapshot
   return_type: SETOF JSON
@@ -202,7 +202,7 @@
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
-    - { name: overlap_type, type: text, default: "'intersects'"}
+    - { name: overlap_type, type: text, default: 'NULL'}
 
 - name: obs_getboundariesbypointandradius
   return_type: TABLE(the_geom geometry, geom_refs text)
@@ -216,7 +216,7 @@
     - { name: radius, type: numeric }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
-    - { name: overlap_type, type: text, default: "'intersects'"}
+    - { name: overlap_type, type: text, default: 'NULL'}
 
 - name: obs_getpointsbygeometry
   return_type: TABLE(the_geom geometry, geom_refs text)
@@ -229,7 +229,7 @@
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
-    - { name: overlap_type, type: text, default: "'intersects'"}
+    - { name: overlap_type, type: text, default: 'NULL'}
 
 - name: obs_getpointsbypointandradius
   return_type: TABLE(the_geom geometry, geom_refs text)
@@ -243,7 +243,7 @@
     - { name: radius, type: numeric }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
-    - { name: overlap_type, type: text, default: "'intersects'"}
+    - { name: overlap_type, type: text, default: 'NULL'}
 
 - name: obs_getmeasure
   return_type: numeric
