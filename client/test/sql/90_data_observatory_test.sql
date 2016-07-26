@@ -80,7 +80,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getboundariesbypointandradius invoked with params (%, %, %, %, %, %, %)', username, orgname, geom, radius, boundary_id, time_span, overlap_type;
@@ -88,7 +88,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getpointsbygeometry invoked with params (%, %, %, %, %, %)', username, orgname, geom, boundary_id, time_span, overlap_type;
@@ -96,7 +96,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getpointsbypointandradius invoked with params (%, %, %, %, %, %, %)', username, orgname, geom, radius, boundary_id, time_span, overlap_type;
@@ -186,7 +186,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getboundariesbygeometry invoked with params (%, %, %, %, %, %)', username, orgname, geom, boundary_id, time_span, overlap_type;

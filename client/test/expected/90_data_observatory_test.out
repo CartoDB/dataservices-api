@@ -71,21 +71,21 @@ BEGIN
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getboundariesbypointandradius invoked with params (%, %, %, %, %, %, %)', username, orgname, geom, radius, boundary_id, time_span, overlap_type;
   RETURN QUERY SELECT '0106000020E6100000010000000103000000010000001500000083A3E4D5397C52C09946938B315A44404AED45B41D7C52C0785DBF60375A444099F221A81A7C52C0D0EFFB372F5A4440B9C15087157C52C034643C4A255A4440BB438A01127C52C0DE1CAED51E5A44400FECF82F107C52C0876D8B321B5A4440510FD1E80E7C52C0C4D32B65195A44407FDAA84E077C52C0E0675C38105A444092AD2EA7047C52C08E75711B0D5A4440CF2D7425027C52C0A86DC328085A4440EFFCA204FD7B52C07E384888F259444034BC5983F77B52C0205ED72FD8594440E76F4221027C52C0F3A96395D259444081AD122C0E7C52C00ED6FF39CC594440CB63CDC8207C52C031276893C359444047205ED72F7C52C0287D21E4BC594440BD1C76DF317C52C0F8325184D4594440CD1FD3DA347C52C0B0A9F3A8F8594440C72E51BD357C52C0C3651536035A444043024697377C52C028999CDA195A444083A3E4D5397C52C09946938B315A4440'::geometry as the_geom, '36047048900'::text as geom_refs;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getpointsbygeometry invoked with params (%, %, %, %, %, %)', username, orgname, geom, boundary_id, time_span, overlap_type;
   RETURN QUERY SELECT '0101000020E610000037CB75821A7C52C0BA8784EFFD594440'::geometry as the_geom, '36047048900'::text as geom_refs;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getpointsbypointandradius (username text, orgname text, geom geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getpointsbypointandradius invoked with params (%, %, %, %, %, %, %)', username, orgname, geom, radius, boundary_id, time_span, overlap_type;
@@ -166,7 +166,7 @@ BEGIN
   RETURN QUERY SELECT 'us.census.tiger.place'::text as boundary_id, 'Incorporated places are those reported to the Census Bureau as legally in existence as of January 1, 2010, as reported in the latest Boundary and Annexation Survey (BAS), under the laws of their respective states.'::text as description, '2014'::text as timespan, 'obs_7c9493c41fa8f4bd178ab993ea3d5891c1977667'::text as tablename;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT 'intersects')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getboundariesbygeometry (username text, orgname text, geom geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
 BEGIN
   RAISE NOTICE 'cdb_dataservices_server.obs_getboundariesbygeometry invoked with params (%, %, %, %, %, %)', username, orgname, geom, boundary_id, time_span, overlap_type;
@@ -236,7 +236,7 @@ PL/pgSQL function obs_getboundarybyid(text,text,text) line 16 at SQL statement
 (1 row)
 
 SELECT obs_getboundariesbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
-NOTICE:  cdb_dataservices_client._obs_getboundariesbygeometry(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getboundariesbygeometry invoked with params (test_user, <NULL>, 0103000020E61000000100000005000000C7F8FFD37E7C52C0F860AE1175594440C7F8FFD37E7C52C0BF0E0D64E55A4440A70300E0647B52C0BF0E0D64E55A4440A70300E0647B52C0F860AE1175594440C7F8FFD37E7C52C0F860AE1175594440, us.census.tiger.census_tract, <NULL>, intersects)
+NOTICE:  cdb_dataservices_client._obs_getboundariesbygeometry(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getboundariesbygeometry invoked with params (test_user, <NULL>, 0103000020E61000000100000005000000C7F8FFD37E7C52C0F860AE1175594440C7F8FFD37E7C52C0BF0E0D64E55A4440A70300E0647B52C0BF0E0D64E55A4440A70300E0647B52C0F860AE1175594440C7F8FFD37E7C52C0F860AE1175594440, us.census.tiger.census_tract, <NULL>, <NULL>)
 CONTEXT:  PL/pgSQL function obs_getboundariesbygeometry(geometry,text,text,text) line 16 at RETURN QUERY
                                                                                                                                                                                                                                                                                                                                                                                                                                     obs_getboundariesbygeometry                                                                                                                                                                                                                                                                                                                                                                                                                                     
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ CONTEXT:  PL/pgSQL function obs_getboundariesbygeometry(geometry,text,text,text)
 (1 row)
 
 SELECT obs_getboundariesbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500, 'us.census.tiger.census_tract'::text);
-NOTICE:  cdb_dataservices_client._obs_getboundariesbypointandradius(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getboundariesbypointandradius invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 500, us.census.tiger.census_tract, <NULL>, intersects)
+NOTICE:  cdb_dataservices_client._obs_getboundariesbypointandradius(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getboundariesbypointandradius invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 500, us.census.tiger.census_tract, <NULL>, <NULL>)
 CONTEXT:  PL/pgSQL function obs_getboundariesbypointandradius(geometry,numeric,text,text,text) line 16 at RETURN QUERY
                                                                                                                                                                                                                                                                                                                                                                  obs_getboundariesbypointandradius                                                                                                                                                                                                                                                                                                                                                                  
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ CONTEXT:  PL/pgSQL function obs_getboundariesbypointandradius(geometry,numeric,t
 (1 row)
 
 SELECT obs_getpointsbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
-NOTICE:  cdb_dataservices_client._obs_getpointsbygeometry(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpointsbygeometry invoked with params (test_user, <NULL>, 0103000020E61000000100000005000000C7F8FFD37E7C52C0F860AE1175594440C7F8FFD37E7C52C0BF0E0D64E55A4440A70300E0647B52C0BF0E0D64E55A4440A70300E0647B52C0F860AE1175594440C7F8FFD37E7C52C0F860AE1175594440, us.census.tiger.census_tract, <NULL>, intersects)
+NOTICE:  cdb_dataservices_client._obs_getpointsbygeometry(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpointsbygeometry invoked with params (test_user, <NULL>, 0103000020E61000000100000005000000C7F8FFD37E7C52C0F860AE1175594440C7F8FFD37E7C52C0BF0E0D64E55A4440A70300E0647B52C0BF0E0D64E55A4440A70300E0647B52C0F860AE1175594440C7F8FFD37E7C52C0F860AE1175594440, us.census.tiger.census_tract, <NULL>, <NULL>)
 CONTEXT:  PL/pgSQL function obs_getpointsbygeometry(geometry,text,text,text) line 16 at RETURN QUERY
                      obs_getpointsbygeometry                      
 ------------------------------------------------------------------
@@ -260,7 +260,7 @@ CONTEXT:  PL/pgSQL function obs_getpointsbygeometry(geometry,text,text,text) lin
 (1 row)
 
 SELECT obs_getpointsbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500::numeric, 'us.census.tiger.census_tract'::text);
-NOTICE:  cdb_dataservices_client._obs_getpointsbypointandradius(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpointsbypointandradius invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 500, us.census.tiger.census_tract, <NULL>, intersects)
+NOTICE:  cdb_dataservices_client._obs_getpointsbypointandradius(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getpointsbypointandradius invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 500, us.census.tiger.census_tract, <NULL>, <NULL>)
 CONTEXT:  PL/pgSQL function obs_getpointsbypointandradius(geometry,numeric,text,text,text) line 16 at RETURN QUERY
                   obs_getpointsbypointandradius                   
 ------------------------------------------------------------------
