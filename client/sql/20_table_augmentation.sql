@@ -101,8 +101,8 @@ RETURNS boolean AS $$
         #   - (a) be able to write the query to grab the actual data to be executed in the remote server via pl/proxy,
         #   - (b) be able to tell OBS to free resources when done.
         ds_fdw_metadata = plpy.execute("SELECT schemaname, tabname, servername "
-            "FROM cdb_dataservices_client._OBS_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {user_schema}::text, {dbname}::text, {table_name}::text);"
-            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), user_schema=plpy.quote_literal(user_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name))
+            "FROM cdb_dataservices_client._OBS_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {user_schema}::text, {dbname}::text, {table_name}::text, {function_name}::text);"
+            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), user_schema=plpy.quote_literal(user_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name), function_name=plpy.quote_literal(function_name))
             )
 
         server_schema = ds_fdw_metadata[0]["schemaname"]
@@ -122,8 +122,8 @@ RETURNS boolean AS $$
             )
 
         # Wipe user FDW data from the server
-        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
-            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
+        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
+            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
             )
 
         # Add index to cartodb_id
@@ -161,8 +161,8 @@ RETURNS boolean AS $$
                 .format(user_schema=user_schema, table_name=table_name, temporary_table_name=temporary_table_name)
                 )
 
-            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
-                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
+            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
+                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
                 )
         return False
 $$ LANGUAGE plpythonu;
@@ -193,8 +193,8 @@ RETURNS boolean AS $$
         #   - (a) be able to write the query to grab the actual data to be executed in the remote server via pl/proxy,
         #   - (b) be able to tell OBS to free resources when done.
         ds_fdw_metadata = plpy.execute("SELECT schemaname, tabname, servername "
-            "FROM cdb_dataservices_client._OBS_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {schema}::text, {dbname}::text, {table_name}::text);"
-            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), schema=plpy.quote_literal(user_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name))
+            "FROM cdb_dataservices_client._OBS_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {schema}::text, {dbname}::text, {table_name}::text, {function_name}::text);"
+            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), schema=plpy.quote_literal(user_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name), function_name=plpy.quote_literal(function_name))
             )
 
         server_schema = ds_fdw_metadata[0]["schemaname"]
@@ -227,8 +227,8 @@ RETURNS boolean AS $$
             )
 
         # Wipe user FDW data from the server
-        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
-            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
+        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
+            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
             )
 
         return True
@@ -236,14 +236,14 @@ RETURNS boolean AS $$
         plpy.warning('Error trying to get table {0}'.format(e))
         # Wipe user FDW data from the server in case of failure if the table was connected
         if server_table_name:
-            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
-                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
+            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
+                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
                 )
         return False
 $$ LANGUAGE plpythonu;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_ConnectUserTable(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_ConnectUserTable(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text, function_name text)
 RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
     CONNECT _server_conn_str();
     TARGET cdb_dataservices_server._OBS_ConnectUserTable;
@@ -261,7 +261,7 @@ RETURNS SETOF record AS $$
     TARGET cdb_dataservices_server._OBS_FetchJoinFdwTableData;
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, server_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, server_name text, function_name text)
 RETURNS boolean AS $$
     CONNECT _server_conn_str();
     TARGET cdb_dataservices_server._OBS_DisconnectUserTable;
