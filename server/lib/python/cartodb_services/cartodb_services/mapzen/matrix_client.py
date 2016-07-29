@@ -1,5 +1,6 @@
 import requests
 import json
+from qps import qps_retry
 
 class MatrixClient:
 
@@ -30,6 +31,7 @@ class MatrixClient:
     Returns:
         A dict with one_to_many, units and locations
     """
+    @qps_retry
     def one_to_many(self, locations, costing):
         request_params = {
             'json': json.dumps({'locations': locations}),
