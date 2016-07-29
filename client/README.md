@@ -42,7 +42,9 @@ CREATE EXTENSION cdb_dataservices_client;
 
 The extension creation in the user's db requires **superuser** privileges.
 
-## User configuration
+## User database configuration
+
+After installing the client extension in a database, you will need to set up your configuration to be able to connect with the server.
 
 ```
 -- Point to the dataservices server DB (you can use a specific database for the server or your same user's):
