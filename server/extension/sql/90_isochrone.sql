@@ -11,11 +11,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.heremaps_provider:
     plpy.debug('Requested isolines provider is heremaps')
     here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-    return plpy.execute(here_plan, [username, orgname, source, mode, range, options], 1)
+    return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
   elif user_isolines_config.mapzen_provider:
     plpy.debug('Requested isolines provider is mapzen')
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-    return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options], 1)
+    return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   else:
     plpy.error('Requested isolines provider is not available')
 $$ LANGUAGE plpythonu;
