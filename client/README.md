@@ -41,3 +41,12 @@ CREATE EXTENSION cdb_dataservices_client;
 ```
 
 The extension creation in the user's db requires **superuser** privileges.
+
+## User configuration
+
+```
+-- Point to the dataservices server DB (you can use a specific database for the server or your same user's):
+SELECT CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}');
+
+SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}');
+```
