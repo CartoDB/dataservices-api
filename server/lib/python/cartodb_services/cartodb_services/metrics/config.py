@@ -15,6 +15,7 @@ class ServiceConfig(object):
         self._username = username
         self._orgname = orgname
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
+        self._environment = self._db_config._server_environment
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
                 username, orgname)
@@ -32,6 +33,10 @@ class ServiceConfig(object):
     @property
     def organization(self):
         return self._orgname
+
+    @property
+    def environment(self):
+        return self._environment
 
 class DataObservatoryConfig(ServiceConfig):
 
@@ -400,10 +405,22 @@ class ServicesDBConfig:
         return self._build()
 
     def _build(self):
+        self._get_server_config()
         self._get_here_config()
         self._get_mapzen_config()
         self._get_logger_config()
         self._get_data_observatory_config()
+
+    def _get_server_config(self):
+        server_config_json = self._get_conf('server_conf')
+        if not server_config_json:
+            self._server_environment = 'production'
+        else:
+            server_config_json = json.loads(server_config_json)
+            if 'environment' in server_config_json:
+                self._server_environment = server_config_json['environment']
+            else:
+                self._server_environment = 'production'
 
     def _get_here_config(self):
         heremaps_conf_json = self._get_conf('heremaps_conf')
@@ -459,6 +476,10 @@ class ServicesDBConfig:
             return conf[0]['conf']
         except Exception as e:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+
+    @property
+    def server_environment(self):
+        return self._server_environment
 
     @property
     def heremaps_isolines_app_id(self):
