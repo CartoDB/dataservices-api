@@ -4,17 +4,17 @@ import json
 import re
 
 
-class LoggerFactory:
+class MetricsLoggerFactory:
 
     @classmethod
     def build(self, service_config):
         if re.match('geocoder_*', service_config.service_type):
-            return GeocoderLogger(service_config)
+            return MetricsGeocoderLogger(service_config)
         else:
             return None
 
 
-class Logger(object):
+class MetricsLogger(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, file_path):
@@ -30,10 +30,10 @@ class Logger(object):
         raise NotImplementedError('log method must be defined')
 
 
-class GeocoderLogger(Logger):
+class MetricsGeocoderLogger(MetricsLogger):
 
     def __init__(self, service_config):
-        super(GeocoderLogger, self).__init__(service_config.log_path)
+        super(MetricsGeocoderLogger, self).__init__(service_config.log_path)
         self._service_config = service_config
 
     def log(self, **data):
