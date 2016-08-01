@@ -26,7 +26,7 @@ class QPSService:
             try:
                 return fn(*args, **kwargs)
             except Exception as e:
-                if hasattr(e, 'response') and (e.response.status_code == 429 or e.response.status_code == 504):
+                if hasattr(e, 'response') and (e.response.status_code == 429):
                     self.retry(start_time, attempt_number)
                 else:
                     raise e
