@@ -16,6 +16,7 @@ class ServiceConfig(object):
         self._orgname = orgname
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
         self._environment = self._db_config._server_environment
+        self._rollbar_api_key = self._db_config._rollbar_api_key
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
                 username, orgname)
@@ -33,6 +34,10 @@ class ServiceConfig(object):
     @property
     def organization(self):
         return self._orgname
+
+    @property
+    def rollbar_api_key(self):
+        return self._rollbar_api_key
 
     @property
     def environment(self):
@@ -468,6 +473,10 @@ class ServicesDBConfig:
         else:
             logger_conf = json.loads(logger_conf_json)
             self._geocoder_log_path = logger_conf['geocoder_log_path']
+            if 'rollbar_api_key' in logger_conf:
+                self._rollbar_api_key = logger_conf['rollbar_api_key']
+            else:
+                self._rollbar_api_key = None
 
     def _get_conf(self, key):
         try:
@@ -528,6 +537,10 @@ class ServicesDBConfig:
     @property
     def geocoder_log_path(self):
         return self._geocoder_log_path
+
+    @property
+    def rollbar_api_key(self):
+        return self._rollbar_api_key
 
     @property
     def data_observatory_connection_str(self):
