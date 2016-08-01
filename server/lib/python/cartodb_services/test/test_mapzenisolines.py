@@ -1,4 +1,5 @@
 import unittest
+from mock import Mock
 from cartodb_services.mapzen import MapzenIsolines
 from math import radians, cos, sin, asin, sqrt
 
@@ -9,6 +10,7 @@ This file is basically a sanity test on the algorithm.
 It uses a mocked client, which returns the cost based on a very simple model:
 just proportional to the distance from origin to the target point.
 """
+
 
 class MatrixClientMock():
 
@@ -67,7 +69,7 @@ class MapzenIsolinesTestCase(unittest.TestCase):
     def setUp(self):
         speed = 4 # in km/h
         matrix_client = MatrixClientMock(speed)
-        self.mapzen_isolines = MapzenIsolines(matrix_client)
+        self.mapzen_isolines = MapzenIsolines(matrix_client, Mock())
 
     def test_calculate_isochrone(self):
         origin = {"lat":40.744014,"lon":-73.990508}

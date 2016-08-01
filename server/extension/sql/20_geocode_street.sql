@@ -7,19 +7,16 @@ RETURNS Geometry AS $$
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   if user_geocoder_config.heremaps_geocoder:
-    plpy.debug('Requested geocoder is heremaps')
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.google_geocoder:
-    plpy.debug('Requested geocoder is google')
     google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   elif user_geocoder_config.mapzen_geocoder:
-    plpy.debug('Requested geocoder is mapzen')
     mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
-    plpy.error('Requested geocoder is not available')
+    raise Exception('Requested geocoder is not available')
 
 $$ LANGUAGE plpythonu;
 
@@ -35,7 +32,7 @@ RETURNS Geometry AS $$
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
-    plpy.error('Here geocoder is not available for your account.')
+    raise Exception('Here geocoder is not available for your account.')
 
 $$ LANGUAGE plpythonu;
 
@@ -50,7 +47,7 @@ RETURNS Geometry AS $$
     google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
-    plpy.error('Google geocoder is not available for your account.')
+    raise Exception('Google geocoder is not available for your account.')
 
 $$ LANGUAGE plpythonu;
 
@@ -71,17 +68,19 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_poin
 RETURNS Geometry AS $$
   from cartodb_services.here import HereMapsGeocoder
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
+  logger = Logger(user_geocoder_config)
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code)
+    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -92,12 +91,10 @@ RETURNS Geometry AS $$
       quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
-    import sys, traceback
-    type_, value_, traceback_ = sys.exc_info()
+    import sys
     quota_service.increment_failed_service_use()
-    error_msg = 'There was an error trying to geocode using here maps geocoder: {0}'.format(e)
-    plpy.notice(traceback.format_tb(traceback_))
-    plpy.error(error_msg)
+    logger.error('Error trying to geocode street point using here maps', sys.exc_info())
+    raise e
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -106,13 +103,16 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_po
 RETURNS Geometry AS $$
   from cartodb_services.google import GoogleMapsGeocoder
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  
+  logger = Logger(user_geocoder_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
   try:
-    geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key)
+    geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key, logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -123,12 +123,10 @@ RETURNS Geometry AS $$
       quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
-    import sys, traceback
-    type_, value_, traceback_ = sys.exc_info()
+    import sys
     quota_service.increment_failed_service_use()
-    error_msg = 'There was an error trying to geocode using google maps geocoder: {0}'.format(e)
-    plpy.notice(traceback.format_tb(traceback_))
-    plpy.error(error_msg)
+    logger.error('Error trying to geocode street point using google maps', sys.exc_info())
+    raise e
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -138,15 +136,18 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  logger = Logger(user_geocoder_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key)
+    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key, logger)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
@@ -162,12 +163,10 @@ RETURNS Geometry AS $$
       quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
-    import sys, traceback
-    type_, value_, traceback_ = sys.exc_info()
+    import sys
     quota_service.increment_failed_service_use()
-    error_msg = 'There was an error trying to geocode using mapzen geocoder: {0}'.format(e)
-    plpy.notice(traceback.format_tb(traceback_))
-    plpy.error(error_msg)
+    logger.error('Error trying to geocode street point using mapzen', sys.exc_info())
+    raise e
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

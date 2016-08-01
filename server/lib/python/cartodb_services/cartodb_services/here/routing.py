@@ -25,9 +25,11 @@ class HereMapsRoutingIsoline:
         'quality'
     ]
 
-    def __init__(self, app_id, app_code, base_url=PRODUCTION_ROUTING_BASE_URL):
+    def __init__(self, app_id, app_code, logger,
+                 base_url=PRODUCTION_ROUTING_BASE_URL):
         self._app_id = app_id
         self._app_code = app_code
+        self._logger = logger
         self._url = "{0}{1}".format(base_url, self.ISOLINE_PATH)
 
     def calculate_isodistance(self, source, mode, data_range, options=[]):
@@ -54,7 +56,12 @@ class HereMapsRoutingIsoline:
         elif response.status_code == requests.codes.bad_request:
             return []
         else:
-            response.raise_for_status()
+            self._logger.error('Error trying to calculate HERE isolines',
+                               data={"response": response.json(), "source":
+                                     source, "mode": mode, "data_range":
+                                     data_range, "range_type": range_type,
+                                     "options": options})
+            raise Exception('Error trying to calculate HERE isolines')
 
     def __parse_options(self, options):
         return dict(option.split('=') for option in options)

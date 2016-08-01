@@ -28,9 +28,10 @@ class MapzenRouting:
     METRICS_UNITS = 'kilometers'
     IMPERIAL_UNITS = 'miles'
 
-    def __init__(self, app_key, base_url=PRODUCTION_ROUTING_BASE_URL):
+    def __init__(self, app_key, logger, base_url=PRODUCTION_ROUTING_BASE_URL):
         self._app_key = app_key
         self._url = base_url
+        self._logger = logger
 
     @qps_retry
     def calculate_route_point_to_point(self, waypoints, mode,
@@ -48,7 +49,11 @@ class MapzenRouting:
         elif response.status_code == requests.codes.bad_request:
             return MapzenRoutingResponse(None, None, None)
         else:
-            response.raise_for_status()
+            self._logger.error('Error trying to calculate route using HERE',
+                               data={"response": response.json(), "waypoints":
+                                     waypoints, "mode": mode, "options":
+                                     options})
+            raise Exception('Error trying to calculate route using HERE')
 
     def __parse_options(self, options):
         return dict(option.split('=') for option in options)

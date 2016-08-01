@@ -3,6 +3,7 @@
 
 import unittest
 import requests_mock
+from mock import Mock
 from urlparse import urlparse, parse_qs
 
 from cartodb_services.here import HereMapsRoutingIsoline
@@ -127,7 +128,8 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
-        self.routing = HereMapsRoutingIsoline(None, None)
+        logger = Mock()
+        self.routing = HereMapsRoutingIsoline(None, None, logger)
         self.isoline_url = "{0}{1}".format(HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL,
                                      HereMapsRoutingIsoline.ISOLINE_PATH)
 

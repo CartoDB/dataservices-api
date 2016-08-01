@@ -17,6 +17,8 @@ class ServiceConfig(object):
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
         self._environment = self._db_config._server_environment
         self._rollbar_api_key = self._db_config._rollbar_api_key
+        self._log_file_path = self._db_config._log_file_path
+        self._min_log_level = self._db_config._min_log_level
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
                 username, orgname)
@@ -40,8 +42,17 @@ class ServiceConfig(object):
         return self._rollbar_api_key
 
     @property
+    def log_file_path(self):
+        return self._log_file_path
+
+    @property
+    def min_log_level(self):
+        return self._min_log_level
+
+    @property
     def environment(self):
         return self._environment
+
 
 class DataObservatoryConfig(ServiceConfig):
 
@@ -64,6 +75,7 @@ class DataObservatoryConfig(ServiceConfig):
     @property
     def connection_str(self):
         return self._connection_str
+
 
 class ObservatorySnapshotConfig(DataObservatoryConfig):
 
@@ -88,6 +100,7 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
     def service_type(self):
         return 'obs_snapshot'
 
+
 class ObservatoryConfig(DataObservatoryConfig):
 
     SOFT_LIMIT_KEY = 'soft_obs_general_limit'
@@ -110,6 +123,7 @@ class ObservatoryConfig(DataObservatoryConfig):
     @property
     def service_type(self):
         return 'obs_general'
+
 
 class RoutingConfig(ServiceConfig):
 
@@ -172,6 +186,7 @@ class IsolinesRoutingConfig(ServiceConfig):
         if not self._isolines_provider:
             self._isolines_provider = self.DEFAULT_PROVIDER
         self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER_KEY].lower()
+        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
             self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
@@ -184,7 +199,6 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
             self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
             self._soft_isolines_limit = False
-        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
 
     @property
     def service_type(self):
@@ -473,10 +487,15 @@ class ServicesDBConfig:
         else:
             logger_conf = json.loads(logger_conf_json)
             self._geocoder_log_path = logger_conf['geocoder_log_path']
+            self._rollbar_api_key = None
+            self._min_log_level = 'warning'
+            self._log_file_path = None
+            if 'min_log_level' in logger_conf:
+                self._min_log_level = logger_conf['min_log_level']
             if 'rollbar_api_key' in logger_conf:
                 self._rollbar_api_key = logger_conf['rollbar_api_key']
-            else:
-                self._rollbar_api_key = None
+            if 'log_file_path' in logger_conf:
+                self._log_file_path = logger_conf['log_file_path']
 
     def _get_conf(self, key):
         try:
@@ -541,6 +560,10 @@ class ServicesDBConfig:
     @property
     def rollbar_api_key(self):
         return self._rollbar_api_key
+
+    @property
+    def log_file_path(self):
+        return self._log_file_path
 
     @property
     def data_observatory_connection_str(self):

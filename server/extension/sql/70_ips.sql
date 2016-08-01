@@ -2,12 +2,14 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(u
 RETURNS Geometry AS $$
     from cartodb_services.metrics import QuotaService
     from cartodb_services.metrics import InternalGeocoderConfig
+    from cartodb_services.tools import Logger
 
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
     plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
     user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
+    logger = Logger(user_geocoder_config)
     quota_service = QuotaService(user_geocoder_config, redis_conn)
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
@@ -20,12 +22,10 @@ RETURNS Geometry AS $$
         quota_service.increment_empty_service_use()
         return None
     except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to geocode using admin0 geocoder: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to geocode postal code polygon', sys.exc_info())
+      raise e
     finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

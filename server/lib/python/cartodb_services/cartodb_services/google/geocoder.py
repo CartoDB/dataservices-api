@@ -9,11 +9,12 @@ from exceptions import MalformedResult
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret, logger):
         self.client_id = self._clean_client_id(client_id)
         self.client_secret = client_secret
         self.geocoder = googlemaps.Client(
             client_id=self.client_id, client_secret=self.client_secret)
+        self._logger = logger
 
     def geocode(self, searchtext, city=None, state=None,
                 country=None):

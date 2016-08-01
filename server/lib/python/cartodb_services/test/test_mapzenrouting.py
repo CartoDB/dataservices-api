@@ -6,6 +6,7 @@ import requests_mock
 import re
 from nose.tools import assert_raises
 from urlparse import urlparse, parse_qs
+from mock import Mock
 
 from cartodb_services.mapzen import MapzenRouting, MapzenRoutingResponse
 from cartodb_services.mapzen.exceptions import WrongParams
@@ -99,7 +100,8 @@ class MapzenRoutingTestCase(unittest.TestCase):
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
-        self.routing = MapzenRouting('api_key')
+        logger = Mock()
+        self.routing = MapzenRouting('api_key', logger)
         self.url = MapzenRouting.PRODUCTION_ROUTING_BASE_URL
 
     def test_calculate_simple_routing_with_valid_params(self, req_mock):

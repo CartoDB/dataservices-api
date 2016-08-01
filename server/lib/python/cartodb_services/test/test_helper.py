@@ -1,5 +1,7 @@
 from datetime import datetime, date
 from mock import Mock
+import sys
+sys.modules['plpy'] = Mock()
 
 
 def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
@@ -72,3 +74,5 @@ def _plpy_execute_side_effect(*args, **kwargs):
         return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]
     elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('data_observatory_conf') as conf":
         return [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}]
+    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('server_conf') as conf":
+        return [{'conf': '{"environment": "testing"}'}]

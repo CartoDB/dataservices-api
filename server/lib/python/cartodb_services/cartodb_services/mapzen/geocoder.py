@@ -12,9 +12,10 @@ class MapzenGeocoder:
 
     BASE_URL = 'https://search.mapzen.com/v1/search'
 
-    def __init__(self, app_key, base_url=BASE_URL):
+    def __init__(self, app_key, logger, base_url=BASE_URL):
         self._app_key = app_key
         self._url = base_url
+        self._logger = logger
 
     @qps_retry
     def geocode(self, searchtext, city=None, state_province=None, country=None):
@@ -25,7 +26,7 @@ class MapzenGeocoder:
         elif response.status_code == requests.codes.bad_request:
             return []
         else:
-            response.raise_for_status()
+            raise Exception('Error trying to geocode {0} using mapzen'.format(searchtext))
 
     def _build_requests_parameters(self, searchtext, city=None,
                                    state_province=None, country=None):
