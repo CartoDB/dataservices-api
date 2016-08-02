@@ -418,13 +418,13 @@ class ServicesDBConfig:
     def _get_server_config(self):
         server_config_json = self._get_conf('server_conf')
         if not server_config_json:
-            self._server_environment = 'production'
+            self._server_environment = 'development'
         else:
             server_config_json = json.loads(server_config_json)
             if 'environment' in server_config_json:
                 self._server_environment = server_config_json['environment']
             else:
-                self._server_environment = 'production'
+                self._server_environment = 'development'
 
     def _get_here_config(self):
         heremaps_conf_json = self._get_conf('heremaps_conf')

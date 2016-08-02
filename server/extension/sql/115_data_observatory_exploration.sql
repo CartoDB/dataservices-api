@@ -48,8 +48,8 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_Search', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_Search', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_Search')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -103,8 +103,8 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetMeasureById', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetMeasureById', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetMeasureById')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

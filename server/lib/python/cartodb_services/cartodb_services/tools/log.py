@@ -22,7 +22,8 @@ class Logger:
             rollbar.init(self._config.rollbar_api_key,
                         self._config.environment, handler='blocking')
         if self._log_file_activated():
-            self._file_logger = self._setup_file_logger(self._config.log_file_path)
+            self._file_logger = self._setup_file_logger(
+                self._config.log_file_path)
 
     def debug(self, text, exception=None, data={}):
         if not self._check_min_level('debug'):
@@ -82,6 +83,7 @@ class Logger:
                 self._file_logger.error(text, extra=extra_data)
 
     def _parse_log_extra_data(self, exception, data):
+        extra_data = {}
         if exception:
             type_, value_, traceback_ = exception
             exception_traceback = traceback.format_tb(traceback_)
@@ -90,7 +92,7 @@ class Logger:
                           "log_data": data}
         else:
             extra_data = {"exception_type": '', "exception_message": '',
-                          "exception_traceback": ''}
+                          "exception_traceback": '', 'log_data': ''}
 
         if data:
             extra_data['data'] = data
@@ -100,10 +102,11 @@ class Logger:
         return extra_data
 
     def _setup_file_logger(self, log_file_path):
-        format_str = "%(asctime)s %(name)-12s %(levelname)-8s %(message)s %(data)s %(exception_type)s %(exception_message)s %(exception_traceback)s"
+        logging.basicConfig(level='DEBUG')
+        formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s %(data)s %(exception_type)s %(exception_message)s %(exception_traceback)s")
         logger = logging.getLogger('dataservices_file_logger')
         handler = logging.FileHandler(log_file_path)
-        handler.setFormatter(format_str)
+        handler.setFormatter(formatter)
         handler.setLevel(self._config.min_log_level.upper())
         logger.addHandler(handler)
 

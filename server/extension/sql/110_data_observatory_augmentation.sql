@@ -61,8 +61,8 @@ RETURNS json AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to obst_get_demographic_snapshot', sys.exc_info())
-      raise e
+      logger.error('Error trying to obs_get_demographic_snapshot', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to obs_get_demographic_snapshot')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -115,8 +115,8 @@ RETURNS SETOF JSON AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to obs_get_demographic_snapshot', sys.exc_info())
-      raise e
+      logger.error('Error trying to obs_get_demographic_snapshot', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to obs_get_demographic_snapshot')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -164,8 +164,8 @@ RETURNS json AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to obs_get_segment_snapshot', sys.exc_info())
-      raise e
+      logger.error('Error trying to obs_get_segment_snapshot', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to obs_get_segment_snapshot')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -216,8 +216,8 @@ RETURNS SETOF JSON AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetSegmentSnapshot', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetSegmentSnapshot', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetSegmentSnapshot')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -270,8 +270,8 @@ RETURNS NUMERIC AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetMeasure', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetMeasure', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetMeasure')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -322,8 +322,8 @@ RETURNS TEXT AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetCategory', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetCategory', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetCategory')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -376,8 +376,8 @@ RETURNS NUMERIC AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetUSCensusMeasure', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetUSCensusMeasure', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetUSCensusMeasure')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -428,8 +428,8 @@ RETURNS TEXT AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetUSCensusCategory', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetUSCensusCategory', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetUSCensusCategory')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -480,8 +480,8 @@ RETURNS NUMERIC AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetPopulation', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetPopulation', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPopulation')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -532,8 +532,8 @@ RETURNS NUMERIC AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetMeasureById', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetMeasureById', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetMeasureById')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

@@ -25,8 +25,8 @@ RETURNS Geometry AS $$
     except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code polygon', sys.exc_info())
-      raise e
+      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

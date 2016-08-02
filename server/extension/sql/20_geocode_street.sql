@@ -94,8 +94,8 @@ RETURNS Geometry AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using here maps', sys.exc_info())
-    raise e
+    logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using here maps')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -127,8 +127,8 @@ RETURNS Geometry AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using google maps', sys.exc_info())
-    raise e
+    logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using google maps')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -168,8 +168,8 @@ RETURNS Geometry AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using mapzen', sys.exc_info())
-    raise e
+    logger.error('Error trying to geocode street point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using mapzen')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

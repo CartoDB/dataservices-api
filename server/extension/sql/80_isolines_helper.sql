@@ -50,8 +50,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to get mapzen isolines', sys.exc_info())
-    raise e
+    logger.error('Error trying to get mapzen isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;
@@ -123,8 +123,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to get mapzen isolines', sys.exc_info())
-    raise e
+    logger.error('Error trying to get mapzen isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;

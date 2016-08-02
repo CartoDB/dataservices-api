@@ -42,8 +42,8 @@ RETURNS geometry(Geometry, 4326) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundary', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetBoundary', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundary')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -92,8 +92,8 @@ RETURNS TEXT AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundaryId', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetBoundaryId', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundaryId')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -142,8 +142,8 @@ RETURNS geometry(Geometry, 4326) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundaryById', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetBoundaryById', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundaryById')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -199,8 +199,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundariesByGeometry', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetBoundariesByGeometry', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundariesByGeometry')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -258,8 +258,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundariesByPointAndRadius', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetBoundariesByPointAndRadius', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -315,8 +315,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetPointsByGeometry', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetPointsByGeometry', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPointsByGeometry')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -374,8 +374,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetPointsByPointAndRadius', sys.exc_info())
-      raise e
+      logger.error('Error trying to OBS_GetPointsByPointAndRadius', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

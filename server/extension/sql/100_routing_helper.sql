@@ -58,8 +58,8 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to get mapzen routing', sys.exc_info())
-    raise e
+    logger.error('Error trying to calculate mapzen routing', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to calculate mapzen routing')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;
