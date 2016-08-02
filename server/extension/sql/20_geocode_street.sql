@@ -68,12 +68,13 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_poin
 RETURNS Geometry AS $$
   from cartodb_services.here import HereMapsGeocoder
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger = Logger(user_geocoder_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -103,12 +104,13 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_po
 RETURNS Geometry AS $$
   from cartodb_services.google import GoogleMapsGeocoder
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
   
-  logger = Logger(user_geocoder_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
   try:
@@ -136,12 +138,13 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger = Logger(user_geocoder_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')

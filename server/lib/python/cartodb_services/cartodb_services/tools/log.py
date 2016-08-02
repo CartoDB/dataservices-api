@@ -1,9 +1,10 @@
 import plpy
 import rollbar
 import logging
+import json
 import traceback
 import sys
-# Monkey path because plpython sys module doesn't have argv and rollbar
+# Monkey patch because plpython sys module doesn't have argv and rollbar
 # package use it
 sys.__dict__['argv'] = []
 
@@ -21,7 +22,7 @@ class Logger:
             rollbar.init(self._config.rollbar_api_key,
                         self._config.environment, handler='blocking')
         if self._log_file_activated():
-            self._setup_log_file_config(self._config.log_file_path)
+            self._file_logger = self._setup_file_logger(self._config.log_file_path)
 
     def debug(self, text, exception=None, data={}):
         if not self._check_min_level('debug'):
@@ -69,15 +70,16 @@ class Logger:
                              format(e))
 
     def _send_to_log_file(self, level, text, exception, data):
-        extra_data = self._parse_log_extra_data(exception, data)
-        if level == 'debug':
-            logging.debug(text, extra=extra_data)
-        elif level == 'info':
-            logging.info(text, extra=extra_data)
-        elif level == 'warning':
-            logging.warning(text, extra=extra_data)
-        elif level == 'error':
-            logging.error(text, extra=extra_data)
+        if self._log_file_activated():
+            extra_data = self._parse_log_extra_data(exception, data)
+            if level == 'debug':
+                self._file_logger.debug(text, extra=extra_data)
+            elif level == 'info':
+                self._file_logger.info(text, extra=extra_data)
+            elif level == 'warning':
+                self._file_logger.warning(text, extra=extra_data)
+            elif level == 'error':
+                self._file_logger.error(text, extra=extra_data)
 
     def _parse_log_extra_data(self, exception, data):
         if exception:
@@ -97,12 +99,84 @@ class Logger:
 
         return extra_data
 
-    def _setup_log_file_config(self, log_file_path):
+    def _setup_file_logger(self, log_file_path):
         format_str = "%(asctime)s %(name)-12s %(levelname)-8s %(message)s %(data)s %(exception_type)s %(exception_message)s %(exception_traceback)s"
-        logging.basicConfig(filename=log_file_path, format=format_str, level=self._config.min_log_level.upper())
+        logger = logging.getLogger('dataservices_file_logger')
+        handler = logging.FileHandler(log_file_path)
+        handler.setFormatter(format_str)
+        handler.setLevel(self._config.min_log_level.upper())
+        logger.addHandler(handler)
+
+        return logger
 
     def _rollbar_activated(self):
         return True if self._config.rollbar_api_key else False
 
     def _log_file_activated(self):
         return True if self._config.log_file_path else False
+
+
+class ConfigException(Exception):
+    pass
+
+
+class LoggerConfig:
+
+    def __init__(self, db_conn):
+        self._db_conn = db_conn
+        return self._build()
+
+    def _build(self):
+        self._get_server_config()
+        self._get_logger_config()
+
+    def _get_server_config(self):
+        server_config_json = self._get_conf('server_conf')
+        if not server_config_json:
+            self._server_environment = 'development'
+        else:
+            server_config_json = json.loads(server_config_json)
+            if 'environment' in server_config_json:
+                self._server_environment = server_config_json['environment']
+            else:
+                self._server_environment = 'development'
+
+    def _get_logger_config(self):
+        logger_conf_json = self._get_conf('logger_conf')
+        if not logger_conf_json:
+            raise ConfigException('Logger configuration missing')
+        else:
+            logger_conf = json.loads(logger_conf_json)
+            self._rollbar_api_key = None
+            self._min_log_level = 'warning'
+            self._log_file_path = None
+            if 'min_log_level' in logger_conf:
+                self._min_log_level = logger_conf['min_log_level']
+            if 'rollbar_api_key' in logger_conf:
+                self._rollbar_api_key = logger_conf['rollbar_api_key']
+            if 'log_file_path' in logger_conf:
+                self._log_file_path = logger_conf['log_file_path']
+
+    def _get_conf(self, key):
+        try:
+            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
+            conf = self._db_conn.execute(sql, 1)
+            return conf[0]['conf']
+        except Exception as e:
+            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+
+    @property
+    def environment(self):
+        return self._server_environment
+
+    @property
+    def rollbar_api_key(self):
+        return self._rollbar_api_key
+
+    @property
+    def log_file_path(self):
+        return self._log_file_path
+
+    @property
+    def min_log_level(self):
+        return self._min_log_level

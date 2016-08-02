@@ -17,14 +17,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
   time_span TEXT DEFAULT NULL)
 RETURNS geometry(Geometry, 4326) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -66,14 +67,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
   time_span TEXT DEFAULT NULL)
 RETURNS TEXT AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -115,14 +117,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
   time_span TEXT DEFAULT NULL)
 RETURNS geometry(Geometry, 4326) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -166,14 +169,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -224,14 +228,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRa
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -280,14 +285,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -338,14 +344,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')

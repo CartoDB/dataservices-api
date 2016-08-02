@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS json AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
   import json
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -43,7 +43,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -85,14 +86,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS SETOF JSON AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -136,7 +138,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS json AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
   import json
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -144,7 +146,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -184,14 +187,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   geometry_level TEXT DEFAULT NULL)
 RETURNS SETOF JSON AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -241,14 +245,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -292,14 +297,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetCategory(
   time_span TEXT DEFAULT NULL)
 RETURNS TEXT AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -345,14 +351,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -396,14 +403,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusCategory(
   time_span TEXT DEFAULT NULL)
 RETURNS TEXT AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -447,14 +455,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -498,14 +507,15 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasureById(
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger = Logger(user_obs_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')

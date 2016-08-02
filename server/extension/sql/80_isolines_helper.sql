@@ -6,12 +6,13 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.here import HereMapsRoutingIsoline
   from cartodb_services.metrics import QuotaService
   from cartodb_services.here.types import geo_polyline_to_multipolygon
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  logger = Logger(user_isolines_routing_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -68,12 +69,13 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapzen import MatrixClient, MapzenIsolines
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  logger = Logger(user_isolines_routing_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():

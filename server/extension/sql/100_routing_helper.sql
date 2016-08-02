@@ -17,12 +17,13 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.mapzen.types import polyline_to_linestring
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Coordinate
-  from cartodb_services.tools import Logger
+  from cartodb_services.tools import Logger,LoggerConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_routing_config = GD["user_routing_config_{0}".format(username)]
 
-  logger = Logger(user_routing_config)
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
 
   quota_service = QuotaService(user_routing_config, redis_conn)
   if not quota_service.check_user_quota():
