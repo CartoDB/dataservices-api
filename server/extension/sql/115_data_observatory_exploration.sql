@@ -15,15 +15,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_Search(
   relevant_boundary TEXT DEFAULT NULL)
 RETURNS TABLE(id text, description text, name text, aggregate text, source text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_Search($1, $2, $3, $4);", ["text", "text", "text", "text"])
@@ -43,12 +46,10 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
         quota_service.increment_empty_service_use()
         return [None, None, None, None, None]
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_Search: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_Search', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_Search')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -70,15 +71,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableBoundaries(
   time_span TEXT DEFAULT NULL)
 RETURNS TABLE(boundary_id text, description text, time_span text, tablename text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetAvailableBoundaries($1, $2, $3, $4) as available_boundaries;", ["text", "text", "geometry(Geometry, 4326)", "text"])
@@ -97,12 +101,10 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
         quota_service.increment_empty_service_use()
         return []
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetAvailableBoundaries: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetMeasureById', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetMeasureById')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

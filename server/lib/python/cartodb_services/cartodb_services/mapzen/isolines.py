@@ -1,5 +1,5 @@
 from math import cos, sin, tan, sqrt, pi, radians, degrees, asin, atan2
-import logging
+
 
 class MapzenIsolines:
 
@@ -9,8 +9,9 @@ class MapzenIsolines:
 
     EARTH_RADIUS_METERS = 6367444
 
-    def __init__(self, matrix_client):
+    def __init__(self, matrix_client, logger):
         self._matrix_client = matrix_client
+        self._logger = logger
 
     """Get an isochrone using mapzen API.
 
@@ -85,11 +86,7 @@ class MapzenIsolines:
     def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable, unit_factor=1.0):
 
         # NOTE: not for production
-        #logging.basicConfig(level=logging.DEBUG, filename='/tmp/isolines.log')
-        #logging.basicConfig(level=logging.DEBUG)
-        logging.debug('origin = %s' % origin)
-        logging.debug('costing_model = %s' % costing_model)
-        logging.debug('isorange = %d' % isorange)
+        self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
 
         # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
         # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
@@ -114,7 +111,7 @@ class MapzenIsolines:
                 else:
                     costs[idx] = isorange
 
-            logging.debug('i = %d, costs = %s' % (i, costs))
+            # self._logger.debug('i = %d, costs = %s' % (i, costs))
 
             errors = [(cost - isorange) / float(isorange) for cost in costs]
             max_abs_error = max([abs(e) for e in errors])

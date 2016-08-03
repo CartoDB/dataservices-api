@@ -10,7 +10,7 @@ NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
 
 REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 TEST_DIR = test/
-REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)'
+REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)' --user='postgres'
 
 # DATA is a special variable used by postgres build infrastructure
 # These are the files to be installed in the server shared dir,

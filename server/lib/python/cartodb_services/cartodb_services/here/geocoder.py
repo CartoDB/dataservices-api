@@ -47,10 +47,11 @@ class HereMapsGeocoder:
         'strictlanguagemode'
         ] + ADDRESS_PARAMS
 
-    def __init__(self, app_id, app_code, maxresults=DEFAULT_MAXRESULTS,
+    def __init__(self, app_id, app_code, logger, maxresults=DEFAULT_MAXRESULTS,
                  gen=DEFAULT_GEN, host=PRODUCTION_GEOCODE_JSON_URL):
         self.app_id = app_id
         self.app_code = app_code
+        self._logger = logger
         self.maxresults = maxresults
         self.gen = gen
         self.host = host
@@ -88,9 +89,15 @@ class HereMapsGeocoder:
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
         elif response.status_code == requests.codes.bad_request:
+            self._logger.warning('Error 4xx trying to geocode street using HERE',
+                               data={"response": response.json(), "params":
+                                     params})
             return []
         else:
-            response.raise_for_status()
+            self._logger.error('Error trying to geocode street using HERE',
+                               data={"response": response.json(), "params":
+                                     params})
+            raise Exception('Error trying to geocode street using Here')
 
     def _extract_lng_lat_from_result(self, result):
         location = result['Location']

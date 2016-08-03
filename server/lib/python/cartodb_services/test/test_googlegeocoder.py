@@ -3,6 +3,7 @@
 
 import unittest
 import requests_mock
+from mock import Mock
 
 from cartodb_services.google import GoogleMapsGeocoder
 from cartodb_services.google.exceptions import BadGeocodingParams
@@ -89,8 +90,9 @@ class GoogleGeocoderTestCase(unittest.TestCase):
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
+        logger = Mock()
         self.geocoder = GoogleMapsGeocoder('dummy_client_id',
-                                 'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E')
+                                 'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E', logger)
 
     def test_geocode_address_with_valid_params(self, req_mock):
         req_mock.register_uri('GET', self.GOOGLE_MAPS_GEOCODER_URL,
