@@ -15,6 +15,7 @@ class ServiceConfig(object):
         self._username = username
         self._orgname = orgname
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
+        self._environment = self._db_config._server_environment
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
                 username, orgname)
@@ -32,6 +33,11 @@ class ServiceConfig(object):
     @property
     def organization(self):
         return self._orgname
+
+    @property
+    def environment(self):
+        return self._environment
+
 
 class DataObservatoryConfig(ServiceConfig):
 
@@ -54,6 +60,7 @@ class DataObservatoryConfig(ServiceConfig):
     @property
     def connection_str(self):
         return self._connection_str
+
 
 class ObservatorySnapshotConfig(DataObservatoryConfig):
 
@@ -78,6 +85,7 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
     def service_type(self):
         return 'obs_snapshot'
 
+
 class ObservatoryConfig(DataObservatoryConfig):
 
     SOFT_LIMIT_KEY = 'soft_obs_general_limit'
@@ -100,6 +108,7 @@ class ObservatoryConfig(DataObservatoryConfig):
     @property
     def service_type(self):
         return 'obs_general'
+
 
 class RoutingConfig(ServiceConfig):
 
@@ -162,6 +171,7 @@ class IsolinesRoutingConfig(ServiceConfig):
         if not self._isolines_provider:
             self._isolines_provider = self.DEFAULT_PROVIDER
         self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER_KEY].lower()
+        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
             self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
@@ -174,7 +184,6 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
             self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
             self._soft_isolines_limit = False
-        self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
 
     @property
     def service_type(self):
@@ -400,10 +409,22 @@ class ServicesDBConfig:
         return self._build()
 
     def _build(self):
+        self._get_server_config()
         self._get_here_config()
         self._get_mapzen_config()
         self._get_logger_config()
         self._get_data_observatory_config()
+
+    def _get_server_config(self):
+        server_config_json = self._get_conf('server_conf')
+        if not server_config_json:
+            self._server_environment = 'development'
+        else:
+            server_config_json = json.loads(server_config_json)
+            if 'environment' in server_config_json:
+                self._server_environment = server_config_json['environment']
+            else:
+                self._server_environment = 'development'
 
     def _get_here_config(self):
         heremaps_conf_json = self._get_conf('heremaps_conf')
@@ -459,6 +480,10 @@ class ServicesDBConfig:
             return conf[0]['conf']
         except Exception as e:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+
+    @property
+    def server_environment(self):
+        return self._server_environment
 
     @property
     def heremaps_isolines_app_id(self):

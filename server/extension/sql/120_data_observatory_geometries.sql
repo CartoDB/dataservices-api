@@ -17,15 +17,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
   time_span TEXT DEFAULT NULL)
 RETURNS geometry(Geometry, 4326) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundary($1, $2, $3, $4) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
@@ -37,12 +40,10 @@ RETURNS geometry(Geometry, 4326) AS $$
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetBoundary: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetBoundary', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundary')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -66,15 +67,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
   time_span TEXT DEFAULT NULL)
 RETURNS TEXT AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryId($1, $2, $3, $4, $5) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
@@ -86,12 +90,10 @@ RETURNS TEXT AS $$
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use obs_search: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetBoundaryId', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundaryId')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -115,15 +117,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
   time_span TEXT DEFAULT NULL)
 RETURNS geometry(Geometry, 4326) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryById($1, $2, $3, $4, $5) as boundary;", ["text", "text", "text", "text", "text"])
@@ -135,12 +140,10 @@ RETURNS geometry(Geometry, 4326) AS $$
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetBoundaryById: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetBoundaryById', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundaryById')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -166,15 +169,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetBoundariesByGeometry($1, $2, $3, $4, $5, $6) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text", "text"])
@@ -191,12 +197,10 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         quota_service.increment_empty_service_use()
         return []
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetBoundariesByGeometry: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetBoundariesByGeometry', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundariesByGeometry')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -224,15 +228,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRa
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius($1, $2, $3, $4, $5, $6, $7) as boundary;", ["text", "text", "geometry(Point, 4326)", "numeric", "text", "text", "text"])
@@ -249,12 +256,10 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         quota_service.increment_empty_service_use()
         return []
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetBoundariesByPointAndRadius: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetBoundariesByPointAndRadius', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -280,15 +285,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetPointsByGeometry($1, $2, $3, $4, $5, $6) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text", "text"])
@@ -305,12 +313,10 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         quota_service.increment_empty_service_use()
         return []
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetPointsByGeometry: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetPointsByGeometry', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPointsByGeometry')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
@@ -338,15 +344,18 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius
   overlap_type TEXT DEFAULT 'intersects')
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
+  logger_config = LoggerConfig(plpy)
+  logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
-    plpy.error('You have reached the limit of your quota')
+    raise Exception('You have reached the limit of your quota')
 
   try:
       obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetPointsByPointAndRadius($1, $2, $3, $4, $5, $6, $7) as boundary;", ["text", "text", "geometry(Point, 4326)", "numeric", "text", "text", "text"])
@@ -363,12 +372,10 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
-      import sys, traceback
-      type_, value_, traceback_ = sys.exc_info()
+      import sys
       quota_service.increment_failed_service_use()
-      error_msg = 'There was an error trying to use OBS_GetPointsByPointAndRadius: {0}'.format(e)
-      plpy.notice(traceback.format_tb(traceback_))
-      plpy.error(error_msg)
+      logger.error('Error trying to OBS_GetPointsByPointAndRadius', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;

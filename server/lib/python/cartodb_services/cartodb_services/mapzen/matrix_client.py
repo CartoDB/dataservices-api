@@ -2,6 +2,7 @@ import requests
 import json
 from qps import qps_retry
 
+
 class MatrixClient:
 
     """
@@ -18,8 +19,9 @@ class MatrixClient:
 
     ONE_TO_MANY_URL = 'https://matrix.mapzen.com/one_to_many'
 
-    def __init__(self, matrix_key):
+    def __init__(self, matrix_key, logger):
         self._matrix_key = matrix_key
+        self._logger = logger
 
     """Get distances and times to a set of locations.
     See https://mapzen.com/documentation/matrix/api-reference/
@@ -40,6 +42,10 @@ class MatrixClient:
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params)
 
-        response.raise_for_status() # raise exception if not 200 OK
+        if not requests.codes.ok:
+            self._logger.error('Error trying to get matrix distance from mapzen',
+                               data={"response": response.json(), "locations":
+                                     locations, "costing": costing})
+            raise Exception('Error trying to get matrix distance from mapzen')
 
         return response.json()

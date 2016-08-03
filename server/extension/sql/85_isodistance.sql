@@ -6,18 +6,16 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
 
   if user_isolines_config.google_services_user:
-    plpy.error('This service is not available for google service users.')
+    raise Exception('This service is not available for google service users.')
 
   if user_isolines_config.heremaps_provider:
-    plpy.debug('Requested isolines provider is heremaps')
     here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
   elif user_isolines_config.mapzen_provider:
-    plpy.debug('Requested isolines provider is mapzen')
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
     return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   else:
-    plpy.error('Requested isolines provider is not available')
+    raise Exception('Requested isolines provider is not available')
 $$ LANGUAGE plpythonu;
 
 -- heremaps isodistance

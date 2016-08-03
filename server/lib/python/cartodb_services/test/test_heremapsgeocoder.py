@@ -3,6 +3,7 @@
 
 import unittest
 import requests_mock
+from mock import Mock
 
 from cartodb_services.here import HereMapsGeocoder
 from cartodb_services.here.exceptions import BadGeocodingParams
@@ -102,7 +103,8 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
-        self.geocoder = HereMapsGeocoder(None, None)
+        logger = Mock()
+        self.geocoder = HereMapsGeocoder(None, None, logger)
 
     def test_geocode_address_with_valid_params(self, req_mock):
         req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,

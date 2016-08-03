@@ -1,5 +1,5 @@
 from user import UserMetricsService
-from log import LoggerFactory
+from log import MetricsLoggerFactory
 from datetime import date
 import re
 
@@ -14,7 +14,7 @@ class QuotaService:
                                            redis_connection)
         self._user_service = UserMetricsService(self._user_service_config,
                                                 redis_connection)
-        self._logger = LoggerFactory.build(user_service_config)
+        self._metrics_logger = MetricsLoggerFactory.build(user_service_config)
 
     def check_user_quota(self):
         return self._quota_checker.check()
@@ -48,11 +48,11 @@ class QuotaService:
             amount=amount)
 
     def _log_service_process(self, event):
-        if self._logger:
+        if self._metrics_logger:
             if event is 'success' or event is 'empty':
-                self._logger.log(success=True)
+                self._metrics_logger.log(success=True)
             elif event is 'empty':
-                self._logger.log(success=False)
+                self._metrics_logger.log(success=False)
 
 
 class QuotaChecker:
