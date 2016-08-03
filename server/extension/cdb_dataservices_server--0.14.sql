@@ -25,7 +25,8 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_routing_config = GD["user_routing_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
   quota_service = QuotaService(user_routing_config, redis_conn)
@@ -167,7 +168,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -217,7 +219,8 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -270,7 +273,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -318,7 +322,8 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -376,7 +381,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -428,7 +434,8 @@ RETURNS TEXT AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -482,7 +489,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -534,7 +542,8 @@ RETURNS TEXT AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -586,7 +595,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -638,7 +648,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -685,7 +696,8 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -741,7 +753,8 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -797,7 +810,8 @@ RETURNS geometry(Geometry, 4326) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -847,7 +861,8 @@ RETURNS TEXT AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -897,7 +912,8 @@ RETURNS geometry(Geometry, 4326) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -949,7 +965,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -1008,7 +1025,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -1065,7 +1083,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -1124,7 +1143,8 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -1193,6 +1213,18 @@ RETURNS text AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.obs_dumpversion();
 $$ LANGUAGE plproxy;
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_logger_config()
+RETURNS boolean AS $$
+  cache_key = "logger_config"
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.tools import LoggerConfig
+    logger_config = LoggerConfig(plpy)
+    GD[cache_key] = logger_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
@@ -1351,7 +1383,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
@@ -1387,7 +1420,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
   
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
@@ -1421,7 +1455,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -1453,35 +1488,36 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon(trim($1)) AS mypolygon", ["text"])
-      rv = plpy.execute(plan, [country_name], 1)
-      result = rv[0]["mypolygon"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode admin0 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode admin0 polygon')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon(trim($1)) AS mypolygon", ["text"])
+    rv = plpy.execute(plan, [country_name], 1)
+    result = rv[0]["mypolygon"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode admin0 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode admin0 polygon')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 
@@ -1506,35 +1542,36 @@ $$ LANGUAGE plpgsql;
 ---- cdb_geocode_admin1_polygon(admin1_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon(trim($1)) AS mypolygon", ["text"])
-      rv = plpy.execute(plan, [admin1_name], 1)
-      result = rv[0]["mypolygon"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode admin1 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode admin1 polygon')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon(trim($1)) AS mypolygon", ["text"])
+    rv = plpy.execute(plan, [admin1_name], 1)
+    result = rv[0]["mypolygon"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode admin1 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode admin1 polygon')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
@@ -1549,7 +1586,8 @@ RETURNS Geometry AS $$
     plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
     user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
+    plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+    logger_config = GD["logger_config"]
     logger = Logger(logger_config)
     quota_service = QuotaService(user_geocoder_config, redis_conn)
     try:
@@ -1627,104 +1665,107 @@ $$ LANGUAGE plpgsql;
 ---- cdb_geocode_namedplace_point(city_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1)) AS mypoint", ["text"])
-      rv = plpy.execute(plan, [city_name], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode namedplace point')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1)) AS mypoint", ["text"])
+    rv = plpy.execute(plan, [city_name], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode namedplace point')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2)) AS mypoint", ["text", "text"])
-      rv = plpy.execute(plan, [city_name, country_name], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode namedplace point')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2)) AS mypoint", ["text", "text"])
+    rv = plpy.execute(plan, [city_name, country_name], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode namedplace point')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
-      rv = plpy.execute(plan, [city_name, admin1_name, country_name], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode namedplace point')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
+    rv = plpy.execute(plan, [city_name, admin1_name, country_name], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode namedplace point', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode namedplace point')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
@@ -1797,134 +1838,138 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
-      rv = plpy.execute(plan, [code], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode postal code point')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
+    rv = plpy.execute(plan, [code], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode postal code point')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1), trim($2)) AS mypoint", ["TEXT", "TEXT"])
-      rv = plpy.execute(plan, [code, country], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode postal code point')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1), trim($2)) AS mypoint", ["TEXT", "TEXT"])
+    rv = plpy.execute(plan, [code, country], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode postal code point')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1)) AS mypolygon", ["text"])
-      rv = plpy.execute(plan, [code], 1)
-      result = rv[0]["mypolygon"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode postal code polygon')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1)) AS mypolygon", ["text"])
+    rv = plpy.execute(plan, [code], 1)
+    result = rv[0]["mypolygon"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode postal code polygon')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1), trim($2)) AS mypolygon", ["TEXT", "TEXT"])
-      rv = plpy.execute(plan, [code, country], 1)
-      result = rv[0]["mypolygon"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode postal code polygon')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1), trim($2)) AS mypolygon", ["TEXT", "TEXT"])
+    rv = plpy.execute(plan, [code, country], 1)
+    result = rv[0]["mypolygon"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode postal code polygon')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
@@ -2024,35 +2069,36 @@ END
 $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
-    from cartodb_services.metrics import QuotaService
-    from cartodb_services.metrics import InternalGeocoderConfig
-    from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.tools import Logger,LoggerConfig
 
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-    plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-    user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
 
-    logger_config = LoggerConfig(plpy)
-    logger = Logger(logger_config)
-    quota_service = QuotaService(user_geocoder_config, redis_conn)
-    try:
-      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
-      rv = plpy.execute(plan, [ip], 1)
-      result = rv[0]["mypoint"]
-      if result:
-        quota_service.increment_success_service_use()
-        return result
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode postal code polygon')
-    finally:
-      quota_service.increment_total_service_use()
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  try:
+    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
+    rv = plpy.execute(plan, [ip], 1)
+    result = rv[0]["mypoint"]
+    if result:
+      quota_service.increment_success_service_use()
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode postal code polygon')
+  finally:
+    quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
@@ -2098,7 +2144,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
@@ -2161,7 +2208,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)

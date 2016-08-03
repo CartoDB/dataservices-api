@@ -1,3 +1,15 @@
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_logger_config()
+RETURNS boolean AS $$
+  cache_key = "logger_config"
+  if cache_key in GD:
+    return False
+  else:
+    from cartodb_services.tools import LoggerConfig
+    logger_config = LoggerConfig(plpy)
+    GD[cache_key] = logger_config
+    return True
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)

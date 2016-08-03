@@ -22,7 +22,8 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -78,7 +79,8 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():

@@ -43,7 +43,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -93,7 +94,8 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -146,7 +148,8 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -194,7 +197,8 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_snapshot_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -252,7 +256,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -304,7 +309,8 @@ RETURNS TEXT AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -358,7 +364,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -410,7 +417,8 @@ RETURNS TEXT AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -462,7 +470,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -514,7 +523,8 @@ RETURNS NUMERIC AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_obs_config, redis_conn)
   if not quota_service.check_user_quota():

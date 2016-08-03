@@ -73,7 +73,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
@@ -109,7 +110,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
   
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
@@ -143,7 +145,8 @@ RETURNS Geometry AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  logger_config = LoggerConfig(plpy)
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():

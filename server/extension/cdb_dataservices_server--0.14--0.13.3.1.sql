@@ -4,6 +4,8 @@
 
 -- HERE goes your code to upgrade/downgrade
 
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_logger_config();
+
 -- Geocoding street
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
