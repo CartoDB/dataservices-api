@@ -34,7 +34,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     client = MapzenRouting(user_routing_config.mapzen_api_key, logger)
 
     if not waypoints or len(waypoints) < 2:
-      logger.notice("Empty origin or destination")
+      logger.info("Empty origin or destination")
       quota_service.increment_empty_service_use()
       return [None, None, None]
 
