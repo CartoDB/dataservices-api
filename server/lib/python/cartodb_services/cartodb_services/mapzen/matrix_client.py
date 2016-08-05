@@ -44,7 +44,7 @@ class MatrixClient:
 
         if not requests.codes.ok:
             self._logger.error('Error trying to get matrix distance from mapzen',
-                               data={"response": response.json(), "locations":
+                               data={"response": response, "locations":
                                      locations, "costing": costing})
             raise Exception('Error trying to get matrix distance from mapzen')
 
