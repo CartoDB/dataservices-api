@@ -231,7 +231,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
   orgname TEXT,
   geom geometry(Geometry, 4326),
   measure_id TEXT,
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
@@ -244,7 +244,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   orgname TEXT,
   geom geometry(Geometry, 4326),
   measure_id TEXT,
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
@@ -339,7 +339,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
   orgname TEXT,
   geom geometry(Geometry, 4326),
   name TEXT,
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
@@ -352,7 +352,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   orgname TEXT,
   geom geometry(Geometry, 4326),
   name TEXT,
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
@@ -446,7 +446,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$
@@ -458,7 +458,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
   orgname TEXT,
   geom geometry(Geometry, 4326),
-  normalize TEXT DEFAULT 'area',
+  normalize TEXT DEFAULT NULL,
   boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
 RETURNS NUMERIC AS $$

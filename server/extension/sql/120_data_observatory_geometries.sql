@@ -157,7 +157,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
   geom geometry(Point, 4326),
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type text DEFAULT 'intersects')
+  overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByGeometry(geom, boundary_id, time_span, overlap_type);
@@ -169,7 +169,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   geom geometry(Point, 4326),
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -216,7 +216,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndR
   radius NUMERIC,
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
@@ -229,7 +229,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRa
   radius NUMERIC,
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -275,7 +275,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
   geom geometry(Point, 4326),
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByGeometry(geom, boundary_id, time_span, overlap_type);
@@ -287,7 +287,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   geom geometry(Point, 4326),
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -334,7 +334,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadiu
   radius NUMERIC,
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
@@ -347,7 +347,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius
   radius NUMERIC,
   boundary_id TEXT,
   time_span TEXT DEFAULT NULL,
-  overlap_type TEXT DEFAULT 'intersects')
+  overlap_type TEXT DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
