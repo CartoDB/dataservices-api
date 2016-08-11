@@ -1,21 +1,30 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundary(
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.14.2'" to load this file. \quit
+
+-- HERE goes your code to upgrade/downgrade
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
   username TEXT,
   orgname TEXT,
-  geom geometry(Point, 4326),
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  measure_id TEXT,
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS geometry(Geometry, 4326) AS $$
+RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_observatory.OBS_GetBoundary(geom, boundary_id, time_span);
+  SELECT cdb_observatory.OBS_GetMeasure(geom, measure_id, normalize, boundary_id, time_span);
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   username TEXT,
   orgname TEXT,
-  geom geometry(Point, 4326),
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  measure_id TEXT,
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS geometry(Geometry, 4326) AS $$
+RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
 
@@ -32,41 +41,45 @@ RETURNS geometry(Geometry, 4326) AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundary($1, $2, $3, $4) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
-      result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span])
+      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetMeasure($1, $2, $3, $4, $5, $6, $7) as measure;", ["text", "text", "geometry(Geometry, 4326)", "text", "text", "text", "text"])
+      result = plpy.execute(obs_plan, [username, orgname, geom, measure_id, normalize, boundary_id, time_span])
       if result:
         quota_service.increment_success_service_use()
-        return result[0]['boundary']
+        return result[0]['measure']
       else:
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundary', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to OBS_GetBoundary')
+      logger.error('Error trying to OBS_GetMeasure', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetMeasure')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
   username TEXT,
   orgname TEXT,
-  geom geometry(Point, 4326),
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  name TEXT,
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS TEXT AS $$
+RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_observatory.OBS_GetBoundaryId(geom, boundary_id, time_span);
+  SELECT cdb_observatory.OBS_GetUSCensusMeasure(geom, name, normalize, boundary_id, time_span);
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   username TEXT,
   orgname TEXT,
-  geom geometry(Point, 4326),
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  name TEXT,
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS TEXT AS $$
+RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
 
@@ -83,41 +96,43 @@ RETURNS TEXT AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryId($1, $2, $3, $4, $5) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
-      result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span])
+      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetUSCensusMeasure($1, $2, $3, $4, $5, $6, $7) as census_measure;", ["text", "text", "geometry(Geometry, 4326)", "text", "text", "text", "text"])
+      result = plpy.execute(obs_plan, [username, orgname, geom, name, normalize, boundary_id, time_span])
       if result:
         quota_service.increment_success_service_use()
-        return result[0]['boundary']
+        return result[0]['census_measure']
       else:
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundaryId', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to OBS_GetBoundaryId')
+      logger.error('Error trying to OBS_GetUSCensusMeasure', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetUSCensusMeasure')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
   username TEXT,
   orgname TEXT,
-  geometry_id TEXT,
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS geometry(Geometry, 4326) AS $$
+RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_observatory.OBS_GetBoundaryById(geometry_id, boundary_id, time_span);
+  SELECT cdb_observatory.OBS_GetPopulation(geom, normalize, boundary_id, time_span);
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
   orgname TEXT,
-  geometry_id TEXT,
-  boundary_id TEXT,
+  geom geometry(Geometry, 4326),
+  normalize TEXT DEFAULT NULL,
+  boundary_id TEXT DEFAULT NULL,
   time_span TEXT DEFAULT NULL)
-RETURNS geometry(Geometry, 4326) AS $$
+RETURNS NUMERIC AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
 
@@ -134,19 +149,19 @@ RETURNS geometry(Geometry, 4326) AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryById($1, $2, $3, $4, $5) as boundary;", ["text", "text", "text", "text", "text"])
-      result = plpy.execute(obs_plan, [username, orgname, geometry_id, boundary_id, time_span])
+      obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetPopulation($1, $2, $3, $4, $5, $6) as population;", ["text", "text", "geometry(Geometry, 4326)", "text", "text", "text"])
+      result = plpy.execute(obs_plan, [username, orgname, geom, normalize, boundary_id, time_span])
       if result:
         quota_service.increment_success_service_use()
-        return result[0]['boundary']
+        return result[0]['population']
       else:
         quota_service.increment_empty_service_use()
         return None
   except BaseException as e:
       import sys
       quota_service.increment_failed_service_use()
-      logger.error('Error trying to OBS_GetBoundaryById', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to OBS_GetBoundaryById')
+      logger.error('Error trying to OBS_GetPopulation', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to OBS_GetPopulation')
   finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
