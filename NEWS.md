@@ -1,4 +1,32 @@
+July 28, 2016
+===========
+* Release server 0.13.3.1
+* Fixed limit to 1 row for isolines with multiple range
 
+https://github.com/CartoDB/dataservices-api/releases/tag/0.13.3.1-server
+
+July 25, 2016
+===========
+* Release client 0.10.1
+* Includes an update of the `__AugmentTable` function of the client which creates an index on `cartodb_id` for the temporary table that stores the augmented results that will be afterwards joined with the original table by using this same key, `cartodb_id`.
+
+https://github.com/CartoDB/dataservices-api/releases/tag/0.10.1-client
+
+July 25, 2016
+===========
+* Release server 0.13.3
+* Add provider per service
+* Default provider in case the provider is not setted
+* Refactor and improvements in the multiprovider services functions
+
+https://github.com/CartoDB/dataservices-api/releases/tag/0.13.3-server
+
+July 22, 2016
+===========
+* Release server 0.13.2
+* Fixes bug with multirange isolines #233
+
+https://github.com/CartoDB/dataservices-api/releases/tag/0.13.2-server
 
 July 15, 2016:
 ===========
