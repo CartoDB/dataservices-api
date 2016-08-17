@@ -230,7 +230,7 @@ Apr 14, 2016:
 
 https://github.com/CartoDB/dataservices-api/releases/tag/0.6.1-server
 
-Apr 1, 2016: https://github.com/CartoDB/dataservices-api/releases/tag/0.6.0.1-server
+Apr 1, 2016:
 ===========
 * Release server 0.6.0.1
 * Use specific isoline routing credentials for a provider for isoline functions, which were previously using the general credentials from the provider.
