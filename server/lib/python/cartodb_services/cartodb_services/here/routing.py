@@ -57,9 +57,14 @@ class HereMapsRoutingIsoline:
             return []
         else:
             self._logger.error('Error trying to calculate HERE isolines',
-                               data={"response": response.json(), "source":
-                                     source, "mode": mode, "data_range":
-                                     data_range, "range_type": range_type,
+                               data={"response_status": response.status_code,
+                                     "response_reason": response.reason,
+                                     "response_content": response.text,
+                                     "reponse_url": response.url,
+                                     "response_headers": response.headers,
+                                     "source": source, "mode": mode,
+                                     "data_range": data_range,
+                                     "range_type": range_type,
                                      "options": options})
             raise Exception('Error trying to calculate HERE isolines')
 
