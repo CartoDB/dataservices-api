@@ -19,14 +19,32 @@ class MapzenGeocoder:
 
     @qps_retry
     def geocode(self, searchtext, city=None, state_province=None, country=None):
-        request_params = self._build_requests_parameters(searchtext, city, state_province, country)
-        response = requests.get(self._url, params=request_params)
-        if response.status_code == requests.codes.ok:
-            return self.__parse_response(response.text)
-        elif response.status_code == requests.codes.bad_request:
+        request_params = self._build_requests_parameters(searchtext, city,
+                                                         state_province,
+                                                         country)
+        try:
+            response = requests.get(self._url, params=request_params)
+            if response.status_code == requests.codes.ok:
+                return self.__parse_response(response.text)
+            elif response.status_code == requests.codes.bad_request:
+                return []
+            else:
+                self._logger.error('Error trying to geocode using mapzen',
+                                data={"response_status": response.status_code,
+                                        "response_reason": response.reason,
+                                        "response_content": response.text,
+                                        "reponse_url": response.url,
+                                        "response_headers": response.headers,
+                                        "searchtext": searchtext,
+                                        "city": city, "country": country,
+                                        "state_province": state_province })
+                raise Exception('Error trying to geocode {0} using mapzen'.format(searchtext))
+        except requests.ConnectionError as e:
+            # Don't raise the exception to continue with the geocoding job
+            self._logger.error('Error connecting to Mapzen geocoding server',
+                               exception=e)
             return []
-        else:
-            raise Exception('Error trying to geocode {0} using mapzen'.format(searchtext))
+
 
     def _build_requests_parameters(self, searchtext, city=None,
                                    state_province=None, country=None):

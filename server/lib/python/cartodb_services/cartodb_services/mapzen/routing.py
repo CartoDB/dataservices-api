@@ -49,11 +49,15 @@ class MapzenRouting:
         elif response.status_code == requests.codes.bad_request:
             return MapzenRoutingResponse(None, None, None)
         else:
-            self._logger.error('Error trying to calculate route using HERE',
-                               data={"response": response.json(), "waypoints":
-                                     waypoints, "mode": mode, "options":
-                                     options})
-            raise Exception('Error trying to calculate route using HERE')
+            self._logger.error('Error trying to calculate route using Mapzen',
+                               data={"response_status": response.status_code,
+                                     "response_reason": response.reason,
+                                     "response_content": response.text,
+                                     "reponse_url": response.url,
+                                     "response_headers": response.headers,
+                                     "waypoints": waypoints, "mode": mode,
+                                     "options": options})
+            raise Exception('Error trying to calculate route using Mapzen')
 
     def __parse_options(self, options):
         return dict(option.split('=') for option in options)
