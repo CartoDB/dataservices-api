@@ -1,3 +1,30 @@
+August 19, 2016
+===========
+* Released version 0.7.4.2 of the server python library
+* Now connection errors, that intermittently come from Mapzen geocoding service, are caught and treated
+* Added more information to the logs from response
+* Fixed some errors in the QPS manager when the response object is None
+
+August 11, 2016
+===========
+* Released server version 0.14.2
+* Released client version 0.10.2
+* Always default arguments for DO functions to NULL, which prevents duplication & overwrite 
+
+August 5, 2016
+===========
+* Released server version 0.14.1
+* Fix problem with calling a logger method that doesn't exists
+
+August 3, 2016
+===========
+* Released server version 0.14
+* New logger with: plpy, rollbar integration and file
+* Added min log level to notify as config option
+* Server config to define dataservices environment for: log, third party servers, etc
+* Added logger to the SQL functions
+* Raise exception on events that should not be logged like reach the quota limit
+
 July 28, 2016
 ===========
 * Release server 0.13.3.1
