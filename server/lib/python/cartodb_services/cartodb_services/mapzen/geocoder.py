@@ -49,7 +49,9 @@ class MapzenGeocoder:
     def _build_requests_parameters(self, searchtext, city=None,
                                    state_province=None, country=None):
         request_params = {}
-        search_string = self._build_search_text(searchtext, city, state_province)
+        search_string = self._build_search_text(searchtext.strip(),
+                                                city,
+                                                state_province)
         request_params['text'] = search_string
         request_params['layers'] = 'address'
         request_params['api_key'] = self._app_key
