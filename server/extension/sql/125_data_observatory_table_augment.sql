@@ -16,7 +16,7 @@ RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     TARGET cdb_observatory._OBS_ConnectUserTable;
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadataOBS_GetMeasure(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_GetReturnMetadata;

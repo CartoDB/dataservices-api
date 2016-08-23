@@ -1,7 +1,7 @@
 CREATE TYPE cdb_dataservices_client.ds_fdw_metadata as (schemaname text, tabname text, servername text);
 CREATE TYPE cdb_dataservices_client.ds_return_metadata as (colnames text[], coltypes text[]);
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetTable(table_name text, output_table_name text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetTableOBS_GetMeasure(table_name text, output_table_name text, params json)
 RETURNS boolean AS $$
 DECLARE
   username text;
@@ -31,20 +31,22 @@ BEGIN
 
   SELECT current_database() INTO dbname;
 
-  SELECT cdb_dataservices_client.__DST_GetTable(username, orgname, user_db_role, user_schema, dbname, table_name, output_table_name, function_name, params) INTO result;
+  SELECT cdb_dataservices_client.__DST_GetTableOBS_GetMeasure(username, orgname, user_db_role, user_schema, dbname, table_name, output_table_name, params) INTO result;
 
   RETURN result;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_GetTable(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text, output_table_name text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_GetTableOBS_GetMeasure(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text, output_table_name text, params json)
 RETURNS boolean AS $$
     try:
+        function_name = 'OBS_GetMeasure'
+
         server_table_name = None
         # Obtain return types for augmentation procedure
         ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
-            "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
+            "FROM cdb_dataservices_client._DST_GetReturnMetadataOBS_GetMeasure({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
             .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), function_name=plpy.quote_literal(function_name), params=plpy.quote_literal(params))
             )
 
@@ -108,10 +110,10 @@ RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
     TARGET cdb_dataservices_server._DST_ConnectUserTable;
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadataOBS_GetMeasure(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_client.ds_return_metadata AS $$
     CONNECT _server_conn_str();
-    TARGET cdb_dataservices_server._DST_GetReturnMetadata;
+    TARGET cdb_dataservices_server._DST_GetReturnMetadataOBS_GetMeasure;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
