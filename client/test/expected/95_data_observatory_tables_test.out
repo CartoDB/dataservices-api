@@ -1,6 +1,6 @@
 -- Add to the search path the schema
 SET search_path TO public,cartodb,cdb_dataservices_client;
-CREATE TABLE my_table(cartodb_id int);
+CREATE TABLE my_table(the_geom geometry, cartodb_id int);
 INSERT INTO my_table (cartodb_id) VALUES (1);
 -- Mock the server functions
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, table_name text)
@@ -9,7 +9,7 @@ BEGIN
   RETURN ('dummy_schema'::text, 'dummy_table'::text, 'dummy_server'::text);
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadataOBS_GetMeasure(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_client.ds_return_metadata AS $$
 BEGIN
   RETURN (Array['total_pop'], Array['double precision']);
@@ -27,20 +27,6 @@ BEGIN
   RETURN true;
 END;
 $$ LANGUAGE 'plpgsql';
--- Augment a table with the total_pop column
-SELECT cdb_dataservices_client._DST_AugmentTable('my_table', 'dummy', '{"dummy":"dummy"}'::json);
- _dst_augmenttable 
--------------------
- t
-(1 row)
-
--- The results of the table should return the mocked value of 23.4 in the total_pop column
-SELECT * FROM my_table;
- cartodb_id | total_pop 
-------------+-----------
-          1 |      23.4
-(1 row)
-
 -- Mock again the function for it to return a different value now
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
 RETURNS RECORD AS $$
@@ -49,19 +35,18 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 -- Augment a new table with total_pop
-SELECT cdb_dataservices_client._DST_GetTable('my_table', 'my_table_new', 'dummy', '{"dummy":"dummy"}'::json);
- _dst_gettable 
----------------
+SELECT cdb_dataservices_client._DST_GetTableOBS_GetMeasure('my_table', 'my_table_new', '{"dummy":"dummy"}'::json);
+ _dst_gettableobs_getmeasure 
+-----------------------------
  t
 (1 row)
 
 -- Check that the table contains the new value for total_pop and not the value already existent in the table
 SELECT * FROM my_table_new;
- total_pop | cartodb_id 
------------+------------
-  577777.4 |          1
+ total_pop | the_geom 
+-----------+----------
+  577777.4 | 
 (1 row)
 
 -- Clean tables
-DROP TABLE my_table;
 DROP TABLE my_table_new;
