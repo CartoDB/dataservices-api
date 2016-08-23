@@ -107,7 +107,7 @@ class MapzenIsolines:
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
             costs = [None] * self.NUMBER_OF_ANGLES
             if response is None:
-                raise Exception('Error with origin: {0}'.format(origin))
+                self._logger.warning('Error with origin: {0}'.format(origin))
 
             for idx, c in enumerate(response['one_to_many'][0][1:]):
                 if c[cost_variable]:
