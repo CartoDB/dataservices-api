@@ -70,23 +70,13 @@ RETURNS boolean AS $$
         server_table_name = ds_fdw_metadata[0]["tabname"]
         server_name = ds_fdw_metadata[0]["servername"]
 
-        # Get list of user columns to include in the new table
-        user_table_columns = ','.join(
-            plpy.execute('SELECT array_agg(\'user_table.\' || attname) AS columns '
-                'FROM pg_attribute WHERE attrelid = \'"{user_schema}".{table_name}\'::regclass '
-                'AND attnum > 0 AND NOT attisdropped AND attname NOT LIKE \'the_geom_webmercator\' '
-                'AND NOT attname LIKE ANY(string_to_array(\'{colnames}\',\',\'));'
-                .format(user_schema=user_schema, table_name=table_name, colnames=colnames)
-                )[0]["columns"]
-        )
-
         # Populate a new table with the augmented results
         plpy.execute('CREATE TABLE "{user_schema}".{output_table_name} AS ('
-            'SELECT results.{columns}, {user_table_columns} '
+            'SELECT results.{columns}, user_table.the_geom '
             'FROM {table_name} AS user_table '
             'LEFT JOIN cdb_dataservices_client._DST_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {function_name}::text, {params}::json) as results({columns_with_types}, cartodb_id int) '
             'ON results.cartodb_id = user_table.cartodb_id)'
-            .format(output_table_name=output_table_name, columns=colnames, user_table_columns=user_table_columns, username=plpy.quote_nullable(username),
+            .format(output_table_name=output_table_name, columns=colnames, username=plpy.quote_nullable(username),
                 orgname=plpy.quote_nullable(orgname), user_schema=user_schema, server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name),
                 table_name=table_name, function_name=plpy.quote_literal(function_name), params=plpy.quote_literal(params), columns_with_types=columns_with_types)
             )
