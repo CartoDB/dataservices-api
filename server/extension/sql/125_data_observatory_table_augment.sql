@@ -42,27 +42,3 @@ $$ LANGUAGE plproxy;
 
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.__DST_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, host_addr text, table_name text)
-RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
-    CONNECT cdb_dataservices_server._dst_server_conn_str(username, orgname);
-    TARGET XXXXXX._DST_ConnectUserTable;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
-RETURNS cdb_dataservices_server.ds_return_metadata AS $$
-    CONNECT cdb_dataservices_server._dst_server_conn_str(username, orgname);
-    TARGET cdb_observatory._DST_GetReturnMetadata;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
-RETURNS SETOF record AS $$
-    CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-    TARGET cdb_observatory._DST_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
-
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, servername text)
-RETURNS boolean AS $$
-    CONNECT cdb_dataservices_server._dst_server_conn_str(username, orgname);
-    TARGET cdb_observatory._DST_DisconnectUserTable;
-$$ LANGUAGE plproxy;

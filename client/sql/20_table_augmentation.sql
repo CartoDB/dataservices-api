@@ -227,8 +227,8 @@ RETURNS boolean AS $$
             )
 
         # Wipe user FDW data from the server
-        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
-            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
+        wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
+            .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
             )
 
         return True
@@ -236,8 +236,8 @@ RETURNS boolean AS $$
         plpy.warning('Error trying to get table {0}'.format(e))
         # Wipe user FDW data from the server in case of failure if the table was connected
         if server_table_name:
-            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text, {function_name}::text)"
-                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name), function_name=plpy.quote_literal(function_name))
+            wiped = plpy.execute("SELECT cdb_dataservices_client._OBS_DisconnectUserTable({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {fdw_server}::text)"
+                .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
                 )
         return False
 $$ LANGUAGE plpythonu;
@@ -261,7 +261,7 @@ RETURNS SETOF record AS $$
     TARGET cdb_dataservices_server._OBS_FetchJoinFdwTableData;
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, server_name text, function_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, server_name text)
 RETURNS boolean AS $$
     CONNECT _server_conn_str();
     TARGET cdb_dataservices_server._OBS_DisconnectUserTable;
