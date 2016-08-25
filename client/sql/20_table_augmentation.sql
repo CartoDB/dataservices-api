@@ -210,17 +210,30 @@ RETURNS boolean AS $$
                 .format(user_schema=user_schema, table_name=table_name, colnames=colnames)
                 )[0]["columns"]
         )
+        colnames_fix = str([ 'results.' + name for name in colnames_arr]).strip('[]').replace("'", "")
 
-        # Populate a new table with the augmented results
-        plpy.execute('CREATE TABLE "{user_schema}".{output_table_name} AS '
-            '(SELECT results.{columns}, {user_table_columns} '
+
+        plpy.warning('CREATE TABLE "{user_schema}".{output_table_name} AS '
+            '(SELECT {columns}, {user_table_columns} '
             'FROM {table_name} AS user_table '
-            'LEFT JOIN cdb_dataservices_client._OBS_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {function_name}::text, {params}::json) as results({columns_with_types}, cartodb_id int) '
+            'LEFT JOIN cdb_dataservices_client._OBS_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {function_name}::text, {params}::json) as results({columns_with_types}) '
             'ON results.cartodb_id = user_table.cartodb_id)'
-            .format(output_table_name=output_table_name, columns=colnames, user_table_columns=user_table_columns, username=plpy.quote_nullable(username),
+            .format(output_table_name=output_table_name, columns=colnames_fix, user_table_columns=user_table_columns, username=plpy.quote_nullable(username),
                 orgname=plpy.quote_nullable(orgname), user_schema=user_schema, server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name),
                 table_name=table_name, function_name=plpy.quote_literal(function_name), params=plpy.quote_literal(params), columns_with_types=columns_with_types)
             )
+
+        # Populate a new table with the augmented results
+        plpy.execute('CREATE TABLE "{user_schema}".{output_table_name} AS '
+            '(SELECT {columns}, {user_table_columns} '
+            'FROM {table_name} AS user_table '
+            'LEFT JOIN cdb_dataservices_client._OBS_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, {function_name}::text, {params}::json) as results({columns_with_types}) '
+            'ON results.cartodb_id = user_table.cartodb_id)'
+            .format(output_table_name=output_table_name, columns=colnames_fix, user_table_columns=user_table_columns, username=plpy.quote_nullable(username),
+                orgname=plpy.quote_nullable(orgname), user_schema=user_schema, server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name),
+                table_name=table_name, function_name=plpy.quote_literal(function_name), params=plpy.quote_literal(params), columns_with_types=columns_with_types)
+            )
+
 
         plpy.execute('ALTER TABLE "{schema}".{table_name} OWNER TO "{user}";'
             .format(schema=user_schema, table_name=output_table_name, user=user_db_role)
