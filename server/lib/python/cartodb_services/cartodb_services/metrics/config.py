@@ -286,11 +286,11 @@ class GeocoderConfig(ServiceConfig):
     PERIOD_END_DATE = 'period_end_date'
     DEFAULT_PROVIDER = 'mapzen'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
+    def __init__(self, redis_connection, db_conn, username, orgname=None, forced_provider=None):
         super(GeocoderConfig, self).__init__(redis_connection, db_conn,
                                              username, orgname)
         filtered_config = {key: self._redis_config[key] for key in self.GEOCODER_CONFIG_KEYS if key in self._redis_config.keys()}
-        self.__parse_config(filtered_config, self._db_config)
+        self.__parse_config(filtered_config, self._db_config, forced_provider)
         self.__check_config(filtered_config)
 
     def __check_config(self, filtered_config):
@@ -307,9 +307,12 @@ class GeocoderConfig(ServiceConfig):
 
         return True
 
-    def __parse_config(self, filtered_config, db_config):
-        self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER].lower()
-        if not self._geocoder_provider:
+    def __parse_config(self, filtered_config, db_config, forced_provider):
+        if forced_provider:
+            self._geocoder_provider = forced_provider
+        elif filtered_config[self.GEOCODER_PROVIDER].lower():
+            self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER].lower()
+        else:
             self._geocoder_provider = self.DEFAULT_PROVIDER
         self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
