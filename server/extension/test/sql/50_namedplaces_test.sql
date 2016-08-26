@@ -15,7 +15,7 @@ INSERT INTO global_cities_alternates_limited (geoname_id, name, preferred, lower
 );
 
 -- Insert dummy data into country decoder table
-INSERT INTO country_decoder (synonyms, iso2) VALUES (Array['spain'], 'ES');
+INSERT INTO country_decoder (synonyms, iso2) VALUES (Array['spain', 'Spain'], 'ES');
 
 -- Insert dummy data into admin1 decoder table
 INSERT INTO admin1_decoder (admin1, synonyms, iso2) VALUES ('Valencia', Array['valencia', 'Valencia'], 'ES');

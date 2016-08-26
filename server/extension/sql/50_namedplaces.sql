@@ -93,10 +93,10 @@ RETURNS Geometry AS $$
   try:
     if admin1_name and country_name:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
-      rv = plpy.execute(plan, [city_name, plpy.quote_nullable(admin1_name), plpy.quote_nullable(country_name)], 1)
+      rv = plpy.execute(plan, [city_name, admin1_name, country_name], 1)
     elif country_name:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2)) AS mypoint", ["text", "text"])
-      rv = plpy.execute(plan, [city_name, plpy.quote_nullable(country_name)], 1)
+      rv = plpy.execute(plan, [city_name, country_name], 1)
     else:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1)) AS mypoint", ["text"])
       rv = plpy.execute(plan, [city_name], 1)

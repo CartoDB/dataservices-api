@@ -4,6 +4,7 @@ CREATE EXTENSION plpythonu;
 CREATE EXTENSION plproxy;
 CREATE EXTENSION cartodb;
 CREATE EXTENSION cdb_geocoder;
+CREATE EXTENSION postgres_fdw;
 CREATE EXTENSION observatory VERSION 'dev';
 
 -- Install the extension
