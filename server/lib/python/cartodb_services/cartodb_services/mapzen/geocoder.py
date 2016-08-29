@@ -54,8 +54,9 @@ class MapzenGeocoder:
                                                 city,
                                                 state_province)
         request_params['text'] = search_string
-        request_params['layers'] = search_type if search_type else 'address'
         request_params['api_key'] = self._app_key
+        if search_type:
+            request_params['layers'] = search_type
         if country:
             request_params['boundary.country'] = country
         return request_params
