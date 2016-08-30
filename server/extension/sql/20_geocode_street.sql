@@ -159,7 +159,7 @@ RETURNS Geometry AS $$
       country_iso3 = country_to_iso3(country)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city,
                                    state_province=state_province,
-                                   country=country_iso3)
+                                   country=country_iso3, search_type='address')
     if coordinates:
       quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])

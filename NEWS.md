@@ -1,3 +1,9 @@
+August 29, 2016
+===========
+* Released version 0.15.0 of the server
+* Geocode namedplace point functions uses Mapzen search service and in case of error
+  it'll use the internal geocoder
+
 August 19, 2016
 ===========
 * Released version 0.7.4.2 of the server python library
