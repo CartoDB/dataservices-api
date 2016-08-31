@@ -245,24 +245,24 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_ConnectUserTable(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text)
 RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._OBS_ConnectUserTable;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_GetReturnMetadata(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_client.ds_return_metadata AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._OBS_GetReturnMetadata;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
 RETURNS SETOF record AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._OBS_FetchJoinFdwTableData;
 $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, server_name text)
 RETURNS boolean AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._OBS_DisconnectUserTable;
 $$ LANGUAGE plproxy;
