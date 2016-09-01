@@ -3,7 +3,6 @@ CREATE TYPE cdb_dataservices_client.ds_return_metadata as (colnames text[], colt
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(
     output_table_name text,
-    function_name text,
     params json
 ) RETURNS boolean AS $$
 DECLARE
@@ -37,7 +36,6 @@ BEGIN
       user_db_role,
       user_schema,
       output_table_name,
-      function_name,
       params
   ) INTO result;
 
@@ -48,7 +46,6 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(
     table_name text,
     output_table_name text,
-    function_name text,
     params json
 ) RETURNS boolean AS $$
 DECLARE
@@ -87,7 +84,6 @@ BEGIN
       dbname,
       table_name,
       output_table_name,
-      function_name,
       params
   ) INTO result;
 
@@ -102,9 +98,9 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
     user_db_role text,
     user_schema text,
     output_table_name text,
-    function_name text,
     params json
 ) RETURNS boolean AS $$
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
         "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
@@ -145,9 +141,9 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     dbname text,
     table_name text,
     output_table_name text,
-    function_name text,
     params json
 ) RETURNS boolean AS $$
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
