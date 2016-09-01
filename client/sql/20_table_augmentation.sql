@@ -111,9 +111,12 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
             params=plpy.quote_literal(params)
             )
         )
+    if ds_return_metadata[0]["colnames"]:
+        colnames_arr = ds_return_metadata[0]["colnames"]
+        coltypes_arr = ds_return_metadata[0]["coltypes"]
+    else:
+        raise Exception('Error retrieving OBS_GetMeasure metadata')
 
-    colnames_arr = ds_return_metadata[0]["colnames"]
-    coltypes_arr = ds_return_metadata[0]["coltypes"]
 
     # Prepare column and type strings required in the SQL queries
     columns_with_types_arr = [colnames_arr[i] + ' ' + coltypes_arr[i] for i in range(0,len(colnames_arr))]
@@ -153,8 +156,11 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
             function_name=plpy.quote_literal(function_name),
             params=plpy.quote_literal(params)))
 
-    colnames_arr = ds_return_metadata[0]["colnames"]
-    coltypes_arr = ds_return_metadata[0]["coltypes"]
+    if ds_return_metadata[0]["colnames"]:
+        colnames_arr = ds_return_metadata[0]["colnames"]
+        coltypes_arr = ds_return_metadata[0]["coltypes"]
+    else:
+        raise Exception('Error retrieving OBS_GetMeasure metadata')
 
     # Prepare column and type strings required in the SQL queries
     columns_with_types_arr = [
@@ -182,9 +188,12 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
             dbname=plpy.quote_literal(dbname),
             table_name=plpy.quote_literal(table_name)))
 
-    server_schema = ds_fdw_metadata[0]["schemaname"]
-    server_table_name = ds_fdw_metadata[0]["tabname"]
-    server_name = ds_fdw_metadata[0]["servername"]
+    if ds_fdw_metadata[0]["schemaname"]:
+        server_schema = ds_fdw_metadata[0]["schemaname"]
+        server_table_name = ds_fdw_metadata[0]["tabname"]
+        server_name = ds_fdw_metadata[0]["servername"]
+    else:
+        raise Exception('Error connecting dataset via FDW')
 
     # Create a new table with the required columns
     plpy.execute(
