@@ -191,26 +191,6 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     server_name = ds_fdw_metadata[0]["servername"]
 
     # Create a new table with the required columns
-
-    plpy.warning(
-        'INSERT INTO "{schema}".{analysis_table_name} '
-        'SELECT ut.cartodb_id, ut.the_geom, {colname_list} '
-        'FROM "{schema}".{table_name} ut '
-        'LEFT JOIN _DST_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, '
-        '{function_name}::text, {params}::json) '
-        'AS result ({columns_with_types}, cartodb_id int)  '
-        'ON result.cartodb_id = ut.cartodb_id;' .format(
-            schema=user_schema,
-            analysis_table_name=output_table_name,
-            colname_list=aliased_colname_list,
-            table_name=table_name,
-            username=plpy.quote_nullable(username),
-            orgname=plpy.quote_nullable(orgname),
-            server_schema=plpy.quote_literal(server_schema),
-            server_table_name=plpy.quote_literal(server_table_name),
-            function_name=plpy.quote_literal(function_name),
-            params=plpy.quote_literal(params),
-            columns_with_types=columns_with_types))
     plpy.execute(
         'INSERT INTO "{schema}".{analysis_table_name} '
         'SELECT ut.cartodb_id, ut.the_geom, {colname_list} '
@@ -252,7 +232,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_ConnectUserTable(
     dbname text,
     table_name text
 )RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_ConnectUserTable;
 $$ LANGUAGE plproxy;
 
@@ -262,7 +242,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(
     function_name text,
     params json
 ) RETURNS cdb_dataservices_client.ds_return_metadata AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_GetReturnMetadata;
 $$ LANGUAGE plproxy;
 
@@ -274,7 +254,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_FetchJoinFdwTableData(
     function_name text,
     params json
 ) RETURNS SETOF record AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_FetchJoinFdwTableData;
 $$ LANGUAGE plproxy;
 
@@ -285,6 +265,6 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
     table_name text,
     server_name text
 ) RETURNS boolean AS $$
-    CONNECT _server_conn_str();
+    CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_DisconnectUserTable;
 $$ LANGUAGE plproxy;
