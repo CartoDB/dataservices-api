@@ -1,3 +1,10 @@
+September 1, 2016
+===========
+* Released version 0.11.0 of the client
+  * Include DS table functions to create and populate a table with the GetMeasure function in observatory
+* Released version 0.15.1 of the server
+  * Rename DS table functions
+
 August 29, 2016
 ===========
 * Released version 0.15.0 of the server
