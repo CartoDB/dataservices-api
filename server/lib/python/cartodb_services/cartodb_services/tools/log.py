@@ -14,7 +14,6 @@ try:
 except ImportError:
     pass
 
-
 class Logger:
 
     LEVELS = {'debug': 1, 'info': 2, 'warning': 3, 'error': 4}
@@ -66,7 +65,7 @@ class Logger:
         if self._rollbar_activated():
             try:
                 if exception:
-                    rollbar.report_exc_info(exception, extra_data=data,
+                    rollbar.report_exc_info(sys.exc_info(), extra_data=data,
                                             level=level)
                 else:
                     rollbar.report_message(text, level, extra_data=data)
@@ -102,7 +101,7 @@ class Logger:
     def _parse_log_extra_data(self, exception, data):
         extra_data = {}
         if exception:
-            type_, value_, traceback_ = exception
+            type_, value_, traceback_ = sys.exc_info()
             exception_traceback = traceback.format_tb(traceback_)
             extra_data = {"exception_type": type_, "exception_message": value_,
                           "exception_traceback": exception_traceback,
