@@ -100,7 +100,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'GetMeasure'
+    function_name = 'OBS_GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
         "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
@@ -146,7 +146,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'GetMeasure'
+    function_name = 'OBS_GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
