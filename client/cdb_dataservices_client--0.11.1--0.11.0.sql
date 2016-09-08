@@ -1,96 +1,6 @@
-CREATE TYPE cdb_dataservices_client.ds_fdw_metadata as (schemaname text, tabname text, servername text);
-CREATE TYPE cdb_dataservices_client.ds_return_metadata as (colnames text[], coltypes text[]);
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(
-    output_table_name text,
-    params json
-) RETURNS boolean AS $$
-DECLARE
-  username text;
-  user_db_role text;
-  orgname text;
-  user_schema text;
-  result boolean;
-BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-
-  SELECT session_user INTO user_db_role;
-
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
-  IF username IS NULL OR username = '' OR username = '""' THEN
-    RAISE EXCEPTION 'Username is a mandatory argument';
-  END IF;
-
-  IF orgname IS NULL OR orgname = '' OR orgname = '""' THEN
-    user_schema := 'public';
-  ELSE
-    user_schema := username;
-  END IF;
-
-  SELECT cdb_dataservices_client.__DST_PrepareTableOBS_GetMeasure(
-      username,
-      orgname,
-      user_db_role,
-      user_schema,
-      output_table_name,
-      params
-  ) INTO result;
-
-  RETURN result;
-END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(
-    table_name text,
-    output_table_name text,
-    params json
-) RETURNS boolean AS $$
-DECLARE
-  username text;
-  user_db_role text;
-  orgname text;
-  dbname text;
-  user_schema text;
-  result boolean;
-BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-
-  SELECT session_user INTO user_db_role;
-
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
-  IF username IS NULL OR username = '' OR username = '""' THEN
-    RAISE EXCEPTION 'Username is a mandatory argument';
-  END IF;
-
-  IF orgname IS NULL OR orgname = '' OR orgname = '""' THEN
-    user_schema := 'public';
-  ELSE
-    user_schema := username;
-  END IF;
-
-  SELECT current_database() INTO dbname;
-
-  SELECT cdb_dataservices_client.__DST_PopulateTableOBS_GetMeasure(
-      username,
-      orgname,
-      user_db_role,
-      user_schema,
-      dbname,
-      table_name,
-      output_table_name,
-      params
-  ) INTO result;
-
-  RETURN result;
-END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_client UPDATE TO '0.11.0'" to load this file. \quit
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeasure(
     username text,
@@ -100,7 +10,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'OBS_GetMeasure'
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
         "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
@@ -146,7 +56,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'OBS_GetMeasure'
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
@@ -228,48 +138,3 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
 
     return True
 $$ LANGUAGE plpythonu;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_ConnectUserTable(
-    username text,
-    orgname text,
-    user_db_role text,
-    user_schema text,
-    dbname text,
-    table_name text
-)RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
-    CONNECT cdb_dataservices_client._server_conn_str();
-    TARGET cdb_dataservices_server._DST_ConnectUserTable;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(
-    username text,
-    orgname text,
-    function_name text,
-    params json
-) RETURNS cdb_dataservices_client.ds_return_metadata AS $$
-    CONNECT cdb_dataservices_client._server_conn_str();
-    TARGET cdb_dataservices_server._DST_GetReturnMetadata;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_FetchJoinFdwTableData(
-    username text,
-    orgname text,
-    table_schema text,
-    table_name text,
-    function_name text,
-    params json
-) RETURNS SETOF record AS $$
-    CONNECT cdb_dataservices_client._server_conn_str();
-    TARGET cdb_dataservices_server._DST_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
-    username text,
-    orgname text,
-    table_schema text,
-    table_name text,
-    server_name text
-) RETURNS boolean AS $$
-    CONNECT cdb_dataservices_client._server_conn_str();
-    TARGET cdb_dataservices_server._DST_DisconnectUserTable;
-$$ LANGUAGE plproxy;
