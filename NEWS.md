@@ -1,3 +1,8 @@
+September 8, 2016
+===========
+* Released version 0.11.1 of the client
+  * Minor change in the name of the function parameter sent to server and Observatory backend for compatibility with the last observatory-extension framework updates
+
 September 1, 2016
 ===========
 * Released version 0.11.0 of the client
