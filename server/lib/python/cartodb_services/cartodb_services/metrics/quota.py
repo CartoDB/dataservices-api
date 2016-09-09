@@ -16,8 +16,8 @@ class QuotaService:
                                                 redis_connection)
         self._metrics_logger = MetricsLoggerFactory.build(user_service_config)
 
-    def check_user_quota(self):
-        return self._quota_checker.check()
+    def check_user_quota(self, amount = 1):
+        return self._quota_checker.check(amount)
 
     def increment_success_service_use(self, amount=1):
         self._user_service.increment_service_use(
@@ -62,7 +62,7 @@ class QuotaChecker:
         self._user_service = UserMetricsService(
             self._user_service_config, redis_connection)
 
-    def check(self):
+    def check(self, amount = 1):
         """ Check if the current user quota surpasses the current quota """
         if re.match('geocoder_*',
                     self._user_service_config.service_type) is not None:
@@ -78,7 +78,7 @@ class QuotaChecker:
             return self.__check_routing_quota()
         elif re.match('obs_*',
                       self._user_service_config.service_type) is not None:
-            return self.__check_data_observatory_quota()
+            return self.__check_data_observatory_quota(amount)
         else:
             return False
 
@@ -121,14 +121,14 @@ class QuotaChecker:
         else:
             return False
 
-    def __check_data_observatory_quota(self):
+    def __check_data_observatory_quota(self, amount = 1):
         user_quota = self._user_service_config.monthly_quota
         soft_limit = self._user_service_config.soft_limit
         today = date.today()
         service_type = self._user_service_config.service_type
         current_used = self._user_service.used_quota(service_type, today)
 
-        if soft_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_limit or (user_quota > 0 and (current_used + amount) <= user_quota):
             return True
         else:
             return False

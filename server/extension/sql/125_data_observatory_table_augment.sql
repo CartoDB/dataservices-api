@@ -16,7 +16,28 @@ RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     TARGET cdb_observatory._OBS_ConnectUserTable;
 $$ LANGUAGE plproxy;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json, credits integer)
+RETURNS cdb_dataservices_server.ds_return_metadata AS $$
+    plpy.warning("We're going to check your quota")
+    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+    plpy.execute("SELECT cdb_dataservices_server._get_obs_general_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+    user_obs_general_config = GD["user_obs_general_config_{0}".format(username)]
+
+    plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+    logger_config = GD["logger_config"]
+    logger = Logger(logger_config)
+    quota_service = QuotaService(user_obs_general_config, redis_conn)
+    plpy.warning("Checking")
+    if not quota_service.check_user_quota(credits):
+        raise Exception('You have reached the limit of your quota')
+
+    return plpy.execute("SELECT * FROM cdb_dataservices_server.__DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json)"
+        .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), function_name=plpy.quote_literal(function_name), params=plpy.quote_literal(params))
+        )[0]
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.__DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_GetReturnMetadata;

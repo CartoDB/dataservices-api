@@ -103,7 +103,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
     function_name = 'OBS_GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
-        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
+        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json, 200);"
         .format(
             username=plpy.quote_nullable(username),
             orgname=plpy.quote_nullable(orgname),
@@ -150,7 +150,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
-        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);" .format(
+        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json, 200);" .format(
             username=plpy.quote_nullable(username),
             orgname=plpy.quote_nullable(orgname),
             function_name=plpy.quote_literal(function_name),
@@ -245,7 +245,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(
     username text,
     orgname text,
     function_name text,
-    params json
+    params json,
+    credits int
 ) RETURNS cdb_dataservices_client.ds_return_metadata AS $$
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_GetReturnMetadata;
