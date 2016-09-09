@@ -147,14 +147,23 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     params json
 ) RETURNS boolean AS $$
     function_name = 'OBS_GetMeasure'
+
+    numrows = plpy.execute(
+        "SELECT count(*) as numrows "
+        "FROM {user_schema}.{table_name} WHERE the_geom IS NOT null;" .format(
+            user_schema=user_schema,
+            table_name=table_name))[0]["numrows"]
+
+    plpy.warning('Your dataset has {0} rows to be processed'.format(numrows))
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
-        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json, 200);" .format(
+        "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json, {numrows}::int);" .format(
             username=plpy.quote_nullable(username),
             orgname=plpy.quote_nullable(orgname),
             function_name=plpy.quote_literal(function_name),
-            params=plpy.quote_literal(params)))
+            params=plpy.quote_literal(params),
+            numrows=numrows))
 
     if ds_return_metadata[0]["colnames"]:
         colnames_arr = ds_return_metadata[0]["colnames"]

@@ -20,15 +20,13 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(userna
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     from cartodb_services.metrics import QuotaService
 
-    plpy.warning("We're going to check your quota")
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
     plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}::text, {1}::text)".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
     user_obs_config = GD["user_obs_config_{0}".format(username)]
 
     quota_service = QuotaService(user_obs_config, redis_conn)
-    plpy.warning("Checking")
-    if not quota_service.check_user_quota(200):
+    if not quota_service.check_user_quota(credits):
         raise Exception('You have reached the limit of your quota')
 
     return plpy.execute("SELECT * FROM cdb_dataservices_server.__DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json)"
