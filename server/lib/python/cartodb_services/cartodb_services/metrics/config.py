@@ -15,7 +15,7 @@ class ServiceConfig(object):
         self._username = username
         self._orgname = orgname
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
-        self._environment = self._db_config._server_environment
+        self._environment = self._db_config.server_environment
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
                 username, orgname)
@@ -403,34 +403,55 @@ class GeocoderConfig(ServiceConfig):
         return self._log_path
 
 
+class DBConfig:
+    def __init__(self, plpy):
+        self._plpy = plpy
+
+    def get(self, key):
+        try:
+            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
+            conf = self._plpy.execute(sql, 1)
+            return conf[0]['conf']
+        except Exception as e:
+            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+
+class Environment:
+    def __init__(self, plpy):
+        self._db_config = DBConfig(plpy)
+
+    def get(self):
+        server_config_json = self._db_config.get('server_conf')
+
+        if not server_config_json:
+            environment = 'development'
+        else:
+            server_config_json = json.loads(server_config_json)
+            if 'environment' in server_config_json:
+                environment = server_config_json['environment']
+            else:
+                environment = 'development'
+
+        return environment
+
+
+
 class ServicesDBConfig:
 
-    def __init__(self, db_conn, username, orgname):
-        self._db_conn = db_conn
+    def __init__(self, plpy, username, orgname):
+        self._db_config = DBConfig(plpy)
+        self._server_environment = Environment(plpy).get()
         self._username = username
         self._orgname = orgname
         return self._build()
 
     def _build(self):
-        self._get_server_config()
         self._get_here_config()
         self._get_mapzen_config()
         self._get_logger_config()
         self._get_data_observatory_config()
 
-    def _get_server_config(self):
-        server_config_json = self._get_conf('server_conf')
-        if not server_config_json:
-            self._server_environment = 'development'
-        else:
-            server_config_json = json.loads(server_config_json)
-            if 'environment' in server_config_json:
-                self._server_environment = server_config_json['environment']
-            else:
-                self._server_environment = 'development'
-
     def _get_here_config(self):
-        heremaps_conf_json = self._get_conf('heremaps_conf')
+        heremaps_conf_json = self._db_config.get('heremaps_conf')
         if not heremaps_conf_json:
             raise ConfigException('Here maps configuration missing')
         else:
@@ -443,7 +464,7 @@ class ServicesDBConfig:
             self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
 
     def _get_mapzen_config(self):
-        mapzen_conf_json = self._get_conf('mapzen_conf')
+        mapzen_conf_json = self._db_config.get('mapzen_conf')
         if not mapzen_conf_json:
             raise ConfigException('Mapzen configuration missing')
         else:
@@ -456,7 +477,7 @@ class ServicesDBConfig:
             self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
 
     def _get_data_observatory_config(self):
-        do_conf_json = self._get_conf('data_observatory_conf')
+        do_conf_json = self._db_config.get('data_observatory_conf')
         if not do_conf_json:
             raise ConfigException('Data Observatory configuration missing')
         else:
@@ -469,20 +490,13 @@ class ServicesDBConfig:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_logger_config(self):
-        logger_conf_json = self._get_conf('logger_conf')
+        logger_conf_json = self._db_config.get('logger_conf')
         if not logger_conf_json:
             raise ConfigException('Logger configuration missing')
         else:
             logger_conf = json.loads(logger_conf_json)
             self._geocoder_log_path = logger_conf['geocoder_log_path']
 
-    def _get_conf(self, key):
-        try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)
-            return conf[0]['conf']
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
     def server_environment(self):
