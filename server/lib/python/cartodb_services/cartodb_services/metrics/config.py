@@ -402,37 +402,6 @@ class GeocoderConfig(ServiceConfig):
         return self._log_path
 
 
-class DBConfig:
-    def __init__(self, plpy):
-        self._plpy = plpy
-
-    def get(self, key):
-        try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._plpy.execute(sql, 1)
-            return conf[0]['conf']
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
-
-class Environment:
-    def __init__(self, plpy):
-        self._db_config = DBConfig(plpy)
-
-    def get(self):
-        server_config_json = self._db_config.get('server_conf')
-
-        if not server_config_json:
-            environment = 'development'
-        else:
-            server_config_json = json.loads(server_config_json)
-            if 'environment' in server_config_json:
-                environment = server_config_json['environment']
-            else:
-                environment = 'development'
-
-        return environment
-
-
 
 class ServicesDBConfig:
 
