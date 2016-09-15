@@ -16,11 +16,16 @@ RETURNS boolean AS $$
   if cache_key in GD:
     return False
   else:
+
     from cartodb_services.metrics import GeocoderConfig
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
-    geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
-    GD[cache_key] = geocoder_config
+
+    if  GD["metadata_config"] = 'redis':
+      plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+      metadata_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    else:
+      metadata_conn = None
+      geocoder_config = GeocoderConfig(metadata_conn, plpy, username, orgname, provider)
+      GD[cache_key] = geocoder_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 

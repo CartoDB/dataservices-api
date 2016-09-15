@@ -1,8 +1,9 @@
 -- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_environment()")
+  env = GD["metadata_config"]
+
   plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
@@ -70,14 +71,18 @@ RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  if GD["metadata_config"] = 'redis':
+    metadata_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  else:
+    metadata_conn = None
+
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   # -- Check the quota
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  quota_service = QuotaService(user_geocoder_config, metadata_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
