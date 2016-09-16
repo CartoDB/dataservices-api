@@ -17,8 +17,8 @@ RETURNS boolean AS $$
     return False
   else:
     from cartodb_services.metrics import GeocoderConfig
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    from cartodb_services.tools.redis_tools import RedisConnectionFactory
+    redis_conn = RedisConnectionFactory.get_metadata_connection(GD, plpy, username)
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
     GD[cache_key] = geocoder_config
     return True
@@ -31,8 +31,9 @@ RETURNS boolean AS $$
     return False
   else:
     from cartodb_services.metrics import InternalGeocoderConfig
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
+    from cartodb_services.tools.redis_tools import RedisConnectionFactory
+    redis_conn = RedisConnectionFactory.get_metadata_connection(GD, plpy, username)
+    -- this does not use anything in redis
     geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
     return True
