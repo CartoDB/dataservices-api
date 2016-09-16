@@ -3,6 +3,28 @@ from redis import StrictRedis
 import json
 
 
+class RedisConnectionFactory:
+
+    @classmethod
+    def get_metadata_connection(GD, plpy, username):
+        cache_key = "redis_connection_{0}_metadata".format(user_id)
+        if cache_key in GD:
+            connection = GD[cache_key]
+        else:
+            config = RedisDBConfig('redis_metadata_config', plpy)
+            connection = RedisConnection(metadata_config).redis_connection()
+        return connection
+
+    @classmethod
+    def get_metrics_connection(GD, plpy, username):
+        cache_key = "redis_connection_{0}_metrics".format(user_id)
+        if cache_key in GD:
+            connection = GD[cache_key]
+        else:
+            config = RedisDBConfig('redis_metrics_config', plpy)
+            connection = RedisConnection(metrics_config).redis_connection()
+        return connection
+
 class RedisConnection:
 
     def __init__(self, config):
