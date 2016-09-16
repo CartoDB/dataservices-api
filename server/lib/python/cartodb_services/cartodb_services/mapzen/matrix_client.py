@@ -1,6 +1,7 @@
 import requests
 import json
 from qps import qps_retry
+from exceptions import ServiceException
 
 
 class MatrixClient:
@@ -51,6 +52,6 @@ class MatrixClient:
                                      "response_headers": response.headers,
                                      "locations": locations,
                                      "costing": costing})
-            raise Exception('Error trying to get matrix distance from mapzen')
+            raise ServiceException("Error trying to get matrix distance from mapzen", response)
 
         return response.json()

@@ -4,18 +4,38 @@ from datetime import datetime
 from exceptions import TimeoutException
 
 DEFAULT_RETRY_TIMEOUT = 60
+DEFAULT_QUERIES_PER_SECOND = 10
 
-
-def qps_retry(f):
-    def wrapped_f(*args, **kw):
-        return QPSService().call(f, *args, **kw)
-    return wrapped_f
+def qps_retry(original_function=None,**options):
+    """ Query Per Second retry decorator
+        The intention of this decorator is to retry requests against third
+        party services that has QPS restriction.
+        Parameters:
+            - timeout: Maximum number of seconds to retry
+            - qps: Allowed queries per second. This parameter is used to
+                   calculate the next time to retry the request
+    """
+    if original_function is not None:
+        def wrapped_function(*args, **kwargs):
+            if 'timeout' in options:
+                timeout = options['timeout']
+            else:
+                timeout = DEFAULT_RETRY_TIMEOUT
+            if 'qps' in options:
+                qps = options['qps']
+            else:
+                qps = DEFAULT_QUERIES_PER_SECOND
+            return QPSService(retry_timeout=timeout, queries_per_second=qps).call(original_function, *args, **kwargs)
+        return wrapped_function
+    else:
+        def partial_wrapper(func):
+            return qps_retry(func, **options)
+        return partial_wrapper
 
 
 class QPSService:
 
-    def __init__(self, queries_per_second=10,
-                 retry_timeout=DEFAULT_RETRY_TIMEOUT):
+    def __init__(self, queries_per_second, retry_timeout):
         self._queries_per_second = queries_per_second
         self._retry_timeout = retry_timeout
 
@@ -27,7 +47,7 @@ class QPSService:
                 return fn(*args, **kwargs)
             except Exception as e:
                 response = getattr(e, 'response', None)
-                if response and (response.status_code == 429):
+                if response is not None and (response.status_code == 429):
                     self.retry(start_time, attempt_number)
                 else:
                     raise e
