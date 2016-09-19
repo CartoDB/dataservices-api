@@ -1,27 +1,28 @@
 from redis.sentinel import Sentinel
 from redis import StrictRedis
 import json
+import plpy
 
 
 class RedisConnectionFactory:
 
     @classmethod
-    def get_metadata_connection(GD, plpy, username):
+    def get_metadata_connection(username):
         cache_key = "redis_connection_{0}_metadata".format(user_id)
-        if cache_key in GD:
-            connection = GD[cache_key]
+        if cache_key in plpy.GD:
+            connection = plpy.GD[cache_key]
         else:
-            config = RedisDBConfig('redis_metadata_config', plpy)
+            config = RedisDBConfig('redis_metadata_config')
             connection = RedisConnection(metadata_config).redis_connection()
         return connection
 
     @classmethod
-    def get_metrics_connection(GD, plpy, username):
+    def get_metrics_connection(username):
         cache_key = "redis_connection_{0}_metrics".format(user_id)
-        if cache_key in GD:
-            connection = GD[cache_key]
+        if cache_key in plpy.GD:
+            connection = plpy.GD[cache_key]
         else:
-            config = RedisDBConfig('redis_metrics_config', plpy)
+            config = RedisDBConfig('redis_metrics_config')
             connection = RedisConnection(metrics_config).redis_connection()
         return connection
 
@@ -54,14 +55,13 @@ class RedisDBConfig:
     DEFAULT_USER_DB = 5
     DEFAULT_TIMEOUT = 1.5  # seconds
 
-    def __init__(self, key, db_conn):
-        self._db_conn = db_conn
+    def __init__(self, key):
         return self._build(key)
 
     def _build(self, key):
         conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(
             key)
-        conf = self._db_conn.execute(conf_query)[0]['conf']
+        conf = plpy.execute(conf_query)[0]['conf']
         if conf is None:
             raise "There is no redis configuration defined"
         else:
