@@ -5,7 +5,7 @@ RETURNS Geometry AS $$
   cartodb_services.init(GD)
   from cartodb_services.metrics import GeocoderConfig
 
-  user_geocoder_config = GeocoderConfig(username, orgname, provider)
+  user_geocoder_config = GeocoderConfig(username, orgname)
 
   if user_geocoder_config.heremaps_geocoder:
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
@@ -18,8 +18,8 @@ RETURNS Geometry AS $$
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
     raise Exception('Requested geocoder is not available')
-
-$$ LANGUAGE plpythonu;
+  #TODO: move SECURITY DEFINER to proper place
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -142,9 +142,12 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.tools.redis_tools import RedisConnectionFactory
+  from cartodb_services.metrics import GeocoderConfig
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  # TODO: move this to proper place
+  redis_conn = RedisConnectionFactory.get_metrics_connection(username)
+  user_geocoder_config = GeocoderConfig(username, orgname)
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
