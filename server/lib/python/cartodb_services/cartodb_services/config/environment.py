@@ -2,8 +2,8 @@ from db_config import DBConfig
 import json
 
 class Environment:
-    def __init__(self, plpy):
-        self._db_config = DBConfig(plpy)
+    def __init__(self):
+        self._db_config = DBConfig()
 
     def get(self):
         server_config_json = self._db_config.get('server_conf')
