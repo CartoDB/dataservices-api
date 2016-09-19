@@ -142,7 +142,6 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.tools.redis_tools import RedisConnectionFactory
   from cartodb_services.metrics import GeocoderConfig
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
