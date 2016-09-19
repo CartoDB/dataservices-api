@@ -4,6 +4,7 @@ from dateutil.parser import parse as date_parse
 from cartodb_services.config.db_config import DBConfig
 from cartodb_services.config.environment import Environment
 from cartodb_services.config.exceptions import *
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
 class ServiceConfig(object):
