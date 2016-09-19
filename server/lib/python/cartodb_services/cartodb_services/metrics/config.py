@@ -404,9 +404,9 @@ class GeocoderConfig(ServiceConfig):
 
 class ServicesDBConfig:
 
-    def __init__(self, plpy, username, orgname):
-        self._db_config = DBConfig(plpy)
-        self._server_environment = Environment(plpy).get()
+    def __init__(self, username, orgname):
+        self._db_config = DBConfig()
+        self._server_environment = Environment().get()
         self._username = username
         self._orgname = orgname
         return self._build()
