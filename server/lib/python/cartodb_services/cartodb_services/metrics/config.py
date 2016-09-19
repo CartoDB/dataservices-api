@@ -16,7 +16,7 @@ class ServiceConfig(object):
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
         self._environment = self._db_config.server_environment
         if redis_connection:
-            self._redis_config = ServicesRedisConfig(redis_connection).build(
+            self._redis_config = ServicesRedisConfig().build(
                 username, orgname)
         else:
             self._redis_config = None
@@ -536,14 +536,12 @@ class ServicesRedisConfig:
     ISOLINES_PROVIDER_KEY = 'isolines_provider'
     ROUTING_PROVIDER_KEY = 'routing_provider'
 
-    def __init__(self, redis_conn):
-        self._redis_connection = redis_conn
-
     def build(self, username, orgname):
         return self.__get_user_config(username, orgname)
 
     def __get_user_config(self, username, orgname):
-        user_config = self._redis_connection.hgetall(
+        redis_connection = RedisConnectionFactory.get_metadata_connection(username)
+        user_config = redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
@@ -562,7 +560,8 @@ class ServicesRedisConfig:
         return user_config
 
     def __get_organization_config(self, orgname, user_config):
-        org_config = self._redis_connection.hgetall(
+        redis_connection = RedisConnectionFactory.get_metadata_connection(username)
+        org_config = redis_connection.hgetall(
             "rails:orgs:{0}".format(orgname))
         if not org_config:
             raise ConfigException("""There is no organization config available. Please check your configuration.'""")
