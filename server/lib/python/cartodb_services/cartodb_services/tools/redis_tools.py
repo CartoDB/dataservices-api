@@ -7,22 +7,22 @@ import plpy
 class RedisConnectionFactory:
 
     @classmethod
-    def get_metadata_connection(username):
-        cache_key = "redis_connection_{0}_metadata".format(user_id)
+    def get_metadata_connection(cls, username):
+        cache_key = "redis_connection_{0}_metadata".format(username)
         if cache_key in plpy.GD:
             connection = plpy.GD[cache_key]
         else:
-            config = RedisDBConfig('redis_metadata_config')
+            metadata_config = RedisDBConfig('redis_metadata_config')
             connection = RedisConnection(metadata_config).redis_connection()
         return connection
 
     @classmethod
-    def get_metrics_connection(username):
-        cache_key = "redis_connection_{0}_metrics".format(user_id)
+    def get_metrics_connection(cls, username):
+        cache_key = "redis_connection_{0}_metrics".format(username)
         if cache_key in plpy.GD:
             connection = plpy.GD[cache_key]
         else:
-            config = RedisDBConfig('redis_metrics_config')
+            metrics_config = RedisDBConfig('redis_metrics_config')
             connection = RedisConnection(metrics_config).redis_connection()
         return connection
 
