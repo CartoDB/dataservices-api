@@ -9,10 +9,10 @@ from cartodb_services.config.exceptions import *
 class ServiceConfig(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, db_conn, username, orgname=None):
+    def __init__(self, username, orgname=None):
         self._username = username
         self._orgname = orgname
-        self._db_config = ServicesDBConfig(db_conn, username, orgname)
+        self._db_config = ServicesDBConfig(username, orgname)
         self._environment = self._db_config.server_environment
 
     @abc.abstractproperty
@@ -34,9 +34,8 @@ class ServiceConfig(object):
 
 class DataObservatoryConfig(ServiceConfig):
 
-    def __init__(self, db_conn, username, orgname=None):
-        super(DataObservatoryConfig, self).__init__(db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(DataObservatoryConfig, self).__init__(username, orgname)
 
     @property
     def monthly_quota(self):
@@ -61,9 +60,8 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
     QUOTA_KEY = 'obs_snapshot_quota'
     PERIOD_END_DATE = 'period_end_date'
 
-    def __init__(self, db_conn, username, orgname=None):
-        super(ObservatorySnapshotConfig, self).__init__(db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(ObservatorySnapshotConfig, self).__init__(username, orgname)
         self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
@@ -86,9 +84,8 @@ class ObservatoryConfig(DataObservatoryConfig):
     QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
 
-    def __init__(self, db_conn, username, orgname=None):
-        super(ObservatoryConfig, self).__init__(db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(ObservatoryConfig, self).__init__(username, orgname)
         self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
@@ -112,9 +109,8 @@ class RoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     DEFAULT_PROVIDER = 'mapzen'
 
-    def __init__(self, db_conn, username, orgname=None):
-        super(RoutingConfig, self).__init__(db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(RoutingConfig, self).__init__(username, orgname)
         self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._routing_provider = self._redis_config[self.ROUTING_PROVIDER_KEY]
         if not self._routing_provider:
@@ -156,9 +152,8 @@ class IsolinesRoutingConfig(ServiceConfig):
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = 'heremaps'
 
-    def __init__(self, db_conn, username, orgname=None):
-        super(IsolinesRoutingConfig, self).__init__(db_conn,
-                                                    username, orgname)
+    def __init__(self, username, orgname=None):
+        super(IsolinesRoutingConfig, self).__init__(username, orgname)
         self._redis_config = ServicesRedisConfig().build(username, orgname)
         filtered_config = {key: self._redis_config[key] for key in self.ISOLINES_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config)
@@ -232,10 +227,9 @@ class IsolinesRoutingConfig(ServiceConfig):
 
 class InternalGeocoderConfig(ServiceConfig):
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
+    def __init__(self, username, orgname=None):
         # For now, internal geocoder doesn't use the redis config
-        super(InternalGeocoderConfig, self).__init__(db_conn,
-                                                     username, orgname)
+        super(InternalGeocoderConfig, self).__init__(username, orgname)
         self._log_path = self._db_config.geocoder_log_path
 
     @property
@@ -283,9 +277,8 @@ class GeocoderConfig(ServiceConfig):
     PERIOD_END_DATE = 'period_end_date'
     DEFAULT_PROVIDER = 'mapzen'
 
-    def __init__(self, db_conn, username, orgname=None, forced_provider=None):
-        super(GeocoderConfig, self).__init__(db_conn,
-                                             username, orgname)
+    def __init__(self, username, orgname=None, forced_provider=None):
+        super(GeocoderConfig, self).__init__(username, orgname)
         self._redis_config = ServicesRedisConfig().build(username, orgname)
         filtered_config = {key: self._redis_config[key] for key in self.GEOCODER_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config, forced_provider)
