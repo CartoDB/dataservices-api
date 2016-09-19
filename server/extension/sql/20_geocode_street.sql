@@ -1,10 +1,11 @@
 -- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(GD)
+  from cartodb_services.metrics import GeocoderConfig
+
+  user_geocoder_config = GeocoderConfig(username, orgname, provider)
 
   if user_geocoder_config.heremaps_geocoder:
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
