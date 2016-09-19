@@ -145,14 +145,12 @@ RETURNS Geometry AS $$
   from cartodb_services.tools.redis_tools import RedisConnectionFactory
   from cartodb_services.metrics import GeocoderConfig
 
-  # TODO: move this to proper place
-  redis_conn = RedisConnectionFactory.get_metrics_connection(username)
-  user_geocoder_config = GeocoderConfig(username, orgname)
-
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+
+  user_geocoder_config = GeocoderConfig(username, orgname)
+  quota_service = QuotaService(user_geocoder_config)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 

@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
 class UserMetricsService:
@@ -10,9 +11,9 @@ class UserMetricsService:
     SERVICE_HERE_ISOLINES = 'here_isolines'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
-    def __init__(self, user_geocoder_config, redis_connection):
+    def __init__(self, user_geocoder_config):
         self._user_geocoder_config = user_geocoder_config
-        self._redis_connection = redis_connection
+        self._redis_connection = RedisConnectionFactory.get_metrics_connection(user_geocoder_config.username)
         self._username = user_geocoder_config.username
         self._orgname = user_geocoder_config.organization
 
