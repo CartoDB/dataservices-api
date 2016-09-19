@@ -102,9 +102,24 @@ class ObservatoryConfig(DataObservatoryConfig):
     def service_type(self):
         return 'obs_general'
 
+class RoutingConfig(Object):
+    """This is a plain value object"""
+    def __init__(self):
+        self.routing_provider = None
 
-class RoutingConfig(ServiceConfig):
+class RoutingConfigFactory(Object):
 
+    def __init__(self, server_config, user_config):
+        self._server_config = server_config
+        self._user_config = user_config
+
+    def get():
+        config = RoutingConfig()
+        config.routing_provider = user_config.get('routing_provider')
+        return config
+
+
+class OldRoutingConfig(ServiceConfig):
     PERIOD_END_DATE = 'period_end_date'
     ROUTING_PROVIDER_KEY = 'routing_provider'
     MAPZEN_PROVIDER = 'mapzen'
