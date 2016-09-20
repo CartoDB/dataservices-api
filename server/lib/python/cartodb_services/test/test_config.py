@@ -21,13 +21,28 @@ class TestConfig(TestCase):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
         import json
         config_mock = DummyServerConfig({
-            # TODO make it return plain python objects rather than json
             # TODO the geocoder should not require all the config to be there
-            'server_conf': json.dumps({"environment": "testing"}),
-            'heremaps_conf': json.dumps({"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}),
-            'mapzen_conf': json.dumps({"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}),
-            'logger_conf': json.dumps({"geocoder_log_path": "/dev/null"}),
-            'data_observatory_conf': json.dumps({"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}})
+            'server_conf': {
+                "environment": "testing"
+            },
+            'heremaps_conf': {
+                "geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1},
+                "isolines": {"app_id": "app_id", "app_code": "code"}
+            },
+            'mapzen_conf': {
+                "routing": {"api_key": "api_key_rou", "monthly_quota": 1500000},
+                "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000},
+                "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}
+            },
+            'logger_conf': {
+                "geocoder_log_path": "/dev/null"
+            },
+            'data_observatory_conf': {
+                "connection": {
+                    "whitelist": ["ethervoid"],
+                    "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api",
+                    "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}
+            }
         })
         ServerConfigFactory._set(config_mock)
         cartodb_services.init(_plpy=None, _GD={})

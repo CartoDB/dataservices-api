@@ -1,6 +1,5 @@
 from redis.sentinel import Sentinel
 from redis import StrictRedis
-import json
 import cartodb_services
 from cartodb_services.config.server_config import ServerConfigFactory
 
@@ -57,30 +56,29 @@ class RedisDBConfig:
     DEFAULT_TIMEOUT = 1.5  # seconds
 
     def __init__(self, key):
-        self._db_config = ServerConfigFactory.get()
+        self._server_config = ServerConfigFactory.get()
         return self._build(key)
 
     def _build(self, key):
-        conf = self._db_config.get(key)
+        conf = self._server_config.get(key)
         if conf is None:
             raise "There is no redis configuration defined"
         else:
-            params = json.loads(conf)
-            self._host = params['redis_host']
-            self._port = params['redis_port']
+            self._host = conf['redis_host']
+            self._port = conf['redis_port']
 
-            if "timeout" in params:
-                self._timeout = params['timeout']
+            if "timeout" in conf:
+                self._timeout = conf['timeout']
             else:
                 self._timeout = self.DEFAULT_TIMEOUT
 
-            if "redis_db" in params:
-                self._db = params['redis_db']
+            if "redis_db" in conf:
+                self._db = conf['redis_db']
             else:
                 self._db = self.DEFAULT_USER_DB
 
-            if "sentinel_master_id" in params:
-                self._sentinel_id = params["sentinel_master_id"]
+            if "sentinel_master_id" in conf:
+                self._sentinel_id = conf["sentinel_master_id"]
             else:
                 self._sentinel_id = None
 

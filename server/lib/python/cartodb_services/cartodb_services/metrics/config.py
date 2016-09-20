@@ -1,4 +1,3 @@
-import json
 import abc
 from dateutil.parser import parse as date_parse
 from cartodb_services.config.server_config import ServerConfigFactory
@@ -399,7 +398,7 @@ class GeocoderConfig(ServiceConfig):
 class ServicesDBConfig:
 
     def __init__(self, username, orgname):
-        self._db_config = ServerConfigFactory.get()
+        self._server_config = ServerConfigFactory.get()
         self._server_environment = Environment().get()
         self._username = username
         self._orgname = orgname
@@ -412,11 +411,10 @@ class ServicesDBConfig:
         self._get_data_observatory_config()
 
     def _get_here_config(self):
-        heremaps_conf_json = self._db_config.get('heremaps_conf')
-        if not heremaps_conf_json:
+        heremaps_conf = self._server_config.get('heremaps_conf')
+        if not heremaps_conf:
             raise ConfigException('Here maps configuration missing')
         else:
-            heremaps_conf = json.loads(heremaps_conf_json)
             self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
             self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
             self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
@@ -425,11 +423,10 @@ class ServicesDBConfig:
             self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
 
     def _get_mapzen_config(self):
-        mapzen_conf_json = self._db_config.get('mapzen_conf')
-        if not mapzen_conf_json:
+        mapzen_conf = self._server_config.get('mapzen_conf')
+        if not mapzen_conf:
             raise ConfigException('Mapzen configuration missing')
         else:
-            mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
             self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
             self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
@@ -438,11 +435,10 @@ class ServicesDBConfig:
             self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
 
     def _get_data_observatory_config(self):
-        do_conf_json = self._db_config.get('data_observatory_conf')
-        if not do_conf_json:
+        do_conf = self._server_config.get('data_observatory_conf')
+        if not do_conf:
             raise ConfigException('Data Observatory configuration missing')
         else:
-            do_conf = json.loads(do_conf_json)
             if self._orgname and self._orgname in do_conf['connection']['whitelist']:
                 self._data_observatory_connection_str = do_conf['connection']['staging']
             elif self._username in do_conf['connection']['whitelist']:
@@ -451,11 +447,10 @@ class ServicesDBConfig:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_logger_config(self):
-        logger_conf_json = self._db_config.get('logger_conf')
-        if not logger_conf_json:
+        logger_conf = self._server_config.get('logger_conf')
+        if not logger_conf:
             raise ConfigException('Logger configuration missing')
         else:
-            logger_conf = json.loads(logger_conf_json)
             self._geocoder_log_path = logger_conf['geocoder_log_path']
 
 

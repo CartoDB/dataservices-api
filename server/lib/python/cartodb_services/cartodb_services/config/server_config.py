@@ -1,4 +1,5 @@
 import cartodb_services
+import json
 from exceptions import ConfigException
 
 class ServerConfigFactory:
@@ -29,7 +30,7 @@ class DbServerConfig:
         try:
             sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
             conf = cartodb_services.plpy.execute(sql, 1)
-            return conf[0]['conf']
+            return json.loads(conf[0]['conf'])
         except Exception as e:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 

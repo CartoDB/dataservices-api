@@ -1,6 +1,5 @@
 import rollbar
 import logging
-import json
 import traceback
 import sys
 from cartodb_services.config.server_config import ServerConfigFactory
@@ -150,7 +149,7 @@ class ConfigException(Exception):
 class LoggerConfig:
 
     def __init__(self):
-        self._db_config = ServerConfigFactory.get()
+        self._server_config = ServerConfigFactory.get()
         return self._build()
 
     def _build(self):
@@ -158,22 +157,20 @@ class LoggerConfig:
         self._get_logger_config()
 
     def _get_server_config(self):
-        server_config_json = self._db_config.get('server_conf')
-        if not server_config_json:
+        server_config = self._server_config.get('server_conf')
+        if not server_config:
             self._server_environment = 'development'
         else:
-            server_config_json = json.loads(server_config_json)
-            if 'environment' in server_config_json:
-                self._server_environment = server_config_json['environment']
+            if 'environment' in server_config:
+                self._server_environment = server_config['environment']
             else:
                 self._server_environment = 'development'
 
     def _get_logger_config(self):
-        logger_conf_json = self._db_config.get('logger_conf')
-        if not logger_conf_json:
+        logger_conf = self._server_config.get('logger_conf')
+        if not logger_conf:
             raise ConfigException('Logger configuration missing')
         else:
-            logger_conf = json.loads(logger_conf_json)
             self._rollbar_api_key = None
             self._min_log_level = 'warning'
             self._log_file_path = None
