@@ -1,5 +1,5 @@
 # Helper to deal with type conversion between HERE and PostGIS
-import plpy
+import cartodb_services
 
 
 def geo_polyline_to_multipolygon(polyline):
@@ -17,5 +17,5 @@ def geo_polyline_to_multipolygon(polyline):
 
         sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
 
-    geometry = plpy.execute(sql, 1)[0]['geom']
+    geometry = cartodb_services.plpy.execute(sql, 1)[0]['geom']
     return geometry
