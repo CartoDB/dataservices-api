@@ -10,6 +10,11 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_conf_getconf(input_key text)
+RETURNS JSON AS $$
+    SELECT VALUE FROM cartodb.cdb_conf WHERE key = input_key;
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text, provider text DEFAULT NULL)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
