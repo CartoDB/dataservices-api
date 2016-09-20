@@ -5,7 +5,7 @@ RETURNS boolean AS $$
     return False
   else:
     from cartodb_services.tools import LoggerConfig
-    logger_config = LoggerConfig(plpy)
+    logger_config = LoggerConfig()
     GD[cache_key] = logger_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
