@@ -1,8 +1,7 @@
 from redis.sentinel import Sentinel
 from redis import StrictRedis
 import json
-import plpy
-from cartodb_services import plpy, GD
+import cartodb_services
 from cartodb_services.config.server_config import ServerConfigFactory
 
 
@@ -11,8 +10,8 @@ class RedisConnectionFactory:
     @classmethod
     def get_metadata_connection(cls, username):
         cache_key = "redis_connection_{0}_metadata".format(username)
-        if cache_key in GD:
-            connection = GD[cache_key]
+        if cache_key in cartodb_services.GD:
+            connection = cartodb_services.GD[cache_key]
         else:
             metadata_config = RedisDBConfig('redis_metadata_config')
             connection = RedisConnection(metadata_config).redis_connection()
@@ -21,8 +20,8 @@ class RedisConnectionFactory:
     @classmethod
     def get_metrics_connection(cls, username):
         cache_key = "redis_connection_{0}_metrics".format(username)
-        if cache_key in GD:
-            connection = GD[cache_key]
+        if cache_key in cartodb_services.GD:
+            connection = cartodb_services.GD[cache_key]
         else:
             metrics_config = RedisDBConfig('redis_metrics_config')
             connection = RedisConnection(metrics_config).redis_connection()

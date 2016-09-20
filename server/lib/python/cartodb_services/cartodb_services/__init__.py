@@ -8,6 +8,8 @@
 #     cartodb_services.init(plpy, GD)
 #
 #     # rest of the code here
+#     cartodb_services.GD[key] = val
+#     cartodb_services.plpy.execute('SELECT * FROM ...')
 #
 # $$ LANGUAGE plpythonu;
 

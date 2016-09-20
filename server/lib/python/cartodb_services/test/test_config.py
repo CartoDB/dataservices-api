@@ -4,6 +4,8 @@ from unittest import TestCase
 from nose.tools import assert_raises
 from mockredis import MockRedis
 from datetime import datetime, timedelta
+from cartodb_services.config.server_config import ServerConfigFactory, DummyServerConfig
+import cartodb_services
 
 
 class TestConfig(TestCase):
@@ -12,10 +14,25 @@ class TestConfig(TestCase):
         self.redis_conn = MockRedis()
         self.plpy_mock = test_helper.build_plpy_mock()
 
+    def tearDown(self):
+        ServerConfigFactory._reset()
+
     def test_should_return_list_of_nokia_geocoder_config_if_its_ok(self):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
-        geocoder_config = GeocoderConfig(self.redis_conn, self.plpy_mock,
-                                         'test_user', None)
+        import json
+        config_mock = DummyServerConfig({
+            # TODO make it return plain python objects rather than json
+            # TODO the geocoder should not require all the config to be there
+            'server_conf': json.dumps({"environment": "testing"}),
+            'heremaps_conf': json.dumps({"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}),
+            'mapzen_conf': json.dumps({"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}),
+            'logger_conf': json.dumps({"geocoder_log_path": "/dev/null"}),
+            'data_observatory_conf': json.dumps({"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}})
+        })
+        ServerConfigFactory._set(config_mock)
+        cartodb_services.init(_plpy=None, _GD={})
+        #from nose.tools import set_trace; set_trace()
+        geocoder_config = GeocoderConfig('test_user', None)
         assert geocoder_config.heremaps_geocoder is True
         assert geocoder_config.geocoding_quota == 100
         assert geocoder_config.soft_geocoding_limit is False
@@ -37,7 +54,7 @@ class TestConfig(TestCase):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user',
                                             do_quota=100, soft_do_limit=True,
                                             end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, self.plpy_mock,
+        do_config = ObservatorySnapshotConfig(self.redis_conn,
                                           'test_user')
         assert do_config.monthly_quota == 100
         assert do_config.soft_limit is True
@@ -57,4 +74,4 @@ class TestConfig(TestCase):
         plpy_mock = test_helper.build_plpy_mock(empty=True)
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
         assert_raises(ConfigException, GeocoderConfig, self.redis_conn,
-                      plpy_mock, 'test_user', None)
+                      'test_user', None)

@@ -14,9 +14,13 @@ class ServerConfigFactory:
             return cls._server_config_obj
 
     @classmethod
-    # To be used just for testing
     def _set(cls, obj):
+        """To be used just for testing"""
         cls._server_config_obj = obj
+
+    @classmethod
+    def _reset(cls):
+        cls._server_config_obj = None
 
 
 class DbServerConfig:
