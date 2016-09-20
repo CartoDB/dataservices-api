@@ -5,7 +5,7 @@ class DBConfig:
 
     def get(self, key):
         try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
+            sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
             conf = plpy.execute(sql, 1)
             return conf[0]['conf']
         except Exception as e:
