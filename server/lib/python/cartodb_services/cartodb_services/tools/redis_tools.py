@@ -2,6 +2,7 @@ from redis.sentinel import Sentinel
 from redis import StrictRedis
 import json
 import plpy
+from cartodb_services.config.db_config import DBConfig
 
 
 class RedisConnectionFactory:
@@ -56,12 +57,11 @@ class RedisDBConfig:
     DEFAULT_TIMEOUT = 1.5  # seconds
 
     def __init__(self, key):
+        self._db_config = DBConfig()
         return self._build(key)
 
     def _build(self, key):
-        conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(
-            key)
-        conf = plpy.execute(conf_query)[0]['conf']
+        conf = self._db_config.get(key)
         if conf is None:
             raise "There is no redis configuration defined"
         else:

@@ -3,6 +3,7 @@ import logging
 import json
 import traceback
 import sys
+from cartodb_services.config.db_config import DBConfig
 # Monkey patch because plpython sys module doesn't have argv and rollbar
 # package use it
 sys.__dict__['argv'] = []
@@ -148,8 +149,8 @@ class ConfigException(Exception):
 
 class LoggerConfig:
 
-    def __init__(self, db_conn):
-        self._db_conn = db_conn
+    def __init__(self):
+        self._db_config = DBConfig()
         return self._build()
 
     def _build(self):
@@ -157,7 +158,7 @@ class LoggerConfig:
         self._get_logger_config()
 
     def _get_server_config(self):
-        server_config_json = self._get_conf('server_conf')
+        server_config_json = self._db_config.get('server_conf')
         if not server_config_json:
             self._server_environment = 'development'
         else:
@@ -168,7 +169,7 @@ class LoggerConfig:
                 self._server_environment = 'development'
 
     def _get_logger_config(self):
-        logger_conf_json = self._get_conf('logger_conf')
+        logger_conf_json = self._db_config.get('logger_conf')
         if not logger_conf_json:
             raise ConfigException('Logger configuration missing')
         else:
@@ -182,14 +183,6 @@ class LoggerConfig:
                 self._rollbar_api_key = logger_conf['rollbar_api_key']
             if 'log_file_path' in logger_conf:
                 self._log_file_path = logger_conf['log_file_path']
-
-    def _get_conf(self, key):
-        try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)
-            return conf[0]['conf']
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
     def environment(self):
