@@ -2,7 +2,7 @@ from redis.sentinel import Sentinel
 from redis import StrictRedis
 import json
 import plpy
-from cartodb_services.config import DBConfig
+from cartodb_services.config.db_config import DBConfig
 
 
 class RedisConnectionFactory:
