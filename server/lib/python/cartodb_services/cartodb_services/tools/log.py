@@ -3,7 +3,7 @@ import logging
 import json
 import traceback
 import sys
-from cartodb_services.config.db_config import DBConfig
+from cartodb_services.config.server_config import ServerConfigFactory
 # Monkey patch because plpython sys module doesn't have argv and rollbar
 # package use it
 sys.__dict__['argv'] = []
@@ -150,7 +150,7 @@ class ConfigException(Exception):
 class LoggerConfig:
 
     def __init__(self):
-        self._db_config = DBConfig()
+        self._db_config = ServerConfigFactory.get()
         return self._build()
 
     def _build(self):

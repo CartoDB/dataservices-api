@@ -5,12 +5,21 @@
 # RETURNS SETOF cdb_dataservices_server.isoline AS $$
 #
 #     import cartodb_services
-#     cartodb_services.init(GD)
+#     cartodb_services.init(plpy, GD)
 #
 #     # rest of the code here
 #
 # $$ LANGUAGE plpythonu;
 
-def init(GD):
-    import plpy
-    plpy.GD = GD
+plpy = None
+GD = None
+
+def init(_plpy, _GD):
+    global plpy
+    global GD
+
+    if plpy is None:
+        plpy = _plpy
+
+    if GD is None:
+        GD = _GD

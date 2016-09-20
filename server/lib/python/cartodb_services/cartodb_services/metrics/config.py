@@ -1,7 +1,7 @@
 import json
 import abc
 from dateutil.parser import parse as date_parse
-from cartodb_services.config.db_config import DBConfig
+from cartodb_services.config.server_config import ServerConfigFactory
 from cartodb_services.config.environment import Environment
 from cartodb_services.config.exceptions import *
 from cartodb_services.tools.redis_tools import RedisConnectionFactory
@@ -399,7 +399,7 @@ class GeocoderConfig(ServiceConfig):
 class ServicesDBConfig:
 
     def __init__(self, username, orgname):
-        self._db_config = DBConfig()
+        self._db_config = ServerConfigFactory.get()
         self._server_environment = Environment().get()
         self._username = username
         self._orgname = orgname

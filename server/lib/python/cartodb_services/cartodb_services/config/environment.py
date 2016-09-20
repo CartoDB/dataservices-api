@@ -1,9 +1,9 @@
-from db_config import DBConfig
+from server_config import ServerConfigFactory
 import json
 
 class Environment:
     def __init__(self):
-        self._db_config = DBConfig()
+        self._db_config = ServerConfigFactory.get()
 
     def get(self):
         server_config_json = self._db_config.get('server_conf')

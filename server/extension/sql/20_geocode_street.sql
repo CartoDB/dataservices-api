@@ -2,7 +2,7 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   import cartodb_services
-  cartodb_services.init(GD)
+  cartodb_services.init(plpy, GD)
   from cartodb_services.metrics import GeocoderConfig
 
   user_geocoder_config = GeocoderConfig(username, orgname)
