@@ -1,6 +1,7 @@
 import cartodb_services
 import json
 from exceptions import ConfigException
+from cartodb_services.config.interfaces import ConfigStorageInterface
 
 class ServerConfigFactory:
 
@@ -24,7 +25,7 @@ class ServerConfigFactory:
         cls._server_config_obj = None
 
 
-class DbServerConfig:
+class DbServerConfig(ConfigStorageInterface):
 
     def get(self, key):
         try:
@@ -35,7 +36,7 @@ class DbServerConfig:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
 
-class DummyServerConfig:
+class DummyServerConfig(ConfigStorageInterface):
 
     def __init__(self, config_hash):
         self._config_hash = config_hash
