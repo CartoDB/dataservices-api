@@ -4,7 +4,7 @@ from unittest import TestCase
 from nose.tools import assert_raises
 from mockredis import MockRedis
 from datetime import datetime, timedelta
-from cartodb_services.config.server_config import ServerConfigFactory, DummyServerConfig
+from cartodb_services.config.server_config import ServerConfigFactory, InMemoryConfigStorage
 import cartodb_services
 
 
@@ -20,7 +20,7 @@ class TestConfig(TestCase):
     def test_should_return_list_of_nokia_geocoder_config_if_its_ok(self):
         test_helper.build_redis_user_config(self.redis_conn, 'test_user')
         import json
-        config_mock = DummyServerConfig({
+        config = InMemoryConfigStorage({
             # TODO the geocoder should not require all the config to be there
             'server_conf': {
                 "environment": "testing"
@@ -44,7 +44,7 @@ class TestConfig(TestCase):
                     "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}
             }
         })
-        ServerConfigFactory._set(config_mock)
+        ServerConfigFactory._set(config)
         cartodb_services.init(_plpy=None, _GD={})
         #from nose.tools import set_trace; set_trace()
         geocoder_config = GeocoderConfig('test_user', None)

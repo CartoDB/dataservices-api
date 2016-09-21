@@ -12,7 +12,7 @@ class ServerConfigFactory:
         if cls._server_config_obj:
             return cls._server_config_obj
         else:
-            cls._server_config_obj = DbServerConfig()
+            cls._server_config_obj = InDbServerConfigStorage()
             return cls._server_config_obj
 
     @classmethod
@@ -25,7 +25,7 @@ class ServerConfigFactory:
         cls._server_config_obj = None
 
 
-class DbServerConfig(ConfigStorageInterface):
+class InDbServerConfigStorage(ConfigStorageInterface):
 
     def get(self, key):
         try:
@@ -36,7 +36,7 @@ class DbServerConfig(ConfigStorageInterface):
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
 
-class DummyServerConfig(ConfigStorageInterface):
+class InMemoryConfigStorage(ConfigStorageInterface):
 
     def __init__(self, config_hash):
         self._config_hash = config_hash
