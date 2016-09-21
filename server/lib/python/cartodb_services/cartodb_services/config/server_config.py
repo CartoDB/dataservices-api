@@ -9,6 +9,7 @@ class ServerConfigFactory:
 
     @classmethod
     def get(cls):
+        """Return a config storage"""
         if cls._server_config_obj:
             return cls._server_config_obj
         else:
@@ -18,6 +19,7 @@ class ServerConfigFactory:
     @classmethod
     def _set(cls, obj):
         """To be used just for testing"""
+        assert isinstance(obj, ConfigStorageInterface)
         cls._server_config_obj = obj
 
     @classmethod
@@ -30,15 +32,15 @@ class InDbServerConfigStorage(ConfigStorageInterface):
     def get(self, key):
         try:
             sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
-            conf = cartodb_services.plpy.execute(sql, 1)
-            return json.loads(conf[0]['conf'])
+            rows = cartodb_services.plpy.execute(sql, 1)
+            return json.loads(rows[0]['conf'])
         except Exception as e:
             raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
 
 class InMemoryConfigStorage(ConfigStorageInterface):
 
-    def __init__(self, config_hash):
+    def __init__(self, config_hash={}):
         self._config_hash = config_hash
 
     def get(self, key):

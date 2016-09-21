@@ -25,3 +25,11 @@ def init(_plpy, _GD):
 
     if GD is None:
         GD = _GD
+
+def _reset():
+    # NOTE: just for testing
+    global plpy
+    global GD
+
+    plpy = None
+    GD = None
