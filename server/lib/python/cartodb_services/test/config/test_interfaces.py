@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cartodb_services.config.config import ConfigStorageInterface
+from cartodb_services.config.interfaces import ConfigStorageInterface
 from nose.tools import raises
 
 class TestConfigStorageInterface(TestCase):
