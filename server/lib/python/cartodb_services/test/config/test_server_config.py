@@ -51,3 +51,15 @@ class TestInDbServerConfigStorage(TestCase):
         server_config = ServerConfigFactory.get()
         assert server_config.get('server_conf') == {'environment': 'testing'}
         self.plpy_mock.execute.assert_called_once_with("SELECT cdb_dataservices_server.cdb_conf_getconf('server_conf') as conf", 1)
+
+
+class TestInMemoryConfigStorage(TestCase):
+
+    def test_can_provide_values_from_hash(self):
+        server_config = InMemoryConfigStorage({'any_key': 'any_value'})
+        assert server_config.get('any_key') == 'any_value'
+
+    @raises(ConfigException)
+    def test_raises_exception_if_cannot_retrieve_key(self):
+        server_config = InMemoryConfigStorage()
+        server_config.get('any_key')
