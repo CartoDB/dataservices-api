@@ -29,6 +29,7 @@ class ServerConfigFactory:
 
 class InDbServerConfigStorage(ConfigStorageInterface):
 
+    # TODO: instead of raising an exception if missing it should return None
     def get(self, key):
         try:
             sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
