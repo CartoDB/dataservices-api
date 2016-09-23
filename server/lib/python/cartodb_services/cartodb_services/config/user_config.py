@@ -2,6 +2,8 @@ import cartodb_services
 from exceptions import ConfigException
 from config import Environment
 
+# TODO split into user and org config
+# TODO make it use the config interface
 class UserConfigFactory(object):
 
     def __init__(self, username, orgname = None):
