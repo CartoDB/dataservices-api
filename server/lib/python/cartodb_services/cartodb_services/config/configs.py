@@ -1,4 +1,6 @@
-from cartodb_services.config.server_config import ServerConfigFactory
+from server_config import ServerConfigFactory
+from user_config import UserConfigFactory
+
 
 class Configs(object):
     """Just a container for the different configurations, to be used by client services"""
@@ -29,7 +31,7 @@ class ConfigsFactory(object):
         Get the configuration objects for a particular user. That means:
           - server configuration
           - user configuration
-          - organization configuration (if it applies).
+          - organization configuration.
         """
         server_config = ServerConfigFactory.get()
         user_config = UserConfigFactory.get(user)
