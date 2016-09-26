@@ -3,17 +3,22 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(user
 RETURNS Geometry AS $$
   import cartodb_services
   cartodb_services.init(plpy, GD)
+  from cartodb_services.config.user import User
+  from cartodb_services.config.configs import ConfigsFactory
   from cartodb_services.metrics import GeocoderConfig
 
-  user_geocoder_config = GeocoderConfig(username, orgname)
+  user = User(username, orgname)
+  configs = ConfigsFactory.get(user)
 
-  if user_geocoder_config.heremaps_geocoder:
+  hires_geocoder_config = HiResGeocoderConfigFactory(configs).get()
+
+  if hires_geocoder_config.heremaps_geocoder:
     here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-  elif user_geocoder_config.google_geocoder:
+  elif hires_geocoder_config.google_geocoder:
     google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-  elif user_geocoder_config.mapzen_geocoder:
+  elif hires_geocoder_config.mapzen_geocoder:
     mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
@@ -109,7 +114,7 @@ RETURNS Geometry AS $$
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  
+
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
