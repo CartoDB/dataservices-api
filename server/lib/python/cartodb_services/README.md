@@ -45,6 +45,3 @@ See the [[../../../../test/README.md]]. Basically, move to the `/test` directory
 cd $(git rev-parse --show-toplevel)/test
 python run_tests.py --host=$YOUR_HOST $YOUR_USERNAME $YOUR_API_KEY
 ```
-
-## TODO
-- Move dependencies expressed in `requirements.txt` to `setup.py`
