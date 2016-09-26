@@ -23,7 +23,7 @@ class HiResGeocoderConfig(object):
 
     @abstractproperty
     def service_type(self):
-        #TODO: rename to provider_name
+        # This is meant to be: geocoder_mapzen, geocoder_here, etc.
         pass
 
     @property
@@ -76,7 +76,7 @@ class MapzenGeocoderConfigFactory(object):
     def __init__(self, configs):
         self._configs = configs
 
-    def get(self, user):
+    def get(self):
         """Returns a mapzen geocoder config object populated for a given user"""
         config = MapzenGeocoderConfig()
 
@@ -98,6 +98,7 @@ class MapzenGeocoderConfigFactory(object):
         return config
 
 
+# TODO: move this to another file
 class GeocoderProviderFactory(object):
 
     GEOCODER_PROVIDER_KEY = 'geocoder_provider_key'
@@ -106,7 +107,7 @@ class GeocoderProviderFactory(object):
     def __init__(self, configs):
         self._configs = configs
 
-    def get(user):
+    def get(self):
         # TODO: IMHO this should be a common pattern for all configs
         # NOTE: I have mixed filligs about the defaults.
         server_provider = _configs.server_config.get(GEOCODER_PROVIDER_KEY)
@@ -118,17 +119,16 @@ class GeocoderProviderFactory(object):
 
 
 
-class HiResGeocoderConfig(object):
+class HiResGeocoderConfigFactory(object):
 
     def __init__(self, configs):
         self._configs = configs
 
     def get(self, user):
         """Returns a concrete config object, depending on the provider set in the config"""
-        #TODO: implement GeocoderProviderFactory
-        provider = GeocoderProviderFactory(self._configs).get(user)
+        provider = GeocoderProviderFactory(self._configs).get()
         if provider == 'mapzen':
-            config = MapzenGeocoderConfigFactory(configs).get(user)
+            config = MapzenGeocoderConfigFactory(configs).get()
         else:
             #TODO: implement other providers
             raise NotImplementedError('Not implemented yet %s' % provider)
