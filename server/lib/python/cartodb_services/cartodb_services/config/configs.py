@@ -1,5 +1,6 @@
 from server_config import ServerConfigFactory
 from user_config import UserConfigFactory
+from org_config import OrgConfigFactory
 
 
 class Configs(object):

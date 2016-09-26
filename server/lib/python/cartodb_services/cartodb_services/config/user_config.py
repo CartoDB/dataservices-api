@@ -5,6 +5,7 @@ from cartodb_services.config.interfaces import ConfigStorageInterface
 from cartodb_services.config.server_config import InDbServerConfigStorage
 
 
+# TODO: this is wrong, configs shall be cached by request
 class UserConfigFactory(object):
 
     _user_config_obj = None

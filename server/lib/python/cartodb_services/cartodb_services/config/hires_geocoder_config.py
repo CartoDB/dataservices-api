@@ -26,6 +26,11 @@ class HiResGeocoderConfig(object):
         # This is meant to be: geocoder_mapzen, geocoder_here, etc.
         pass
 
+    @abstractproperty
+    def provider(self):
+        # This is meant to be: mapzen, here, etc.
+        pass
+
     @property
     def geocoding_quota(self):
         return self._geocoding_quota
@@ -65,6 +70,10 @@ class MapzenGeocoderConfig(HiResGeocoderConfig):
         return 'geocoder_mapzen'
 
     @property
+    def provider(self):
+        return 'mapzen'
+
+    @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
 
@@ -76,11 +85,11 @@ class MapzenGeocoderConfigFactory(object):
     def __init__(self, configs):
         self._configs = configs
 
-    def get(self):
+    def get(self, user):
         """Returns a mapzen geocoder config object populated for a given user"""
         config = MapzenGeocoderConfig()
 
-        mapzen_server_conf = self._configs.server_conf.get('mapzen_conf')
+        mapzen_server_conf = self._configs.server_config.get('mapzen_conf')
         config._geocoding_quota = mapzen_server_conf['geocoder']['monthly_quota']
 
         config._soft_geocoding_limit = self._configs.user_config.get('soft_geocoding_limit')
@@ -110,11 +119,11 @@ class GeocoderProviderFactory(object):
     def get(self):
         # TODO: IMHO this should be a common pattern for all configs
         # NOTE: I have mixed filligs about the defaults.
-        server_provider = _configs.server_config.get(GEOCODER_PROVIDER_KEY)
-        user_provider = _configs.user_config.get(GEOCODER_PROVIDER_KEY)
-        org_provider = _configs.org_config.get(GEOCODER_PROVIDER_KEY)
+        server_provider = self._configs.server_config.get(self.GEOCODER_PROVIDER_KEY)
+        user_provider = self._configs.user_config.get(self.GEOCODER_PROVIDER_KEY)
+        org_provider = self._configs.org_config.get(self.GEOCODER_PROVIDER_KEY)
 
-        effective_provider = server_provider or user_provider or org_provider or DEFAULT_PROVIDER
+        effective_provider = server_provider or user_provider or org_provider or self.DEFAULT_PROVIDER
         return effective_provider
 
 
@@ -128,7 +137,7 @@ class HiResGeocoderConfigFactory(object):
         """Returns a concrete config object, depending on the provider set in the config"""
         provider = GeocoderProviderFactory(self._configs).get()
         if provider == 'mapzen':
-            config = MapzenGeocoderConfigFactory(configs).get()
+            config = MapzenGeocoderConfigFactory(self._configs).get(user)
         else:
             #TODO: implement other providers
             raise NotImplementedError('Not implemented yet %s' % provider)
