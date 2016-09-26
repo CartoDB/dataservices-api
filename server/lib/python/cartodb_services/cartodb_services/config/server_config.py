@@ -29,14 +29,14 @@ class ServerConfigFactory:
 
 class InDbServerConfigStorage(ConfigStorageInterface):
 
-    # TODO: instead of raising an exception if missing it should return None
     def get(self, key):
-        try:
-            sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
-            rows = cartodb_services.plpy.execute(sql, 1)
-            return json.loads(rows[0]['conf'])
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+        sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)
+        rows = cartodb_services.plpy.execute(sql, 1)
+        json_output = rows[0]['conf']
+        if json_output:
+            return json.loads(json_output)
+        else:
+            return None
 
 
 class InMemoryConfigStorage(ConfigStorageInterface):

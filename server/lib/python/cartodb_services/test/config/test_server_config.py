@@ -40,11 +40,10 @@ class TestInDbServerConfigStorage(TestCase):
         assert server_config.get('any_config') == 'any_value'
         self.plpy_mock.execute.assert_called_once_with("SELECT cdb_dataservices_server.cdb_conf_getconf('any_config') as conf", 1)
 
-    @raises(ConfigException)
-    def test_raises_exception_if_cannot_retrieve_key(self):
-        self.plpy_mock.execute = MagicMock(return_value=None)
+    def test_gets_none_if_cannot_retrieve_key(self):
+        self.plpy_mock.execute = MagicMock(return_value=[{'conf': None}])
         server_config = ServerConfigFactory.get()
-        server_config.get('any_config')
+        assert server_config.get('any_config') is None
 
     def test_deserializes_from_db_to_plain_dict(self):
         self.plpy_mock.execute = MagicMock(return_value=[{'conf': '{"environment": "testing"}'}])
