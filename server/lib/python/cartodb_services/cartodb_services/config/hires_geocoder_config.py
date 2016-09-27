@@ -77,6 +77,17 @@ class MapzenGeocoderConfig(HiResGeocoderConfig):
     def mapzen_api_key(self):
         return self._mapzen_api_key
 
+    # TODO: this is a hack for backwards compat, probably to be removed
+    @property
+    def username(self):
+        return self._username
+
+    # TODO: this is a hack for backwards compat, probably to be removed
+    @property
+    def organization(self):
+        return self._organization
+
+
     #TODO: add method to check validity
 
 
@@ -102,7 +113,10 @@ class MapzenGeocoderConfigFactory(object):
         config._cost_per_hit = 0
 
         logger_conf = self._configs.server_config.get('logger_conf')
-        self._log_path = logger_conf['geocoder_log_path']
+        config._log_path = logger_conf['geocoder_log_path']
+
+        config._username = user.username
+        config._organization = user.orgname
         # TODO: call check for validity
         return config
 

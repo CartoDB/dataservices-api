@@ -3,6 +3,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(user
 RETURNS Geometry AS $$
   import cartodb_services
   cartodb_services.init(plpy, GD)
+
   from cartodb_services.config.user import User
   from cartodb_services.config.configs import ConfigsFactory
   from cartodb_services.config.hires_geocoder_config import HiResGeocoderConfigFactory
@@ -56,18 +57,16 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu;
 
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  # The configuration is retrieved but no checks are performed on it
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
   mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
   return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-
 $$ LANGUAGE plpythonu;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -142,18 +141,28 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  import cartodb_services
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.metrics import GeocoderConfig
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
+  from cartodb_services.config.user import User
+  from cartodb_services.config.configs import ConfigsFactory
+  from cartodb_services.config.hires_geocoder_config import MapzenGeocoderConfigFactory
+
+  #TODO: deal with the logger configuration/instantiation
+  cartodb_services.plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = cartodb_services.GD["logger_config"]
   logger = Logger(logger_config)
 
-  user_geocoder_config = GeocoderConfig(username, orgname)
+  user = User(username, orgname)
+  configs = ConfigsFactory.get(user)
+  user_geocoder_config = MapzenGeocoderConfigFactory(configs).get(user)
+
+
   quota_service = QuotaService(user_geocoder_config)
+
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
