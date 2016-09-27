@@ -3,6 +3,7 @@ from exceptions import ConfigException
 from environment import Environment
 from cartodb_services.config.interfaces import ConfigStorageInterface
 from cartodb_services.config.server_config import InDbServerConfigStorage
+from cartodb_services.request import request_cached
 
 
 # TODO: this is wrong, configs shall be cached by request
@@ -11,6 +12,7 @@ class UserConfigFactory(object):
     _user_config_obj = None
 
     @classmethod
+    @request_cached
     def get(cls, user):
         if cls._user_config_obj:
             # In-memory cache

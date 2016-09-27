@@ -7,9 +7,11 @@ RETURNS Geometry AS $$
   from cartodb_services.config.user import User
   from cartodb_services.config.configs import ConfigsFactory
   from cartodb_services.config.hires_geocoder_config import HiResGeocoderConfigFactory
+  from cartodb_services.request import Request, TxId
 
   user = User(username, orgname)
-  configs = ConfigsFactory.get(user)
+  request = RequestFactory().create(user, 'cdb_geocode_street_point')
+  configs = ConfigsFactory.get(request)
 
   hires_geocoder_config = HiResGeocoderConfigFactory(configs).get(user)
 
