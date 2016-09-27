@@ -1,6 +1,7 @@
 from environment import Environment
 from interfaces import ConfigStorageInterface
 from server_config import InDbServerConfigStorage
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
 class OrgConfigFactory(object):
@@ -10,15 +11,14 @@ class OrgConfigFactory(object):
     @classmethod
     def get(cls, user):
         if cls._org_config_obj:
-            # In-memory cache
             return cls._org_config_obj
         else:
             environment = Environment().get()
             if environment == 'onpremise':
-                cls._org_config_obj = InDbServerConfigStorage()
+                org_config_obj = InDbServerConfigStorage()
             else:
-                cls._org_config_obj = RedisOrgConfig(user.orgname)
-            return cls._org_config_obj
+                org_config_obj = RedisOrgConfig(user.orgname)
+            return org_config_obj
 
     @classmethod
     def _set(cls, obj):
@@ -35,8 +35,14 @@ class RedisOrgConfig(object):
     def __init__(self, orgname):
         self._orgname = orgname
         self._redis_conn = RedisConnectionFactory().get_metadata_connection(orgname)
+        self._org_config = None
 
     def get(self, key):
-        return self._redis_conn.hget(
-            "rails:orgs:{0} {1}".format(self._orgname, key)
+        if not self._org_config:
+            self._org_config = self._redis_conn.hgetall(
+                "rails:orgs:{0}".format(self._orgname)
             )
+        try:
+            return self._org_config[key]
+        except KeyError:
+            return None

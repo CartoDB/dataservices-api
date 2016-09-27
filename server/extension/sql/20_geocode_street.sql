@@ -7,12 +7,13 @@ RETURNS Geometry AS $$
   from cartodb_services.config.user import User
   from cartodb_services.config.configs import ConfigsFactory
   from cartodb_services.config.hires_geocoder_config import HiResGeocoderConfigFactory
-  from cartodb_services.request import Request, TxId
+  from cartodb_services.request.request import RequestFactory
 
   user = User(username, orgname)
-  request = RequestFactory().create(user, 'cdb_geocode_street_point')
-  configs = ConfigsFactory.get(request)
+  configs = ConfigsFactory.get(user)
+  request = RequestFactory().create(user, configs, 'cdb_geocode_street_point')
 
+  # TODO change to hires_geocoder_config = HiResGeocoderConfigFactory.get(request)
   hires_geocoder_config = HiResGeocoderConfigFactory(configs).get(user)
 
   if hires_geocoder_config.provider == 'here':
@@ -152,14 +153,18 @@ RETURNS Geometry AS $$
   from cartodb_services.config.user import User
   from cartodb_services.config.configs import ConfigsFactory
   from cartodb_services.config.hires_geocoder_config import MapzenGeocoderConfigFactory
+  from cartodb_services.request.request import RequestFactory
 
   #TODO: deal with the logger configuration/instantiation
   cartodb_services.plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = cartodb_services.GD["logger_config"]
   logger = Logger(logger_config)
 
-  user = User(username, orgname)
-  configs = ConfigsFactory.get(user)
+  request = RequestFactory().current()
+  user = request.user
+  configs = request.configs
+
+  # TODO change to hires_geocoder_config = MapzenGeocoderConfigFactory.get(request)
   user_geocoder_config = MapzenGeocoderConfigFactory(configs).get(user)
 
 

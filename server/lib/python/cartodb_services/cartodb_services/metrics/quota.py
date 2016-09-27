@@ -82,7 +82,7 @@ class QuotaChecker:
 
     def __check_geocoder_quota(self):
         # We don't have quota check for google geocoder
-        if self._user_service_config.google_geocoder:
+        if self._user_service_config.provider == 'google':
             return True
 
         user_quota = self._user_service_config.geocoding_quota

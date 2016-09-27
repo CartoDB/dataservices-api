@@ -3,27 +3,24 @@ from exceptions import ConfigException
 from environment import Environment
 from cartodb_services.config.interfaces import ConfigStorageInterface
 from cartodb_services.config.server_config import InDbServerConfigStorage
-from cartodb_services.request import request_cached
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
-# TODO: this is wrong, configs shall be cached by request
 class UserConfigFactory(object):
 
     _user_config_obj = None
 
     @classmethod
-    @request_cached
     def get(cls, user):
         if cls._user_config_obj:
-            # In-memory cache
             return cls._user_config_obj
         else:
             environment = Environment().get()
             if environment == 'onpremise':
-                cls._user_config_obj = InDbServerConfigStorage()
+                user_config_obj = InDbServerConfigStorage()
             else:
-                cls._user_config_obj = RedisUserConfig(user.username)
-            return cls._user_config_obj
+                user_config_obj = RedisUserConfig(user.username)
+            return user_config_obj
 
     @classmethod
     def _set(cls, obj):
@@ -40,9 +37,15 @@ class RedisUserConfig(object):
 
     def __init__(self, username):
         self._username = username
-        self._redis_comm = RedisConnectionFactory().get_metadata_connection(username)
+        self._redis_conn = RedisConnectionFactory().get_metadata_connection(username)
+        self._user_config = None
 
     def get(self, key):
-        return self._redis_conn.hget(
-            "rails:users:{0} {1}".format(self._username, key)
+        if not self._user_config:
+            self._user_config = self._redis_conn.hgetall(
+                "rails:users:{0}".format(self._username)
             )
+        try:
+            return self._user_config[key]
+        except KeyError:
+            return None

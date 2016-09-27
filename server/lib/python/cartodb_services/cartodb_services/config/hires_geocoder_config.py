@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractproperty
+from dateutil.parser import parse as date_parse
 
 
 class HiResGeocoderConfig(object):
@@ -87,7 +88,6 @@ class MapzenGeocoderConfig(HiResGeocoderConfig):
     def organization(self):
         return self._organization
 
-
     #TODO: add method to check validity
 
 
@@ -102,13 +102,15 @@ class MapzenGeocoderConfigFactory(object):
 
         mapzen_server_conf = self._configs.server_config.get('mapzen_conf')
         config._geocoding_quota = mapzen_server_conf['geocoder']['monthly_quota']
+        config._mapzen_api_key = mapzen_server_conf['geocoder']['api_key']
 
         config._soft_geocoding_limit = self._configs.user_config.get('soft_geocoding_limit')
 
         if user.is_org_user:
-            config._period_end_date = self._configs.org_config.get('period_end_date')
+            period_end_date_str = self._configs.org_config.get('period_end_date')
         else:
-            config._period_end_date = self._configs.user_config.get('period_end_date')
+            period_end_date_str = self._configs.user_config.get('period_end_date')
+        config._period_end_date = date_parse(period_end_date_str)
 
         config._cost_per_hit = 0
 
@@ -124,7 +126,7 @@ class MapzenGeocoderConfigFactory(object):
 # TODO: move this to another file
 class GeocoderProviderFactory(object):
 
-    GEOCODER_PROVIDER_KEY = 'geocoder_provider_key'
+    GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     DEFAULT_PROVIDER = 'mapzen'
 
     def __init__(self, configs):
