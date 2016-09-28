@@ -16,7 +16,7 @@ class TestQPS(TestCase):
 
     def test_qps_timeout(self, req_mock):
         class TestClass:
-            @qps_retry(timeout=1)
+            @qps_retry(timeout=0.001, qps=100)
             def test(self):
                 response = requests.get('http://localhost/test_qps')
                 if response.status_code == 429:
