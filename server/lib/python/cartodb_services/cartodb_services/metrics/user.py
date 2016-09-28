@@ -3,7 +3,19 @@ from dateutil.relativedelta import relativedelta
 from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
-class UserMetricsService:
+class UserMetricsServiceFactory:
+
+    def __init__(self, user_service_config):
+      self._user_service_config = user_service_config
+      self._storage_connection = RedisConnectionFactory.get_metrics_connection(user_service_config.username)
+      self._username = user_service_config.username
+      self._orgname = user_service_config.organization
+
+    def get(self):
+      
+
+
+class UserRedisMetricsService:
     """ Class to manage all the user info """
 
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'
@@ -11,11 +23,11 @@ class UserMetricsService:
     SERVICE_HERE_ISOLINES = 'here_isolines'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
-    def __init__(self, user_geocoder_config):
-        self._user_geocoder_config = user_geocoder_config
-        self._redis_connection = RedisConnectionFactory.get_metrics_connection(user_geocoder_config.username)
-        self._username = user_geocoder_config.username
-        self._orgname = user_geocoder_config.organization
+    def __init__(self, user_service_config):
+        self._user_service_config = user_service_config
+        self._redis_connection = RedisConnectionFactory.get_metrics_connection(user_service_config.username)
+        self._username = user_service_config.username
+        self._orgname = user_service_config.organization
 
     def used_quota(self, service_type, date):
         if service_type == self.SERVICE_HERE_ISOLINES:
@@ -121,7 +133,7 @@ class UserMetricsService:
 
     def __current_billing_cycle(self):
         """ Return the begining and end date for the current billing cycle """
-        end_period_day = self._user_geocoder_config.period_end_date.day
+        end_period_day = self._user_service_config.period_end_date.day
         today = date.today()
         if end_period_day > today.day:
             temp_date = today + relativedelta(months=-1)

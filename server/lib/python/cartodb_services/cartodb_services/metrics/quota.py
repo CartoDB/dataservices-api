@@ -54,79 +54,35 @@ class QuotaService:
                 self._metrics_logger.log(success=False)
 
 
+
 class QuotaChecker:
+
+    # This requires following a convention: make quota properties named monthly_quota
+    # and soft_X_limit properties named soft_limit in each config type
+    # Half of the configs (routing and obs) are doing this already
 
     def __init__(self, user_service_config, user_metrics_service):
         self._user_service_config = user_service_config
         self._user_service = user_metrics_service
 
     def check(self):
-        """ Check if the current user quota surpasses the current quota """
-        if re.match('geocoder_*',
-                    self._user_service_config.service_type) is not None:
-            return self.__check_geocoder_quota()
-        elif re.match('here_isolines',
-                      self._user_service_config.service_type) is not None:
-            return self.__check_isolines_quota()
-        elif re.match('mapzen_isolines',
-                      self._user_service_config.service_type) is not None:
-            return self.__check_isolines_quota()
-        elif re.match('routing_mapzen',
-                      self._user_service_config.service_type) is not None:
-            return self.__check_routing_quota()
-        elif re.match('obs_*',
-                      self._user_service_config.service_type) is not None:
-            return self.__check_data_observatory_quota()
-        else:
+
+        VALID_SERVICES = ['here_geocoder', 'here_isolines', 'routing_mapzen', 'mapzen_isolines',
+            'obs_general', 'obs_snapshot', '...']
+
+        # not even required because we're setting up the service_type
+        if self._user_service_config.service_type not in VALID_SERVICES:
             return False
 
-    def __check_geocoder_quota(self):
-        # We don't have quota check for google geocoder
-        if self._user_service_config.provider == 'google':
-            return True
-
-        user_quota = self._user_service_config.geocoding_quota
+        available_quota = self._user_service_config.monthly_quota
         today = date.today()
         service_type = self._user_service_config.service_type
-        current_used = self._user_service.used_quota(service_type, today)
-        soft_geocoding_limit = self._user_service_config.soft_geocoding_limit
-
-        if soft_geocoding_limit or (user_quota > 0 and current_used <= user_quota):
-            return True
-        else:
-            return False
-
-    def __check_isolines_quota(self):
-        user_quota = self._user_service_config.isolines_quota
-        today = date.today()
-        service_type = self._user_service_config.service_type
-        current_used = self._user_service.used_quota(service_type, today)
-        soft_isolines_limit = self._user_service_config.soft_isolines_limit
-
-        if soft_isolines_limit or (user_quota > 0 and current_used <= user_quota):
-            return True
-        else:
-            return False
-
-    def __check_routing_quota(self):
-        user_quota = self._user_service_config.monthly_quota
-        today = date.today()
-        service_type = self._user_service_config.service_type
-        current_used = self._user_service.used_quota(service_type, today)
-
-        if (user_quota > 0 and current_used <= user_quota):
-            return True
-        else:
-            return False
-
-    def __check_data_observatory_quota(self):
-        user_quota = self._user_service_config.monthly_quota
+        used_quota = self._user_service.used_quota(service_type, today)
         soft_limit = self._user_service_config.soft_limit
-        today = date.today()
-        service_type = self._user_service_config.service_type
-        current_used = self._user_service.used_quota(service_type, today)
 
-        if soft_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_limit or (available_quota > 0 and used_quota <= available_quota):
             return True
         else:
             return False
+
+
