@@ -88,11 +88,12 @@ class MapzenIsolines:
         # NOTE: not for production
         self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
 
-        # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
-        # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
+        # Formally, a solution is an array of {angle, radius, lat, lon, cost}
+        # with cardinality NUMBER_OF_ANGLES we're looking for a solution in
+        # which abs(cost - isorange) / isorange <= TOLERANCE
 
         # Initial setup
-        angles = self._get_angles(self.NUMBER_OF_ANGLES) # array of angles
+        angles = self._get_angles(self.NUMBER_OF_ANGLES)  # array of angles
         rmax = [upper_rmax] * self.NUMBER_OF_ANGLES
         rmin = [0.0] * self.NUMBER_OF_ANGLES
         location_estimates = [self._calculate_dest_location(origin, a, upper_rmax / 2.0) for a in angles]
@@ -105,6 +106,9 @@ class MapzenIsolines:
 
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
             costs = [None] * self.NUMBER_OF_ANGLES
+            if response is None:
+                self._logger.warning('Error with origin: {0}'.format(origin))
+
             for idx, c in enumerate(response['one_to_many'][0][1:]):
                 if c[cost_variable]:
                     costs[idx] = c[cost_variable]*unit_factor
@@ -130,14 +134,17 @@ class MapzenIsolines:
 
                     location_estimates[j] = self._calculate_dest_location(origin, angles[j], (rmax[j]+rmin[j])/2.0)
 
-        # delete points that got None
+        # In case we have some problem getting response from Mapzen
+        # for example 400 with some wrong points
+        if all(c is None for c in costs):
+            return []
+
         location_estimates_filtered = []
         for i, c in enumerate(costs):
             if c <> isorange:
                 location_estimates_filtered.append(location_estimates[i])
 
         return location_estimates_filtered
-
 
 
     # NOTE: all angles in calculations are in radians

@@ -42,7 +42,15 @@ class MatrixClient:
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params)
 
-        if not requests.codes.ok:
+        if response.status_code == requests.codes.ok:
+            return response.json()
+        elif response.status_code == requests.codes.bad_request:
+            self._logger.warning('4xx error trying to get mapzen matrix distance',
+                                 data={"response": response.__dict__,
+                                       "locations": locations,
+                                       "costing": costing})
+            return {}
+        else:
             self._logger.error('Error trying to get matrix distance from mapzen',
                                data={"response_status": response.status_code,
                                      "response_reason": response.reason,
@@ -52,5 +60,3 @@ class MatrixClient:
                                      "locations": locations,
                                      "costing": costing})
             raise Exception('Error trying to get matrix distance from mapzen')
-
-        return response.json()
