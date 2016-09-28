@@ -137,17 +137,25 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.tools import Logger
+  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
+  from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
+  server_config_storage = InDbServerConfigStorage()
+
+  logger_config = LoggerConfigBuilder(server_config_storage).get()
   logger = Logger(logger_config)
+
+
+
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
