@@ -19,3 +19,15 @@ class MalformedResult(Exception):
 class TimeoutException(Exception):
     def __str__(self):
             return repr('Timeout requesting to mapzen server')
+
+
+class ServiceException(Exception):
+    def __init__(self, message, response):
+        self.message = message
+        self.response = response
+
+    def response(self):
+        return self.response
+
+    def __str__(self):
+        return self.message
