@@ -1,4 +1,3 @@
-import plpy
 import rollbar
 import logging
 import json
@@ -6,7 +5,14 @@ import traceback
 import sys
 # Monkey patch because plpython sys module doesn't have argv and rollbar
 # package use it
-sys.__dict__['argv'] = []
+if 'argv' not in sys.__dict__:
+    sys.__dict__['argv'] = []
+
+# Only can be imported when is called from PLPython
+try:
+    import plpy
+except ImportError:
+    pass
 
 
 class Logger:
@@ -30,30 +36,28 @@ class Logger:
             return
         self._send_to_rollbar('debug', text, exception, data)
         self._send_to_log_file('debug', text, exception, data)
-        plpy.debug(text)
+        self._send_to_plpy('debug', text)
 
     def info(self, text, exception=None, data={}):
         if not self._check_min_level('info'):
             return
         self._send_to_rollbar('info', text, exception, data)
         self._send_to_log_file('info', text, exception, data)
-        plpy.info(text)
+        self._send_to_plpy('info', text)
 
     def warning(self, text, exception=None, data={}):
         if not self._check_min_level('warning'):
             return
         self._send_to_rollbar('warning', text, exception, data)
         self._send_to_log_file('warning', text, exception, data)
-        plpy.warning(text)
+        self._send_to_plpy('warning', text)
 
     def error(self, text, exception=None, data={}):
         if not self._check_min_level('error'):
             return
         self._send_to_rollbar('error', text, exception, data)
         self._send_to_log_file('error', text, exception, data)
-        # Plpy.error and fatal raises exceptions and we only want to log an
-        # error, exceptions should be raise explicitly
-        plpy.warning(text)
+        self._send_to_plpy('error', text)
 
     def _check_min_level(self, level):
         return True if self.LEVELS[level] >= self._min_level else False
@@ -81,6 +85,19 @@ class Logger:
                 self._file_logger.warning(text, extra=extra_data)
             elif level == 'error':
                 self._file_logger.error(text, extra=extra_data)
+
+    def _send_to_plpy(self, level, text):
+        if self._check_plpy():
+            if level == 'debug':
+                plpy.debug(text)
+            elif level == 'info':
+                plpy.info(text)
+            elif level == 'warning':
+                plpy.warning(text)
+            elif level == 'error':
+                # Plpy.error and fatal raises exceptions and we only want to
+                # log an error, exceptions should be raise explicitly
+                plpy.warning(text)
 
     def _parse_log_extra_data(self, exception, data):
         extra_data = {}
@@ -117,6 +134,13 @@ class Logger:
 
     def _log_file_activated(self):
         return True if self._config.log_file_path else False
+
+    def _check_plpy(self):
+        try:
+            module = sys.modules['plpy']
+            return True
+        except KeyError:
+            return False
 
 
 class ConfigException(Exception):

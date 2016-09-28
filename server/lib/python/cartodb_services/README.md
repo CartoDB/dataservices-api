@@ -1,4 +1,4 @@
-# CartoDB dataservices API python module
+# CARTO dataservices API python module
 
 This directory contains the python library used by the server side of CARTO LDS (Location Data Services).
 

@@ -2,7 +2,7 @@ import requests
 import json
 import re
 
-from exceptions import WrongParams, MalformedResult
+from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
 
@@ -17,8 +17,9 @@ class MapzenGeocoder:
         self._url = base_url
         self._logger = logger
 
-    @qps_retry
-    def geocode(self, searchtext, city=None, state_province=None, country=None, search_type=None):
+    @qps_retry(qps=20)
+    def geocode(self, searchtext, city=None, state_province=None,
+                country=None, search_type=None):
         request_params = self._build_requests_parameters(searchtext, city,
                                                          state_province,
                                                          country, search_type)
@@ -31,20 +32,20 @@ class MapzenGeocoder:
             else:
                 self._logger.error('Error trying to geocode using mapzen',
                                 data={"response_status": response.status_code,
-                                        "response_reason": response.reason,
-                                        "response_content": response.text,
-                                        "reponse_url": response.url,
-                                        "response_headers": response.headers,
-                                        "searchtext": searchtext,
-                                        "city": city, "country": country,
-                                        "state_province": state_province })
-                raise Exception('Error trying to geocode {0} using mapzen'.format(searchtext))
+                                      "response_reason": response.reason,
+                                      "response_content": response.text,
+                                      "reponse_url": response.url,
+                                      "response_headers": response.headers,
+                                      "searchtext": searchtext,
+                                      "city": city, "country": country,
+                                      "state_province": state_province})
+                raise ServiceException('Error trying to geocode {0} using mapzen'.format(searchtext),
+                                       response)
         except requests.ConnectionError as e:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to Mapzen geocoding server',
                                exception=e)
             return []
-
 
     def _build_requests_parameters(self, searchtext, city=None,
                                    state_province=None, country=None,

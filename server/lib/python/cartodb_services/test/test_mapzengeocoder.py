@@ -6,7 +6,7 @@ import requests_mock
 from mock import Mock
 
 from cartodb_services.mapzen import MapzenGeocoder
-from cartodb_services.mapzen.exceptions import MalformedResult
+from cartodb_services.mapzen.exceptions import MalformedResult, TimeoutException
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
 

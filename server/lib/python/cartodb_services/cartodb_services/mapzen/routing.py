@@ -2,7 +2,7 @@ import requests
 import json
 import re
 
-from exceptions import WrongParams, MalformedResult
+from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
 
@@ -57,7 +57,7 @@ class MapzenRouting:
                                      "response_headers": response.headers,
                                      "waypoints": waypoints, "mode": mode,
                                      "options": options})
-            raise Exception('Error trying to calculate route using Mapzen')
+            raise ServiceException('Error trying to calculate route using Mapzen', response)
 
     def __parse_options(self, options):
         return dict(option.split('=') for option in options)
