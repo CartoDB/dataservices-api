@@ -1,6 +1,7 @@
 from user import UserMetricsService
 from log import MetricsLoggerFactory
 from datetime import date
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 import re
 
 
@@ -8,12 +9,10 @@ class QuotaService:
     """ Class to manage all the quota operation for
     the Dataservices SQL API Extension """
 
-    def __init__(self, user_service_config, redis_connection):
+    def __init__(self, user_service_config):
         self._user_service_config = user_service_config
-        self._quota_checker = QuotaChecker(user_service_config,
-                                           redis_connection)
-        self._user_service = UserMetricsService(self._user_service_config,
-                                                redis_connection)
+        self._user_service = UserMetricsService(self._user_service_config)
+        self._quota_checker = QuotaChecker(user_service_config, self._user_service)
         self._metrics_logger = MetricsLoggerFactory.build(user_service_config)
 
     def check_user_quota(self):
@@ -57,10 +56,9 @@ class QuotaService:
 
 class QuotaChecker:
 
-    def __init__(self, user_service_config, redis_connection):
+    def __init__(self, user_service_config, user_metrics_service):
         self._user_service_config = user_service_config
-        self._user_service = UserMetricsService(
-            self._user_service_config, redis_connection)
+        self._user_service = user_metrics_service
 
     def check(self):
         """ Check if the current user quota surpasses the current quota """
@@ -84,7 +82,7 @@ class QuotaChecker:
 
     def __check_geocoder_quota(self):
         # We don't have quota check for google geocoder
-        if self._user_service_config.google_geocoder:
+        if self._user_service_config.provider == 'google':
             return True
 
         user_quota = self._user_service_config.geocoding_quota

@@ -1,26 +1,19 @@
-import json
 import abc
 from dateutil.parser import parse as date_parse
-
-
-class ConfigException(Exception):
-    pass
+from cartodb_services.config.server_config import ServerConfigFactory
+from cartodb_services.config.environment import Environment
+from cartodb_services.config.exceptions import *
+from cartodb_services.tools.redis_tools import RedisConnectionFactory
 
 
 class ServiceConfig(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        self._redis_connection = redis_connection
+    def __init__(self, username, orgname=None):
         self._username = username
         self._orgname = orgname
-        self._db_config = ServicesDBConfig(db_conn, username, orgname)
-        self._environment = self._db_config._server_environment
-        if redis_connection:
-            self._redis_config = ServicesRedisConfig(redis_connection).build(
-                username, orgname)
-        else:
-            self._redis_config = None
+        self._db_config = ServicesDBConfig(username, orgname)
+        self._environment = self._db_config.server_environment
 
     @abc.abstractproperty
     def service_type(self):
@@ -41,9 +34,8 @@ class ServiceConfig(object):
 
 class DataObservatoryConfig(ServiceConfig):
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(DataObservatoryConfig, self).__init__(username, orgname)
 
     @property
     def monthly_quota(self):
@@ -68,9 +60,9 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
     QUOTA_KEY = 'obs_snapshot_quota'
     PERIOD_END_DATE = 'period_end_date'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(ObservatorySnapshotConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(ObservatorySnapshotConfig, self).__init__(username, orgname)
+        self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_limit = True
@@ -92,9 +84,9 @@ class ObservatoryConfig(DataObservatoryConfig):
     QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(ObservatoryConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(ObservatoryConfig, self).__init__(username, orgname)
+        self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_limit = True
@@ -117,9 +109,9 @@ class RoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     DEFAULT_PROVIDER = 'mapzen'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(RoutingConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
+    def __init__(self, username, orgname=None):
+        super(RoutingConfig, self).__init__(username, orgname)
+        self._redis_config = ServicesRedisConfig().build(username, orgname)
         self._routing_provider = self._redis_config[self.ROUTING_PROVIDER_KEY]
         if not self._routing_provider:
             self._routing_provider = self.DEFAULT_PROVIDER
@@ -160,9 +152,9 @@ class IsolinesRoutingConfig(ServiceConfig):
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = 'heremaps'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(IsolinesRoutingConfig, self).__init__(redis_connection, db_conn,
-                                                    username, orgname)
+    def __init__(self, username, orgname=None):
+        super(IsolinesRoutingConfig, self).__init__(username, orgname)
+        self._redis_config = ServicesRedisConfig().build(username, orgname)
         filtered_config = {key: self._redis_config[key] for key in self.ISOLINES_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config)
 
@@ -235,10 +227,9 @@ class IsolinesRoutingConfig(ServiceConfig):
 
 class InternalGeocoderConfig(ServiceConfig):
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
+    def __init__(self, username, orgname=None):
         # For now, internal geocoder doesn't use the redis config
-        super(InternalGeocoderConfig, self).__init__(None, db_conn,
-                                                     username, orgname)
+        super(InternalGeocoderConfig, self).__init__(username, orgname)
         self._log_path = self._db_config.geocoder_log_path
 
     @property
@@ -286,9 +277,9 @@ class GeocoderConfig(ServiceConfig):
     PERIOD_END_DATE = 'period_end_date'
     DEFAULT_PROVIDER = 'mapzen'
 
-    def __init__(self, redis_connection, db_conn, username, orgname=None, forced_provider=None):
-        super(GeocoderConfig, self).__init__(redis_connection, db_conn,
-                                             username, orgname)
+    def __init__(self, username, orgname=None, forced_provider=None):
+        super(GeocoderConfig, self).__init__(username, orgname)
+        self._redis_config = ServicesRedisConfig().build(username, orgname)
         filtered_config = {key: self._redis_config[key] for key in self.GEOCODER_CONFIG_KEYS if key in self._redis_config.keys()}
         self.__parse_config(filtered_config, self._db_config, forced_provider)
         self.__check_config(filtered_config)
@@ -403,38 +394,27 @@ class GeocoderConfig(ServiceConfig):
         return self._log_path
 
 
+
 class ServicesDBConfig:
 
-    def __init__(self, db_conn, username, orgname):
-        self._db_conn = db_conn
+    def __init__(self, username, orgname):
+        self._server_config = ServerConfigFactory.get()
+        self._server_environment = Environment().get()
         self._username = username
         self._orgname = orgname
         return self._build()
 
     def _build(self):
-        self._get_server_config()
         self._get_here_config()
         self._get_mapzen_config()
         self._get_logger_config()
         self._get_data_observatory_config()
 
-    def _get_server_config(self):
-        server_config_json = self._get_conf('server_conf')
-        if not server_config_json:
-            self._server_environment = 'development'
-        else:
-            server_config_json = json.loads(server_config_json)
-            if 'environment' in server_config_json:
-                self._server_environment = server_config_json['environment']
-            else:
-                self._server_environment = 'development'
-
     def _get_here_config(self):
-        heremaps_conf_json = self._get_conf('heremaps_conf')
-        if not heremaps_conf_json:
+        heremaps_conf = self._server_config.get('heremaps_conf')
+        if not heremaps_conf:
             raise ConfigException('Here maps configuration missing')
         else:
-            heremaps_conf = json.loads(heremaps_conf_json)
             self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
             self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
             self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
@@ -443,11 +423,10 @@ class ServicesDBConfig:
             self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
 
     def _get_mapzen_config(self):
-        mapzen_conf_json = self._get_conf('mapzen_conf')
-        if not mapzen_conf_json:
+        mapzen_conf = self._server_config.get('mapzen_conf')
+        if not mapzen_conf:
             raise ConfigException('Mapzen configuration missing')
         else:
-            mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
             self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
             self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
@@ -456,11 +435,10 @@ class ServicesDBConfig:
             self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
 
     def _get_data_observatory_config(self):
-        do_conf_json = self._get_conf('data_observatory_conf')
-        if not do_conf_json:
+        do_conf = self._server_config.get('data_observatory_conf')
+        if not do_conf:
             raise ConfigException('Data Observatory configuration missing')
         else:
-            do_conf = json.loads(do_conf_json)
             if self._orgname and self._orgname in do_conf['connection']['whitelist']:
                 self._data_observatory_connection_str = do_conf['connection']['staging']
             elif self._username in do_conf['connection']['whitelist']:
@@ -469,20 +447,12 @@ class ServicesDBConfig:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_logger_config(self):
-        logger_conf_json = self._get_conf('logger_conf')
-        if not logger_conf_json:
+        logger_conf = self._server_config.get('logger_conf')
+        if not logger_conf:
             raise ConfigException('Logger configuration missing')
         else:
-            logger_conf = json.loads(logger_conf_json)
             self._geocoder_log_path = logger_conf['geocoder_log_path']
 
-    def _get_conf(self, key):
-        try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)
-            return conf[0]['conf']
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
     def server_environment(self):
@@ -554,14 +524,12 @@ class ServicesRedisConfig:
     ISOLINES_PROVIDER_KEY = 'isolines_provider'
     ROUTING_PROVIDER_KEY = 'routing_provider'
 
-    def __init__(self, redis_conn):
-        self._redis_connection = redis_conn
-
     def build(self, username, orgname):
         return self.__get_user_config(username, orgname)
 
     def __get_user_config(self, username, orgname):
-        user_config = self._redis_connection.hgetall(
+        redis_connection = RedisConnectionFactory.get_metadata_connection(username)
+        user_config = redis_connection.hgetall(
             "rails:users:{0}".format(username))
         if not user_config:
             raise ConfigException("""There is no user config available. Please check your configuration.'""")
@@ -580,7 +548,8 @@ class ServicesRedisConfig:
         return user_config
 
     def __get_organization_config(self, orgname, user_config):
-        org_config = self._redis_connection.hgetall(
+        redis_connection = RedisConnectionFactory.get_metadata_connection(username)
+        org_config = redis_connection.hgetall(
             "rails:orgs:{0}".format(orgname))
         if not org_config:
             raise ConfigException("""There is no organization config available. Please check your configuration.'""")

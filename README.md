@@ -81,7 +81,7 @@ Steps to deploy a new Data Services API version :
     SELECT CDB_Conf_SetConf('data_observatory_conf', '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}');
 
     # Environment to decide: rollbar message, which servers for third party use, etc. If not setted uses production by default (current behavior)
-    SELECT CDB_Conf_SetConf('server_conf', '{"environment": "[development|staging|production]"}')
+    SELECT CDB_Conf_SetConf('server_conf', '{"environment": "[development|staging|production|onpremise]"}')
     ```
 
 - configure the user DB:

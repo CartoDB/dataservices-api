@@ -16,8 +16,8 @@ setup(
 
     url='https://github.com/CartoDB/dataservices-api',
 
-    author='Data Services Team - CartoDB',
-    author_email='dataservices@cartodb.com',
+    author='DataServices Team - CARTO',
+    author_email='dataservices@carto.com',
 
     license='MIT',
 

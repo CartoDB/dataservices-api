@@ -1,13 +1,16 @@
-import plpy
 import rollbar
 import logging
-import json
 import traceback
 import sys
+from cartodb_services.config.server_config import ServerConfigFactory
 # Monkey patch because plpython sys module doesn't have argv and rollbar
 # package use it
 sys.__dict__['argv'] = []
 
+try:
+    import plpy
+except ImportError:
+    pass
 
 class Logger:
 
@@ -30,21 +33,21 @@ class Logger:
             return
         self._send_to_rollbar('debug', text, exception, data)
         self._send_to_log_file('debug', text, exception, data)
-        plpy.debug(text)
+        self._send_to_plpy('debug', text)
 
     def info(self, text, exception=None, data={}):
         if not self._check_min_level('info'):
             return
         self._send_to_rollbar('info', text, exception, data)
         self._send_to_log_file('info', text, exception, data)
-        plpy.info(text)
+        self._send_to_plpy('info', text)
 
     def warning(self, text, exception=None, data={}):
         if not self._check_min_level('warning'):
             return
         self._send_to_rollbar('warning', text, exception, data)
         self._send_to_log_file('warning', text, exception, data)
-        plpy.warning(text)
+        self._send_to_plpy('warning', text)
 
     def error(self, text, exception=None, data={}):
         if not self._check_min_level('error'):
@@ -53,7 +56,7 @@ class Logger:
         self._send_to_log_file('error', text, exception, data)
         # Plpy.error and fatal raises exceptions and we only want to log an
         # error, exceptions should be raise explicitly
-        plpy.warning(text)
+        self._send_to_plpy('error', text)
 
     def _check_min_level(self, level):
         return True if self.LEVELS[level] >= self._min_level else False
@@ -81,6 +84,19 @@ class Logger:
                 self._file_logger.warning(text, extra=extra_data)
             elif level == 'error':
                 self._file_logger.error(text, extra=extra_data)
+
+    def _send_to_plpy(self, level, text):
+        if self._check_plpy():
+            if level == 'debug':
+                plpy.debug(text)
+            elif level == 'info':
+                plpy.info(text)
+            elif level == 'warning':
+                plpy.warning(text)
+            elif level == 'error':
+                # Plpy.error and fatal raises exceptions and we only want to
+                # log an error, exceptions should be raise explicitly
+                plpy.warning(text)
 
     def _parse_log_extra_data(self, exception, data):
         extra_data = {}
@@ -118,6 +134,13 @@ class Logger:
     def _log_file_activated(self):
         return True if self._config.log_file_path else False
 
+    def _check_plpy(self):
+        try:
+            module = sys.modules['plpy']
+            return True
+        except KeyError:
+            return False
+
 
 class ConfigException(Exception):
     pass
@@ -125,8 +148,8 @@ class ConfigException(Exception):
 
 class LoggerConfig:
 
-    def __init__(self, db_conn):
-        self._db_conn = db_conn
+    def __init__(self):
+        self._server_config = ServerConfigFactory.get()
         return self._build()
 
     def _build(self):
@@ -134,22 +157,20 @@ class LoggerConfig:
         self._get_logger_config()
 
     def _get_server_config(self):
-        server_config_json = self._get_conf('server_conf')
-        if not server_config_json:
+        server_config = self._server_config.get('server_conf')
+        if not server_config:
             self._server_environment = 'development'
         else:
-            server_config_json = json.loads(server_config_json)
-            if 'environment' in server_config_json:
-                self._server_environment = server_config_json['environment']
+            if 'environment' in server_config:
+                self._server_environment = server_config['environment']
             else:
                 self._server_environment = 'development'
 
     def _get_logger_config(self):
-        logger_conf_json = self._get_conf('logger_conf')
-        if not logger_conf_json:
+        logger_conf = self._server_config.get('logger_conf')
+        if not logger_conf:
             raise ConfigException('Logger configuration missing')
         else:
-            logger_conf = json.loads(logger_conf_json)
             self._rollbar_api_key = None
             self._min_log_level = 'warning'
             self._log_file_path = None
@@ -159,14 +180,6 @@ class LoggerConfig:
                 self._rollbar_api_key = logger_conf['rollbar_api_key']
             if 'log_file_path' in logger_conf:
                 self._log_file_path = logger_conf['log_file_path']
-
-    def _get_conf(self, key):
-        try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)
-            return conf[0]['conf']
-        except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
 
     @property
     def environment(self):
