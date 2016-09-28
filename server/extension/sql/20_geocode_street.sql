@@ -165,16 +165,16 @@ RETURNS Geometry AS $$
   configs = request.configs
 
   # TODO change to hires_geocoder_config = MapzenGeocoderConfigFactory.get(request)
-  user_geocoder_config = MapzenGeocoderConfigFactory(configs).get(user)
+  mapzen_geocoder_config = MapzenGeocoderConfigFactory(configs).get(user)
 
-
-  quota_service = QuotaService(user_geocoder_config)
+  from cartodb_services.refactor.quota.mapzen_quota_service import MapzenGeocoderQuotaService
+  quota_service = MapzenGeocoderQuotaService(mapzen_geocoder_config)
 
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key, logger)
+    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
