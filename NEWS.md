@@ -1,3 +1,8 @@
+September 28, 2016
+==========
+* Released version 0.8.1 of Python package cartodb\_services
+  * Improvements in QPS retry decorator for requests to external services
+
 September 8, 2016
 ===========
 * Released version 0.11.1 of the client
