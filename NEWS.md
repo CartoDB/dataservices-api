@@ -1,3 +1,21 @@
+September 8, 2016
+===========
+* Released version 0.11.1 of the client
+  * Minor change in the name of the function parameter sent to server and Observatory backend for compatibility with the last observatory-extension framework updates
+
+September 1, 2016
+===========
+* Released version 0.11.0 of the client
+  * Include DS table functions to create and populate a table with the GetMeasure function in observatory
+* Released version 0.15.1 of the server
+  * Rename DS table functions
+
+August 29, 2016
+===========
+* Released version 0.15.0 of the server
+* Geocode namedplace point functions uses Mapzen search service and in case of error
+  it'll use the internal geocoder
+
 August 19, 2016
 ===========
 * Released version 0.7.4.2 of the server python library

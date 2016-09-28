@@ -1,5 +1,15 @@
-CREATE TYPE cdb_dataservices_client.ds_fdw_metadata as (schemaname text, tabname text, servername text);
-CREATE TYPE cdb_dataservices_client.ds_return_metadata as (colnames text[], coltypes text[]);
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_client UPDATE TO '0.11.0'" to load this file. \quit
+
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_GetTable(text, text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_AugmentTable(text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client.__OBS_AugmentTable(text, text, text, text, text, text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client.__OBS_GetTable(text, text, text, text, text, text, text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_ConnectUserTable(text, text, text, text, text, text);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_GetReturnMetadata(text, text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_FetchJoinFdwTableData(text, text, text, text, text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._OBS_DisconnectUserTable(text, text, text, text, text);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(
     output_table_name text,
@@ -100,7 +110,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'OBS_GetMeasure'
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute("SELECT colnames, coltypes "
         "FROM cdb_dataservices_client._DST_GetReturnMetadata({username}::text, {orgname}::text, {function_name}::text, {params}::json);"
@@ -146,7 +156,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
     output_table_name text,
     params json
 ) RETURNS boolean AS $$
-    function_name = 'OBS_GetMeasure'
+    function_name = 'GetMeasure'
     # Obtain return types for augmentation procedure
     ds_return_metadata = plpy.execute(
         "SELECT colnames, coltypes "
@@ -273,3 +283,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_DisconnectUserTable;
 $$ LANGUAGE plproxy;
+
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(output_table_name text, params json) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(table_name text, output_table_name text, params json) TO publicuser;
+

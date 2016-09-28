@@ -10,7 +10,7 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text, provider text DEFAULT NULL)
 RETURNS boolean AS $$
   cache_key = "user_geocoder_config_{0}".format(username)
   if cache_key in GD:
@@ -19,7 +19,7 @@ RETURNS boolean AS $$
     from cartodb_services.metrics import GeocoderConfig
     plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
     redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
-    geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname)
+    geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
     GD[cache_key] = geocoder_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER;

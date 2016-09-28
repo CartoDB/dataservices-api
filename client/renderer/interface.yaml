@@ -33,7 +33,6 @@
     - { name: admin1_name,  type: text}
     - { name: country_name, type: text}
 
-
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
   params:

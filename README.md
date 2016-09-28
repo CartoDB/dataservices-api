@@ -5,7 +5,7 @@ The CARTO Data Services SQL API
 Steps to deploy a new Data Services API version :
 
 - Deploy new version of dataservices API to all servers
-- Update the server user using: ALTER EXTENSION cdb_dataservices_server UPDATE TO '<CURRENT_VERSION>';
+- Update the server user using: ALTER EXTENSION cdb_dataservices_server UPDATE TO '\<CURRENT_VERSION\>';
 - Update the python dependencies if needed: **cartodb_geocoder** and **heremaps**
 - Add the needed config in the `cdb_conf` table:
   - `redis_metadata_config` and `redis_metrics_conf`
