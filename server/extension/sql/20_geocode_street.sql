@@ -154,7 +154,7 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
 
   redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
-  redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config)
+  redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config).get()
   user_config_storage = RedisConfigStorage(redis_metadata_connection, 'rails:users:{0}'.format(username))
 
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
