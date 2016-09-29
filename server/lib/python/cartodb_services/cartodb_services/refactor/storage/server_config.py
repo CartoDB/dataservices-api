@@ -25,13 +25,15 @@ class InMemoryConfigStorage(ConfigStorageInterface):
         except KeyError:
             return None
 
-
+# TODO move out of this file. In general this is config but either user or org config
 class RedisConfigStorage(ConfigStorageInterface):
 
-    def __init__(self, connection, prefix):
+    def __init__(self, connection, config_key):
         self._connection = connection
-        self._prefix = prefix
+        self._config_key = config_key
+        self._data = None
 
     def get(self, key):
-        # TODO: Implement. this is just a stub
-        return None
+        if not self._data:
+            self._data = self._connection.hgetall(self._config_key)
+        return self._data[key]
