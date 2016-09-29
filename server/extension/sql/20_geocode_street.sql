@@ -147,6 +147,7 @@ RETURNS Geometry AS $$
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.storage.redis_config import RedisMetadataConnectionConfigBuilder
   from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
+  from cartodb_services.refactor.service.mapzen_geocoder import MapzenGeocoderConfigBuilder
 
   server_config_storage = InDbServerConfigStorage()
 
@@ -158,7 +159,9 @@ RETURNS Geometry AS $$
   user_config_storage = UserConfigStorageFactory(redis_metadata_connection, username).get()
   org_config_storage = OrgConfigStorageFactory(redis_metadata_connection, orgname).get()
 
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  # TODO rename this variable
+  user_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
+
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
 
 
