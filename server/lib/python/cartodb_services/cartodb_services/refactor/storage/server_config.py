@@ -25,6 +25,11 @@ class InMemoryConfigStorage(ConfigStorageInterface):
         except KeyError:
             return None
 
+class NullConfigStorage(ConfigStorageInterface):
+
+    def get(self, key):
+        return None
+
 # TODO move out of this file. In general this is config but either user or org config
 class RedisConfigStorage(ConfigStorageInterface):
 
@@ -37,3 +42,24 @@ class RedisConfigStorage(ConfigStorageInterface):
         if not self._data:
             self._data = self._connection.hgetall(self._config_key)
         return self._data[key]
+
+class UserConfigStorageFactory(object):
+    # TODO rework to support onpremise and InDbStorage
+    def __init__(self, redis_connection, username):
+        self._redis_connection = redis_connection
+        self._username = username
+
+    def get(self):
+        return RedisConfigStorage(self._redis_connection, 'rails:users:{0}'.format(self._username))
+
+class OrgConfigStorageFactory(object):
+    # TODO rework to support onpremise and InDbStorage
+    def __init__(self, redis_connection, orgname):
+        self._redis_connection = redis_connection
+        self._orgname = orgname
+
+    def get(self):
+        if self._orgname:
+            return RedisConfigStorage(self._redis_connection, 'rails:orgs:{0}'.format(self._orgname))
+        else:
+            return NullConfigStorage()
