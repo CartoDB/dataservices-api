@@ -143,17 +143,22 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
-  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
+  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage, RedisConfigStorage
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
-
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  from cartodb_services.refactor.storage.redis_config import RedisMetadataConnectionConfigBuilder
+  from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
 
   server_config_storage = InDbServerConfigStorage()
 
   logger_config = LoggerConfigBuilder(server_config_storage).get()
   logger = Logger(logger_config)
 
+  redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
+  redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config)
+  user_config_storage = RedisConfigStorage(redis_metadata_connection, 'rails:users:{0}'.format(username))
+
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
 
 
   quota_service = QuotaService(user_geocoder_config, redis_conn)
