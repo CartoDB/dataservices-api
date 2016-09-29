@@ -24,3 +24,14 @@ class InMemoryConfigStorage(ConfigStorageInterface):
             return self._config_hash[key]
         except KeyError:
             return None
+
+
+class RedisConfigStorage(ConfigStorageInterface):
+
+    def __init__(self, connection, prefix):
+        self._connection = connection
+        self._prefix = prefix
+
+    def get(self, key):
+        # TODO: Implement. this is just a stub
+        return None
