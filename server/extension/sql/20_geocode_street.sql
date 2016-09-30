@@ -145,27 +145,38 @@ RETURNS Geometry AS $$
   from cartodb_services.tools import Logger
   from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage, UserConfigStorageFactory, OrgConfigStorageFactory
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
-  from cartodb_services.refactor.storage.redis_config import RedisMetadataConnectionConfigBuilder
+  from cartodb_services.refactor.storage.redis_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
   from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
   from cartodb_services.refactor.service.mapzen_geocoder import MapzenGeocoderConfigBuilder
+  from cartodb_services.refactor.core.environment import Environment
 
   server_config_storage = InDbServerConfigStorage()
 
   logger_config = LoggerConfigBuilder(server_config_storage).get()
   logger = Logger(logger_config)
 
-  redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
-  redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config).get()
-  user_config_storage = UserConfigStorageFactory(redis_metadata_connection, username).get()
-  org_config_storage = OrgConfigStorageFactory(redis_metadata_connection, orgname).get()
+  # TODO encapsulate construction of user_config_storage and org_config_storage
+  environment = Environment(server_config_storage).get()
+  if environment == 'onpremise':
+    user_config_storage = org_config_storage = server_config_storage
+  else:
+    redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
+    redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config).get()
+    user_config_storage = UserConfigStorageFactory(redis_metadata_connection, username).get()
+    org_config_storage = OrgConfigStorageFactory(redis_metadata_connection, orgname).get()
 
   # TODO rename this variable
   user_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  # TODO encapsulate the connection creation
+  # TODO implement the RedisConnectionMock
+  if environment == 'onpremise':
+     redis_metrics_connection = RedisConnectionMock()
+  else:
+    redis_metrics_connection_config = RedisMetricsConnectionConfigBuilder(server_config_storage).get()
+    redis_metrics_connection = RedisConnectionBuilder(redis_metrics_connection_config).get()
 
-
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  quota_service = QuotaService(user_geocoder_config, redis_metrics_connection)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
