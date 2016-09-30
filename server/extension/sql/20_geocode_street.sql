@@ -170,7 +170,6 @@ RETURNS Geometry AS $$
   user_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
 
   # TODO encapsulate the connection creation
-  # TODO implement the RedisConnectionMock
   if environment == 'onpremise':
      redis_metrics_connection = RedisConnectionMock()
   else:
