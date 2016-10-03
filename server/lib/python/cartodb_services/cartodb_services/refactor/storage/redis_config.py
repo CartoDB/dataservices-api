@@ -1,3 +1,6 @@
+from cartodb_services.refactor.config.exceptions import ConfigException
+from abc import ABCMeta, abstractmethod
+
 """
 How to use this (just a draft, WIP):
 
@@ -43,12 +46,14 @@ class RedisConnectionConfig(object):
         return self._sentinel_id
 
 
-# TODO make it abstract
 class RedisConnectionConfigBuilder(object):
+
+    __metaclass__ = ABCMeta
 
     DEFAULT_USER_DB = 5
     DEFAULT_TIMEOUT = 1.5  # seconds
 
+    @abstractmethod
     def __init__(self, server_config_storage, config_key):
         self._server_config_storage = server_config_storage
         self._config_key = config_key
@@ -56,7 +61,7 @@ class RedisConnectionConfigBuilder(object):
     def get(self):
         conf = self._server_config_storage.get(self._config_key)
         if conf is None:
-            raise Exception("There is no redis configuration defined")
+            raise ConfigException("There is no redis configuration defined")
 
         host = conf['redis_host']
         port = conf['redis_port']
