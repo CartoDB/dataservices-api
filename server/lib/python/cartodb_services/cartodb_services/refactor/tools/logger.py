@@ -1,3 +1,5 @@
+from cartodb_services.refactor.config.exceptions import ConfigException
+
 class LoggerConfig(object):
 
     """This class is a value object needed to setup a Logger"""
@@ -23,9 +25,6 @@ class LoggerConfig(object):
     @property
     def min_log_level(self):
         return self._min_log_level
-
-class ConfigException(Exception):
-    pass
 
 # TODO this needs tests
 # TODO FTM this is just config, maybe move around
