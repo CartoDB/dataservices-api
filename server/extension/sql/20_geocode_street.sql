@@ -152,13 +152,12 @@ RETURNS Geometry AS $$
   from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
 
   server_config_storage = InDbServerConfigStorage()
-
-  logger_config = LoggerConfigBuilder(server_config_storage).get()
-  logger = Logger(logger_config)
-
   environment = ServerEnvironmentBuilder(server_config_storage).get()
   user_config_backend = UserConfigBackendFactory(username, environment, server_config_storage).get()
   org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_storage).get()
+
+  logger_config = LoggerConfigBuilder(environment, server_config_storage).get()
+  logger = Logger(logger_config)
 
   mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_backend, org_config_backend, username, orgname).get()
 
