@@ -1,22 +1,12 @@
 from cartodb_services.refactor.config.exceptions import ConfigException
 from abc import ABCMeta, abstractmethod
 
-"""
-How to use this (just a draft, WIP):
-
-  redis_connection_config = RedisConnectionConfigBuilder(server_config_storage).get()
-  connection = RedisConnectionBuilder(redis_connection_config)
-
-  user_config_storage = RedisConfigStorage(connection, user)
-  user_config_storage = UserConfigStorageFactory(environment).get()
-"""
 
 class RedisConnectionConfig(object):
     """
     This represents a value object to contain configuration needed to set up
     a connection to a redis server.
     """
-
 
     def __init__(self, host, port, timeout, db, sentinel_id):
         self._host = host

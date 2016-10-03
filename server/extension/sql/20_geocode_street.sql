@@ -143,7 +143,8 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
-  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage, UserConfigStorageFactory, OrgConfigStorageFactory
+  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
+  from cartodb_services.refactor.storage.redis_config import UserConfigStorageFactory, OrgConfigStorageFactory
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.tools.redis_mock import RedisConnectionMock
   from cartodb_services.refactor.storage.redis_connection_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
