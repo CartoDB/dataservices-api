@@ -144,30 +144,25 @@ RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
   from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
-  from cartodb_services.refactor.storage.redis_config import RedisUserConfigStorageBuilder, RedisOrgConfigStorageBuilder
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.tools.redis_mock import RedisConnectionMock
-  from cartodb_services.refactor.storage.redis_connection_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
+  from cartodb_services.refactor.storage.redis_connection_config import RedisMetricsConnectionConfigBuilder
   from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
   from cartodb_services.refactor.core.environment import Environment
+  from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
+  from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
 
   server_config_storage = InDbServerConfigStorage()
 
   logger_config = LoggerConfigBuilder(server_config_storage).get()
   logger = Logger(logger_config)
 
-  # TODO encapsulate construction of user_config_storage and org_config_storage
   environment = Environment(server_config_storage).get()
-  if environment == 'onpremise':
-    user_config_storage = org_config_storage = server_config_storage
-  else:
-    redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
-    redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config).get()
-    user_config_storage = RedisUserConfigStorageBuilder(redis_metadata_connection, username).get()
-    org_config_storage = RedisOrgConfigStorageBuilder(redis_metadata_connection, orgname).get()
+  user_config_backend = UserConfigBackendFactory(username, environment, server_config_storage).get()
+  org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_storage).get()
 
-  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
+  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_backend, org_config_backend, username, orgname).get()
 
   # TODO encapsulate the connection creation
   if environment == 'onpremise':

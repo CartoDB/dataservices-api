@@ -16,7 +16,6 @@ class RedisConfigStorage(ConfigStorageInterface):
 
 
 class RedisUserConfigStorageBuilder(object):
-    # TODO rework to support onpremise and InDbStorage
     def __init__(self, redis_connection, username):
         self._redis_connection = redis_connection
         self._username = username
@@ -26,7 +25,6 @@ class RedisUserConfigStorageBuilder(object):
 
 
 class RedisOrgConfigStorageBuilder(object):
-    # TODO rework to support onpremise and InDbStorage
     def __init__(self, redis_connection, orgname):
         self._redis_connection = redis_connection
         self._orgname = orgname
