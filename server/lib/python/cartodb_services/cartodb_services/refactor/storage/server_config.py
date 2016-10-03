@@ -1,8 +1,8 @@
 import json
 import cartodb_services
-from interfaces import ConfigStorageInterface
+from ..core.interfaces import ConfigBackendInterface
 
-class InDbServerConfigStorage(ConfigStorageInterface):
+class InDbServerConfigStorage(ConfigBackendInterface):
 
     def get(self, key):
         sql = "SELECT cdb_dataservices_server.cdb_conf_getconf('{0}') as conf".format(key)

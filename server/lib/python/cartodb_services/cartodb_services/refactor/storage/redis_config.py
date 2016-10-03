@@ -1,8 +1,8 @@
-from interfaces import ConfigStorageInterface
+from ..core.interfaces import ConfigBackendInterface
 from null_config import NullConfigStorage
 
 
-class RedisConfigStorage(ConfigStorageInterface):
+class RedisConfigStorage(ConfigBackendInterface):
 
     def __init__(self, connection, config_key):
         self._connection = connection

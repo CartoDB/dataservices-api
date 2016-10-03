@@ -1,7 +1,7 @@
 import abc
 
-class ConfigStorageInterface(object):
-    """This is an interface that all config storages must abide to"""
+class ConfigBackendInterface(object):
+    """This is an interface that all config backends must abide to"""
 
     __metaclass__ = abc.ABCMeta
 

@@ -5,7 +5,7 @@ from cartodb_services.refactor.storage.redis_config import RedisOrgConfigStorage
 class OrgConfigBackendFactory(object):
     """
     This class abstracts the creation of an org configuration storage. It will return
-    an implementation of the ConfigStorageInterface appropriate to the org, depending
+    an implementation of the ConfigBackendInterface appropriate to the org, depending
     on the environment.
     """
 

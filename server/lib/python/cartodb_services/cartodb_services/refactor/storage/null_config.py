@@ -1,6 +1,6 @@
-from interfaces import ConfigStorageInterface
+from ..core.interfaces import ConfigBackendInterface
 
-class NullConfigStorage(ConfigStorageInterface):
+class NullConfigStorage(ConfigBackendInterface):
 
     def get(self, key):
         return None

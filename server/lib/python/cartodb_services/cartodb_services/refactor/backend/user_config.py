@@ -5,7 +5,7 @@ from cartodb_services.refactor.storage.redis_config import RedisUserConfigStorag
 class UserConfigBackendFactory(object):
     """
     This class abstracts the creation of a user configuration storage. It will return
-    an implementation of the ConfigStorageInterface appropriate to the user, depending
+    an implementation of the ConfigBackendInterface appropriate to the user, depending
     on the environment.
     """
 
