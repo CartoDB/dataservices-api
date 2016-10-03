@@ -166,8 +166,7 @@ RETURNS Geometry AS $$
     user_config_storage = UserConfigStorageFactory(redis_metadata_connection, username).get()
     org_config_storage = OrgConfigStorageFactory(redis_metadata_connection, orgname).get()
 
-  # TODO rename this variable
-  user_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
+  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
 
   # TODO encapsulate the connection creation
   if environment == 'onpremise':
@@ -176,12 +175,12 @@ RETURNS Geometry AS $$
     redis_metrics_connection_config = RedisMetricsConnectionConfigBuilder(server_config_storage).get()
     redis_metrics_connection = RedisConnectionBuilder(redis_metrics_connection_config).get()
 
-  quota_service = QuotaService(user_geocoder_config, redis_metrics_connection)
+  quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key, logger)
+    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
