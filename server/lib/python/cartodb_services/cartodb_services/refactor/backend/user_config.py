@@ -15,8 +15,7 @@ class UserConfigBackendFactory(object):
         self._server_config_storage = server_config_storage
 
     def get(self):
-        # TODO rename Environment class to ServerEnvironment and add accessors instead of checking against plain str
-        if self._environment == 'onpremise':
+        if self._environment.is_onpremise:
             user_config_backend = self._server_config_storage
         else:
             redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(self._server_config_storage).get()

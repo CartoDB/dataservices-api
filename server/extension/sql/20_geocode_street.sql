@@ -149,7 +149,7 @@ RETURNS Geometry AS $$
   from cartodb_services.refactor.storage.redis_connection_config import RedisMetricsConnectionConfigBuilder
   from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
-  from cartodb_services.refactor.core.environment import Environment
+  from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
   from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
   from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
 
@@ -158,14 +158,14 @@ RETURNS Geometry AS $$
   logger_config = LoggerConfigBuilder(server_config_storage).get()
   logger = Logger(logger_config)
 
-  environment = Environment(server_config_storage).get()
+  environment = ServerEnvironmentBuilder(server_config_storage).get()
   user_config_backend = UserConfigBackendFactory(username, environment, server_config_storage).get()
   org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_storage).get()
 
   mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_backend, org_config_backend, username, orgname).get()
 
   # TODO encapsulate the connection creation
-  if environment == 'onpremise':
+  if environment.is_onpremise:
      redis_metrics_connection = RedisConnectionMock()
   else:
     redis_metrics_connection_config = RedisMetricsConnectionConfigBuilder(server_config_storage).get()
