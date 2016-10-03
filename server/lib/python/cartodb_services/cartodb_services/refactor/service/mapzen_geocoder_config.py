@@ -1,6 +1,5 @@
 from dateutil.parser import parse as date_parse
 
-# TODO: rename this file
 class MapzenGeocoderConfig(object):
     """
     Value object that represents the configuration needed to operate the mapzen service.
@@ -86,7 +85,7 @@ class MapzenGeocoderConfigBuilder(object):
         self._org_conf = org_conf
         self._username = username
         self._orgname = orgname
-        
+
 
     def get(self):
         mapzen_server_conf = self._server_conf.get('mapzen_conf')
@@ -96,7 +95,7 @@ class MapzenGeocoderConfigBuilder(object):
         soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit')
 
         cost_per_hit=0
-        
+
         period_end_date_str = self._org_conf.get('period_end_date') or self._user_conf.get('period_end_date')
         period_end_date = date_parse(period_end_date_str)
 
