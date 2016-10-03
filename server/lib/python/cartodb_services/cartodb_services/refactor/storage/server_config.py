@@ -1,6 +1,7 @@
 import json
 import cartodb_services
 from interfaces import ConfigStorageInterface
+from null_config import NullConfigStorage
 
 class InDbServerConfigStorage(ConfigStorageInterface):
 
@@ -13,10 +14,6 @@ class InDbServerConfigStorage(ConfigStorageInterface):
         else:
             return None
 
-class NullConfigStorage(ConfigStorageInterface):
-
-    def get(self, key):
-        return None
 
 # TODO move out of this file. In general this is config but either user or org config
 class RedisConfigStorage(ConfigStorageInterface):
