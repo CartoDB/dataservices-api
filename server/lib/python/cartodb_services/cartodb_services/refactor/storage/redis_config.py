@@ -15,7 +15,7 @@ class RedisConfigStorage(ConfigStorageInterface):
         return self._data[key]
 
 
-class UserConfigStorageFactory(object):
+class RedisUserConfigStorageBuilder(object):
     # TODO rework to support onpremise and InDbStorage
     def __init__(self, redis_connection, username):
         self._redis_connection = redis_connection
@@ -25,7 +25,7 @@ class UserConfigStorageFactory(object):
         return RedisConfigStorage(self._redis_connection, 'rails:users:{0}'.format(self._username))
 
 
-class OrgConfigStorageFactory(object):
+class RedisOrgConfigStorageBuilder(object):
     # TODO rework to support onpremise and InDbStorage
     def __init__(self, redis_connection, orgname):
         self._redis_connection = redis_connection

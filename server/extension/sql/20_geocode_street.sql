@@ -144,7 +144,7 @@ RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
   from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
-  from cartodb_services.refactor.storage.redis_config import UserConfigStorageFactory, OrgConfigStorageFactory
+  from cartodb_services.refactor.storage.redis_config import RedisUserConfigStorageBuilder, RedisOrgConfigStorageBuilder
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.tools.redis_mock import RedisConnectionMock
   from cartodb_services.refactor.storage.redis_connection_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
@@ -164,8 +164,8 @@ RETURNS Geometry AS $$
   else:
     redis_metadata_connection_config = RedisMetadataConnectionConfigBuilder(server_config_storage).get()
     redis_metadata_connection = RedisConnectionBuilder(redis_metadata_connection_config).get()
-    user_config_storage = UserConfigStorageFactory(redis_metadata_connection, username).get()
-    org_config_storage = OrgConfigStorageFactory(redis_metadata_connection, orgname).get()
+    user_config_storage = RedisUserConfigStorageBuilder(redis_metadata_connection, username).get()
+    org_config_storage = RedisOrgConfigStorageBuilder(redis_metadata_connection, orgname).get()
 
   mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_storage, org_config_storage, username, orgname).get()
 
