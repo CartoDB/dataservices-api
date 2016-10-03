@@ -143,25 +143,25 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
-  from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
   from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
+  from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
   from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
   from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
   from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
 
-  server_config_storage = InDbServerConfigStorage()
-  environment = ServerEnvironmentBuilder(server_config_storage).get()
-  user_config_backend = UserConfigBackendFactory(username, environment, server_config_storage).get()
-  org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_storage).get()
+  server_config_backend = ServerConfigBackendFactory().get()
+  environment = ServerEnvironmentBuilder(server_config_backend).get()
+  user_config_backend = UserConfigBackendFactory(username, environment, server_config_backend).get()
+  org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_backend).get()
 
-  logger_config = LoggerConfigBuilder(environment, server_config_storage).get()
+  logger_config = LoggerConfigBuilder(environment, server_config_backend).get()
   logger = Logger(logger_config)
 
-  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_storage, user_config_backend, org_config_backend, username, orgname).get()
+  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_backend, user_config_backend, org_config_backend, username, orgname).get()
 
-  redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_storage).get()
+  redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
 
   quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
   if not quota_service.check_user_quota():
