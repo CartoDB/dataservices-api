@@ -146,7 +146,7 @@ RETURNS Geometry AS $$
   from cartodb_services.refactor.storage.server_config import InDbServerConfigStorage, UserConfigStorageFactory, OrgConfigStorageFactory
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.tools.redis_mock import RedisConnectionMock
-  from cartodb_services.refactor.storage.redis_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
+  from cartodb_services.refactor.storage.redis_connection_config import RedisMetadataConnectionConfigBuilder, RedisMetricsConnectionConfigBuilder
   from cartodb_services.refactor.storage.redis_connection import RedisConnectionBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
   from cartodb_services.refactor.core.environment import Environment

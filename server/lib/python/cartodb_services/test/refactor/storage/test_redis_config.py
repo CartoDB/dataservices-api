@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cartodb_services.refactor.storage.redis_config import *
+from cartodb_services.refactor.storage.redis_connection_config import *
 from cartodb_services.refactor.storage.mem_config import InMemoryConfigStorage
 from cartodb_services.refactor.config.exceptions import ConfigException
 
