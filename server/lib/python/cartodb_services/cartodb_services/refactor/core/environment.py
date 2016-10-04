@@ -20,8 +20,23 @@ class ServerEnvironment(object):
         return self._environment_str
 
     @property
+    def is_development(self):
+        return self._environment_str == self.DEVELOPMENT
+
+    @property
+    def is_staging(self):
+        return self._environment_str == self.STAGING
+
+    @property
+    def is_production(self):
+        return self._environment_str == self.PRODUCTION
+
+    @property
     def is_onpremise(self):
         return self._environment_str == self.ONPREMISE
+
+    def __eq__(self, other):
+        return self._environment_str == other._environment_str
 
 
 class ServerEnvironmentBuilder(object):
