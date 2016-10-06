@@ -55,9 +55,9 @@ class RedisConnectionConfigBuilder(object):
 
         host = conf['redis_host']
         port = conf['redis_port']
-        timeout = conf['timeout'] or self.DEFAULT_TIMEOUT
-        db = conf['redis_db'] or self.DEFAULT_USER_DB
-        sentinel_id = conf['sentinel_master_id']
+        timeout = conf.get('timeout', self.DEFAULT_TIMEOUT) or self.DEFAULT_TIMEOUT
+        db = conf.get('redis_db', self.DEFAULT_USER_DB) or self.DEFAULT_USER_DB
+        sentinel_id = conf.get('sentinel_master_id', None)
 
         return RedisConnectionConfig(host, port, timeout, db, sentinel_id)
 

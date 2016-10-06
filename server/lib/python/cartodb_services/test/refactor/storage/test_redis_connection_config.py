@@ -99,3 +99,17 @@ class TestRedisMetricsConnectionConfigBuilder(TestCase):
         assert config.timeout == 0.2
         assert config.db == 3
         assert config.sentinel_id == 'some_master_id'
+
+    def test_it_sets_absent_values_to_none_or_defaults(self):
+        server_config_storage = InMemoryConfigStorage({
+            'redis_metrics_config': {
+                'redis_host': 'myhost.com',
+                'redis_port': 6379,
+            }
+        })
+        config = RedisMetricsConnectionConfigBuilder(server_config_storage).get()
+        assert config.host == 'myhost.com'
+        assert config.port == 6379
+        assert config.timeout == 1.5
+        assert config.db == 5
+        assert config.sentinel_id is None
