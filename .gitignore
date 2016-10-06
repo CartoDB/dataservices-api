@@ -1,5 +1,6 @@
 .DS_Store
 *.pyc
+.coverage
 cartodb_services.egg-info/
 build/
 dist/
