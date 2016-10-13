@@ -290,8 +290,7 @@ Geocodes a postal code from a specified country into an IP address, displayed as
 
 Name | Type | Description
 --- | --- | ---
-`ip_address` | `text` | Postal code
-`country_name` | `text` | IPv4 or IPv6 address
+`ip_address` | `text` | IPv4 or IPv6 address
 
 #### Returns
 
