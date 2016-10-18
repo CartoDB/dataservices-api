@@ -156,7 +156,7 @@ class RoutingConfig(ServiceConfig):
         self._monthly_quota = self._get_effective_monthly_quota()
 
     def _get_effective_monthly_quota(self):
-        quota_from_redis = self._redis_config[self.QUOTA_KEY]
+        quota_from_redis = self._redis_config.get(self.QUOTA_KEY)
         if quota_from_redis and quota_from_redis <> '':
             return int(quota_from_redis)
         else:
@@ -600,9 +600,6 @@ class ServicesRedisConfig:
         if self.ROUTING_PROVIDER_KEY not in user_config:
             user_config[self.ROUTING_PROVIDER_KEY] = ''
 
-        # Mapzen routing quota might be not present
-        user_config[self.ROUTING_QUOTA_KEY] = user_config.get(self.ROUTING_QUOTA_KEY)
-
         if orgname:
             self.__get_organization_config(orgname, user_config)
 
@@ -616,7 +613,8 @@ class ServicesRedisConfig:
         else:
             user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
             user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
-            user_config[self.ROUTING_QUOTA_KEY] = org_config.get(self.ROUTING_QUOTA_KEY)
+            if self.ROUTING_QUOTA_KEY in org_config:
+                user_config[self.ROUTING_QUOTA_KEY] = org_config[self.ROUTING_QUOTA_KEY]
             if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
                 user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
             if self.OBS_GENERAL_QUOTA_KEY in org_config:
