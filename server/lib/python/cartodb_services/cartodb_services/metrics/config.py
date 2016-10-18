@@ -117,6 +117,7 @@ class RoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     DEFAULT_PROVIDER = 'mapzen'
     QUOTA_KEY = 'mapzen_routing_quota'
+    SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(RoutingConfig, self).__init__(redis_connection, db_conn,
@@ -126,6 +127,7 @@ class RoutingConfig(ServiceConfig):
             self._routing_provider = self.DEFAULT_PROVIDER
         self._mapzen_api_key = self._db_config.mapzen_routing_api_key
         self._set_monthly_quota()
+        self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
 
     @property
@@ -145,6 +147,11 @@ class RoutingConfig(ServiceConfig):
     def period_end_date(self):
         return self._period_end_date
 
+    @property
+    def soft_limit(self):
+        return self._soft_limit
+
+
     def _set_monthly_quota(self):
         self._monthly_quota = self._get_effective_monthly_quota()
 
@@ -155,7 +162,11 @@ class RoutingConfig(ServiceConfig):
         else:
             return self._db_config.mapzen_routing_monthly_quota
 
-        
+    def _set_soft_limit(self):
+        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_limit = True
+        else:
+            self._soft_limit = False
 
 
 
