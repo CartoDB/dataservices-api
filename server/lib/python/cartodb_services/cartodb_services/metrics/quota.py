@@ -115,8 +115,9 @@ class QuotaChecker:
         today = date.today()
         service_type = self._user_service_config.service_type
         current_used = self._user_service.used_quota(service_type, today)
+        soft_limit = self._user_service_config.soft_limit
 
-        if (user_quota > 0 and current_used <= user_quota):
+        if soft_limit or (user_quota > 0 and current_used <= user_quota):
             return True
         else:
             return False
