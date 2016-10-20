@@ -51,6 +51,24 @@ class TestQuotaChecker(TestCase):
         checker = QuotaChecker(user_service_config, redis_conn)
         assert checker.check() == False
 
+    def test_routing_quota_check_fails_right_in_the_limit(self):
+        """
+        I have 1000 credits and I just spent 1000 today. I should not pass
+        the check to perform the 1001th routing operation.
+        """
+        user_service_config = RoutingConfigMock(
+            username = self.USERNAME,
+            organization = None,
+            service_type = self.SERVICE_TYPE,
+            monthly_quota = 1000,
+            period_end_date = datetime.today(),
+            soft_limit = False
+        )
+        redis_conn = MockRedis()
+        redis_conn.zincrby(self.REDIS_KEY, self.PERIOD_END_DATE.day, 1000)
+        checker = QuotaChecker(user_service_config, redis_conn)
+        assert checker.check() == False
+
     def test_routing_quota_check_passes_if_no_quota_but_soft_limit(self):
         user_service_config = RoutingConfigMock(
             username = self.USERNAME,

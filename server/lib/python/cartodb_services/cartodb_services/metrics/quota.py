@@ -93,7 +93,7 @@ class QuotaChecker:
         current_used = self._user_service.used_quota(service_type, today)
         soft_geocoding_limit = self._user_service_config.soft_geocoding_limit
 
-        if soft_geocoding_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_geocoding_limit or (user_quota > 0 and current_used < user_quota):
             return True
         else:
             return False
@@ -105,7 +105,7 @@ class QuotaChecker:
         current_used = self._user_service.used_quota(service_type, today)
         soft_isolines_limit = self._user_service_config.soft_isolines_limit
 
-        if soft_isolines_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_isolines_limit or (user_quota > 0 and current_used < user_quota):
             return True
         else:
             return False
@@ -117,7 +117,7 @@ class QuotaChecker:
         current_used = self._user_service.used_quota(service_type, today)
         soft_limit = self._user_service_config.soft_limit
 
-        if soft_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_limit or (user_quota > 0 and current_used < user_quota):
             return True
         else:
             return False
@@ -129,7 +129,7 @@ class QuotaChecker:
         service_type = self._user_service_config.service_type
         current_used = self._user_service.used_quota(service_type, today)
 
-        if soft_limit or (user_quota > 0 and current_used <= user_quota):
+        if soft_limit or (user_quota > 0 and current_used < user_quota):
             return True
         else:
             return False
