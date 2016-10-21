@@ -1,3 +1,8 @@
+October 21st, 2016
+==================
+* Version 0.9.2 of the python package
+    * mapzen routing quota now is configurable per user
+
 September 28, 2016
 ==========
 * Released version 0.8.1 of Python package cartodb\_services
