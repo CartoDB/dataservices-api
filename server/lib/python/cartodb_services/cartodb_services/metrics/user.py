@@ -8,6 +8,7 @@ class UserMetricsService:
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
     SERVICE_HERE_ISOLINES = 'here_isolines'
+    SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
     def __init__(self, user_geocoder_config, redis_connection):
@@ -19,6 +20,8 @@ class UserMetricsService:
     def used_quota(self, service_type, date):
         if service_type == self.SERVICE_HERE_ISOLINES:
             return self.__used_isolines_quota(service_type, date)
+        elif service_type == self.SERVICE_MAPZEN_ROUTING:
+            return self.__used_routing_quota(service_type, date)
         else:
             return self.__used_geocoding_quota(service_type, date)
 

@@ -116,6 +116,8 @@ class RoutingConfig(ServiceConfig):
     ROUTING_PROVIDER_KEY = 'routing_provider'
     MAPZEN_PROVIDER = 'mapzen'
     DEFAULT_PROVIDER = 'mapzen'
+    QUOTA_KEY = 'mapzen_routing_quota'
+    SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(RoutingConfig, self).__init__(redis_connection, db_conn,
@@ -124,7 +126,8 @@ class RoutingConfig(ServiceConfig):
         if not self._routing_provider:
             self._routing_provider = self.DEFAULT_PROVIDER
         self._mapzen_api_key = self._db_config.mapzen_routing_api_key
-        self._monthly_quota = self._db_config.mapzen_routing_monthly_quota
+        self._set_monthly_quota()
+        self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
 
     @property
@@ -143,6 +146,28 @@ class RoutingConfig(ServiceConfig):
     @property
     def period_end_date(self):
         return self._period_end_date
+
+    @property
+    def soft_limit(self):
+        return self._soft_limit
+
+
+    def _set_monthly_quota(self):
+        self._monthly_quota = self._get_effective_monthly_quota()
+
+    def _get_effective_monthly_quota(self):
+        quota_from_redis = self._redis_config.get(self.QUOTA_KEY)
+        if quota_from_redis and quota_from_redis <> '':
+            return int(quota_from_redis)
+        else:
+            return self._db_config.mapzen_routing_monthly_quota
+
+    def _set_soft_limit(self):
+        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_limit = True
+        else:
+            self._soft_limit = False
+
 
 
 class IsolinesRoutingConfig(ServiceConfig):
@@ -547,6 +572,7 @@ class ServicesRedisConfig:
     GOOGLE_GEOCODER_CLIENT_ID = 'google_maps_client_id'
     QUOTA_KEY = 'geocoding_quota'
     ISOLINES_QUOTA_KEY = 'here_isolines_quota'
+    ROUTING_QUOTA_KEY = 'mapzen_routing_quota'
     OBS_SNAPSHOT_QUOTA_KEY = 'obs_snapshot_quota'
     OBS_GENERAL_QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
@@ -585,8 +611,12 @@ class ServicesRedisConfig:
         if not org_config:
             raise ConfigException("""There is no organization config available. Please check your configuration.'""")
         else:
-            user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
-            user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
+            if self.QUOTA_KEY in org_config:
+                user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
+            if self.ISOLINES_QUOTA_KEY in org_config:
+                user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
+            if self.ROUTING_QUOTA_KEY in org_config:
+                user_config[self.ROUTING_QUOTA_KEY] = org_config[self.ROUTING_QUOTA_KEY]
             if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
                 user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
             if self.OBS_GENERAL_QUOTA_KEY in org_config:
