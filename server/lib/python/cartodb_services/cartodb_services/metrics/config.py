@@ -611,8 +611,10 @@ class ServicesRedisConfig:
         if not org_config:
             raise ConfigException("""There is no organization config available. Please check your configuration.'""")
         else:
-            user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
-            user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
+            if self.QUOTA_KEY in org_config:
+                user_config[self.QUOTA_KEY] = org_config[self.QUOTA_KEY]
+            if self.ISOLINES_QUOTA_KEY in org_config:
+                user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
             if self.ROUTING_QUOTA_KEY in org_config:
                 user_config[self.ROUTING_QUOTA_KEY] = org_config[self.ROUTING_QUOTA_KEY]
             if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
