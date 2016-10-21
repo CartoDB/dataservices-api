@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mockredis import MockRedis
-from cartodb_services.metrics import RoutingConfig
+from cartodb_services.metrics.config import RoutingConfig, ServicesRedisConfig
 from ..test_helper import build_plpy_mock
 
 class TestRoutingConfig(TestCase):
@@ -48,3 +48,20 @@ class TestRoutingConfig(TestCase):
         orgname = None
         config = RoutingConfig(self._redis_conn, self._db_conn, self._username, orgname)
         assert config.soft_limit == True
+
+
+class TestServicesRedisConfig(TestCase):
+    def test_it_picks_mapzen_routing_quota_from_redis(self):
+        redis_conn = MockRedis()
+        redis_conn.hset('rails:users:my_username', 'mapzen_routing_quota', 42)
+        redis_config = ServicesRedisConfig(redis_conn).build('my_username', None)
+        assert 'mapzen_routing_quota' in redis_config
+        assert int(redis_config['mapzen_routing_quota']) == 42
+
+    def test_org_quota_overrides_user_quota(self):
+        redis_conn = MockRedis()
+        redis_conn.hset('rails:users:my_username', 'mapzen_routing_quota', 42)
+        redis_conn.hset('rails:orgs:acme', 'mapzen_routing_quota', 31415)
+        redis_config = ServicesRedisConfig(redis_conn).build('my_username', 'acme')
+        assert 'mapzen_routing_quota' in redis_config
+        assert int(redis_config['mapzen_routing_quota']) == 31415
