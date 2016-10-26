@@ -43,7 +43,7 @@ class MatrixClient:
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params)
 
-        if not requests.codes.ok:
+        if response.status_code != requests.codes.ok:
             self._logger.error('Error trying to get matrix distance from mapzen',
                                data={"response_status": response.status_code,
                                      "response_reason": response.reason,
@@ -52,6 +52,22 @@ class MatrixClient:
                                      "response_headers": response.headers,
                                      "locations": locations,
                                      "costing": costing})
-            raise ServiceException("Error trying to get matrix distance from mapzen", response)
+            # In case 4xx error we return empty because the error comes from
+            # the provided info by the user and we don't want to top the
+            # isolines generation
+            if response.status_code == requests.codes.bad_request:
+                return {}
+            elif response.status_coe == 504:
+                # Due to some unsolved problems in the Mapzen Matrix API we're
+                # getting randomly 504, probably timeouts. To avoid raise an
+                # exception in all the jobs, for now we're going to return
+                # empty in that case
+                return {}
+            else:
+                raise ServiceException("Error trying to get matrix distance from mapzen", response)
 
-        return response.json()
+        # response could return with empty json
+        try:
+            return response.json()
+        except:
+            return {}
