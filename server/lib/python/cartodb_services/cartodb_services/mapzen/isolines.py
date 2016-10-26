@@ -86,7 +86,7 @@ class MapzenIsolines:
     def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable, unit_factor=1.0):
 
         # NOTE: not for production
-        self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
+        # self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
 
         # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
         # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
@@ -105,13 +105,15 @@ class MapzenIsolines:
 
             response = self._matrix_client.one_to_many([origin] + location_estimates,  costing_model)
             costs = [None] * self.NUMBER_OF_ANGLES
+            if not response:
+                # In case the matrix client doesn't return any data
+                break
+
             for idx, c in enumerate(response['one_to_many'][0][1:]):
                 if c[cost_variable]:
                     costs[idx] = c[cost_variable]*unit_factor
                 else:
                     costs[idx] = isorange
-
-            # self._logger.debug('i = %d, costs = %s' % (i, costs))
 
             errors = [(cost - isorange) / float(isorange) for cost in costs]
             max_abs_error = max([abs(e) for e in errors])
