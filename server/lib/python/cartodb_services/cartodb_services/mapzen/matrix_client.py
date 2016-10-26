@@ -57,7 +57,7 @@ class MatrixClient:
             # isolines generation
             if response.status_code == requests.codes.bad_request:
                 return {}
-            elif response.status_coe == 504:
+            elif response.status_code == 504:
                 # Due to some unsolved problems in the Mapzen Matrix API we're
                 # getting randomly 504, probably timeouts. To avoid raise an
                 # exception in all the jobs, for now we're going to return
