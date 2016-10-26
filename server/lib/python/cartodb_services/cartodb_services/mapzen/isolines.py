@@ -86,7 +86,7 @@ class MapzenIsolines:
     def calculate_isoline(self, origin, costing_model, isorange, upper_rmax, cost_variable, unit_factor=1.0):
 
         # NOTE: not for production
-        self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
+        # self._logger.debug('Calculate isoline', data={"origin": origin, "costing_model": costing_model, "isorange": isorange})
 
         # Formally, a solution is an array of {angle, radius, lat, lon, cost} with cardinality NUMBER_OF_ANGLES
         # we're looking for a solution in which abs(cost - isorange) / isorange <= TOLERANCE
