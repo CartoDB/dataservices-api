@@ -19,6 +19,8 @@ class MatrixClient:
     """
 
     ONE_TO_MANY_URL = 'https://matrix.mapzen.com/one_to_many'
+    READ_TIMEOUT = 60
+    CONNECT_TIMEOUT = 10
 
     def __init__(self, matrix_key, logger):
         self._matrix_key = matrix_key
@@ -41,7 +43,8 @@ class MatrixClient:
             'costing': costing,
             'api_key': self._matrix_key
         }
-        response = requests.get(self.ONE_TO_MANY_URL, params=request_params)
+        response = requests.get(self.ONE_TO_MANY_URL, params=request_params,
+                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
 
         if response.status_code != requests.codes.ok:
             self._logger.error('Error trying to get matrix distance from mapzen',

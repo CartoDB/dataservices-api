@@ -11,6 +11,8 @@ class MapzenGeocoder:
     'A Mapzen Geocoder wrapper for python'
 
     BASE_URL = 'https://search.mapzen.com/v1/search'
+    READ_TIMEOUT = 60
+    CONNECT_TIMEOUT = 10
 
     def __init__(self, app_key, logger, base_url=BASE_URL):
         self._app_key = app_key
@@ -24,7 +26,8 @@ class MapzenGeocoder:
                                                          state_province,
                                                          country, search_type)
         try:
-            response = requests.get(self._url, params=request_params)
+            response = requests.get(self._url, params=request_params,
+                                    timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
             if response.status_code == requests.codes.ok:
                 return self.__parse_response(response.text)
             elif response.status_code == requests.codes.bad_request:
@@ -41,6 +44,12 @@ class MapzenGeocoder:
                                       "state_province": state_province})
                 raise ServiceException('Error trying to geocode {0} using mapzen'.format(searchtext),
                                        response)
+        except requests.Timeout as te:
+            # In case of timeout we want to stop the job because the server
+            # could be down
+            self._logger.error('Timeout connecting to Mapzen geocoding server')
+            raise ServiceException('Error trying to geocode {0} using mapzen'.format(searchtext),
+                                    None)
         except requests.ConnectionError as e:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to Mapzen geocoding server',

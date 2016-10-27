@@ -14,6 +14,8 @@ class HereMapsGeocoder:
     STAGING_GEOCODE_JSON_URL = 'https://geocoder.cit.api.here.com/6.2/geocode.json'
     DEFAULT_MAXRESULTS = 1
     DEFAULT_GEN = 9
+    READ_TIMEOUT = 60
+    CONNECT_TIMEOUT = 10
 
     ADDRESS_PARAMS = [
         'city',
@@ -85,7 +87,8 @@ class HereMapsGeocoder:
             'gen': self.gen
         }
         request_params.update(params)
-        response = requests.get(self.host, params=request_params)
+        response = requests.get(self.host, params=request_params,
+                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
         elif response.status_code == requests.codes.bad_request:

@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 setup(
     name='cartodb_services',
 
-    version='0.9.3',
+    version='0.9.4',
 
     description='CartoDB Services API Python Library',
 
