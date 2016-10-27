@@ -10,6 +10,8 @@ class HereMapsRoutingIsoline:
     PRODUCTION_ROUTING_BASE_URL = 'https://isoline.route.api.here.com'
     STAGING_ROUTING_BASE_URL = 'https://isoline.route.cit.api.here.com'
     ISOLINE_PATH = '/routing/7.2/calculateisoline.json'
+    READ_TIMEOUT = 60
+    CONNECT_TIMEOUT = 10
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -50,7 +52,8 @@ class HereMapsRoutingIsoline:
                                                          data_range,
                                                          range_type,
                                                          parsed_options)
-        response = requests.get(self._url, params=request_params)
+        response = requests.get(self._url, params=request_params,
+                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         if response.status_code == requests.codes.ok:
             return self.__parse_isolines_response(response.text)
         elif response.status_code == requests.codes.bad_request:

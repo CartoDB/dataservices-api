@@ -11,6 +11,8 @@ class MapzenRouting:
     'A Mapzen Routing wrapper for python'
 
     PRODUCTION_ROUTING_BASE_URL = 'https://valhalla.mapzen.com/route'
+    READ_TIMEOUT = 60
+    CONNECT_TIMEOUT = 10
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -43,7 +45,8 @@ class MapzenRouting:
                                                            mode_param,
                                                            units)
         request_params = self.__parse_request_parameters(json_request_params)
-        response = requests.get(self._url, params=request_params)
+        response = requests.get(self._url, params=request_params,
+                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         if response.status_code == requests.codes.ok:
             return self.__parse_routing_response(response.text)
         elif response.status_code == requests.codes.bad_request:
