@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(us
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
+  from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger,LoggerConfig
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -13,23 +14,24 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon(trim($1)) AS mypolygon", ["text"])
-    rv = plpy.execute(plan, [country_name], 1)
-    result = rv[0]["mypolygon"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode admin0 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode admin0 polygon')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_admin0_polygon', user_geocoder_config):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon(trim($1)) AS mypolygon", ["text"])
+      rv = plpy.execute(plan, [country_name], 1)
+      result = rv[0]["mypolygon"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode admin0 polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode admin0 polygon')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 

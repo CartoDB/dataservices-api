@@ -15,6 +15,7 @@ class ServiceConfig(object):
         self._username = username
         self._orgname = orgname
         self._db_config = ServicesDBConfig(db_conn, username, orgname)
+        self._metrics_log_path = self.__get_metrics_log_path()
         self._environment = self._db_config._server_environment
         if redis_connection:
             self._redis_config = ServicesRedisConfig(redis_connection).build(
@@ -38,8 +39,19 @@ class ServiceConfig(object):
     def environment(self):
         return self._environment
 
+    @property
+    def metrics_log_path(self):
+        return self._metrics_log_path
+
+    def __get_metrics_log_path(self):
+        if self.METRICS_LOG_KEY:
+            return self._db_config.logger_config.get(self.METRICS_LOG_KEY, None)
+        else:
+            return None
 
 class DataObservatoryConfig(ServiceConfig):
+
+    METRICS_LOG_KEY = 'do_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
@@ -60,6 +72,10 @@ class DataObservatoryConfig(ServiceConfig):
     @property
     def connection_str(self):
         return self._connection_str
+
+    @property
+    def provider(self):
+        return 'data observatory'
 
 
 class ObservatorySnapshotConfig(DataObservatoryConfig):
@@ -118,6 +134,7 @@ class RoutingConfig(ServiceConfig):
     DEFAULT_PROVIDER = 'mapzen'
     QUOTA_KEY = 'mapzen_routing_quota'
     SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
+    METRICS_LOG_KEY = 'routing_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(RoutingConfig, self).__init__(redis_connection, db_conn,
@@ -136,6 +153,10 @@ class RoutingConfig(ServiceConfig):
             return 'routing_mapzen'
 
     @property
+    def provider(self):
+        return self._routing_provider
+
+    @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
 
@@ -150,7 +171,6 @@ class RoutingConfig(ServiceConfig):
     @property
     def soft_limit(self):
         return self._soft_limit
-
 
     def _set_monthly_quota(self):
         self._monthly_quota = self._get_effective_monthly_quota()
@@ -169,7 +189,6 @@ class RoutingConfig(ServiceConfig):
             self._soft_limit = False
 
 
-
 class IsolinesRoutingConfig(ServiceConfig):
 
     ISOLINES_CONFIG_KEYS = ['here_isolines_quota', 'soft_here_isolines_limit',
@@ -184,6 +203,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = 'heremaps'
+    METRICS_LOG_KEY = 'isolines_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         super(IsolinesRoutingConfig, self).__init__(redis_connection, db_conn,
@@ -260,11 +280,12 @@ class IsolinesRoutingConfig(ServiceConfig):
 
 class InternalGeocoderConfig(ServiceConfig):
 
+    METRICS_LOG_KEY = 'geocoder_log_path'
+
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         # For now, internal geocoder doesn't use the redis config
         super(InternalGeocoderConfig, self).__init__(None, db_conn,
                                                      username, orgname)
-        self._log_path = self._db_config.geocoder_log_path
 
     @property
     def service_type(self):
@@ -283,8 +304,8 @@ class InternalGeocoderConfig(ServiceConfig):
         return None
 
     @property
-    def log_path(self):
-        return self._log_path
+    def provider(self):
+        return 'internal'
 
 
 class GeocoderConfig(ServiceConfig):
@@ -310,6 +331,7 @@ class GeocoderConfig(ServiceConfig):
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
     DEFAULT_PROVIDER = 'mapzen'
+    METRICS_LOG_KEY = 'geocoder_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None, forced_provider=None):
         super(GeocoderConfig, self).__init__(redis_connection, db_conn,
@@ -341,7 +363,6 @@ class GeocoderConfig(ServiceConfig):
             self._geocoder_provider = self.DEFAULT_PROVIDER
         self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
-        self._log_path = db_config.geocoder_log_path
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_geocoding_limit = True
         else:
@@ -424,8 +445,8 @@ class GeocoderConfig(ServiceConfig):
         return self._cost_per_hit
 
     @property
-    def log_path(self):
-        return self._log_path
+    def provider(self):
+        return self._geocoder_provider
 
 
 class ServicesDBConfig:
@@ -440,7 +461,6 @@ class ServicesDBConfig:
         self._get_server_config()
         self._get_here_config()
         self._get_mapzen_config()
-        self._get_logger_config()
         self._get_data_observatory_config()
 
     def _get_server_config(self):
@@ -493,13 +513,6 @@ class ServicesDBConfig:
             else:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
-    def _get_logger_config(self):
-        logger_conf_json = self._get_conf('logger_conf')
-        if not logger_conf_json:
-            raise ConfigException('Logger configuration missing')
-        else:
-            logger_conf = json.loads(logger_conf_json)
-            self._geocoder_log_path = logger_conf['geocoder_log_path']
 
     def _get_conf(self, key):
         try:
@@ -507,7 +520,7 @@ class ServicesDBConfig:
             conf = self._db_conn.execute(sql, 1)
             return conf[0]['conf']
         except Exception as e:
-            raise ConfigException("Malformed config for {0}: {1}".format(key, e))
+            raise ConfigException("Error trying to get config for {0}: {1}".format(key, e))
 
     @property
     def server_environment(self):
@@ -558,12 +571,16 @@ class ServicesDBConfig:
         return self._mapzen_geocoder_quota
 
     @property
-    def geocoder_log_path(self):
-        return self._geocoder_log_path
-
-    @property
     def data_observatory_connection_str(self):
         return self._data_observatory_connection_str
+
+    @property
+    def logger_config(self):
+        logger_conf_json = self._get_conf('logger_conf')
+        if not logger_conf_json:
+            raise ConfigException('Logger configuration missing')
+        else:
+            return json.loads(logger_conf_json)
 
 
 class ServicesRedisConfig:
