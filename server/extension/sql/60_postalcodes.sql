@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
+  from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
   from cartodb_services.tools import Logger,LoggerConfig
@@ -13,27 +14,29 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
-    rv = plpy.execute(plan, [code], 1)
-    result = rv[0]["mypoint"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode postal code point')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
+      rv = plpy.execute(plan, [code], 1)
+      result = rv[0]["mypoint"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code point')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
+  from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
   from cartodb_services.tools import Logger,LoggerConfig
@@ -47,27 +50,29 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1), trim($2)) AS mypoint", ["TEXT", "TEXT"])
-    rv = plpy.execute(plan, [code, country], 1)
-    result = rv[0]["mypoint"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode postal code point')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1), trim($2)) AS mypoint", ["TEXT", "TEXT"])
+      rv = plpy.execute(plan, [code, country], 1)
+      result = rv[0]["mypoint"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode postal code point', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code point')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
+  from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
   from cartodb_services.tools import Logger,LoggerConfig
@@ -81,27 +86,29 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1)) AS mypolygon", ["text"])
-    rv = plpy.execute(plan, [code], 1)
-    result = rv[0]["mypolygon"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode postal code polygon')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1)) AS mypolygon", ["text"])
+      rv = plpy.execute(plan, [code], 1)
+      result = rv[0]["mypolygon"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code polygon')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
+  from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
   from cartodb_services.tools import Logger,LoggerConfig
@@ -115,23 +122,24 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1), trim($2)) AS mypolygon", ["TEXT", "TEXT"])
-    rv = plpy.execute(plan, [code, country], 1)
-    result = rv[0]["mypolygon"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode postal code polygon')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1), trim($2)) AS mypolygon", ["TEXT", "TEXT"])
+      rv = plpy.execute(plan, [code, country], 1)
+      result = rv[0]["mypolygon"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code polygon')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
