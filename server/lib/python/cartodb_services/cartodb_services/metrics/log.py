@@ -4,6 +4,7 @@ import json
 import re
 import time
 from contextlib import contextmanager
+from urlparse import urlparse
 
 
 @contextmanager
@@ -23,23 +24,27 @@ def metrics(function, service_config, logger=None):
 
 
 class Traceable:
-
     def add_response_data(self, response, logger=None):
         try:
             response_data = {}
             response_data['time'] = response.elapsed.total_seconds()
             response_data['code'] = response.status_code
             response_data['message'] = response.reason
+            response_data['url'] = self._parse_response_url(response.url)
             stored_data = MetricsDataGatherer.get_element('response')
             if stored_data:
                 stored_data.append(response_data)
             else:
                 MetricsDataGatherer.add('response', [response_data])
         except BaseException as e:
-            # We don't want to stop the job for some error here
+            # We don't want to stop the job for some error processing response
             if logger:
                 logger.error("Error trying to process response data for metrics",
                              exception=e)
+
+    def _parse_response_url(self, url):
+        u = urlparse(url)
+        return "{0}://{1}{2}".format(u.scheme, u.netloc, u.path)
 
 
 class MetricsDataGatherer:
