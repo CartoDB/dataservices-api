@@ -48,7 +48,7 @@ class MapzenRouting(Traceable):
         request_params = self.__parse_request_parameters(json_request_params)
         response = requests.get(self._url, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
-        self.add_response_data(response)
+        self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return self.__parse_routing_response(response.text)
         elif response.status_code == requests.codes.bad_request:

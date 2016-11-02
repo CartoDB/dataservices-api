@@ -7,7 +7,7 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def metrics(function, service_config):
+def metrics(function, service_config, logger=None):
     try:
         start_time = time.time()
         yield
@@ -15,16 +15,16 @@ def metrics(function, service_config):
         end_time = time.time()
         MetricsDataGatherer.add('function_name', function)
         MetricsDataGatherer.add('function_execution_time', (end_time - start_time))
-        logger = MetricsServiceLoggerFactory.build(service_config)
-        if logger:
+        metrics_logger = MetricsServiceLoggerFactory.build(service_config, logger)
+        if metrics_logger:
             data = MetricsDataGatherer.get()
-            logger.log(data)
+            metrics_logger.log(data)
         MetricsDataGatherer.clean()
 
 
 class Traceable:
 
-    def add_response_data(self, response):
+    def add_response_data(self, response, logger=None):
         try:
             response_data = {}
             response_data['time'] = response.elapsed.total_seconds()
@@ -37,7 +37,9 @@ class Traceable:
                 MetricsDataGatherer.add('response', [response_data])
         except BaseException as e:
             # We don't want to stop the job for some error here
-            plpy.warning(e)
+            if logger:
+                logger.error("Error trying to process response data for metrics",
+                             exception=e)
 
 
 class MetricsDataGatherer:
@@ -87,15 +89,15 @@ class MetricsDataGatherer:
 class MetricsServiceLoggerFactory:
 
     @classmethod
-    def build(self, service_config):
+    def build(self, service_config, logger=None):
         if re.search('^geocoder_*', service_config.service_type):
-            return MetricsGeocoderLogger(service_config)
+            return MetricsGeocoderLogger(service_config, logger)
         elif re.search('^routing_*', service_config.service_type):
-            return MetricsGenericLogger(service_config)
+            return MetricsGenericLogger(service_config, logger)
         elif re.search('_isolines$', service_config.service_type):
-            return MetricsIsolinesLogger(service_config)
+            return MetricsIsolinesLogger(service_config, logger)
         elif re.search('^obs_*', service_config.service_type):
-            return MetricsGenericLogger(service_config)
+            return MetricsGenericLogger(service_config, logger)
         else:
             return None
 
@@ -103,15 +105,20 @@ class MetricsServiceLoggerFactory:
 class MetricsLogger(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, service_config):
+    def __init__(self, service_config, logger):
         self._service_config = service_config
+        self._logger = logger
 
     def dump_to_file(self, data):
-        log_path = self.service_config.metrics_log_path
-        if log_path:
-            with open(log_path, 'a') as logfile:
-                json.dump(data, logfile)
-                logfile.write('\n')
+        try:
+            log_path = self.service_config.metrics_log_path
+            if log_path:
+                with open(log_path, 'a') as logfile:
+                    json.dump(data, logfile)
+                    logfile.write('\n')
+        except BaseException as e:
+            self._logger("Error dumping metrics to file {0}".format(log_path),
+                         exception=e)
 
     def collect_data(self, data):
         return {
@@ -141,8 +148,8 @@ class MetricsLogger(object):
 
 class MetricsGeocoderLogger(MetricsLogger):
 
-    def __init__(self, service_config):
-        super(MetricsGeocoderLogger, self).__init__(service_config)
+    def __init__(self, service_config, logger):
+        super(MetricsGeocoderLogger, self).__init__(service_config, logger)
 
     def log(self, data):
         dump_data = self.collect_data(data)
@@ -176,8 +183,8 @@ class MetricsGeocoderLogger(MetricsLogger):
 
 class MetricsGenericLogger(MetricsLogger):
 
-    def __init__(self, service_config):
-        super(MetricsGenericLogger, self).__init__(service_config)
+    def __init__(self, service_config, logger):
+        super(MetricsGenericLogger, self).__init__(service_config, logger)
 
     def log(self, data):
         dump_data = self.collect_data(data)
@@ -188,8 +195,8 @@ class MetricsGenericLogger(MetricsLogger):
 
 class MetricsIsolinesLogger(MetricsLogger):
 
-    def __init__(self, service_config):
-        super(MetricsIsolinesLogger, self).__init__(service_config)
+    def __init__(self, service_config, logger):
+        super(MetricsIsolinesLogger, self).__init__(service_config, logger)
 
     def log(self, data):
         dump_data = self.collect_data(data)

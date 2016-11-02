@@ -30,7 +30,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_search', user_obs_snapshot_config):
+  with metrics('obs_search', user_obs_snapshot_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_Search($1, $2, $3, $4);", ["text", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, search_term, relevant_boundary])
@@ -89,7 +89,7 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getavailableboundaries', user_obs_snapshot_config):
+  with metrics('obs_getavailableboundaries', user_obs_snapshot_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetAvailableBoundaries($1, $2, $3, $4) as available_boundaries;", ["text", "text", "geometry(Geometry, 4326)", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, time_span])

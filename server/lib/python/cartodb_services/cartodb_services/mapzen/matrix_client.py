@@ -46,7 +46,7 @@ class MatrixClient(Traceable):
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
-        self.add_response_data(response)
+        self.add_response_data(response, self._logger)
 
         if response.status_code != requests.codes.ok:
             self._logger.error('Error trying to get matrix distance from mapzen',

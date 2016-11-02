@@ -5,9 +5,10 @@ import json
 import requests
 
 from exceptions import *
+from cartodb_services.metrics import Traceable
 
 
-class HereMapsGeocoder:
+class HereMapsGeocoder(Traceable):
     'A Here Maps Geocoder wrapper for python'
 
     PRODUCTION_GEOCODE_JSON_URL = 'https://geocoder.api.here.com/6.2/geocode.json'
@@ -89,6 +90,7 @@ class HereMapsGeocoder:
         request_params.update(params)
         response = requests.get(self.host, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+        self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)
         elif response.status_code == requests.codes.bad_request:

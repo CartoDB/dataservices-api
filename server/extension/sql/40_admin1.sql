@@ -16,7 +16,7 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  with metrics('cdb_geocode_admin1_polygon', user_geocoder_config):
+  with metrics('cdb_geocode_admin1_polygon', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon(trim($1)) AS mypolygon", ["text"])
       rv = plpy.execute(plan, [admin1_name], 1)
@@ -54,7 +54,7 @@ RETURNS Geometry AS $$
     logger = Logger(logger_config)
     quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-    with metrics('cdb_geocode_admin1_polygon', user_geocoder_config):
+    with metrics('cdb_geocode_admin1_polygon', user_geocoder_config, logger):
       try:
         plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon(trim($1), trim($2)) AS mypolygon", ["text", "text"])
         rv = plpy.execute(plan, [admin1_name, country_name], 1)

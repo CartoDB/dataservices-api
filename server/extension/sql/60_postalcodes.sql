@@ -14,7 +14,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
       rv = plpy.execute(plan, [code], 1)
@@ -50,7 +50,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1), trim($2)) AS mypoint", ["TEXT", "TEXT"])
       rv = plpy.execute(plan, [code, country], 1)
@@ -86,7 +86,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1)) AS mypolygon", ["text"])
       rv = plpy.execute(plan, [code], 1)
@@ -122,7 +122,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_postalcode_point', user_geocoder_config):
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_polygon(trim($1), trim($2)) AS mypolygon", ["TEXT", "TEXT"])
       rv = plpy.execute(plan, [code, country], 1)
