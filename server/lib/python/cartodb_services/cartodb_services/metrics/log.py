@@ -3,6 +3,7 @@ import abc
 import json
 import re
 import time
+import uuid
 from contextlib import contextmanager
 from urlparse import urlparse
 
@@ -14,9 +15,11 @@ def metrics(function, service_config, logger=None):
         yield
     finally:
         end_time = time.time()
+        MetricsDataGatherer.add('uuid', str(uuid.uuid1()))
         MetricsDataGatherer.add('function_name', function)
         MetricsDataGatherer.add('function_execution_time', (end_time - start_time))
-        metrics_logger = MetricsServiceLoggerFactory.build(service_config, logger)
+        metrics_logger = MetricsServiceLoggerFactory.build(service_config,
+                                                           logger)
         if metrics_logger:
             data = MetricsDataGatherer.get()
             metrics_logger.log(data)
@@ -24,10 +27,16 @@ def metrics(function, service_config, logger=None):
 
 
 class Traceable:
+    """
+    Module to add metrics traceability, for example to get response object
+    in order to add to the metrics dump
+    """
     def add_response_data(self, response, logger=None):
         try:
             response_data = {}
-            response_data['time'] = response.elapsed.total_seconds()
+            response_data['type'] = "request"
+            response_data['date'] = datetime.now().isoformat()
+            response_data['elapsed_time'] = response.elapsed.total_seconds()
             response_data['code'] = response.status_code
             response_data['message'] = response.reason
             response_data['url'] = self._parse_response_url(response.url)
@@ -39,7 +48,7 @@ class Traceable:
         except BaseException as e:
             # We don't want to stop the job for some error processing response
             if logger:
-                logger.error("Error trying to process response data for metrics",
+                logger.error("Error trying to process response metricd data",
                              exception=e)
 
     def _parse_response_url(self, url):
@@ -48,6 +57,10 @@ class Traceable:
 
 
 class MetricsDataGatherer:
+    """
+    Metrics gatherer used as a singleton. The intend is to use it as a global
+    storage for the metrics along the function request.
+    """
 
     class __MetricsDataGatherer:
         def __init__(self):
@@ -117,8 +130,11 @@ class MetricsLogger(object):
     def dump_to_file(self, data):
         try:
             log_path = self.service_config.metrics_log_path
+            response_data = data.pop('response', [])
+            uuid = data.get('uuid')
             if log_path:
                 with open(log_path, 'a') as logfile:
+                    self._dump_response_to_file(uuid, response_data, logfile)
                     json.dump(data, logfile)
                     logfile.write('\n')
         except BaseException as e:
@@ -127,8 +143,11 @@ class MetricsLogger(object):
 
     def collect_data(self, data):
         return {
+            "uuid": data.get('uuid', uuid.uuid1()),
+            "type": 'function',
             "function_name": data.get('function_name', None),
-            "function_execution_time": data.get('function_execution_time', None),
+            "function_execution_time": data.get('function_execution_time',
+                                                None),
             "service": self._service_config.service_type,
             "processable_rows": 1,
             "success": data.get('success', False),
@@ -139,8 +158,16 @@ class MetricsLogger(object):
             "provider": self._service_config.provider,
             "username": self._service_config.username,
             "organization": self._service_config.organization,
-            "response": data.get('response', None)
+            "response": data.get('response', [])
         }
+
+    def _dump_response_to_file(self, uuid, response_data, log_file):
+        for r in response_data:
+            r['uuid'] = uuid
+            self._logger.info(r)
+            json.dump(r, log_file)
+            log_file.write('\n')
+
 
     @property
     def service_config(self):
@@ -198,6 +225,7 @@ class MetricsGenericLogger(MetricsLogger):
     def collect_data(self, data):
         return super(MetricsGenericLogger, self).collect_data(data)
 
+
 class MetricsIsolinesLogger(MetricsLogger):
 
     def __init__(self, service_config, logger):
@@ -208,7 +236,7 @@ class MetricsIsolinesLogger(MetricsLogger):
         self.dump_to_file(dump_data)
 
     def collect_data(self, data):
-        dump_data =  super(MetricsIsolinesLogger, self).collect_data(data)
+        dump_data = super(MetricsIsolinesLogger, self).collect_data(data)
 
         dump_data.update({
             "isolines_generated": data.get('isolines_generated', 0)
