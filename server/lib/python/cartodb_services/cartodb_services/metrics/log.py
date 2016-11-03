@@ -1,9 +1,10 @@
-from datetime import datetime
 import abc
 import json
 import re
 import time
 import uuid
+import plpy
+from datetime import datetime
 from contextlib import contextmanager
 from urlparse import urlparse
 
@@ -78,7 +79,9 @@ class MetricsDataGatherer:
         def clean(self):
             self.data = {}
 
-    __instance = None
+
+    #  We use pgbouncer so we need to have multiples instances per request id
+    __instance = {}
 
     @classmethod
     def add(self, key, value):
@@ -98,10 +101,16 @@ class MetricsDataGatherer:
 
     @classmethod
     def instance(self):
-        if not MetricsDataGatherer.__instance:
-            MetricsDataGatherer.__instance = MetricsDataGatherer.__MetricsDataGatherer()
+        txid = MetricsDataGatherer._get_txid()
+        if txid not in MetricsDataGatherer.__instance:
+            MetricsDataGatherer.__instance[txid] = MetricsDataGatherer.__MetricsDataGatherer()
 
-        return MetricsDataGatherer.__instance
+        return MetricsDataGatherer.__instance[txid]
+
+    @classmethod
+    def _get_txid(self):
+        result = plpy.execute('select txid_current() as txid')
+        return result[0]['txid']
 
 
 class MetricsServiceLoggerFactory:
@@ -167,7 +176,6 @@ class MetricsLogger(object):
             self._logger.info(r)
             json.dump(r, log_file)
             log_file.write('\n')
-
 
     @property
     def service_config(self):
@@ -237,9 +245,7 @@ class MetricsIsolinesLogger(MetricsLogger):
 
     def collect_data(self, data):
         dump_data = super(MetricsIsolinesLogger, self).collect_data(data)
-
         dump_data.update({
             "isolines_generated": data.get('isolines_generated', 0)
         })
-
         return dump_data
