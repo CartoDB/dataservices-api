@@ -10,7 +10,7 @@ _The Data Services API is collaborating with [Mapzen](https://mapzen.com/), and 
 
 By using the SQL API to query the Data Services API functions, you can manage specific operations and the corresponding geometries (a `polygon` or a `point`), according to the input information.
 
-The Data Services API also exposes its services directly through the CARTO Builder. For example, you can geocode data (from single rows, complete datasets, or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically, through authenticated SQL requests, or by using the ANALYSIS options. 
+The Data Services API also exposes its services directly through CARTO Builder. For example, you can geocode data (from single rows, complete datasets, or simple inputs) and to perform trade areas analysis (computing isodistances or isochrones) programatically, through authenticated SQL requests, or by using the ANALYSIS options. 
 
 The geometries provided by this API are projected in the projection [WGS 84 SRID 4326](http://spatialreference.org/ref/epsg/wgs-84/).
 
