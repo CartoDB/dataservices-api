@@ -2,9 +2,10 @@ import requests
 import json
 from qps import qps_retry
 from exceptions import ServiceException
+from cartodb_services.metrics import Traceable
 
 
-class MatrixClient:
+class MatrixClient(Traceable):
 
     """
     A minimal client for Mapzen Time-Distance Matrix Service
@@ -45,6 +46,7 @@ class MatrixClient:
         }
         response = requests.get(self.ONE_TO_MANY_URL, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+        self.add_response_data(response, self._logger)
 
         if response.status_code != requests.codes.ok:
             self._logger.error('Error trying to get matrix distance from mapzen',

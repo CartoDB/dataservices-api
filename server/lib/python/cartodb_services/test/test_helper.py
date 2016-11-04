@@ -1,7 +1,11 @@
 from datetime import datetime, date
-from mock import Mock
+from mock import Mock, MagicMock
+import random
 import sys
-sys.modules['plpy'] = Mock()
+from mock_plpy import MockPlPy
+
+plpy_mock = MockPlPy()
+sys.modules['plpy'] = plpy_mock
 
 
 def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
@@ -57,22 +61,10 @@ def increment_service_uses(redis_conn, username, orgname=None,
     redis_conn.zincrby(redis_name, date.day, amount)
 
 
-def build_plpy_mock(empty=False):
-    plpy_mock = Mock()
-    if not empty:
-        plpy_mock.execute.side_effect = _plpy_execute_side_effect
-
-    return plpy_mock
-
-
-def _plpy_execute_side_effect(*args, **kwargs):
-    if args[0] == "SELECT cartodb.CDB_Conf_GetConf('heremaps_conf') as conf":
-        return [{'conf': '{"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}'}]
-    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('mapzen_conf') as conf":
-        return [{'conf': '{"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}'}]
-    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('logger_conf') as conf":
-        return [{'conf': '{"geocoder_log_path": "/dev/null"}'}]
-    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('data_observatory_conf') as conf":
-        return [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}]
-    elif args[0] == "SELECT cartodb.CDB_Conf_GetConf('server_conf') as conf":
-        return [{'conf': '{"environment": "testing"}'}]
+def plpy_mock_config():
+    plpy_mock._define_result("CDB_Conf_GetConf\('heremaps_conf'\)", [{'conf': '{"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('mapzen_conf'\)", [{'conf': '{"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('logger_conf'\)", [{'conf': '{"geocoder_log_path": "/dev/null"}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('data_observatory_conf'\)", [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('server_conf'\)", [{'conf': '{"environment": "testing"}'}])
+    plpy_mock._define_result("select txid_current", [{'txid': random.randint(0, 1000)}])

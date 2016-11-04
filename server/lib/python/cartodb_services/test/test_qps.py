@@ -1,4 +1,3 @@
-import test_helper
 import requests
 from unittest import TestCase
 from nose.tools import assert_raises

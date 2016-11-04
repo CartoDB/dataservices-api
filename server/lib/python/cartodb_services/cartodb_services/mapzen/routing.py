@@ -5,9 +5,10 @@ import re
 from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
+from cartodb_services.metrics import MetricsDataGatherer, Traceable
 
 
-class MapzenRouting:
+class MapzenRouting(Traceable):
     'A Mapzen Routing wrapper for python'
 
     PRODUCTION_ROUTING_BASE_URL = 'https://valhalla.mapzen.com/route'
@@ -47,6 +48,7 @@ class MapzenRouting:
         request_params = self.__parse_request_parameters(json_request_params)
         response = requests.get(self._url, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+        self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return self.__parse_routing_response(response.text)
         elif response.status_code == requests.codes.bad_request:

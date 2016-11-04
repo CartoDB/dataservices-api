@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
+  from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
   from cartodb_services.tools import Logger,LoggerConfig
@@ -13,23 +14,24 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  try:
-    plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
-    rv = plpy.execute(plan, [ip], 1)
-    result = rv[0]["mypoint"]
-    if result:
-      quota_service.increment_success_service_use()
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return None
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to geocode postal code polygon')
-  finally:
-    quota_service.increment_total_service_use()
+  with metrics('cdb_geocode_ipaddress_point', user_geocoder_config, logger):
+    try:
+      plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
+      rv = plpy.execute(plan, [ip], 1)
+      result = rv[0]["mypoint"]
+      if result:
+        quota_service.increment_success_service_use()
+        return result
+      else:
+        quota_service.increment_empty_service_use()
+        return None
+    except BaseException as e:
+      import sys
+      quota_service.increment_failed_service_use()
+      logger.error('Error trying to geocode postal code polygon', sys.exc_info(), data={"username": username, "orgname": orgname})
+      raise Exception('Error trying to geocode postal code polygon')
+    finally:
+      quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------

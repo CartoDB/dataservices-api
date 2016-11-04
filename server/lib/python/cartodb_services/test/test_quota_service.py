@@ -1,4 +1,4 @@
-import test_helper
+from test_helper import *
 from mockredis import MockRedis
 from cartodb_services.metrics import QuotaService
 from cartodb_services.metrics import GeocoderConfig, RoutingConfig, ObservatorySnapshotConfig, IsolinesRoutingConfig
@@ -28,32 +28,32 @@ class TestQuotaService(TestCase):
 
     def test_should_return_true_if_user_quota_is_not_completely_used(self):
         qs = self.__build_geocoder_quota_service('test_user')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user')
+        increment_service_uses(self.redis_conn, 'test_user')
         assert qs.check_user_quota() is True
 
     def test_should_return_true_if_org_quota_is_not_completely_used(self):
         qs = self.__build_geocoder_quota_service('test_user',
                                                  orgname='test_org')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            orgname='test_org')
         assert qs.check_user_quota() is True
 
     def test_should_return_false_if_user_quota_is_surpassed(self):
         qs = self.__build_geocoder_quota_service('test_user')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            amount=300)
         assert qs.check_user_quota() is False
 
     def test_should_return_false_if_org_quota_is_surpassed(self):
         qs = self.__build_geocoder_quota_service('test_user',
                                                  orgname='test_org')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            orgname='test_org', amount=400)
         assert qs.check_user_quota() is False
 
     def test_should_return_true_if_user_quota_is_surpassed_but_soft_limit_is_enabled(self):
         qs = self.__build_geocoder_quota_service('test_user', soft_limit=True)
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            amount=300)
         assert qs.check_user_quota() is True
 
@@ -61,7 +61,7 @@ class TestQuotaService(TestCase):
         qs = self.__build_geocoder_quota_service('test_user',
                                                  orgname='test_org',
                                                  soft_limit=True)
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                             orgname='test_org', amount=400)
         assert qs.check_user_quota() is True
 
@@ -140,18 +140,17 @@ class TestQuotaService(TestCase):
 
     def __prepare_quota_service(self, username, quota, service, orgname,
                                 soft_limit, do_quota, soft_do_limit, end_date):
-        test_helper.build_redis_user_config(self.redis_conn, username,
+        build_redis_user_config(self.redis_conn, username,
                                             quota=quota, service=service,
                                             soft_limit=soft_limit,
                                             soft_do_limit=soft_do_limit,
                                             do_quota=do_quota,
                                             end_date=end_date)
         if orgname:
-            test_helper.build_redis_org_config(self.redis_conn, orgname,
+            build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, service=service,
                                                do_quota=do_quota,
                                                end_date=end_date)
-        self._plpy_mock = test_helper.build_plpy_mock()
 
     def __build_geocoder_quota_service(self, username, quota=100,
                                        service='heremaps', orgname=None,
@@ -159,7 +158,7 @@ class TestQuotaService(TestCase):
                                        end_date=datetime.today()):
         self.__prepare_quota_service(username, quota, service, orgname,
                                      soft_limit, 0, False, end_date)
-        geocoder_config = GeocoderConfig(self.redis_conn, self._plpy_mock,
+        geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
                                          username, orgname)
         return QuotaService(geocoder_config, redis_connection=self.redis_conn)
 
@@ -168,7 +167,7 @@ class TestQuotaService(TestCase):
                                       quota=100, end_date=datetime.today()):
         self.__prepare_quota_service(username, quota, service, orgname,
                                      soft_limit, 0, False, end_date)
-        routing_config = RoutingConfig(self.redis_conn, self._plpy_mock,
+        routing_config = RoutingConfig(self.redis_conn, plpy_mock,
                                        username, orgname)
         return QuotaService(routing_config, redis_connection=self.redis_conn)
 
@@ -177,7 +176,7 @@ class TestQuotaService(TestCase):
                                       quota=100, end_date=datetime.today()):
         self.__prepare_quota_service(username, quota, service, orgname,
                                      soft_limit, 0, False, end_date)
-        isolines_config = IsolinesRoutingConfig(self.redis_conn, self._plpy_mock,
+        isolines_config = IsolinesRoutingConfig(self.redis_conn, plpy_mock,
                                                username, orgname)
         return QuotaService(isolines_config, redis_connection=self.redis_conn)
 
@@ -188,6 +187,6 @@ class TestQuotaService(TestCase):
                                                end_date=datetime.today()):
         self.__prepare_quota_service(username, 0, service, orgname, False,
                                      quota, soft_limit, end_date)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, self._plpy_mock,
+        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
                                           username, orgname)
         return QuotaService(do_config, redis_connection=self.redis_conn)
