@@ -1,13 +1,14 @@
 from unittest import TestCase
 from mockredis import MockRedis
+from ..test_helper import *
 from cartodb_services.metrics.config import RoutingConfig, ServicesRedisConfig
-from ..test_helper import build_plpy_mock
+
 
 class TestRoutingConfig(TestCase):
 
     def setUp(self):
         self._redis_conn = MockRedis()
-        self._db_conn = build_plpy_mock()
+        self._db_conn = plpy_mock
         self._username = 'my_test_user'
         self._user_key = "rails:users:{0}".format(self._username)
         self._redis_conn.hset(self._user_key, 'period_end_date', '2016-10-10')

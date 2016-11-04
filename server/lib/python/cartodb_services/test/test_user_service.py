@@ -1,4 +1,4 @@
-import test_helper
+from test_helper import *
 from mockredis import MockRedis
 from cartodb_services.metrics import UserMetricsService
 from cartodb_services.metrics import GeocoderConfig
@@ -19,13 +19,13 @@ class TestUserService(TestCase):
 
     def test_user_used_quota_for_a_day(self):
         us = self.__build_user_service('test_user')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            amount=400)
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_org_used_quota_for_a_day(self):
         us = self.__build_user_service('test_user', orgname='test_org')
-        test_helper.increment_service_uses(self.redis_conn, 'test_user',
+        increment_service_uses(self.redis_conn, 'test_user',
                                            orgname='test_org',
                                            amount=400)
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
@@ -135,14 +135,13 @@ class TestUserService(TestCase):
     def __build_user_service(self, username, quota=100, service='heremaps',
                              orgname=None, soft_limit=False,
                              end_date=date.today()):
-        test_helper.build_redis_user_config(self.redis_conn, username,
+        build_redis_user_config(self.redis_conn, username,
                                             quota=quota, service=service,
                                             soft_limit=soft_limit,
                                             end_date=end_date)
         if orgname:
-            test_helper.build_redis_org_config(self.redis_conn, orgname,
+            build_redis_org_config(self.redis_conn, orgname,
                                                quota=quota, end_date=end_date)
-        plpy_mock = test_helper.build_plpy_mock()
         geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
                                          username, orgname)
         return UserMetricsService(geocoder_config, self.redis_conn)
