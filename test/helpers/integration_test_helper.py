@@ -10,11 +10,13 @@ class IntegrationTestHelper:
         username = os.environ["GEOCODER_API_TEST_USERNAME"]
         api_key = os.environ["GEOCODER_API_TEST_API_KEY"]
         host = os.environ["GEOCODER_API_TEST_HOST"]
+        schema = os.environ["GEOCODER_API_TEST_SCHEMA"]
         table_name = os.environ["GEOCODER_API_TEST_TABLE_NAME"]
 
         return {
             "username": username,
             "api_key": api_key,
+            "schema": schema,
             "host": host,
             "table_name": table_name
         }

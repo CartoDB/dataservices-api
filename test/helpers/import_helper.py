@@ -9,11 +9,11 @@ import time
 class ImportHelper:
 
     @classmethod
-    def import_test_dataset(cls, username, api_key, host):
+    def import_test_dataset(cls, username, api_key, host, schema):
         requests.packages.urllib3.disable_warnings()
-        url = "https://{0}.{1}/api/v1/imports/"\
-              "?type_guessing=false&privacy=public&api_key={2}".format(
-              username, host, api_key)
+        url = "{0}://{1}.{2}/api/v1/imports/"\
+              "?type_guessing=false&privacy=public&api_key={3}".format(
+              schema, username, host, api_key)
         dataset = {
             'file': open('fixtures/geocoder_api_test_dataset.csv', 'rb')}
         response = requests.post(url, files=dataset)
@@ -27,7 +27,8 @@ class ImportHelper:
                 username,
                 host,
                 api_key,
-                response_json['item_queue_id']
+                response_json['item_queue_id'],
+                schema
             )
             if table_name:
                 return table_name
@@ -35,10 +36,10 @@ class ImportHelper:
                 time.sleep(5)
 
     @classmethod
-    def get_imported_table_name(cls, username, host, api_key, import_id):
+    def get_imported_table_name(cls, username, host, api_key, import_id, schema):
         requests.packages.urllib3.disable_warnings()
-        import_url = "https://{0}.{1}/api/v1/imports/{2}?api_key={3}".format(
-            username, host, import_id, api_key)
+        import_url = "{0}://{1}.{2}/api/v1/imports/{3}?api_key={4}".format(
+            schema, username, host, import_id, api_key)
         import_data_response = requests.get(import_url)
         if import_data_response.status_code != 200:
             print "Error getting the table name from " \
@@ -49,10 +50,10 @@ class ImportHelper:
         return import_data_json['table_name']
 
     @classmethod
-    def clean_test_dataset(cls, username, api_key, table_name, host):
+    def clean_test_dataset(cls, username, api_key, table_name, host, schema):
         requests.packages.urllib3.disable_warnings()
-        url = "https://{0}.{1}/api/v2/sql?q=drop table {2}&api_key={3}".format(
-            username, host, table_name, api_key
+        url = "{0}://{1}.{2}/api/v2/sql?q=drop table {3}&api_key={4}".format(
+            schema, username, host, table_name, api_key
         )
         response = requests.get(url)
         if response.status_code != 200:
