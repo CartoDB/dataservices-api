@@ -173,7 +173,6 @@ class MetricsLogger(object):
     def _dump_response_to_file(self, uuid, response_data, log_file):
         for r in response_data:
             r['uuid'] = uuid
-            self._logger.info(r)
             json.dump(r, log_file)
             log_file.write('\n')
 
