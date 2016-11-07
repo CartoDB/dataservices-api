@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mockredis import MockRedis
-from ..test_helper import build_plpy_mock
+from ..test_helper import *
 from cartodb_services.metrics.quota import QuotaChecker
 from cartodb_services.metrics import RoutingConfig
 from datetime import datetime

@@ -5,9 +5,10 @@ import re
 from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
+from cartodb_services.metrics import Traceable
 
 
-class MapzenGeocoder:
+class MapzenGeocoder(Traceable):
     'A Mapzen Geocoder wrapper for python'
 
     BASE_URL = 'https://search.mapzen.com/v1/search'
@@ -28,6 +29,7 @@ class MapzenGeocoder:
         try:
             response = requests.get(self._url, params=request_params,
                                     timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+            self.add_response_data(response, self._logger)
             if response.status_code == requests.codes.ok:
                 return self.__parse_response(response.text)
             elif response.status_code == requests.codes.bad_request:

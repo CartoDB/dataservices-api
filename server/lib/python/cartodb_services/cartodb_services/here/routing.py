@@ -2,9 +2,10 @@ import requests
 import json
 
 from exceptions import WrongParams
+from cartodb_services.metrics import Traceable
 
 
-class HereMapsRoutingIsoline:
+class HereMapsRoutingIsoline(Traceable):
     'A Here Maps Routing wrapper for python'
 
     PRODUCTION_ROUTING_BASE_URL = 'https://isoline.route.api.here.com'
@@ -54,6 +55,7 @@ class HereMapsRoutingIsoline:
                                                          parsed_options)
         response = requests.get(self._url, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+        self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return self.__parse_isolines_response(response.text)
         elif response.status_code == requests.codes.bad_request:
