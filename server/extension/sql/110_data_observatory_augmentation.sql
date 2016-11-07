@@ -11,7 +11,7 @@ RETURNS text AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   return user_obs_config.connection_str
 $$ LANGUAGE plpythonu;
@@ -42,7 +42,7 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -95,7 +95,7 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -151,7 +151,7 @@ RETURNS json AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -202,7 +202,7 @@ RETURNS SETOF JSON AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
