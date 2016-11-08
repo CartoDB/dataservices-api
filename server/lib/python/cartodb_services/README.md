@@ -29,12 +29,12 @@ NOTE: a system installation is required at present because the library is meant 
 
 
 ## Running the unit tests
-Just run `nosetests`
+Just run `nosetests test/`
 ```shell
-$ nosetests
-.................................................
+$ nosetests test/
+......................................................................................................
 ----------------------------------------------------------------------
-Ran 49 tests in 0.131s
+Ran 102 tests in 0.122s
 
 OK
 ```
