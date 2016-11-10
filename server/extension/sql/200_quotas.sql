@@ -44,3 +44,18 @@ RETURNS cdb_dataservices_server.service_params AS $$
   return [monthly_quota, used_quota, soft_limit, provider]
 
 $$ LANGUAGE plpythonu;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  input_size NUMERIC)
+returns BOOLEAN AS $$
+  DECLARE
+    params cdb_dataservices_server.service_params;
+  BEGIN
+    SELECT * INTO params FROM cdb_dataservices_server.cdb_service_params(username, orgname, service);
+    RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
+  END
+$$ LANGUAGE plpgsql;
