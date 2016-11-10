@@ -3,6 +3,15 @@ from log import MetricsDataGatherer
 from datetime import date
 import re
 
+class Service:
+    """The services bound to quota"""
+
+    ISOLINES = 'isolines'
+    HIRES_GEOCODER = 'hires_geocoder'
+    ROUTING = 'routing'
+    OBSERVATORY = 'observatory'
+    INTERNAL_GEOCODER = 'internal_geocoder'
+
 
 class QuotaService:
     """ Class to manage all the quota operation for
