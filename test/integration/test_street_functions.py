@@ -15,8 +15,8 @@ class TestStreetFunctions(TestCase):
             self.env_variables['api_key']
         )
 
-    def test_if_select_with_here_street_point_is_ok(self):
-        query = "SELECT cdb_here_geocode_street_point(street) " \
+    def test_if_select_with_street_point_is_ok(self):
+        query = "SELECT cdb_geocode_street_point(street) " \
                 "as geometry FROM {0} LIMIT 1&api_key={1}".format(
                     self.env_variables['table_name'],
                     self.env_variables['api_key'])
