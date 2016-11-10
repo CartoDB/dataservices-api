@@ -1,3 +1,11 @@
+CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
+  'isolines',
+  'hires_geocoder',
+  'routing',
+  'observatory',
+  'internal_geocoder'
+);
+
 CREATE TYPE cdb_dataservices_server.service_params AS (
   monthly_quota NUMERIC,
   used_quota NUMERIC,
