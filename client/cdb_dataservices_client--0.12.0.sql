@@ -1240,7 +1240,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 -- and should also be the only ones with SECURITY DEFINER
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.obs_legacybuildermetadata (aggregate_type text DEFAULT NULL)
-RETURNS TABLE(name text, subsection jsonb) AS $$
+RETURNS TABLE(name text, subsection json) AS $$
 DECLARE
   
   username text;
@@ -1925,7 +1925,7 @@ $$ LANGUAGE plproxy;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_legacybuildermetadata (username text, organization_name text, aggregate_type text DEFAULT NULL)
 
-RETURNS TABLE(name text, subsection jsonb) AS $$
+RETURNS TABLE(name text, subsection json) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
   SELECT * FROM cdb_dataservices_server.obs_legacybuildermetadata (username, organization_name, aggregate_type);

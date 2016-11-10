@@ -372,7 +372,7 @@
     - { name: geom_id, type: text, default: 'NULL'}
 
 - name: obs_legacybuildermetadata
-  return_type: TABLE(name text, subsection jsonb)
+  return_type: TABLE(name text, subsection json)
   multi_row: true
   multi_field: true
   params:
