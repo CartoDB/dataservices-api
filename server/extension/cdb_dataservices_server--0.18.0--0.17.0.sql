@@ -7,7 +7,7 @@ DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_getavailablenumerators(TEXT,
 DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_getavailabledenominators(TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT, TEXT, TEXT);
 DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_getavailablegeometries(TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT, TEXT, TEXT);
 DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_getavailabletimespans(TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT, TEXT, TEXT);
-DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_legacybuildermetadata(TEXT);
+DROP FUNCTION IF EXISTS cdb_dataservices_server.obs_legacybuildermetadata(TEXT, TEXT, TEXT);
 
 DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_numerator;
 DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_denominator;

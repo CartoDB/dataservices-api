@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_LegacyBuilderMetadata(
   username TEXT,
   orgname TEXT,
   aggregate_type TEXT DEFAULT NULL)
-RETURNS TABLE(name TEXT, subsection JSONB) AS $$
+RETURNS TABLE(name TEXT, subsection JSON) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_LegacyBuilderMetadata(aggregate_type);
 $$ LANGUAGE plproxy;
