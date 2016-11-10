@@ -3,15 +3,22 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_monthly_quota(
   orgname TEXT,
   service TEXT)
 RETURNS integer AS $$
+  import cartodb_services.metrics.quota as quota
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
 
-  if service == 'isolines':
+  if service == quota.Service.ISOLINES:
     plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
     user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
-    return user_isolines_config.isolines_quota
+    monthly_quota = user_isolines_config.isolines_quota
+  elif service == quota.Service.HIRES_GEOCODER:
+    plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+    user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+    monthly_quota = user_geocoder_config.geocoding_quota
   else:
     raise 'not implemented'
+
+  return monthly_quota
 $$ LANGUAGE plpythonu;
 
 
