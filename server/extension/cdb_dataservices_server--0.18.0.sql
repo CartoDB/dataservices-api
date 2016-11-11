@@ -736,7 +736,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_search', user_obs_snapshot_config, logger):
+  with metrics('obs_search', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_Search($1, $2, $3, $4);", ["text", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, search_term, relevant_boundary])
@@ -795,7 +795,7 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getavailableboundaries', user_obs_snapshot_config, logger):
+  with metrics('obs_getavailableboundaries', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetAvailableBoundaries($1, $2, $3, $4) as available_boundaries;", ["text", "text", "geometry(Geometry, 4326)", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, time_span])
@@ -854,7 +854,7 @@ RETURNS geometry(Geometry, 4326) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getboundary', user_obs_snapshot_config, logger):
+  with metrics('obs_getboundary', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundary($1, $2, $3, $4) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span])
@@ -907,7 +907,7 @@ RETURNS TEXT AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getboundaryid', user_obs_snapshot_config, logger):
+  with metrics('obs_getboundaryid', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryId($1, $2, $3, $4, $5) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span])
@@ -960,7 +960,7 @@ RETURNS geometry(Geometry, 4326) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getboundarybyid', user_obs_snapshot_config, logger):
+  with metrics('obs_getboundarybyid', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetBoundaryById($1, $2, $3, $4, $5) as boundary;", ["text", "text", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geometry_id, boundary_id, time_span])
@@ -1015,7 +1015,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getboundariesbygeometry', user_obs_snapshot_config, logger):
+  with metrics('obs_getboundariesbygeometry', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetBoundariesByGeometry($1, $2, $3, $4, $5, $6) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span, overlap_type])
@@ -1077,7 +1077,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getboundariesbypointandradius', user_obs_snapshot_config, logger):
+  with metrics('obs_getboundariesbypointandradius', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius($1, $2, $3, $4, $5, $6, $7) as boundary;", ["text", "text", "geometry(Point, 4326)", "numeric", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, radius, boundary_id, time_span, overlap_type])
@@ -1137,7 +1137,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getpointsbygeometry', user_obs_snapshot_config, logger):
+  with metrics('obs_getpointsbygeometry', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetPointsByGeometry($1, $2, $3, $4, $5, $6) as boundary;", ["text", "text", "geometry(Point, 4326)", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, boundary_id, time_span, overlap_type])
@@ -1199,7 +1199,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getpointsbypointandradius', user_obs_snapshot_config, logger):
+  with metrics('obs_getpointsbypointandradius', user_obs_config, logger):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetPointsByPointAndRadius($1, $2, $3, $4, $5, $6, $7) as boundary;", ["text", "text", "geometry(Point, 4326)", "numeric", "text", "text", "text"])
         result = plpy.execute(obs_plan, [username, orgname, geom, radius, boundary_id, time_span, overlap_type])
@@ -2495,6 +2495,7 @@ $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.metrics import metrics
+  from cartodb_services.tools import Logger
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
