@@ -282,7 +282,7 @@ class TestDataObservatoryFunctions(TestCase):
     def test_if_obs_get_available_timespans_is_ok(self):
         query = "SELECT timespan_id FROM OBS_GetAvailableTimespans() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
-        assert_not_equal(result['geom_id'], None)
+        assert_not_equal(result['timespan_id'], None)
 
     def test_if_obs_get_available_timespans_without_api_key_raise_error(self):
         query = "SELECT timespan_id FROM OBS_GetAvailableTimespans() LIMIT 1;"
