@@ -52,6 +52,18 @@ RETURNS SETOF cdb_dataservices_server.service_params AS $$
   provider = user_geocoder_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
+  #-- Routing
+  service = 'routing'
+  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  user_service = UserMetricsService(user_routing_config, redis_conn)
+
+  monthly_quota = user_routing_config.monthly_quota
+  used_quota = user_service.used_quota(user_routing_config, today)
+  soft_limit = user_routing_config.soft_limit
+  provider = user_routing_config.provider
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+
   return ret
 $$ LANGUAGE plpythonu;
 
