@@ -100,7 +100,7 @@ class MapzenGeocoderConfigBuilder(object):
         period_end_date = date_parse(period_end_date_str)
 
         logger_conf = self._server_conf.get('logger_conf')
-        log_path = logger_conf['geocoder_log_path']
+        log_path = logger_conf.get('geocoder_log_path', None)
 
         return MapzenGeocoderConfig(geocoding_quota,
                                     soft_geocoding_limit,
