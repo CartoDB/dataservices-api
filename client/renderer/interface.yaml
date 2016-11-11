@@ -326,3 +326,54 @@
   no_params: true
   params:
     - {}
+
+- name: obs_getavailablenumerators
+  return_type: SETOF cdb_dataservices_client.obs_meta_numerator
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: filter_tags, type: "text[]", default: 'NULL' }
+    - { name: denom_id, type: text, default: 'NULL' }
+    - { name: geom_id, type: text, default: 'NULL' }
+    - { name: timespan, type: text, default: 'NULL'}
+
+- name: obs_getavailabledenominators
+  return_type: SETOF cdb_dataservices_client.obs_meta_denominator
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: filter_tags, type: "text[]", default: 'NULL' }
+    - { name: numer_id, type: text, default: 'NULL' }
+    - { name: geom_id, type: text, default: 'NULL' }
+    - { name: timespan, type: text, default: 'NULL'}
+
+- name: obs_getavailablegeometries
+  return_type: SETOF cdb_dataservices_client.obs_meta_geometry
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: filter_tags, type: "text[]", default: 'NULL' }
+    - { name: numer_id, type: text, default: 'NULL' }
+    - { name: denom_id, type: text, default: 'NULL' }
+    - { name: timespan, type: text, default: 'NULL'}
+
+- name: obs_getavailabletimespans
+  return_type: SETOF cdb_dataservices_client.obs_meta_timespan
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: filter_tags, type: "text[]", default: 'NULL' }
+    - { name: numer_id, type: text, default: 'NULL' }
+    - { name: denom_id, type: text, default: 'NULL' }
+    - { name: geom_id, type: text, default: 'NULL'}
+
+- name: obs_legacybuildermetadata
+  return_type: TABLE(name text, subsection json)
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: aggregate_type, type: text, default: 'NULL' }

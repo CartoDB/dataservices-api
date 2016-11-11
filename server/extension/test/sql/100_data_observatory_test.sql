@@ -116,3 +116,38 @@ SELECT exists(SELECT *
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'obs_getpointsbypointandradius'
               AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, numeric, text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getavailablenumerators'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text[], text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getavailabledenominators'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text[], text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getavailablegeometries'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text[], text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getavailabletimespans'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text[], text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_legacybuildermetadata'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text');

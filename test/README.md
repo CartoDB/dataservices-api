@@ -5,7 +5,7 @@ This are the automatic integration tests for geocoder api (both client and serve
 In order to execute the tests you have to execute the `run_tests.py` python script:
 
 ```sh
-python run_tests.py [--host=cartodb.com] username api_key
+python run_tests.py [--host=cartodb.com --schema=https] username api_key
 ```
 
 You can define the host where is going to execute the SQL API queries to test the

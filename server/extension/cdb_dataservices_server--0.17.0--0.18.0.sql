@@ -1,10 +1,8 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_dumpversion(username text, orgname text)
-RETURNS text AS $$
-  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT cdb_observatory.obs_dumpversion();
-$$ LANGUAGE plproxy;
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.18.0'" to load this file. \quit
 
--- We could create a super type for the common data like id, name and so on but we need to parse inside the functions because the -- the return data tha comes from OBS is a TABLE() with them
+-- HERE goes your code to upgrade/downgrade
 CREATE TYPE cdb_dataservices_server.obs_meta_numerator AS (numer_id text, numer_name text, numer_description text, numer_weight text, numer_license text, numer_source text, numer_type text, numer_aggregate text, numer_extra jsonb, numer_tags jsonb, valid_denom boolean, valid_geom boolean, valid_timespan boolean);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableNumerators(

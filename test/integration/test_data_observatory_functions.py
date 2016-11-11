@@ -231,3 +231,62 @@ class TestDataObservatoryFunctions(TestCase):
         except Exception as e:
             assert_equal(e.message[0], "The api_key must be provided")
 
+    def test_if_obs_get_legacy_builder_metadata_is_ok(self):
+        query = "SELECT name FROM OBS_LegacyBuilderMetadata() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['name'], None)
+
+    def test_if_obs_get_points_by_point_and_radius_without_api_key_raise_error(self):
+        query = "SELECT name FROM OBS_LegacyBuilderMetadata() LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_available_numerators_is_ok(self):
+        query = "SELECT numer_id FROM OBS_GetAvailableNumerators() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['numer_id'], None)
+
+    def test_if_obs_get_available_numerators_without_api_key_raise_error(self):
+        query = "SELECT numer_id FROM OBS_GetAvailableNumerators() LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_available_denominators_is_ok(self):
+        query = "SELECT denom_id FROM OBS_GetAvailableDenominators() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['denom_id'], None)
+
+    def test_if_obs_get_available_denominators_without_api_key_raise_error(self):
+        query = "SELECT denom_id FROM OBS_GetAvailableDenominators() LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_available_geometries_is_ok(self):
+        query = "SELECT geom_id FROM OBS_GetAvailableGeometries() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['geom_id'], None)
+
+    def test_if_obs_get_available_geometries_without_api_key_raise_error(self):
+        query = "SELECT geom_id FROM OBS_GetAvailableGeometries() LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_available_timespans_is_ok(self):
+        query = "SELECT timespan_id FROM OBS_GetAvailableTimespans() LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['geom_id'], None)
+
+    def test_if_obs_get_available_timespans_without_api_key_raise_error(self):
+        query = "SELECT timespan_id FROM OBS_GetAvailableTimespans() LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
