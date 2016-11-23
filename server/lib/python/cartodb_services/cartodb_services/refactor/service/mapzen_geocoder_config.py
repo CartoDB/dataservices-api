@@ -92,7 +92,7 @@ class MapzenGeocoderConfigBuilder(object):
         geocoding_quota = mapzen_server_conf['geocoder']['monthly_quota']
         mapzen_api_key = mapzen_server_conf['geocoder']['api_key']
 
-        soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit')
+        soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit').lower() == 'true'
 
         cost_per_hit=0
 
