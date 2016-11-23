@@ -1,19 +1,28 @@
-CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
-  'isolines',
-  'hires_geocoder',
-  'routing',
-  'observatory',
-  'internal_geocoder'
-);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_type') THEN
+    CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
+      'isolines',
+      'hires_geocoder',
+      'routing',
+      'observatory',
+      'internal_geocoder'
+    );
+  END IF;
+END $$;
 
-CREATE TYPE cdb_dataservices_server.service_params AS (
-  service cdb_dataservices_server.service_type,
-  monthly_quota NUMERIC,
-  used_quota NUMERIC,
-  soft_limit BOOLEAN,
-  provider TEXT
-);
-
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_params') THEN
+    CREATE TYPE cdb_dataservices_server.service_params AS (
+      service cdb_dataservices_server.service_type,
+      monthly_quota NUMERIC,
+      used_quota NUMERIC,
+      soft_limit BOOLEAN,
+      provider TEXT
+    );
+  END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_params(
   username TEXT,
