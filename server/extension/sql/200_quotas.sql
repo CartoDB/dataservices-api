@@ -56,7 +56,7 @@ RETURNS SETOF cdb_dataservices_server.service_params AS $$
   user_service = UserMetricsService(user_geocoder_config, redis_conn)
 
   monthly_quota = user_geocoder_config.geocoding_quota
-  used_quota = user_service.used_quota(user_geocoder_config, today)
+  used_quota = user_service.used_quota(user_geocoder_config.service_type, today)
   soft_limit = user_geocoder_config.soft_geocoding_limit
   provider = user_geocoder_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
@@ -68,7 +68,7 @@ RETURNS SETOF cdb_dataservices_server.service_params AS $$
   user_service = UserMetricsService(user_routing_config, redis_conn)
 
   monthly_quota = user_routing_config.monthly_quota
-  used_quota = user_service.used_quota(user_routing_config, today)
+  used_quota = user_service.used_quota(user_routing_config.service_type, today)
   soft_limit = user_routing_config.soft_limit
   provider = user_routing_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
@@ -80,7 +80,7 @@ RETURNS SETOF cdb_dataservices_server.service_params AS $$
   user_service = UserMetricsService(user_obs_config, redis_conn)
 
   monthly_quota = user_obs_config.monthly_quota
-  used_quota = user_service.used_quota(user_obs_config, today)
+  used_quota = user_service.used_quota(user_obs_config.service_type, today)
   soft_limit = user_obs_config.soft_limit
   provider = user_obs_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
