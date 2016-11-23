@@ -113,6 +113,8 @@ returns BOOLEAN AS $$
     SELECT * INTO params
       FROM cdb_dataservices_server.cdb_service_params(username, orgname) AS p
       WHERE p.service = service_;
-    RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
+    RETURN params.soft_limit
+           OR params.monthly_quota IS NULL -- account for the internal_geocoder
+           OR ((params.used_quota + input_size) <= params.monthly_quota);
   END
 $$ LANGUAGE plpgsql;
