@@ -4,7 +4,7 @@
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default %>)
+CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default.join(' ,') %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
   <% if not multi_row %>ret <%= return_type %>;<% end %>
@@ -21,15 +21,12 @@ BEGIN
   END IF;
   <% if multi_row %>
     RETURN QUERY
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>);
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
   <% elsif multi_field %>
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
-    RETURN ret;
-  <% elsif no_params %>
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname) INTO ret;
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
     RETURN ret;
   <% else %>
-    SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(username, orgname, <%= params %>) INTO ret;
+    SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
     RETURN ret;
   <% end %>
 END;
