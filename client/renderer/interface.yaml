@@ -323,7 +323,6 @@
 
 - name: obs_dumpversion
   return_type: text
-  no_params: true
   params:
     - {}
 
@@ -381,7 +380,6 @@
 - name: cdb_service_params
   return_type: SETOF cdb_dataservices_client.service_params
   multi_row: true
-  no_params: true
   params:
     - {}
 
