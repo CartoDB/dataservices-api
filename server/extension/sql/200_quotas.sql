@@ -5,8 +5,7 @@ BEGIN
       'isolines',
       'hires_geocoder',
       'routing',
-      'observatory',
-      'internal_geocoder'
+      'observatory'
     );
   END IF;
 END $$;
