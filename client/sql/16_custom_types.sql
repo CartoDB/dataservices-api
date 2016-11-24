@@ -25,8 +25,7 @@ CREATE TYPE cdb_dataservices_client.service_type AS ENUM (
     'isolines',
     'hires_geocoder',
     'routing',
-    'observatory',
-    'internal_geocoder'
+    'observatory'
 );
 
 CREATE TYPE cdb_dataservices_client.service_params AS (
