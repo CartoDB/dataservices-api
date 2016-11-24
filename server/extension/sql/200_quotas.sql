@@ -12,8 +12,8 @@ END $$;
 
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_params') THEN
-    CREATE TYPE cdb_dataservices_server.service_params AS (
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_quota_info') THEN
+    CREATE TYPE cdb_dataservices_server.service_quota_info AS (
       service cdb_dataservices_server.service_type,
       monthly_quota NUMERIC,
       used_quota NUMERIC,
@@ -23,10 +23,10 @@ BEGIN
   END IF;
 END $$;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_params(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(
   username TEXT,
   orgname TEXT)
-RETURNS SETOF cdb_dataservices_server.service_params AS $$
+RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   from cartodb_services.metrics.user import UserMetricsService
   from datetime import date
 
@@ -95,10 +95,10 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
   input_size NUMERIC)
 returns BOOLEAN AS $$
   DECLARE
-    params cdb_dataservices_server.service_params;
+    params cdb_dataservices_server.service_quota_info;
   BEGIN
     SELECT * INTO params
-      FROM cdb_dataservices_server.cdb_service_params(username, orgname) AS p
+      FROM cdb_dataservices_server.cdb_service_quota_info(username, orgname) AS p
       WHERE p.service = service_;
     RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
   END

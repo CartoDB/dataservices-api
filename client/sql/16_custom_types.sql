@@ -28,7 +28,7 @@ CREATE TYPE cdb_dataservices_client.service_type AS ENUM (
     'observatory'
 );
 
-CREATE TYPE cdb_dataservices_client.service_params AS (
+CREATE TYPE cdb_dataservices_client.service_quota_info AS (
     service cdb_dataservices_client.service_type,
     monthly_quota NUMERIC,
     used_quota NUMERIC,
