@@ -281,13 +281,11 @@ class IsolinesRoutingConfig(ServiceConfig):
 class InternalGeocoderConfig(ServiceConfig):
 
     METRICS_LOG_KEY = 'geocoder_log_path'
-    PERIOD_END_DATE = 'period_end_date'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
         # For now, internal geocoder doesn't use the redis config
-        super(InternalGeocoderConfig, self).__init__(redis_connection, db_conn,
+        super(InternalGeocoderConfig, self).__init__(None, db_conn,
                                                      username, orgname)
-        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
 
     @property
     def service_type(self):
@@ -306,21 +304,8 @@ class InternalGeocoderConfig(ServiceConfig):
         return None
 
     @property
-    def monthly_quota(self):
-        return None
-
-    @property
     def provider(self):
         return 'internal'
-
-    @property
-    def period_end_date(self):
-        return self._period_end_date
-
-    @property
-    def soft_limit(self):
-        return False
-
 
 
 class GeocoderConfig(ServiceConfig):
