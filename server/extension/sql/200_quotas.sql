@@ -85,18 +85,6 @@ RETURNS SETOF cdb_dataservices_server.service_params AS $$
   provider = user_obs_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
-  #-- Internal geocoder
-  service = 'internal_geocoder'
-  plpy.execute("SELECT cdb_dataservices_server._get_internal_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_internal_geocoder_config_{0}".format(username)]
-  user_service = UserMetricsService(user_geocoder_config, redis_conn)
-
-  monthly_quota = user_geocoder_config.monthly_quota
-  used_quota = user_service.used_quota(user_geocoder_config.service_type, today)
-  soft_limit = user_geocoder_config.soft_limit
-  provider = user_geocoder_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
-
   return ret
 $$ LANGUAGE plpythonu;
 
@@ -113,8 +101,6 @@ returns BOOLEAN AS $$
     SELECT * INTO params
       FROM cdb_dataservices_server.cdb_service_params(username, orgname) AS p
       WHERE p.service = service_;
-    RETURN params.soft_limit
-           OR params.monthly_quota IS NULL -- account for the internal_geocoder
-           OR ((params.used_quota + input_size) <= params.monthly_quota);
+    RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
   END
 $$ LANGUAGE plpgsql;
