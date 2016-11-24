@@ -378,7 +378,7 @@
     - { name: aggregate_type, type: text, default: 'NULL' }
 
 - name: cdb_service_quota_info
-  return_type: SETOF cdb_dataservices_client.service_quota_info
+  return_type: SETOF service_quota_info
   multi_row: true
   multi_field: true
   params:
@@ -387,5 +387,5 @@
 - name: cdb_enough_quota
   return_type: BOOLEAN
   params:
-    - { name: service, type: cdb_dataservices_client.service_type }
+    - { name: service, type: TEXT }
     - { name: input_size, type: NUMERIC }
