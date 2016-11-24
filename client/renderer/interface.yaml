@@ -377,8 +377,8 @@
   params:
     - { name: aggregate_type, type: text, default: 'NULL' }
 
-- name: cdb_service_params
-  return_type: SETOF cdb_dataservices_client.service_params
+- name: cdb_service_quota_info
+  return_type: SETOF cdb_dataservices_client.service_quota_info
   multi_row: true
   params:
     - {}
