@@ -380,6 +380,7 @@
 - name: cdb_service_quota_info
   return_type: SETOF cdb_dataservices_client.service_quota_info
   multi_row: true
+  multi_field: true
   params:
     - {}
 
