@@ -91,7 +91,7 @@ $$ LANGUAGE plpythonu;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
   username TEXT,
   orgname TEXT,
-  service_ cdb_dataservices_server.service_type,
+  service_ TEXT,
   input_size NUMERIC)
 returns BOOLEAN AS $$
   DECLARE
@@ -99,7 +99,7 @@ returns BOOLEAN AS $$
   BEGIN
     SELECT * INTO params
       FROM cdb_dataservices_server.cdb_service_quota_info(username, orgname) AS p
-      WHERE p.service = service_;
+      WHERE p.service = service_::cdb_dataservices_server.service_type;
     RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
   END
 $$ LANGUAGE plpgsql;
