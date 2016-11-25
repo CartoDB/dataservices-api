@@ -14,6 +14,12 @@ try:
 except ImportError:
     pass
 
+# Only can be imported when is called from PLPython
+try:
+    import plpy
+except ImportError:
+    pass
+
 
 class Logger:
 
