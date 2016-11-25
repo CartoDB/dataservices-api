@@ -94,7 +94,7 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
             self._soft_limit = False
         self._monthly_quota = 0
         if self.QUOTA_KEY in self._redis_config:
-            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
+            self._monthly_quota = int(self._redis_config[self.QUOTA_KEY])
         self._connection_str = self._db_config.data_observatory_connection_str
 
     @property
@@ -118,7 +118,7 @@ class ObservatoryConfig(DataObservatoryConfig):
             self._soft_limit = False
         self._monthly_quota = 0
         if self.QUOTA_KEY in self._redis_config:
-            self._monthly_quota = float(self._redis_config[self.QUOTA_KEY])
+            self._monthly_quota = int(self._redis_config[self.QUOTA_KEY])
         self._connection_str = self._db_config.data_observatory_connection_str
 
     @property
@@ -218,7 +218,7 @@ class IsolinesRoutingConfig(ServiceConfig):
         self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER_KEY].lower()
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
-            self._isolines_quota = float(filtered_config[self.QUOTA_KEY])
+            self._isolines_quota = int(filtered_config[self.QUOTA_KEY])
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
             self._heremaps_app_code = db_config.heremaps_isolines_app_code
             if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
@@ -361,7 +361,7 @@ class GeocoderConfig(ServiceConfig):
             self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER].lower()
         else:
             self._geocoder_provider = self.DEFAULT_PROVIDER
-        self._geocoding_quota = float(filtered_config[self.QUOTA_KEY])
+        self._geocoding_quota = int(filtered_config[self.QUOTA_KEY])
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_geocoding_limit = True

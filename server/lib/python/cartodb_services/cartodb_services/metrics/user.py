@@ -9,6 +9,7 @@ class UserMetricsService:
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
     SERVICE_HERE_ISOLINES = 'here_isolines'
     SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
+    SERVICE_OBSERVATORY = 'obs_general'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
     def __init__(self, user_geocoder_config, redis_connection):
@@ -22,6 +23,8 @@ class UserMetricsService:
             return self.__used_isolines_quota(service_type, date)
         elif service_type == self.SERVICE_MAPZEN_ROUTING:
             return self.__used_routing_quota(service_type, date)
+        elif service_type == self.SERVICE_OBSERVATORY:
+            return self.__used_observatory_quota(service_type, date)
         else:
             return self.__used_geocoding_quota(service_type, date)
 
@@ -72,6 +75,19 @@ class UserMetricsService:
 
         return current_use
 
+    def __used_observatory_quota(self, service_type, date):
+        date_from, date_to = self.__current_billing_cycle()
+        current_use = 0
+        success_responses = self.get_metrics(service_type,
+                                             'success_responses', date_from,
+                                             date_to)
+        empty_responses = self.get_metrics(service_type,
+                                           'empty_responses', date_from,
+                                           date_to)
+        current_use += (success_responses + empty_responses)
+
+        return current_use
+
     def increment_service_use(self, service_type, metric, date=date.today(),
                               amount=1):
         """ Increment the services uses in monthly and daily basis"""
@@ -88,11 +104,11 @@ class UserMetricsService:
             redis_prefix = self.__parse_redis_prefix(key_prefix, entity_name,
                                                      service, metric, date)
             score = self._redis_connection.zscore(redis_prefix, date.day)
-            aggregated_metric += score if score else 0
+            aggregated_metric += int(score) if score else 0
             zero_padded_day = date.strftime(self.DAY_OF_MONTH_ZERO_PADDED)
             if str(date.day) != zero_padded_day:
                 score = self._redis_connection.zscore(redis_prefix, zero_padded_day)
-                aggregated_metric += score if score else 0
+                aggregated_metric += int(score) if score else 0
 
         return aggregated_metric
 

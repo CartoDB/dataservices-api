@@ -18,3 +18,20 @@ CREATE TYPE cdb_dataservices_client.obs_meta_denominator AS (denom_id text, deno
 CREATE TYPE cdb_dataservices_client.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric);
 
 CREATE TYPE cdb_dataservices_client.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean);
+
+
+-- For quotas and services configuration
+CREATE TYPE cdb_dataservices_client.service_type AS ENUM (
+    'isolines',
+    'hires_geocoder',
+    'routing',
+    'observatory'
+);
+
+CREATE TYPE cdb_dataservices_client.service_quota_info AS (
+    service cdb_dataservices_client.service_type,
+    monthly_quota NUMERIC,
+    used_quota NUMERIC,
+    soft_limit BOOLEAN,
+    provider TEXT
+);
