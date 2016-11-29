@@ -15,7 +15,7 @@ class MapzenIsochrones:
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
-        "car": "car"
+        "car": "auto"
     }
 
     def __init__(self, app_key, logger, base_url=BASE_URL):
