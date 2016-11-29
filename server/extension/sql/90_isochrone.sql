@@ -47,9 +47,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
-  type = 'isochrone'
 
-  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-  result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   return result
 $$ LANGUAGE plpythonu;

@@ -19,6 +19,24 @@ def polyline_to_linestring(polyline):
 
     return geometry
 
+
+def coordinates_to_polygon(coordinates):
+    """Convert a Mapzen coordinates to a PostGIS polygon"""
+    result_coordinates = []
+    for coordinate in coordinates:
+        result_coordinates.append("%s %s" % (coordinate[0], coordinate[1]))
+    wkt_coordinates = ','.join(result_coordinates)
+
+    try:
+        sql = "SELECT ST_MakePolygon(ST_GeomFromText('LINESTRING({0})', 4326)) as geom".format(wkt_coordinates)
+        geometry = plpy.execute(sql, 1)[0]['geom']
+    except BaseException as e:
+        plpy.warning("Can't generate POLYGON from coordinates: {0}".format(e))
+        geometry = None
+
+    return geometry
+
+
 def country_to_iso3(country):
     """ Convert country to its iso3 code """
     try:
