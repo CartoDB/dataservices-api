@@ -128,8 +128,8 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
     def setUp(self):
-        logger = Mock()
-        self.routing = HereMapsRoutingIsoline(None, None, logger)
+        self.logger = Mock()
+        self.routing = HereMapsRoutingIsoline(None, None, self.logger)
         self.isoline_url = "{0}{1}".format(HereMapsRoutingIsoline.PRODUCTION_ROUTING_BASE_URL,
                                      HereMapsRoutingIsoline.ISOLINE_PATH)
 
