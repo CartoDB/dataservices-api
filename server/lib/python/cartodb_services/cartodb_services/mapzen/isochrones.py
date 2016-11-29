@@ -73,7 +73,9 @@ class MapzenIsochrones:
         request_params = {
             'json': json.dumps({'locations': [locations],
                                 'costing': mode_source,
-                                'contours': contours}),
+                                'contours': contours,
+                                'generalize': 50,
+                                'denoise': .3}),
             'api_key': self._app_key
         }
 
