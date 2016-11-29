@@ -57,11 +57,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;
 
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isolines(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isodistance(
    username TEXT,
    orgname TEXT,
-   isotype TEXT,
    source geometry(Geometry, 4326),
    mode TEXT,
    data_range integer[],
@@ -78,7 +76,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
-  # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
@@ -96,14 +93,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
     # -- TODO Support options properly
     isolines = {}
-    if isotype == 'isodistance':
-      for r in data_range:
-          isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
-          isolines[r] = isoline
-    elif isotype == 'isochrone':
-      for r in data_range:
-          isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
-          isolines[r] = isoline
+    for r in data_range:
+        isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
+        isolines[r] = isoline
 
     result = []
     for r in data_range:
@@ -127,6 +119,70 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     quota_service.increment_failed_service_use()
     logger.error('Error trying to get mapzen isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to get mapzen isolines')
+  finally:
+    quota_service.increment_total_service_use()
+$$ LANGUAGE plpythonu SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  import json
+  from cartodb_services.mapzen import MatrixClient, MapzenIsochrones
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.mapzen.types import coordinates_to_polygon
+
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  # -- Check the quota
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    raise Exception('You have reached the limit of your quota')
+
+  try:
+    mapzen_isochrones = MapzenIsochrones(user_isolines_routing_config.mapzen_matrix_api_key,
+                                         logger)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = {'lat': lat, 'lon': lon}
+    else:
+      raise Exception('source is NULL')
+
+    resp = mapzen_isochrones.isochrone(origin, mode, data_range)
+
+    if resp:
+      result = []
+      for isochrone in resp:
+        result_polygon = coordinates_to_polygon(isochrone.coordinates)
+        if result_polygon:
+          quota_service.increment_success_service_use()
+          result.append([source, isochrone.duration, result_polygon])
+        else:
+          quota_service.increment_empty_service_use()
+          result.append([source, isochrone.duration, None])
+      quota_service.increment_success_service_use()
+      quota_service.increment_isolines_service_use(len(result))
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return []
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to get mapzen isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isochrones')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER;

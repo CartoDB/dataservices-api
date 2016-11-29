@@ -49,7 +49,7 @@ class MapzenGeocoder(Traceable):
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
-            self._logger.error('Timeout connecting to Mapzen geocoding server')
+            self._logger.error('Timeout connecting to Mapzen geocoding server', te)
             raise ServiceException('Error trying to geocode {0} using mapzen'.format(searchtext),
                                     None)
         except requests.ConnectionError as e:
