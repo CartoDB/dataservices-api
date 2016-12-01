@@ -1,3 +1,28 @@
+November 29st, 2016
+===================
+* Version 0.20.0 of the server and version 0.12.0 of the python library
+  * Added integration with the new Mapzen isochrones functionality
+
+November 25st, 2016
+===================
+* Version 0.19.0 of the server, version 0.11.0 of the python library and version 0.13.0 of the client
+  * functions to check the quota, both server and client
+  * removed the no_params from the templates (this caused trouble, not needed anymore)
+  * bug fixes: observatory quota, quotas as integers, mapzen geocoder soft limit as bool
+
+November 21st, 2016
+===================
+* Version 0.18.1 of the server and version 0.12.1 of the client
+  * Add new fields to the obs_meta_geometry due to new changes introduced in the DO 1.1.2 release
+
+November 11st, 2016
+===================
+* Version 0.18.0 of the server and version 0.12.0 of the client
+  * Added obs_legacybuildermetada functions to grab the needed metadata in the builder while making a data enrichment analysis. Closes #286
+  * Added metadata functions that will be used in the future to gather the metadata for the new data enrichment UI. Closes #287
+  * Fixed integration test for street geocoding
+  * Makefile now has a new task to create a new release in the client part, as was in the server, using make release NEW_VERSION=x.x.x
+
 November 7st, 2016
 ==================
 * Version 0.17.0 of the server and version 0.10.0 of the python package
