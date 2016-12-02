@@ -4,6 +4,7 @@
 import json
 import requests
 
+from requests.adapters import HTTPAdapter
 from exceptions import *
 from cartodb_services.metrics import Traceable
 
@@ -17,6 +18,7 @@ class HereMapsGeocoder(Traceable):
     DEFAULT_GEN = 9
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
+    MAX_RETRIES=3
 
     ADDRESS_PARAMS = [
         'city',
@@ -88,7 +90,10 @@ class HereMapsGeocoder(Traceable):
             'gen': self.gen
         }
         request_params.update(params)
-        response = requests.get(self.host, params=request_params,
+        # TODO Extract HTTP client wrapper
+        session = requests.Session()
+        session.mount(self.host, HTTPAdapter(self.MAX_RETRIES))
+        response = session.get(self.host, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
