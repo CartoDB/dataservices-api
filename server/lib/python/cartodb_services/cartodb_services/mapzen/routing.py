@@ -2,6 +2,7 @@ import requests
 import json
 import re
 
+from requests.adapters import HTTPAdapter
 from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
@@ -14,6 +15,7 @@ class MapzenRouting(Traceable):
     PRODUCTION_ROUTING_BASE_URL = 'https://valhalla.mapzen.com/route'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
+    MAX_RETRIES=3
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -46,7 +48,10 @@ class MapzenRouting(Traceable):
                                                            mode_param,
                                                            units)
         request_params = self.__parse_request_parameters(json_request_params)
-        response = requests.get(self._url, params=request_params,
+        # TODO Extract HTTP client wrapper
+        session = requests.Session()
+        session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
+        response = session.get(self._url, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:

@@ -2,6 +2,7 @@ import requests
 import json
 import re
 
+from requests.adapters import HTTPAdapter
 from exceptions import WrongParams, MalformedResult, ServiceException
 from qps import qps_retry
 
@@ -12,6 +13,7 @@ class MapzenIsochrones:
     BASE_URL = 'https://matrix.mapzen.com/isochrone'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
+    MAX_RETRIES = 3
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -28,7 +30,10 @@ class MapzenIsochrones:
         request_params = self._parse_request_params(locations, costing,
                                                     ranges)
         try:
-            response = requests.get(self._url, params=request_params,
+            # TODO Extract HTTP client wrapper
+            session = requests.Session()
+            session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
+            response = session.get(self._url, params=request_params,
                                     timeout=(self.CONNECT_TIMEOUT,
                                             self.READ_TIMEOUT))
 

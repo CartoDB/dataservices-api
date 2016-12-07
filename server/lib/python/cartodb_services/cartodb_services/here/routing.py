@@ -2,6 +2,7 @@ import requests
 import json
 
 from exceptions import WrongParams
+from requests.adapters import HTTPAdapter
 from cartodb_services.metrics import Traceable
 
 
@@ -13,6 +14,7 @@ class HereMapsRoutingIsoline(Traceable):
     ISOLINE_PATH = '/routing/7.2/calculateisoline.json'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
+    MAX_RETRIES = 3
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -53,6 +55,9 @@ class HereMapsRoutingIsoline(Traceable):
                                                          data_range,
                                                          range_type,
                                                          parsed_options)
+        # TODO Extract HTTP client wrapper
+        session = requests.Session()
+        session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
         response = requests.get(self._url, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         self.add_response_data(response, self._logger)
