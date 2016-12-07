@@ -13,7 +13,7 @@ class MapzenIsochrones:
     BASE_URL = 'https://matrix.mapzen.com/isochrone'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 3
+    MAX_RETRIES = 1
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -25,7 +25,7 @@ class MapzenIsochrones:
         self._url = base_url
         self._logger = logger
 
-    @qps_retry
+    @qps_retry(qps=7)
     def isochrone(self, locations, costing, ranges):
         request_params = self._parse_request_params(locations, costing,
                                                     ranges)
