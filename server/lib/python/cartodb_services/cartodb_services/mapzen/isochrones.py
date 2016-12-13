@@ -13,7 +13,7 @@ class MapzenIsochrones:
     BASE_URL = 'https://matrix.mapzen.com/isochrone'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 3
+    MAX_RETRIES = 0
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
@@ -32,7 +32,7 @@ class MapzenIsochrones:
         try:
             # TODO Extract HTTP client wrapper
             session = requests.Session()
-            session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
+            session.mount(self._url, HTTPAdapter(max_retries=self.MAX_RETRIES))
             response = session.get(self._url, params=request_params,
                                     timeout=(self.CONNECT_TIMEOUT,
                                             self.READ_TIMEOUT))

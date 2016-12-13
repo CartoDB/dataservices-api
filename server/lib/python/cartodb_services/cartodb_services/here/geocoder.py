@@ -18,7 +18,7 @@ class HereMapsGeocoder(Traceable):
     DEFAULT_GEN = 9
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES=3
+    MAX_RETRIES=0
 
     ADDRESS_PARAMS = [
         'city',
@@ -92,7 +92,7 @@ class HereMapsGeocoder(Traceable):
         request_params.update(params)
         # TODO Extract HTTP client wrapper
         session = requests.Session()
-        session.mount(self.host, HTTPAdapter(self.MAX_RETRIES))
+        session.mount(self.host, HTTPAdapter(max_retries=self.MAX_RETRIES))
         response = session.get(self.host, params=request_params,
                                 timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
         self.add_response_data(response, self._logger)
