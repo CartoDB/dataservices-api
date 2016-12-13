@@ -202,7 +202,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     MAPZEN_PROVIDER = 'mapzen'
     HEREMAPS_PROVIDER = 'heremaps'
-    DEFAULT_PROVIDER = 'heremaps'
+    DEFAULT_PROVIDER = 'mapzen'
     METRICS_LOG_KEY = 'isolines_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
