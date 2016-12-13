@@ -18,7 +18,7 @@ class HereMapsGeocoder(Traceable):
     DEFAULT_GEN = 9
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES=0
+    MAX_RETRIES=1
 
     ADDRESS_PARAMS = [
         'city',

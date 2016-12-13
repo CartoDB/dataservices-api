@@ -15,7 +15,7 @@ class MapzenGeocoder(Traceable):
     BASE_URL = 'https://search.mapzen.com/v1/search'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 0
+    MAX_RETRIES = 1
 
     def __init__(self, app_key, logger, base_url=BASE_URL):
         self._app_key = app_key

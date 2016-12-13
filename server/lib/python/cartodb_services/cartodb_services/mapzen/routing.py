@@ -15,7 +15,7 @@ class MapzenRouting(Traceable):
     PRODUCTION_ROUTING_BASE_URL = 'https://valhalla.mapzen.com/route'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES=0
+    MAX_RETRIES=1
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",

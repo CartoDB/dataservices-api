@@ -13,7 +13,7 @@ class MapzenIsochrones:
     BASE_URL = 'https://matrix.mapzen.com/isochrone'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 0
+    MAX_RETRIES = 1
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",

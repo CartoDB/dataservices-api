@@ -14,7 +14,7 @@ class HereMapsRoutingIsoline(Traceable):
     ISOLINE_PATH = '/routing/7.2/calculateisoline.json'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 0
+    MAX_RETRIES = 1
 
     ACCEPTED_MODES = {
         "walk": "pedestrian",
