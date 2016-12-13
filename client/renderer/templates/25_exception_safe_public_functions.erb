@@ -19,8 +19,13 @@ BEGIN
   END IF;
 
   <% if multi_row %>
-    RETURN QUERY
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
+    BEGIN
+      RETURN QUERY
+      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
+    EXCEPTION
+      WHEN OTHERS THEN
+        RAISE WARNING 'whatever';
+    END;
   <% elsif multi_field %>
     SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
     RETURN ret;
