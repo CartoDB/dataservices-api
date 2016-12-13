@@ -15,7 +15,7 @@ class MapzenGeocoder(Traceable):
     BASE_URL = 'https://search.mapzen.com/v1/search'
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
-    MAX_RETRIES = 3
+    MAX_RETRIES = 1
 
     def __init__(self, app_key, logger, base_url=BASE_URL):
         self._app_key = app_key
@@ -31,7 +31,7 @@ class MapzenGeocoder(Traceable):
         try:
             # TODO Extract HTTP client wrapper
             session = requests.Session()
-            session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
+            session.mount(self._url, HTTPAdapter(max_retries=self.MAX_RETRIES))
             response = session.get(self._url, params=request_params,
                                     timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
             self.add_response_data(response, self._logger)

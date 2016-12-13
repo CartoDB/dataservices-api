@@ -32,7 +32,7 @@ class MapzenIsochrones:
         try:
             # TODO Extract HTTP client wrapper
             session = requests.Session()
-            session.mount(self._url, HTTPAdapter(self.MAX_RETRIES))
+            session.mount(self._url, HTTPAdapter(max_retries=self.MAX_RETRIES))
             response = session.get(self._url, params=request_params,
                                     timeout=(self.CONNECT_TIMEOUT,
                                             self.READ_TIMEOUT))
