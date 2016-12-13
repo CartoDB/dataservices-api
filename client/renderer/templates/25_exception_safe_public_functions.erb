@@ -17,20 +17,22 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  BEGIN
-    <% if multi_row %>
-      RETURN QUERY
-      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
-    <% elsif multi_field %>
-      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-      RETURN ret;
-    <% else %>
+
+  <% if multi_row %>
+    RETURN QUERY
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
+  <% elsif multi_field %>
+    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
+    RETURN ret;
+  <% else %>
+    BEGIN
       SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
       RETURN ret;
-    <% end %>
-  EXCEPTION
-    WHEN OTHERS THEN
-      RAISE WARNING 'whatever';
-  END;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RAISE WARNING 'whatever';
+        RETURN ret;
+    END;
+  <% end %>
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
