@@ -27,8 +27,14 @@ BEGIN
         RAISE WARNING 'whatever';
     END;
   <% elsif multi_field %>
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-    RETURN ret;
+    BEGIN
+      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
+      RETURN ret;
+    EXCEPTION
+      WHEN OTHERS THEN
+        RAISE WARNING 'whatever';
+        RETURN ret;
+    END;
   <% else %>
     BEGIN
       SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
