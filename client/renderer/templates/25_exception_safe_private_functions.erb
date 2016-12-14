@@ -1,8 +1,8 @@
 --
--- Exception-safe public DataServices API function
+-- Exception-safe private DataServices API function
 --
 
-CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %>_exception_safe (<%= params_with_type_and_default.join(' ,') %>)
+CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>_exception_safe (<%= params_with_type_and_default.join(' ,') %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
   <% if not multi_row %>ret <%= return_type %>;<% end %>
