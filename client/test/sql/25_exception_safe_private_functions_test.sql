@@ -37,5 +37,5 @@ SET ROLE test_regular_user;
 
 -- Exercise the exception safe and the proxied functions
 SELECT _cdb_geocode_street_point_exception_safe('One street, 1');
-SELECT the_geom FROM _cdb_isodistance_exception_safe('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
-SELECT shape FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.41706163)'::geometry,'POINT(-3.69909883 40.41236875)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
+SELECT * FROM _cdb_isodistance_exception_safe('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
+SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.41706163)'::geometry,'POINT(-3.69909883 40.41236875)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
