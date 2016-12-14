@@ -1,1 +1,2 @@
 GRANT EXECUTE ON FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %>(<%= params_with_type.join(', ') %>) TO publicuser;
+GRANT EXECUTE ON FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>_exception_safe(<%= params_with_type.join(', ') %>) TO publicuser;
