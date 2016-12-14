@@ -27,7 +27,10 @@ BEGIN
       SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
     EXCEPTION
       WHEN OTHERS THEN
-        RAISE WARNING 'whatever';
+        GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
+                                _message_text = MESSAGE_TEXT,
+                                _pg_exception_context = PG_EXCEPTION_CONTEXT;
+        RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
     END;
   <% elsif multi_field %>
     BEGIN
@@ -47,7 +50,10 @@ BEGIN
       RETURN ret;
     EXCEPTION
       WHEN OTHERS THEN
-        RAISE WARNING 'whatever';
+        GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
+                                _message_text = MESSAGE_TEXT,
+                                _pg_exception_context = PG_EXCEPTION_CONTEXT;
+        RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
         RETURN ret;
     END;
   <% end %>
