@@ -8,6 +8,9 @@ DECLARE
   <% if not multi_row %>ret <%= return_type %>;<% end %>
   username text;
   orgname text;
+  _returned_sqlstate TEXT;
+  _message_text TEXT;
+  _pg_exception_context TEXT;
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
@@ -27,10 +30,6 @@ BEGIN
         RAISE WARNING 'whatever';
     END;
   <% elsif multi_field %>
-    DECLARE
-      _returned_sqlstate TEXT;
-      _message_text TEXT;
-      _pg_exception_context TEXT;
     BEGIN
       SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
       RETURN ret;
