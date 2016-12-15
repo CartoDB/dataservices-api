@@ -3,10 +3,14 @@
 The public API dataservices functions emit exceptions in general when an error occurs
 or a limiting condition is met (e.g. quotas are exceeded).
 
-For each public function `x` we have a internal function named `_x_exception_safe` which
+For each public function `func` we have a internal function named `_func_exception_safe` which
 acts as a wrapper to the public function, with the same signature, but captures
 exceptions generated during its execution (except those due to incomplete configuration or
 authentication issues) and returns NULL or empty set values in those cases.
+
+Please note these functions are considered **not public** and therefore their API (including which exceptions are wrapped and which ones are not) may change.
+
+Instead of raising an exception they raise warnings, hopefully containing the same information of the original exception.
 
 ## Intended Use
 
