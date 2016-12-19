@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from dateutil.tz import tzlocal
 from mock import Mock, MagicMock
 import random
 import sys
@@ -8,46 +9,60 @@ plpy_mock = MockPlPy()
 sys.modules['plpy'] = plpy_mock
 
 
-def build_redis_user_config(redis_conn, username, quota=100, soft_limit=False,
-                            service="heremaps", isolines_quota=0,
-                            do_quota=None, soft_do_limit=None,
-                            do_general_quota=None, soft_do_general_limit=None,
+def build_redis_user_config(redis_conn, username, service, quota=100,
+                            soft_limit=False, provider="heremaps",
                             end_date=datetime.today()):
+    end_date_tz = end_date.replace(tzinfo=tzlocal())
     user_redis_name = "rails:users:{0}".format(username)
-    redis_conn.hset(user_redis_name, 'soft_geocoding_limit', soft_limit)
-    redis_conn.hset(user_redis_name, 'geocoding_quota', quota)
-    redis_conn.hset(user_redis_name, 'here_isolines_quota', isolines_quota)
-    redis_conn.hset(user_redis_name, 'geocoder_provider', service)
-    redis_conn.hset(user_redis_name, 'isolines_provider', service)
-    redis_conn.hset(user_redis_name, 'routing_provider', service)
-    redis_conn.hset(user_redis_name, 'period_end_date', end_date)
-    if do_quota:
-        redis_conn.hset(user_redis_name, 'obs_snapshot_quota', do_quota)
-    if soft_do_limit:
-        redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit',
-                        soft_do_limit)
-    if do_general_quota:
-        redis_conn.hset(user_redis_name, 'obs_general_quota', do_general_quota)
-    if soft_do_general_limit:
-        redis_conn.hset(user_redis_name, 'soft_obs_general_limit',
-                        soft_do_general_limit)
+
+    if service is 'geocoding':
+        redis_conn.hset(user_redis_name, 'geocoder_provider', provider)
+        redis_conn.hset(user_redis_name, 'geocoding_quota', str(quota))
+        redis_conn.hset(user_redis_name, 'soft_geocoding_limit', str(soft_limit).lower())
+    elif service is 'isolines':
+        redis_conn.hset(user_redis_name, 'isolines_provider', provider)
+        redis_conn.hset(user_redis_name, 'here_isolines_quota', str(quota))
+        redis_conn.hset(user_redis_name, 'soft_here_isolines_limit', str(soft_limit).lower())
+    elif service is 'routing':
+        redis_conn.hset(user_redis_name, 'routing_provider', provider)
+        redis_conn.hset(user_redis_name, 'mapzen_routing_quota', str(quota))
+        redis_conn.hset(user_redis_name, 'soft_mapzen_routing_limit', str(soft_limit).lower())
+    elif service is 'data_observatory':
+        redis_conn.hset(user_redis_name, 'obs_snapshot_quota', str(quota))
+        redis_conn.hset(user_redis_name, 'obs_general_quota', str(quota))
+        redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit', str(soft_limit).lower())
+        redis_conn.hset(user_redis_name, 'soft_obs_general_limit', str(soft_limit).lower())
+
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(user_redis_name, 'google_maps_api_key', '')
+    redis_conn.hset(user_redis_name, 'period_end_date', end_date_tz.strftime("%Y-%m-%d %H:%M:%S %z"))
 
 
-def build_redis_org_config(redis_conn, orgname, quota=100, service="heremaps",
-                           isolines_quota=0, do_quota=None,
-                           do_general_quota=None, end_date=datetime.today()):
+def build_redis_org_config(redis_conn, orgname, service, quota=100,
+                           provider="heremaps", end_date=datetime.now(tzlocal())):
     org_redis_name = "rails:orgs:{0}".format(orgname)
-    redis_conn.hset(org_redis_name, 'geocoding_quota', quota)
-    redis_conn.hset(org_redis_name, 'here_isolines_quota', isolines_quota)
-    if do_quota:
-        redis_conn.hset(org_redis_name, 'obs_snapshot_quota', do_quota)
-    if do_general_quota:
-        redis_conn.hset(org_redis_name, 'obs_snapshot_quota', do_quota)
-    redis_conn.hset(org_redis_name, 'period_end_date', end_date)
+    end_date_tz = end_date.replace(tzinfo=tzlocal())
+
+    if service is 'geocoding':
+        redis_conn.hset(org_redis_name, 'geocoder_provider', provider)
+        if quota is not None:
+            redis_conn.hset(org_redis_name, 'geocoding_quota', str(quota))
+    elif service is 'isolines':
+        redis_conn.hset(org_redis_name, 'isolines_provider', provider)
+        if quota is not None:
+            redis_conn.hset(org_redis_name, 'here_isolines_quota', str(quota))
+    elif service is 'routing':
+        redis_conn.hset(org_redis_name, 'routing_provider', provider)
+        if quota is not None:
+            redis_conn.hset(org_redis_name, 'mapzen_routing_quota', str(quota))
+    elif service is 'data_observatory':
+        if quota is not None:
+            redis_conn.hset(org_redis_name, 'obs_snapshot_quota', str(quota))
+            redis_conn.hset(org_redis_name, 'obs_general_quota', str(quota))
+
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(org_redis_name, 'google_maps_api_key', '')
+    redis_conn.hset(org_redis_name, 'period_end_date', end_date_tz.strftime("%Y-%m-%d %H:%M:%S %z"))
 
 
 def increment_service_uses(redis_conn, username, orgname=None,
