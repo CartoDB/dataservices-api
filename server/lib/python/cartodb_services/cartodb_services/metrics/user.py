@@ -1,6 +1,15 @@
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
+from calendar import monthrange
 
+def last_day_of_month(year, month):
+    """last valid day of a month"""
+    return monthrange(year, month)[1]
+
+def latest_valid_date(year, month, day):
+    """latest date not later than the day specified"""
+    valid_day = min(day, last_day_of_month(year, month))
+    return date(year, month, valid_day)
 
 class UserMetricsService:
     """ Class to manage all the user info """
@@ -143,9 +152,9 @@ class UserMetricsService:
         today = date.today()
         if end_period_day > today.day:
             temp_date = today + relativedelta(months=-1)
-            date_from = date(temp_date.year, temp_date.month, end_period_day)
+            date_from = latest_valid_date(temp_date.year, temp_date.month, end_period_day)
         else:
-            date_from = date(today.year, today.month, end_period_day)
+            date_from = latest_valid_date(today.year, today.month, end_period_day)
 
         return date_from, today
 
