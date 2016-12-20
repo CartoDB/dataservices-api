@@ -91,7 +91,7 @@ class MapzenGeocoderConfigBuilder(object):
         mapzen_server_conf = self._server_conf.get('mapzen_conf')
         mapzen_api_key = mapzen_server_conf['geocoder']['api_key']
 
-        geocoding_quota = int(self._get_quota(mapzen_server_conf))
+        geocoding_quota = self._get_quota(mapzen_server_conf)
         soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit').lower() == 'true'
         cost_per_hit = 0
         period_end_date_str = self._org_conf.get('period_end_date') or self._user_conf.get('period_end_date')
@@ -111,7 +111,7 @@ class MapzenGeocoderConfigBuilder(object):
 
     def _get_quota(self, mapzen_server_conf):
         geocoding_quota = self._org_conf.get('geocoding_quota') or self._user_conf.get('geocoding_quota')
-        if not geocoding_quota:
-            geocoding_quota = mapzen_server_conf['geocoder']['monthly_quota']
+        if geocoding_quota is '':
+            return 0
 
-        return geocoding_quota
+        return int(geocoding_quota)
