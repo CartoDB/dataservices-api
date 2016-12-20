@@ -46,5 +46,7 @@ cd $(git rev-parse --show-toplevel)/test
 python run_tests.py --host=$YOUR_HOST $YOUR_USERNAME $YOUR_API_KEY
 ```
 
-## TODO
-- Move dependencies expressed in `requirements.txt` to `setup.py`
+## Versioning
+Once you're satisfied with your changes, it is time to bump the version number in the `setup.py`. A couple of rules:
+- **Backwards compatibility**: in general all changes shall be backwards compatible. Do not remove any code used from the server public `pl/python` functions or you'll run into problems when deploying.
+- **Semantic versioning**: we try to stick to [Semantic Versioning 2.0.0](http://semver.org/spec/v2.0.0.html)
