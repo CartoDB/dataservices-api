@@ -24,7 +24,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_user_quota_for_a_month_shorter_than_end_day(self):
-        us = self.__build_user_service('test_user', end_date=date(2016,1,31))
+        us = self.__build_user_service('test_user', end_date=datetime(2016,1,31))
         assert us.used_quota(self.NOKIA_GEOCODER, date(2016,2,10)) == 0
 
     def test_org_used_quota_for_a_day(self):
@@ -35,7 +35,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_org_quota_quota_for_a_month_shorter_than_end_day(self):
-        us = self.__build_user_service('test_user', orgname='test_org', end_date=date(2016,1,31))
+        us = self.__build_user_service('test_user', orgname='test_org', end_date=datetime(2016,1,31))
         assert us.used_quota(self.NOKIA_GEOCODER, date(2016,2,10)) == 0
 
     def test_user_not_amount_in_used_quota_for_month_should_be_0(self):
