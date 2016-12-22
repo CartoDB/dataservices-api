@@ -1,7 +1,7 @@
 from test_helper import *
 from mockredis import MockRedis
 from cartodb_services.metrics import QuotaService
-from cartodb_services.metrics import GeocoderConfig, RoutingConfig, ObservatorySnapshotConfig, IsolinesRoutingConfig
+from cartodb_services.metrics import *
 from unittest import TestCase
 from nose.tools import assert_raises
 from datetime import datetime, date
@@ -81,15 +81,17 @@ class TestQuotaService(TestCase):
         assert qs.check_user_quota() is False
 
     def test_should_check_user_mapzen_geocoder_quota_correctly(self):
-        qs = self.__build_geocoder_quota_service('test_user', provider='mapzen')
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 provider='mapzen')
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
     def test_should_check_org_mapzen_geocoder_quota_correctly(self):
-        qs = self.__build_geocoder_quota_service('test_user', orgname='testorg',
-                                                provider='mapzen')
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 orgname='testorg',
+                                                 provider='mapzen')
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=1500000)
@@ -111,16 +113,17 @@ class TestQuotaService(TestCase):
 
     def test_should_check_user_isolines_quota_correctly(self):
         qs = self.__build_isolines_quota_service('test_user')
-        qs.increment_success_service_use()
+        qs.increment_isolines_service_use()
         assert qs.check_user_quota() is True
-        qs.increment_success_service_use(amount=1500000)
+        qs.increment_isolines_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
     def test_should_check_org_isolines_quota_correctly(self):
-        qs = self.__build_isolines_quota_service('test_user', orgname='testorg')
-        qs.increment_success_service_use()
+        qs = self.__build_isolines_quota_service('test_user',
+                                                 orgname='testorg')
+        qs.increment_isolines_service_use()
         assert qs.check_user_quota() is True
-        qs.increment_success_service_use(amount=1500000)
+        qs.increment_isolines_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
     def test_should_check_user_obs_snapshot_quota_correctly(self):
@@ -133,6 +136,21 @@ class TestQuotaService(TestCase):
     def test_should_check_org_obs_snapshot_quota_correctly(self):
         qs = self.__build_obs_snapshot_quota_service('test_user',
                                                      orgname='testorg')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=100000)
+        assert qs.check_user_quota() is False
+
+    def test_should_check_user_obs_quota_correctly(self):
+        qs = self.__build_obs_snapshot_quota_service('test_user')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=100000)
+        assert qs.check_user_quota() is False
+
+    def test_should_check_org_obs_quota_correctly(self):
+        qs = self.__build_obs_quota_service('test_user',
+                                            orgname='testorg')
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=100000)
@@ -184,5 +202,16 @@ class TestQuotaService(TestCase):
         self.__prepare_quota_service(username, 'data_observatory', quota,
                                      None, orgname, soft_limit, end_date)
         do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
+                                          username, orgname)
+        return QuotaService(do_config, redis_connection=self.redis_conn)
+
+    def __build_obs_quota_service(self, username, quota=100,
+                                  provider='obs_general',
+                                  orgname=None,
+                                  soft_limit=False,
+                                  end_date=datetime.today()):
+        self.__prepare_quota_service(username, 'data_observatory', quota,
+                                     None, orgname, soft_limit, end_date)
+        do_config = ObservatoryConfig(self.redis_conn, plpy_mock,
                                           username, orgname)
         return QuotaService(do_config, redis_connection=self.redis_conn)
