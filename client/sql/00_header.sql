@@ -3,4 +3,4 @@
 \echo Use "CREATE EXTENSION cdb_dataservices_client" to load this file. \quit
 
 -- Make sure we have a sane search path to create/update the extension
-SET search_path = "$user",public,cdb_dataservices_client;
+SET search_path = "$user",cartodb,public,cdb_dataservices_client;
