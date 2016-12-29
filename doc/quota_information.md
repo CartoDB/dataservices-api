@@ -83,6 +83,9 @@ In the case of of calling repeatedly quota-consuming functions (e.g. to geocode 
 extremely important to first check if enough quota is available to complete the job using
 this function.
 
+Mind that some services consume more than one credit per row/call.
+E.g: isolines with more than one range/track would consume (N rows x M ranges) credits and therefore the input size should be N x M.
+
 #### Arguments
 
 Name         | Type      | Description
@@ -98,10 +101,9 @@ insufficient quota.
 
 #### Example
 
-Imagine you wish to geocode a table named 
-To check if you have enogh quota is available and avoiding ending with a partially
-
-First you should find out how many records you need to geocode:
+Imagine you wish to geocode a whole table.
+In order to check that you have enough quota and avoid a "quota exhausted" exception
+you should first find out how many records you need to geocode:
 
 ```sql
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
@@ -116,7 +118,9 @@ Result: here's a sample result of 10000 records:
 (1 row)
 ```
 
-Now you can find out if there's enough quota to complete this job
+Now you can find out if there's enough quota to complete this job. In this case
+each call to `cdb_geocode_street_point` will consume one quota credit, so we need
+as many credits as rows to be geocoded.
 
 ```sql
 SELECT cdb_enough_quota('hires_geocoder', {number_of_records});
