@@ -24,7 +24,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_user_quota_for_a_month_shorter_than_end_day(self):
-        us = self.__build_user_service('test_user', end_date=date(2016,1,31))
+        us = self.__build_user_service('test_user', end_date=datetime(2016,1,31))
         assert us.used_quota(self.NOKIA_GEOCODER, date(2016,2,10)) == 0
 
     def test_org_used_quota_for_a_day(self):
@@ -35,7 +35,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 400
 
     def test_org_quota_quota_for_a_month_shorter_than_end_day(self):
-        us = self.__build_user_service('test_user', orgname='test_org', end_date=date(2016,1,31))
+        us = self.__build_user_service('test_user', orgname='test_org', end_date=datetime(2016,1,31))
         assert us.used_quota(self.NOKIA_GEOCODER, date(2016,2,10)) == 0
 
     def test_user_not_amount_in_used_quota_for_month_should_be_0(self):
@@ -116,7 +116,7 @@ class TestUserService(TestCase):
             def zscore_counter(self):
                 return self._zscore_counter
         self.redis_conn = MockRedisWithCounter()
-        us = self.__build_user_service('test_user', end_date=date.today())
+        us = self.__build_user_service('test_user', end_date=datetime.today())
         us.used_quota(self.NOKIA_GEOCODER, date(2015, 6, 15))
 
         #('user:test_user:geocoder_here:success_responses:201506', 15)
@@ -140,16 +140,17 @@ class TestUserService(TestCase):
         assert self.redis_conn.zscore('org:test_org:geocoder_here:success_responses:201506',  '1') == None
 
 
-    def __build_user_service(self, username, quota=100, service='heremaps',
-                             orgname=None, soft_limit=False,
-                             end_date=date.today()):
-        build_redis_user_config(self.redis_conn, username,
-                                            quota=quota, service=service,
-                                            soft_limit=soft_limit,
-                                            end_date=end_date)
+    def __build_user_service(self, username, service='geocoding', quota=100,
+                             provider='heremaps', orgname=None,
+                             soft_limit=False, end_date=datetime.today()):
+        build_redis_user_config(self.redis_conn, username, service,
+                                quota=quota, provider=provider,
+                                soft_limit=soft_limit,
+                                end_date=end_date)
         if orgname:
-            build_redis_org_config(self.redis_conn, orgname,
-                                               quota=quota, end_date=end_date)
+            build_redis_org_config(self.redis_conn, orgname, service,
+                                   provider=provider, quota=quota,
+                                   end_date=end_date)
         geocoder_config = GeocoderConfig(self.redis_conn, plpy_mock,
                                          username, orgname)
         return UserMetricsService(geocoder_config, self.redis_conn)

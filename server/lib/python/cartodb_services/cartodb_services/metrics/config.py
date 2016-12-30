@@ -43,11 +43,19 @@ class ServiceConfig(object):
     def metrics_log_path(self):
         return self._metrics_log_path
 
+    def _get_effective_monthly_quota(self, quota_key, default=0):
+        quota_from_redis = self._redis_config.get(quota_key, None)
+        if quota_from_redis and quota_from_redis <> '':
+            return int(quota_from_redis)
+        else:
+            return default
+
     def __get_metrics_log_path(self):
         if self.METRICS_LOG_KEY:
             return self._db_config.logger_config.get(self.METRICS_LOG_KEY, None)
         else:
             return None
+
 
 class DataObservatoryConfig(ServiceConfig):
 
@@ -92,9 +100,7 @@ class ObservatorySnapshotConfig(DataObservatoryConfig):
             self._soft_limit = True
         else:
             self._soft_limit = False
-        self._monthly_quota = 0
-        if self.QUOTA_KEY in self._redis_config:
-            self._monthly_quota = int(self._redis_config[self.QUOTA_KEY])
+        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
         self._connection_str = self._db_config.data_observatory_connection_str
 
     @property
@@ -116,9 +122,7 @@ class ObservatoryConfig(DataObservatoryConfig):
             self._soft_limit = True
         else:
             self._soft_limit = False
-        self._monthly_quota = 0
-        if self.QUOTA_KEY in self._redis_config:
-            self._monthly_quota = int(self._redis_config[self.QUOTA_KEY])
+        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
         self._connection_str = self._db_config.data_observatory_connection_str
 
     @property
@@ -173,14 +177,7 @@ class RoutingConfig(ServiceConfig):
         return self._soft_limit
 
     def _set_monthly_quota(self):
-        self._monthly_quota = self._get_effective_monthly_quota()
-
-    def _get_effective_monthly_quota(self):
-        quota_from_redis = self._redis_config.get(self.QUOTA_KEY)
-        if quota_from_redis and quota_from_redis <> '':
-            return int(quota_from_redis)
-        else:
-            return self._db_config.mapzen_routing_monthly_quota
+        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
 
     def _set_soft_limit(self):
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
@@ -217,18 +214,16 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._isolines_provider = self.DEFAULT_PROVIDER
         self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER_KEY].lower()
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
+        self._isolines_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
+        if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
+            self._soft_isolines_limit = True
+        else:
+            self._soft_isolines_limit = False
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
-            self._isolines_quota = int(filtered_config[self.QUOTA_KEY])
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
             self._heremaps_app_code = db_config.heremaps_isolines_app_code
-            if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
-                self._soft_isolines_limit = True
-            else:
-                self._soft_isolines_limit = False
         elif self._isolines_provider == self.MAPZEN_PROVIDER:
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
-            self._isolines_quota = self._db_config.mapzen_matrix_monthly_quota
-            self._soft_isolines_limit = False
 
     @property
     def service_type(self):
@@ -361,8 +356,10 @@ class GeocoderConfig(ServiceConfig):
             self._geocoder_provider = filtered_config[self.GEOCODER_PROVIDER].lower()
         else:
             self._geocoder_provider = self.DEFAULT_PROVIDER
-        self._geocoding_quota = int(filtered_config[self.QUOTA_KEY])
+
+        self._geocoding_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
         self._period_end_date = date_parse(filtered_config[self.PERIOD_END_DATE])
+
         if filtered_config[self.SOFT_LIMIT_KEY].lower() == 'true':
             self._soft_geocoding_limit = True
         else:
@@ -377,7 +374,6 @@ class GeocoderConfig(ServiceConfig):
             self._cost_per_hit = 0
         elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             self._mapzen_api_key = db_config.mapzen_geocoder_api_key
-            self._geocoding_quota = db_config.mapzen_geocoder_monthly_quota
             self._cost_per_hit = 0
 
     @property
