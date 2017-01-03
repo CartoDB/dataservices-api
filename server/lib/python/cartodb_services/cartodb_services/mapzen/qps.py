@@ -55,7 +55,7 @@ class QPSService:
 
     def retry(self, first_request_time, retry_count):
         elapsed = datetime.now() - first_request_time
-        if elapsed.microseconds  > (self._retry_timeout * 1000.0 * 1000.0):
+        if elapsed.total_seconds()  > self._retry_timeout:
             raise TimeoutException()
 
         # inverse qps * (1.5 ^ i) is an increased sleep time of 1.5x per

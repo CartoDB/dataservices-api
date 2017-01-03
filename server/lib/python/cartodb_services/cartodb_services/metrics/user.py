@@ -2,14 +2,17 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 
+
 def last_day_of_month(year, month):
     """last valid day of a month"""
     return monthrange(year, month)[1]
+
 
 def latest_valid_date(year, month, day):
     """latest date not later than the day specified"""
     valid_day = min(day, last_day_of_month(year, month))
     return date(year, month, valid_day)
+
 
 class UserMetricsService:
     """ Class to manage all the user info """
@@ -17,6 +20,7 @@ class UserMetricsService:
     SERVICE_GEOCODER_NOKIA = 'geocoder_here'
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
     SERVICE_HERE_ISOLINES = 'here_isolines'
+    SERVICE_MAPZEN_ISOLINES = 'mapzen_isolines'
     SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
     SERVICE_OBSERVATORY = 'obs_general'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
@@ -29,6 +33,8 @@ class UserMetricsService:
 
     def used_quota(self, service_type, date):
         if service_type == self.SERVICE_HERE_ISOLINES:
+            return self.__used_isolines_quota(service_type, date)
+        if service_type == self.SERVICE_MAPZEN_ISOLINES:
             return self.__used_isolines_quota(service_type, date)
         elif service_type == self.SERVICE_MAPZEN_ROUTING:
             return self.__used_routing_quota(service_type, date)
