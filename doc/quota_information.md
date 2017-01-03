@@ -94,7 +94,7 @@ insufficient quota.
 
 #### Example
 
-Suppose you want to geocode a whole table. In order to check that you have enough quota, and avoid a "quota exhausted" exceptio, first find out how many records you need to geocode:
+Suppose you want to geocode a whole table. In order to check that you have enough quota, and avoid a "quota exhausted" exception, first find out how many records you need to geocode:
 
 ```sql
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
