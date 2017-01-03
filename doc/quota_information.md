@@ -14,9 +14,9 @@ Quota consumption is calculated based on the number of request made for each fun
 * It is advised to store results of these queries into your datasets, and refresh them as needed. This ensure more control of quota credits for your account
 
 
-## Quota information functions
+## Quota Information Functions
 
-Two functions are available to obtain information about available services quotas. 
+There are several SQL functions that you can run to obtain quota information about your services. 
 
 ## cdb_service_quota_info()
 
@@ -31,19 +31,19 @@ Name            | Type      | Description
 `service`       | `text`    | Type of service.
 `monthly_quota` | `numeric` | Quota available to the user (number of calls) per monthly period.
 `used_quota`    | `numeric` | Quota used by the user in the present period.
-`soft_limit`    | `boolean` | True if the user has *soft-limit* quota
-`provider`      | `text`    | Service provider for this type of service
+`soft_limit`    | `boolean` | Set to `True`, if the user has *soft-limit* quota.
+`provider`      | `text`    | Service provider for this type of service.
 
-Service types:
+Service Types:
 
 * `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service](https://carto.com/docs/carto-engine/dataservices-api/isoline_functions/)
 * `'hires_geocoder'` [Street level geocoding](https://carto.com/docs/carto-engine/dataservices-api/geocoding-functions#street-level-geocoder)
 * `'routing'` [Routing functions](https://carto.com/docs/carto-engine/dataservices-api/routing_functions/)
 * `'observatory'` Data Observatory services ([demographic](https://carto.com/docs/carto-engine/dataservices-api/demographic_functions/) and [segmentation](https://carto.com/docs/carto-engine/dataservices-api/segmentation_functions/) functions)
 
-Notes:
+**Notes**
 
-Users who have *soft-quota* activated never run out of quota, but they may incurr into extra
+Users who have *soft-quota* activated never run out of quota, but they may incur extra
 expenses when the regular quota is exceeded.
 
 A zero value of `monthly_quota` indicates that the service has not been activated for the user.
@@ -67,31 +67,24 @@ Result:
 
 ```
 
-In this case we notice the user has no access to the observatory services, 
-all quotas are *hard-limited* (no soft limits), and no quota has been used 
-in the present period.
+In this case, notice that the user has no access to the observatory services. All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
 
 ## cdb_enough_quota(service text ,input_size numeric)
 
 This function is useful to check if enough quota is available for completing a job.
 
-This is specially relevant if a number of service calls are to be performed inside a transaction:
-if any of the calls fails due to exceeded quota the transaction will be rolled back, resulting
-in some quota being consumed but no saved results from the services consumed.
+This is specifically relevant if a number of service calls are to be performed inside a transaction. If any of the calls fails (due to exceeded quota), the transaction will be rolled back; resulting in partial quota consumption, but no saved results from the services consumed.
 
-In the case of of calling repeatedly quota-consuming functions (e.g. to geocode a whole table) it is 
-extremely important to first check if enough quota is available to complete the job using
-this function.
+**Tip:** If you are requesting repeating quota-consuming functions (e.g. to geocode a whole table), it is extremely important to check if enough quota is available to complete the job _before_ applying this function.
 
-Mind that some services consume more than one credit per row/call.
-E.g: isolines with more than one range/track would consume (N rows x M ranges) credits and therefore the input size should be N x M.
+Note that some services consume more than one credit per row/call. For example, isolines (with more than one range/track) consume (N rows x M ranges) credits; indicating that the input size should be N x M.
 
 #### Arguments
 
 Name         | Type      | Description
 ------------ | --------- | -----------
-`service`    | `text`    | Service to check; see the list of valid services above
-`input_size` | `numeric` | Number of service calls required, i.e. size of the input to be processed
+`service`    | `text`    | Service to check; see the list of valid services above.
+`input_size` | `numeric` | Number of service calls required, i.e. size of the input to be processed.
 
 #### Returns
 
@@ -101,9 +94,7 @@ insufficient quota.
 
 #### Example
 
-Imagine you wish to geocode a whole table.
-In order to check that you have enough quota and avoid a "quota exhausted" exception
-you should first find out how many records you need to geocode:
+Suppose you want to geocode a whole table. In order to check that you have enough quota, and avoid a "quota exhausted" exceptio, first find out how many records you need to geocode:
 
 ```sql
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
@@ -118,15 +109,14 @@ Result: here's a sample result of 10000 records:
 (1 row)
 ```
 
-Now you can find out if there's enough quota to complete this job. In this case
-each call to `cdb_geocode_street_point` will consume one quota credit, so we need
-as many credits as rows to be geocoded.
+The result shows how much quota is needed to complete this job. In this case,
+each call to `cdb_geocode_street_point` consumes one quota credit. This indicates that we need one credit per row to geocode the whole table.
 
 ```sql
 SELECT cdb_enough_quota('hires_geocoder', {number_of_records});
 ```
 
-The result should be similar to this:
+The result is similar to the following:
 
 ```
  cdb_enough_quota
@@ -134,12 +124,9 @@ The result should be similar to this:
  t
 ```
 
-If the result of this query is *true* (`'t'`) you can safely proceed; if you get
-a *false* value (`'f'`) you should avoid the processing; use `cdb_service_quota_info` as explained
-above to obtain further information.
+If the result of this query is *true* (`'t'`), you can safely proceed. If a *false* value (`'f'`) is returned, you should avoid processing any more requests that consume quota. Apply the `cdb_service_quota_info` function to get more information about your services.
 
-Don't forget to apply any filtering conditions you've used to 
-count the records (in our case `{street_name_column} IS NOT NULL`):
+**Note:** Remember to apply any filtering conditions that you used to count the records (in this case, `{street_name_column} IS NOT NULL`):
 
 
 ```sql
