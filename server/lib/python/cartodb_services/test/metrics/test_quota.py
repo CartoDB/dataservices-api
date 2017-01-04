@@ -22,7 +22,7 @@ class TestQuotaChecker(TestCase):
             self.username,
             self.service_type,
             self.period_end_date.year,
-            self.period_end_date.month
+            self.period_end_date.strftime('%m')
         )
 
     def test_routing_quota_check_passes_when_enough_quota(self):
