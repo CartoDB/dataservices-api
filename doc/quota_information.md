@@ -125,7 +125,7 @@ The result is similar to the following:
 
 If the result of this query is *true* (`'t'`), you can safely proceed. If a *false* value (`'f'`) is returned, you should avoid processing any more requests that consume quota. Apply the `cdb_service_quota_info` function to get more information about your services.
 
-**Note:** Remember to apply any filtering conditions that you used to count the records (in this case, `{street_name_column} IS NOT NULL`):`
+**Note:** Remember to apply any filtering conditions that you used to count the records (in this case, `{street_name_column} IS NOT NULL`):
 
 
 ```sql
