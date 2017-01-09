@@ -100,7 +100,7 @@ Suppose you want to geocode a whole table. In order to check that you have enoug
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
 ```
 
-Result: here's a sample result of 10000 records:
+Result: Here is a sample result of 10000 records.
 
 ```
  count
