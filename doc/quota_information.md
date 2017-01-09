@@ -56,7 +56,7 @@ SELECT * FROM cdb_service_quota_info();
 
 Result:
 
-```
+```bash
     service     | monthly_quota | used_quota | soft_limit |     provider
 ----------------+---------------+------------+------------+------------------
  isolines       |           100 |          0 | f          | mapzen
@@ -101,7 +101,7 @@ SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
 
 Result: Here is a sample result of 10000 records.
 
-```
+```bash
  count
 -------
   10000
@@ -117,7 +117,7 @@ SELECT cdb_enough_quota('hires_geocoder', {number_of_records});
 
 The result is similar to the following:
 
-```
+```bash
  cdb_enough_quota
 ------------------
  t
