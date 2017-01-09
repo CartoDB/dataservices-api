@@ -56,7 +56,7 @@ SELECT * FROM cdb_service_quota_info();
 
 Result:
 
-```
+```bash
     service     | monthly_quota | used_quota | soft_limit |     provider
 ----------------+---------------+------------+------------+------------------
  isolines       |           100 |          0 | f          | mapzen
@@ -64,7 +64,6 @@ Result:
  routing        |            50 |          0 | f          | mapzen
  observatory    |             0 |          0 | f          | data observatory
 (4 rows)
-
 ```
 
 In this case, notice that the user has no access to the observatory services. All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
@@ -100,9 +99,9 @@ Suppose you want to geocode a whole table. In order to check that you have enoug
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
 ```
 
-Result: here's a sample result of 10000 records:
+Result: Here is a sample result of 10000 records.
 
-```
+```bash
  count
 -------
   10000
@@ -118,7 +117,7 @@ SELECT cdb_enough_quota('hires_geocoder', {number_of_records});
 
 The result is similar to the following:
 
-```
+```bash
  cdb_enough_quota
 ------------------
  t
