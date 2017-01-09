@@ -64,7 +64,6 @@ Result:
  routing        |            50 |          0 | f          | mapzen
  observatory    |             0 |          0 | f          | data observatory
 (4 rows)
-
 ```
 
 In this case, notice that the user has no access to the observatory services. All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
