@@ -93,6 +93,27 @@ SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getmeta'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, json, integer, integer, integer');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getdata'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geomval[], json, boolean');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_getdata'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text[], json');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'obs_getboundariesbygeometry'
               AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text, text, text');
 
