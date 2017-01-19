@@ -174,7 +174,6 @@ SELECT exists(SELECT *
  t
 (1 row)
 
-
 SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
