@@ -202,18 +202,18 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(username text, orgname text, geomrefs text[], params JSON)
-RETURNS TABLE ( id TEXT, data JSON) AS $$
-DECLARE
-  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %)', username, orgname, id, data;
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getdata(username text, orgname text, geomrefs text[], params json)
+RETURNS TABLE (id TEXT, data JSON) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %)', username, orgname, geomrefs, params;
   RETURN QUERY SELECT '36047'::TEXT AS id, '[{"value" : 10349.1547875017}]'::JSON AS data;
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(username text, orgname text, geomvals geomval[], params JSON)
-RETURNS TABLE ( id TEXT, data JSON) AS $$
-DECLARE
-  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %)', username, orgname, id, data;
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getdata(username text, orgname text, geomvals geomval[], params json, merge boolean default true)
+RETURNS TABLE (id TEXT, data JSON) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %, %)', username, orgname, geomvals, params, merge;
   RETURN QUERY SELECT '36047'::TEXT AS id, '[{"value" : 10349.1547875017}]'::JSON AS data;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -240,5 +240,5 @@ SELECT obs_search('total_pop'::text);
 SELECT obs_getavailableboundaries(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
 SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]', 1, 1, 1000);
 SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}]', 1, 1, 1000));
-SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]',
+SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
 
