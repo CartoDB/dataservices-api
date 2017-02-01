@@ -41,7 +41,7 @@ class RedisDBConfig:
             key)
         conf = self._db_conn.execute(conf_query)[0]['conf']
         if conf is None:
-            raise "There is no redis configuration defined"
+            raise Exception("There is no redis configuration defined")
         else:
             params = json.loads(conf)
             self._host = params['redis_host']

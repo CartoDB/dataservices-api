@@ -173,6 +173,27 @@ BEGIN
   RETURN QUERY SELECT '0106000020E61000000100000001030000000100000019000000DD96C805677C52C0CBD8D0CDFE5A44407A19C5724B7C52C033BF9A03045B4440FF59F3E32F7C52C0CB290131095B4440247EC51A2E7C52C0548B8862F25A44401FF5D72B2C7C52C0CB811E6ADB5A444049F086342A7C52C09CC3B5DAC35A444044679945287C52C01F680586AC5A444012D90759167C52C09430D3F6AF5A44405698BED7107C52C04759BF99985A4440DEE522BE137C52C00664AF777F5A4440F92EA52E197C52C09BA73AE4665A4440C558A65F227C52C0D80DDB16655A4440373465A71F7C52C065A71FD4455A44404AED45B41D7C52C0785DBF60375A444083A3E4D5397C52C09946938B315A4440F2B4FCC0557C52C01FF5D72B2C5A444026C286A7577C52C02BDD5D67435A44405BCF108E597C52C0C651B9895A5A444030D461855B7C52C0D1393FC5715A444065E1EB6B5D7C52C078280AF4895A44403AE63C635F7C52C07D1F0E12A25A44403F6F2A52617C52C05983F755B95A44405C3AE63C637C52C04852D2C3D05A444049810530657C52C0FAEE5696E85A4440DD96C805677C52C0CBD8D0CDFE5A4440'::geometry as the_geom, '36047049300'::text as geom_refs;
 END;
 $$ LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getmeta(username text, orgname text, geom geometry(Geometry, 4326), params JSON, max_timespan_rank INTEGER DEFAULT NULL, max_score_rank INTEGER DEFAULT NULL, target_geoms INTEGER DEFAULT NULL)
+RETURNS JSON AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getmeta invoked with params (%, %, %, %, %, %, %)', username, orgname, geom, params, max_timespan_rank, max_score_rank, target_geoms;
+  RETURN '[{"id" : 1, "numer_id" : "us.census.acs.B01003001", "timespan_rank" : 1, "score_rank" : 1, "score" : 19.9580760018781868330120152747832081562684, "numer_aggregate" : "sum", "numer_colname" : "total_pop", "numer_geomref_colname" : "geoid", "numer_tablename" : "obs_209d3476ef8eaaa18e597cabcf1bdb627f37aa5e", "numer_type" : "Numeric", "denom_aggregate" : null, "denom_colname" : null, "denom_geomref_colname" : null, "denom_tablename" : null, "denom_type" : null, "geom_colname" : "the_geom", "geom_geomref_colname" : "geoid", "geom_tablename" : "obs_78fb6c1d6ff6505225175922c2c389ce48d7632c", "geom_type" : "Geometry", "geom_timespan" : "2015", "numer_timespan" : "2011 - 2015", "numer_name" : "Total Population", "denom_name" : null, "geom_name" : "US Census Block Groups", "normalization" : null, "denom_id" : null, "geom_id" : "us.census.tiger.block_group"}]'::JSON;
+END;
+$$ LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getdata(username text, orgname text, geomrefs text[], params json)
+RETURNS TABLE (id TEXT, data JSON) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %)', username, orgname, geomrefs, params;
+  RETURN QUERY SELECT '36047'::TEXT AS id, '[{"value" : 10349.1547875017}]'::JSON AS data;
+END;
+$$ LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_getdata(username text, orgname text, geomvals geomval[], params json, merge boolean default true)
+RETURNS TABLE (id TEXT, data JSON) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_getdata invoked with params (%, %, %, %, %)', username, orgname, geomvals, params, merge;
+  RETURN QUERY SELECT '36047'::TEXT AS id, '[{"value" : 10349.1547875017}]'::JSON AS data;
+END;
+$$ LANGUAGE 'plpgsql';
 -- Exercise the public and the proxied function
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 NOTICE:  cdb_dataservices_client._obs_get_demographic_snapshot(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_get_demographic_snapshot invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 2009 - 2013, "us.census.tiger".block_group)
@@ -335,5 +356,36 @@ CONTEXT:  PL/pgSQL function obs_getavailableboundaries(geometry,text) line 16 at
                                                                                                                                     obs_getavailableboundaries                                                                                                                                     
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  (us.census.tiger.place,"Incorporated places are those reported to the Census Bureau as legally in existence as of January 1, 2010, as reported in the latest Boundary and Annexation Survey (BAS), under the laws of their respective states.",2014,obs_7c9493c41fa8f4bd178ab993ea3d5891c1977667)
+(1 row)
+
+SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]', 1, 1, 1000);
+NOTICE:  cdb_dataservices_client._obs_getmeta(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeta invoked with params (test_user, <NULL>, 0101000020E61000009A999999997952C09A99999999594440, [{"numer_id": "us.census.acs.B01003001"}], 1, 1, 1000)
+CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeta(username, orgname, geom_ref, params, max_timespan_rank, max_score_rank, target_geoms)"
+PL/pgSQL function obs_getmeta(geometry,json,integer,integer,integer) line 16 at SQL statement
+                                                                                                                                                                                                                                                                                                                                                                                                                                         obs_getmeta                                                                                                                                                                                                                                                                                                                                                                                                                                          
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ [{"id" : 1, "numer_id" : "us.census.acs.B01003001", "timespan_rank" : 1, "score_rank" : 1, "score" : 19.9580760018781868330120152747832081562684, "numer_aggregate" : "sum", "numer_colname" : "total_pop", "numer_geomref_colname" : "geoid", "numer_tablename" : "obs_209d3476ef8eaaa18e597cabcf1bdb627f37aa5e", "numer_type" : "Numeric", "denom_aggregate" : null, "denom_colname" : null, "denom_geomref_colname" : null, "denom_tablename" : null, "denom_type" : null, "geom_colname" : "the_geom", "geom_geomref_colname" : "geoid", "geom_tablename" : "obs_78fb6c1d6ff6505225175922c2c389ce48d7632c", "geom_type" : "Geometry", "geom_timespan" : "2015", "numer_timespan" : "2011 - 2015", "numer_name" : "Total Population", "denom_name" : null, "geom_name" : "US Census Block Groups", "normalization" : null, "denom_id" : null, "geom_id" : "us.census.tiger.block_group"}]
+(1 row)
+
+SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}]', 1, 1, 1000));
+NOTICE:  cdb_dataservices_client._obs_getmeta(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeta invoked with params (test_user, <NULL>, 0101000020E61000009A999999997952C09A99999999594440, [{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}], 1, 1, 1000)
+CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeta(username, orgname, geom_ref, params, max_timespan_rank, max_score_rank, target_geoms)"
+PL/pgSQL function obs_getmeta(geometry,json,integer,integer,integer) line 16 at SQL statement
+NOTICE:  cdb_dataservices_client._obs_getdata(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getdata invoked with params (test_user, <NULL>, {36047}, [{"id" : 1, "numer_id" : "us.census.acs.B01003001", "timespan_rank" : 1, "score_rank" : 1, "score" : 19.9580760018781868330120152747832081562684, "numer_aggregate" : "sum", "numer_colname" : "total_pop", "numer_geomref_colname" : "geoid", "numer_tablename" : "obs_209d3476ef8eaaa18e597cabcf1bdb627f37aa5e", "numer_type" : "Numeric", "denom_aggregate" : null, "denom_colname" : null, "denom_geomref_colname" : null, "denom_tablename" : null, "denom_type" : null, "geom_colname" : "the_geom", "geom_geomref_colname" : "geoid", "geom_tablename" : "obs_78fb6c1d6ff6505225175922c2c389ce48d7632c", "geom_type" : "Geometry", "geom_timespan" : "2015", "numer_timespan" : "2011 - 2015", "numer_name" : "Total Population", "denom_name" : null, "geom_name" : "US Census Block Groups", "normalization" : null, "denom_id" : null, "geom_id" : "us.census.tiger.block_group"}])
+CONTEXT:  PL/pgSQL function obs_getdata(text[],json) line 16 at RETURN QUERY
+                obs_getdata                 
+--------------------------------------------
+ (36047,"[{""value"" : 10349.1547875017}]")
+(1 row)
+
+SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
+NOTICE:  cdb_dataservices_client._obs_getmeta(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getmeta invoked with params (test_user, <NULL>, 0101000020E61000009A999999997952C09A99999999594440, [{"numer_id": "us.census.acs.B01003001"}], <NULL>, <NULL>, <NULL>)
+CONTEXT:  SQL statement "SELECT cdb_dataservices_client._obs_getmeta(username, orgname, geom_ref, params, max_timespan_rank, max_score_rank, target_geoms)"
+PL/pgSQL function obs_getmeta(geometry,json,integer,integer,integer) line 16 at SQL statement
+NOTICE:  cdb_dataservices_client._obs_getdata(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_getdata invoked with params (test_user, <NULL>, {"(0101000020E61000009A999999997952C09A99999999594440,1)"}, [{"id" : 1, "numer_id" : "us.census.acs.B01003001", "timespan_rank" : 1, "score_rank" : 1, "score" : 19.9580760018781868330120152747832081562684, "numer_aggregate" : "sum", "numer_colname" : "total_pop", "numer_geomref_colname" : "geoid", "numer_tablename" : "obs_209d3476ef8eaaa18e597cabcf1bdb627f37aa5e", "numer_type" : "Numeric", "denom_aggregate" : null, "denom_colname" : null, "denom_geomref_colname" : null, "denom_tablename" : null, "denom_type" : null, "geom_colname" : "the_geom", "geom_geomref_colname" : "geoid", "geom_tablename" : "obs_78fb6c1d6ff6505225175922c2c389ce48d7632c", "geom_type" : "Geometry", "geom_timespan" : "2015", "numer_timespan" : "2011 - 2015", "numer_name" : "Total Population", "denom_name" : null, "geom_name" : "US Census Block Groups", "normalization" : null, "denom_id" : null, "geom_id" : "us.census.tiger.block_group"}], t)
+CONTEXT:  PL/pgSQL function obs_getdata(geomval[],json,boolean) line 16 at RETURN QUERY
+                obs_getdata                 
+--------------------------------------------
+ (36047,"[{""value"" : 10349.1547875017}]")
 (1 row)
 

@@ -160,12 +160,12 @@ class TestDataObservatoryFunctions(TestCase):
             assert_equal(e.message[0], "The api_key must be provided")
 
     def test_if_obs_get_boundary_id_is_ok(self):
-        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2014') as boundary_id;&api_key={0}".format(self.env_variables['api_key'])
+        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2015') as boundary_id;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['boundary_id'], None)
 
     def test_if_obs_get_boundary_id_without_api_key_raise_error(self):
-        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2014') as boundary_id;"
+        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2015') as boundary_id;"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
@@ -288,5 +288,37 @@ class TestDataObservatoryFunctions(TestCase):
         query = "SELECT timespan_id FROM OBS_GetAvailableTimespans() LIMIT 1;"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_meta_is_ok(self):
+        query = "SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\"}]', 1, 1, 1000) as metadata LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        assert_not_equal(result['metadata'], None)
+
+    def test_if_obs_get_meta_without_api_key_raise_error(self):
+        query = "SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\"}]', 1, 1, 1000) LIMIT 1;"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+
+    def test_if_obs_get_data_is_ok(self):
+        query_1 = "SELECT id as data_id FROM obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\", \"geom_id\": \"us.census.tiger.county\"}]', 1, 1, 1000)) LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        query_2 = "SELECT id as data_id FROM obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\"}]')) LIMIT 1;&api_key={0}".format(self.env_variables['api_key'])
+        result_1 = IntegrationTestHelper.execute_query(self.sql_api_url, query_1)
+        assert_not_equal(result_1['data_id'], None)
+        result_2 = IntegrationTestHelper.execute_query(self.sql_api_url, query_2)
+        assert_not_equal(result_2['data_id'], None)
+
+    def test_if_obs_get_data_without_api_key_raise_error(self):
+        query_1 = "SELECT id FROM obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\", \"geom_id\": \"us.census.tiger.county\"}]', 1, 1, 1000))"
+        query_2 = "SELECT id FROM obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{\"numer_id\": \"us.census.acs.B01003001\"}]'));"
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query_1)
+        except Exception as e:
+            assert_equal(e.message[0], "The api_key must be provided")
+        try:
+            IntegrationTestHelper.execute_query(self.sql_api_url, query_2)
         except Exception as e:
             assert_equal(e.message[0], "The api_key must be provided")

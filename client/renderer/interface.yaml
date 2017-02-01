@@ -261,6 +261,38 @@
     - { name: boundary_id, type: text}
     - { name: time_span, type: text, default: 'NULL'}
 
+- name: obs_getdata
+  return_type: TABLE(id int, data json)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: id, type: integer }
+    - { name: data, type: json }
+  params:
+    - { name: geomvals,  type: "geomval[]" }
+    - { name: params, type: json }
+    - { name: merge, type: boolean, default: true }
+
+- name: obs_getdata
+  return_type: TABLE(id text, data json)
+  multi_row: true
+  multi_field: true
+  table_fields:
+    - { name: id, type: text }
+    - { name: data, type: json }
+  params:
+    - { name: geomrefs,  type: "text[]" }
+    - { name: params, type: json }
+
+- name: obs_getmeta
+  return_type: json
+  params:
+    - { name: geom_ref,  type: "Geometry(Geometry, 4326)" }
+    - { name: params, type: json }
+    - { name: max_timespan_rank, type: integer, default: 'NULL' }
+    - { name: max_score_rank, type: integer, default: 'NULL' }
+    - { name: target_geoms, type: integer, default: 'NULL' }
+
 - name: obs_getcategory
   return_type: text
   params:
