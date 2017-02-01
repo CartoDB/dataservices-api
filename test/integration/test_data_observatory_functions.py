@@ -160,12 +160,12 @@ class TestDataObservatoryFunctions(TestCase):
             assert_equal(e.message[0], "The api_key must be provided")
 
     def test_if_obs_get_boundary_id_is_ok(self):
-        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2014') as boundary_id;&api_key={0}".format(self.env_variables['api_key'])
+        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2015') as boundary_id;&api_key={0}".format(self.env_variables['api_key'])
         result = IntegrationTestHelper.execute_query(self.sql_api_url, query)
         assert_not_equal(result['boundary_id'], None)
 
     def test_if_obs_get_boundary_id_without_api_key_raise_error(self):
-        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2014') as boundary_id;"
+        query = "SELECT OBS_GetBoundaryId(CDB_LatLng(40.704512, -73.936669), 'us.census.tiger.census_tract', '2015') as boundary_id;"
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
