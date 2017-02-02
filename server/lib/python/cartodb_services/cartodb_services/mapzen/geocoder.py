@@ -25,6 +25,10 @@ class MapzenGeocoder(Traceable):
     @qps_retry(qps=20)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None, search_type=None):
+        
+        if search_type.lower() == 'address': #remove the search_type if its address from the params sent to mapzen
+            search_type = None
+
         request_params = self._build_requests_parameters(searchtext, city,
                                                          state_province,
                                                          country, search_type)
