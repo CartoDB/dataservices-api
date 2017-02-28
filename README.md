@@ -26,7 +26,7 @@ Steps to deploy a new Data Services API version :
 - install data services geocoder extension 
 
     ```
-    git clone git@github.com:CartoDB/data-services.git
+    git clone https://github.com/CartoDB/data-services.git
     cd data-services/geocoder/extension
     sudo make install
     ```
@@ -34,7 +34,7 @@ Steps to deploy a new Data Services API version :
 - install observatory extension 
 
     ```
-    git clone git@github.com:CartoDB/observatory-extension.git
+    git clone https://github.com/CartoDB/observatory-extension.git
     cd observatory
     sudo make install
     ```
