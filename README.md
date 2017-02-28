@@ -51,7 +51,7 @@ Steps to deploy a new Data Services API version :
 
     ```
     # in data-services repo root path:
-    cd server/lib/python/cartodb_services && sudo pip install -r requirements.txt --upgrade .
+    cd server/lib/python/cartodb_services && sudo pip install . --upgrade 
     ```
 
 - install extensions in user database
