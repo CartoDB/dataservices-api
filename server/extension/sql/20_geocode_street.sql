@@ -88,7 +88,7 @@ RETURNS Geometry AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger)
+    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger, user_geocoder_config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()

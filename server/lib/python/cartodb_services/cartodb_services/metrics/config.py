@@ -222,6 +222,7 @@ class IsolinesRoutingConfig(ServiceConfig):
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
             self._heremaps_app_code = db_config.heremaps_isolines_app_code
+            self._heremaps_service_params = db_config.heremaps_isolines_service_params
         elif self._isolines_provider == self.MAPZEN_PROVIDER:
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
 
@@ -255,6 +256,10 @@ class IsolinesRoutingConfig(ServiceConfig):
     @property
     def heremaps_app_code(self):
         return self._heremaps_app_code
+
+    @property
+    def heremaps_service_params(self):
+        return self._heremaps_service_params
 
     @property
     def mapzen_matrix_api_key(self):
@@ -368,6 +373,7 @@ class GeocoderConfig(ServiceConfig):
             self._heremaps_app_id = db_config.heremaps_geocoder_app_id
             self._heremaps_app_code = db_config.heremaps_geocoder_app_code
             self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
+            self._heremaps_service_params = db_config.heremaps_geocoder_service_params
         elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
@@ -429,6 +435,10 @@ class GeocoderConfig(ServiceConfig):
         return self._heremaps_app_code
 
     @property
+    def heremaps_service_params(self):
+        return self._heremaps_service_params
+
+    @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
 
@@ -444,6 +454,9 @@ class GeocoderConfig(ServiceConfig):
     def provider(self):
         return self._geocoder_provider
 
+    @property
+    def service(self):
+        return self._service
 
 class ServicesDBConfig:
 
@@ -480,8 +493,10 @@ class ServicesDBConfig:
             self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
             self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
                 'geocoder_cost_per_hit']
+            self._heremaps_geocoder_service_params = heremaps_conf['geocoder'].get('service', {})
             self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
             self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
+            self._heremaps_isolines_service_params = heremaps_conf['isolines'].get('service', {})
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
@@ -531,6 +546,10 @@ class ServicesDBConfig:
         return self._heremaps_isolines_app_code
 
     @property
+    def heremaps_isolines_service_params(self):
+        return self._heremaps_isolines_service_params
+
+    @property
     def heremaps_geocoder_app_id(self):
         return self._heremaps_geocoder_app_id
 
@@ -541,6 +560,10 @@ class ServicesDBConfig:
     @property
     def heremaps_geocoder_cost_per_hit(self):
         return self._heremaps_geocoder_cost_per_hit
+
+    @property
+    def heremaps_geocoder_service_params(self):
+        return self._heremaps_geocoder_service_params
 
     @property
     def mapzen_matrix_api_key(self):
