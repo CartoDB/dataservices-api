@@ -23,9 +23,14 @@ class MatrixClient(Traceable):
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
 
-    def __init__(self, matrix_key, logger):
+    def __init__(self, matrix_key, logger, service_params={}):
+        service_params = service_params or {}
         self._matrix_key = matrix_key
         self._logger = logger
+        self._url = service_params.get('one_to_many_url', self.ONE_TO_MANY_URL)
+        self._connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
+        self._read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
+
 
     """Get distances and times to a set of locations.
     See https://mapzen.com/documentation/matrix/api-reference/
@@ -44,8 +49,8 @@ class MatrixClient(Traceable):
             'costing': costing,
             'api_key': self._matrix_key
         }
-        response = requests.get(self.ONE_TO_MANY_URL, params=request_params,
-                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+        response = requests.get(self._url, params=request_params,
+                                timeout=(self._connect_timeout, self._read_timeout))
         self.add_response_data(response, self._logger)
 
         if response.status_code != requests.codes.ok:
