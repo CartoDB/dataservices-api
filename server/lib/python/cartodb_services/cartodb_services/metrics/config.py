@@ -276,6 +276,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     def mapzen_matrix_service_params(self):
         return self._mapzen_matrix_service_params
 
+    @property
     def mapzen_isochrones_service_params(self):
         return self._mapzen_isochrones_service_params
 
