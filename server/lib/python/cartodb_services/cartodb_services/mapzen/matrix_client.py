@@ -23,7 +23,7 @@ class MatrixClient(Traceable):
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
 
-    def __init__(self, matrix_key, logger, service_params={}):
+    def __init__(self, matrix_key, logger, service_params=None):
         service_params = service_params or {}
         self._matrix_key = matrix_key
         self._logger = logger

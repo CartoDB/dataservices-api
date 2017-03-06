@@ -30,7 +30,7 @@ class HereMapsRoutingIsoline(Traceable):
         'quality'
     ]
 
-    def __init__(self, app_id, app_code, logger, service_params={}):
+    def __init__(self, app_id, app_code, logger, service_params=None):
         service_params = service_params or {}
         self._app_id = app_id
         self._app_code = app_code

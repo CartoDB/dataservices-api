@@ -33,7 +33,7 @@ class MapzenRouting(Traceable):
     METRICS_UNITS = 'kilometers'
     IMPERIAL_UNITS = 'miles'
 
-    def __init__(self, app_key, logger, service_params={}):
+    def __init__(self, app_key, logger, service_params=None):
         service_params = service_params or {}
         self._app_key = app_key
         self._logger = logger

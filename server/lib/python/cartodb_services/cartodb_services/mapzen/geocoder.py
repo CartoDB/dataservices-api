@@ -17,7 +17,7 @@ class MapzenGeocoder(Traceable):
     CONNECT_TIMEOUT = 10
     MAX_RETRIES = 1
 
-    def __init__(self, app_key, logger, service_params={}):
+    def __init__(self, app_key, logger, service_params=None):
         service_params = service_params or {}
         self._app_key = app_key
         self._url = service_params.get('base_url', self.BASE_URL)
