@@ -23,15 +23,15 @@ Steps to deploy a new Data Services API version :
 
 ### Local install instructions
 
-- install data services geocoder extension 
+- install data services geocoder extension
 
     ```
     git clone https://github.com/CartoDB/data-services.git
     cd data-services/geocoder/extension
     sudo make install
     ```
-    
-- install observatory extension 
+
+- install observatory extension
 
     ```
     git clone https://github.com/CartoDB/observatory-extension.git
@@ -40,7 +40,7 @@ Steps to deploy a new Data Services API version :
     ```
 
 - install server and client extensions
-    
+
     ```
     # in data-services repo root path:
     cd client && sudo make install
@@ -51,7 +51,7 @@ Steps to deploy a new Data Services API version :
 
     ```
     # in data-services repo root path:
-    cd server/lib/python/cartodb_services && sudo pip install . --upgrade 
+    cd server/lib/python/cartodb_services && sudo pip install . --upgrade
     ```
 
 - install extensions in user database
@@ -64,104 +64,184 @@ Steps to deploy a new Data Services API version :
     create extension cdb_dataservices_client;
     ```
 
-- add configuration for different services in server database
 
+### Server configuration
 
-    ```
-    # If sentinel is used:
-      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}');
-      
-    # If sentinel is not used
-      SELECT CDB_Conf_SetConf('redis_metadata_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
-      SELECT CDB_Conf_SetConf('redis_metrics_config', '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}');
-  
-    SELECT CDB_Conf_SetConf('heremaps_conf', '{"geocoder": {"app_id": "here_geocoder_app_id", "app_code": "here_geocoder_app_code", "geocoder_cost_per_hit": "1"}, "isolines" : {"app_id": "here_isolines_app_id", "app_code": "here_geocoder_app_code"}}');
-    SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}')
-    SELECT CDB_Conf_SetConf('mapzen_conf', '{"routing": {"api_key": "valhalla_app_key", "monthly_quota": 999999}, "geocoder": {"api_key": "search_app_key", "monthly_quota": 999999}, "matrix": {"api_key": "[your_matrix_key]", "monthly_quota": 1500000}}');
-    SELECT CDB_Conf_SetConf('logger_conf', '{"geocoder_log_path": "/tmp/geocodings.log", [ "min_log_level": "[debug|info|warning|error]", "rollbar_api_key": "SERVER_SIDE_API_KEY", "log_file_path": "LOG_FILE_PATH"]}');
-    SELECT CDB_Conf_SetConf('data_observatory_conf', '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}');
+Configuration for the different services must be stored in the server database using `CDB_Conf_SetConf()`.
 
-    # Environment to decide: rollbar message, which servers for third party use, etc. If not setted uses production by default (current behavior)
-    SELECT CDB_Conf_SetConf('server_conf', '{"environment": "[development|staging|production]"}')
-    ```
+#### Redis configuration
 
-- External services (Mapzen, Here) can have optional configuration, which is only needed for using non-standard services, such
-  as on-premise installations. We can add the service parameters to an existing configuration like this:
+If sentinel is used:
 
-    ```
-    # Here geocoder
-    SELECT CDB_Conf_SetConf(
+```sql
+SELECT CDB_Conf_SetConf(
+    'redis_metadata_config',
+    '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}'
+);
+SELECT CDB_Conf_SetConf(
+    'redis_metrics_config',
+    '{"sentinel_host": "localhost", "sentinel_port": 26379, "sentinel_master_id": "mymaster", "timeout": 0.1, "redis_db": 5}'
+);
+```
+
+If sentinel is not used:
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'redis_metadata_config',
+    '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}'
+);
+SELECT CDB_Conf_SetConf(
+    'redis_metrics_config',
+    '{"redis_host": "localhost", "redis_port": 6379, "sentinel_master_id": "", "timeout": 0.1, "redis_db": 5}'
+);
+```
+
+#### Users/Organizations
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'user_config',
+    '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}'
+);
+```
+
+#### HERE configuration
+
+```sql
+SELECT CDB_Conf_SetConf(
     'heremaps_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
-        '{geocoder, service}',
-        '{"json_url":"https://geocoder.api.here.com/6.2/geocode.json","gen":9,"read_timeout":60,"connect_timeout":10,"max_retries":1}'
-    )::json
-    );
+    '{"geocoder": {"app_id": "here_geocoder_app_id", "app_code": "here_geocoder_app_code", "geocoder_cost_per_hit": "1"}, "isolines" : {"app_id": "here_isolines_app_id", "app_code": "here_geocoder_app_code"}}'
+);
+```
 
-    # Here isolines
-    SELECT CDB_Conf_SetConf(
-    'heremaps_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
-        '{isolines, service}',
-        '{"base_url":"https://isoline.route.api.here.com","isoline_path":"/routing/7.2/calculateisoline.json","read_timeout":60,"connect_timeout":10,"max_retries":1}'
-    )::json
-    );
+#### Mapzen configuration
 
-    # Mapzen geocoder
-    SELECT CDB_Conf_SetConf(
+```sql
+SELECT CDB_Conf_SetConf(
     'mapzen_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
-        '{geocoder, service}',
-        '{"base_url":"https://search.mapzen.com/v1/search","read_timeout":60,"connect_timeout":10,"max_retries":1}'
-    )::json
-    );
+    '{"routing": {"api_key": "valhalla_app_key", "monthly_quota": 999999}, "geocoder": {"api_key": "search_app_key", "monthly_quota": 999999}, "matrix": {"api_key": "[your_matrix_key]", "monthly_quota": 1500000}}'
+);
+```
 
-    # Mapzen isochrones
-    SELECT CDB_Conf_SetConf(
-    'mapzen_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
-        '{isochrones, service}',
-        '{"base_url":"https://matrix.mapzen.com/isochrone","read_timeout":60,"connect_timeout":10,"max_retries":1}'
-    )::json
-    );
+#### Data Observatory
 
-    # Mapzen isolines (matrix service)
-    SELECT CDB_Conf_SetConf(
-    'mapzen_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
-        '{matrix, service}',
-        '{"base_url":"https://matrix.mapzen.com/one_to_many","read_timeout":60,"connect_timeout":10}'
-    )::json
-    );
+```sql
+SELECT CDB_Conf_SetConf(
+    'data_observatory_conf',
+    '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'
+);
+```
 
-    # Mapzen routing
-    SELECT CDB_Conf_SetConf(
-    'mapzen_conf',
-    jsonb_set(
-        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
-        '{routing, service}',
-        '{"base_url":"https://valhalla.mapzen.com/route","read_timeout":60,"connect_timeout":10}'
-    )::json
-    );
-    ```
+#### Logger
 
-- configure the user DB:
+```sql
+SELECT CDB_Conf_SetConf(
+    'logger_conf',
+    '{"geocoder_log_path": "/tmp/geocodings.log", [ "min_log_level": "[debug|info|warning|error]", "rollbar_api_key": "SERVER_SIDE_API_KEY", "log_file_path": "LOG_FILE_PATH"]}'
+);
+```
 
-    ```sql
-    -- Point to the dataservices server DB (you can use a specific database for the server or your same user's):
-    SELECT CDB_Conf_SetConf('geocoder_server_config', '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}');
+#### Environment
 
-    SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}');
-    ```
+The execution environment (development/staging/production) affects rollbar messages and other details.
+The production environment is used by default.
 
-- configure the search path in order to be able to execute the functions without using the schema:
+```sql
+SELECT CDB_Conf_SetConf(
+    'server_conf',
+    '{"environment": "[development|staging|production]"}'
+);
+```
+### Server optional configuration
 
-    ```
-    ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservices_client;
-    ```
+External services (Mapzen, Here) can have optional configuration, which is only needed for using non-standard services, such as on-premise installations. We can add the service parameters to an existing configuration like this:
+
+```
+# Here geocoder
+SELECT CDB_Conf_SetConf(
+'heremaps_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
+    '{geocoder, service}',
+    '{"json_url":"https://geocoder.api.here.com/6.2/geocode.json","gen":9,"read_timeout":60,"connect_timeout":10,"max_retries":1}'
+)::json
+);
+
+# Here isolines
+SELECT CDB_Conf_SetConf(
+'heremaps_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
+    '{isolines, service}',
+    '{"base_url":"https://isoline.route.api.here.com","isoline_path":"/routing/7.2/calculateisoline.json","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+)::json
+);
+
+# Mapzen geocoder
+SELECT CDB_Conf_SetConf(
+'mapzen_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+    '{geocoder, service}',
+    '{"base_url":"https://search.mapzen.com/v1/search","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+)::json
+);
+
+# Mapzen isochrones
+SELECT CDB_Conf_SetConf(
+'mapzen_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+    '{isochrones, service}',
+    '{"base_url":"https://matrix.mapzen.com/isochrone","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+)::json
+);
+
+# Mapzen isolines (matrix service)
+SELECT CDB_Conf_SetConf(
+'mapzen_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+    '{matrix, service}',
+    '{"base_url":"https://matrix.mapzen.com/one_to_many","read_timeout":60,"connect_timeout":10}'
+)::json
+);
+
+# Mapzen routing
+SELECT CDB_Conf_SetConf(
+'mapzen_conf',
+jsonb_set(
+    to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+    '{routing, service}',
+    '{"base_url":"https://valhalla.mapzen.com/route","read_timeout":60,"connect_timeout":10}'
+)::json
+);
+```
+### User database configuration
+
+User (client) databases need also some configuration so that the client extension can access the server:
+#### Users/Organizations
+
+```sql
+SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}');
+```
+
+#### Dataservices server
+
+The `geocoder_server_config` (the name is not accurate for historical reasons) entry points
+to the dataservices server DB (you can use a specific database for the server or your same user's):
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'geocoder_server_config',
+    '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}'
+);
+```
+#### Search path
+
+The search path must be configured in order to be able to execute the functions without using the schema:
+
+```sql
+ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservices_client;
+```
