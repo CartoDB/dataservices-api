@@ -86,6 +86,71 @@ Steps to deploy a new Data Services API version :
     SELECT CDB_Conf_SetConf('server_conf', '{"environment": "[development|staging|production]"}')
     ```
 
+- External services (Mapzen, Here) can have optional configuration, which is only needed for using non-standard services, such
+  as on-premise installations. We can add the service parameters to an existing configuration like this:
+
+    ```
+    # Here geocoder
+    SELECT CDB_Conf_SetConf(
+    'heremaps_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
+        '{geocoder, service}',
+        '{"json_url":"https://geocoder.api.here.com/6.2/geocode.json","gen":9,"read_timeout":60,"connect_timeout":10,"max_retries":1}'
+    )::json
+    );
+
+    # Here isolines
+    SELECT CDB_Conf_SetConf(
+    'heremaps_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('heremaps_conf')),
+        '{isolines, service}',
+        '{"base_url":"https://isoline.route.api.here.com","isoline_path":"/routing/7.2/calculateisoline.json","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+    )::json
+    );
+
+    # Mapzen geocoder
+    SELECT CDB_Conf_SetConf(
+    'mapzen_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+        '{geocoder, service}',
+        '{"base_url":"https://search.mapzen.com/v1/search","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+    )::json
+    );
+
+    # Mapzen isochrones
+    SELECT CDB_Conf_SetConf(
+    'mapzen_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+        '{isochrones, service}',
+        '{"base_url":"https://matrix.mapzen.com/isochrone","read_timeout":60,"connect_timeout":10,"max_retries":1}'
+    )::json
+    );
+
+    # Mapzen isolines (matrix service)
+    SELECT CDB_Conf_SetConf(
+    'mapzen_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+        '{matrix, service}',
+        '{"base_url":"https://matrix.mapzen.com/one_to_many","read_timeout":60,"connect_timeout":10}'
+    )::json
+    );
+
+    # Mapzen routing
+    SELECT CDB_Conf_SetConf(
+    'mapzen_conf',
+    jsonb_set(
+        to_jsonb(CDB_Conf_GetConf('mapzen_conf')),
+        '{routing, service}',
+        '{"base_url":"https://valhalla.mapzen.com/route","read_timeout":60,"connect_timeout":10}'
+    )::json
+    );
+    ```
+
 - configure the user DB:
 
     ```sql
