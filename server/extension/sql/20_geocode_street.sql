@@ -169,6 +169,16 @@ RETURNS Geometry AS $$
 
   redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
 
+  #-- e.g: RateLimit(service='geocoder', user=username, max_requests=2, period=60)
+  #-- rate_limiter = RateLimitBuilder(service='geocoder', user=username)
+  #-- How to pass the redis config along?
+  #-- rate_limiter_geocoder_config = RateLimiterUserConfigFactory(redis_metrics_connection, service='geocoder', user=username)
+  from rratelimit import Limiter
+  rate_limiter = Limiter(redis_metrics_connection, action='geocode', limit=2, period=60)
+  if not rate_limiter.checked_insert(username):
+     raise Exception('Rate limit exceeded')
+
+
   quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
