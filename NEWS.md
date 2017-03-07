@@ -1,3 +1,9 @@
+February 2st, 2017
+===================
+* Version 0.21.0 of the server and version 0.15.0 of the client
+  * Added functions `OBS_GetData` and `OBS_GetMeta`
+  * Default isolines provider changed to `mapzen` instead of `heremaps`
+
 November 29st, 2016
 ===================
 * Version 0.20.0 of the server and version 0.12.0 of the python library
