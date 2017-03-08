@@ -38,7 +38,7 @@ all: $(DATA)
 .PHONY: release
 release: $(EXTENSION).control $(SOURCES_DATA)
 	test -n "$(NEW_VERSION)"  # $$NEW_VERSION VARIABLE MISSING. Eg. make release NEW_VERSION=0.x.0
-	mv *.sql old_versions
+	git mv *.sql old_versions
 	$(SED) $(REPLACEMENTS) $(EXTENSION).control
 	cat $(SOURCES_DATA_DIR)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
