@@ -27,7 +27,7 @@ class MapzenGeocoder(Traceable):
                 country=None, search_type=None):
 
         # Remove the search_type if its address from the params sent to mapzen
-        if search_type.lower() == 'address':
+        if search_type and search_type.lower() == 'address':
             search_type = None
 
         request_params = self._build_requests_parameters(searchtext, city,
