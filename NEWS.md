@@ -9,6 +9,7 @@ March 8th, 2017
     - In `mapzen_conf`, under `matrix.service`: `one_to_many_url`, `connect_timeout`, `read_timeout`
     - In `mapzen_conf`, under `isochrones.service`: `base_url`, `connect_timeout`, `read_timeout`, `max_retries`
   * Strictly speaking, version 0.14.0 of the python library is not compatible with 0.13.0, but the changes are made on method signatures with default values that were not used from the PG extension.
+  * Improvements to the Mapzen geocoder client, that should yield better results overall. See #342
 
 February 2st, 2017
 ===================
