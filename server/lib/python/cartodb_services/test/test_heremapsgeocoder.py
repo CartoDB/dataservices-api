@@ -145,3 +145,17 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
                 searchtext='Calle amor de dios',
                 city='Cordoba',
                 country='España')
+
+    def test_geocode_with_nonstandard_url(self, req_mock):
+        geocoder = HereMapsGeocoder(None, None, Mock(), { 'json_url': 'http://nonstandard_here_url' })
+        req_mock.register_uri('GET', 'http://nonstandard_here_url', text=self.GOOD_RESPONSE)
+        response = geocoder.geocode(
+            searchtext='Calle amor de dios',
+            city='Cordoba',
+            country='España')
+
+        self.assertEqual(response[0], -5.2794)
+        self.assertEqual(response[1], 37.70246)
+
+
+

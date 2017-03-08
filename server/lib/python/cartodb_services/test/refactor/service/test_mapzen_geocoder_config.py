@@ -13,7 +13,7 @@ class TestMapzenGeocoderUserConfig(TestCase):
         self._server_config = InMemoryConfigStorage({"server_conf": {"environment": "testing"},
                                                      "mapzen_conf":
                                                      {"geocoder":
-                                                      {"api_key": "search-xxxxxxx", "monthly_quota": 1500000}
+                                                      {"api_key": "search-xxxxxxx", "monthly_quota": 1500000, "service":{"base_url":"http://base"}}
                                                      }, "logger_conf": {}})
         self._username = 'test_user'
         self._user_key = "rails:users:{0}".format(self._username)
@@ -80,6 +80,14 @@ class TestMapzenGeocoderUserConfig(TestCase):
         self._redis_connection.hset(self._user_key, 'geocoding_quota', '100')
         self._redis_connection.hset(self._user_key, 'soft_geocoding_limit', 'false')
         self._redis_connection.hset(self._user_key, 'period_end_date', '2016-12-31 00:00:00')
+
+    def test_config_service_values(self):
+        config = MapzenGeocoderConfigBuilder(self._server_config,
+                                             self._user_config,
+                                             self._org_config,
+                                             self._username,
+                                             None).get()
+        assert config.service_params == {"base_url":"http://base"}
 
 class TestMapzenGeocoderOrgConfig(TestCase):
 
@@ -152,3 +160,11 @@ class TestMapzenGeocoderOrgConfig(TestCase):
         self._redis_connection.hset(self._user_key, 'period_end_date', '2016-12-15 00:00:00')
         self._redis_connection.hset(self._org_key, 'geocoding_quota', '200')
         self._redis_connection.hset(self._org_key, 'period_end_date', '2016-12-31 00:00:00')
+
+    def test_config_default_service_values(self):
+        config = MapzenGeocoderConfigBuilder(self._server_config,
+                                             self._user_config,
+                                             self._org_config,
+                                             self._username,
+                                             self._organization).get()
+        assert config.service_params == {}

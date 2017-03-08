@@ -88,7 +88,7 @@ RETURNS Geometry AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger)
+    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger, user_geocoder_config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -115,7 +115,7 @@ RETURNS Geometry AS $$
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  
+
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
@@ -174,7 +174,7 @@ RETURNS Geometry AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger)
+    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger, mapzen_geocoder_config.service_params)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)

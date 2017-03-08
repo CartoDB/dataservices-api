@@ -31,7 +31,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = MapzenRouting(user_routing_config.mapzen_api_key, logger)
+    client = MapzenRouting(user_routing_config.mapzen_api_key, logger, user_routing_config.mapzen_service_params)
 
     if not waypoints or len(waypoints) < 2:
       logger.info("Empty origin or destination")

@@ -147,6 +147,7 @@ class RoutingConfig(ServiceConfig):
         if not self._routing_provider:
             self._routing_provider = self.DEFAULT_PROVIDER
         self._mapzen_api_key = self._db_config.mapzen_routing_api_key
+        self._mapzen_service_params = self._db_config.mapzen_routing_service_params
         self._set_monthly_quota()
         self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
@@ -163,6 +164,10 @@ class RoutingConfig(ServiceConfig):
     @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
+
+    @property
+    def mapzen_service_params(self):
+        return self._mapzen_service_params
 
     @property
     def monthly_quota(self):
@@ -222,8 +227,11 @@ class IsolinesRoutingConfig(ServiceConfig):
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
             self._heremaps_app_code = db_config.heremaps_isolines_app_code
+            self._heremaps_service_params = db_config.heremaps_isolines_service_params
         elif self._isolines_provider == self.MAPZEN_PROVIDER:
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
+            self._mapzen_matrix_service_params = db_config.mapzen_matrix_service_params
+            self._mapzen_isochrones_service_params = db_config.mapzen_isochrones_service_params
 
     @property
     def service_type(self):
@@ -257,8 +265,20 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._heremaps_app_code
 
     @property
+    def heremaps_service_params(self):
+        return self._heremaps_service_params
+
+    @property
     def mapzen_matrix_api_key(self):
         return self._mapzen_matrix_api_key
+
+    @property
+    def mapzen_matrix_service_params(self):
+        return self._mapzen_matrix_service_params
+
+    @property
+    def mapzen_isochrones_service_params(self):
+        return self._mapzen_isochrones_service_params
 
     @property
     def mapzen_provider(self):
@@ -368,6 +388,7 @@ class GeocoderConfig(ServiceConfig):
             self._heremaps_app_id = db_config.heremaps_geocoder_app_id
             self._heremaps_app_code = db_config.heremaps_geocoder_app_code
             self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
+            self._heremaps_service_params = db_config.heremaps_geocoder_service_params
         elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             self._google_maps_api_key = filtered_config[self.GOOGLE_GEOCODER_API_KEY]
             self._google_maps_client_id = filtered_config[self.GOOGLE_GEOCODER_CLIENT_ID]
@@ -375,6 +396,7 @@ class GeocoderConfig(ServiceConfig):
         elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             self._mapzen_api_key = db_config.mapzen_geocoder_api_key
             self._cost_per_hit = 0
+            self._mapzen_service_params = db_config.mapzen_geocoder_service_params
 
     @property
     def service_type(self):
@@ -429,8 +451,16 @@ class GeocoderConfig(ServiceConfig):
         return self._heremaps_app_code
 
     @property
+    def heremaps_service_params(self):
+        return self._heremaps_service_params
+
+    @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
+
+    @property
+    def mapzen_service_params(self):
+        return self._mapzen_service_params
 
     @property
     def is_high_resolution(self):
@@ -444,6 +474,9 @@ class GeocoderConfig(ServiceConfig):
     def provider(self):
         return self._geocoder_provider
 
+    @property
+    def service(self):
+        return self._service
 
 class ServicesDBConfig:
 
@@ -480,8 +513,10 @@ class ServicesDBConfig:
             self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
             self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
                 'geocoder_cost_per_hit']
+            self._heremaps_geocoder_service_params = heremaps_conf['geocoder'].get('service', {})
             self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
             self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
+            self._heremaps_isolines_service_params = heremaps_conf['isolines'].get('service', {})
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
@@ -491,10 +526,14 @@ class ServicesDBConfig:
             mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
             self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
+            self._mapzen_matrix_service_params = mapzen_conf['matrix'].get('service', {})
+            self._mapzen_isochrones_service_params = mapzen_conf.get('isochrones', {}).get('service', {})
             self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
             self._mapzen_routing_quota = mapzen_conf['routing']['monthly_quota']
+            self._mapzen_routing_service_params = mapzen_conf['routing'].get('service', {})
             self._mapzen_geocoder_api_key = mapzen_conf['geocoder']['api_key']
             self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
+            self._mapzen_geocoder_service_params = mapzen_conf['geocoder'].get('service', {})
 
     def _get_data_observatory_config(self):
         do_conf_json = self._get_conf('data_observatory_conf')
@@ -531,6 +570,10 @@ class ServicesDBConfig:
         return self._heremaps_isolines_app_code
 
     @property
+    def heremaps_isolines_service_params(self):
+        return self._heremaps_isolines_service_params
+
+    @property
     def heremaps_geocoder_app_id(self):
         return self._heremaps_geocoder_app_id
 
@@ -543,12 +586,24 @@ class ServicesDBConfig:
         return self._heremaps_geocoder_cost_per_hit
 
     @property
+    def heremaps_geocoder_service_params(self):
+        return self._heremaps_geocoder_service_params
+
+    @property
     def mapzen_matrix_api_key(self):
         return self._mapzen_matrix_api_key
 
     @property
     def mapzen_matrix_monthly_quota(self):
         return self._mapzen_matrix_quota
+
+    @property
+    def mapzen_matrix_service_params(self):
+        return self._mapzen_matrix_service_params
+
+    @property
+    def mapzen_isochrones_service_params(self):
+        return self._mapzen_isochrones_service_params
 
     @property
     def mapzen_routing_api_key(self):
@@ -559,12 +614,20 @@ class ServicesDBConfig:
         return self._mapzen_routing_quota
 
     @property
+    def mapzen_routing_service_params(self):
+        return self._mapzen_routing_service_params
+
+    @property
     def mapzen_geocoder_api_key(self):
         return self._mapzen_geocoder_api_key
 
     @property
     def mapzen_geocoder_monthly_quota(self):
         return self._mapzen_geocoder_quota
+
+    @property
+    def mapzen_geocoder_service_params(self):
+        return self._mapzen_geocoder_service_params
 
     @property
     def data_observatory_connection_str(self):

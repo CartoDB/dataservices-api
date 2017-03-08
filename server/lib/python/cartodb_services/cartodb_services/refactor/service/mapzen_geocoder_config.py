@@ -13,7 +13,8 @@ class MapzenGeocoderConfig(object):
                  log_path,
                  mapzen_api_key,
                  username,
-                 organization):
+                 organization,
+                 service_params):
         self._geocoding_quota = geocoding_quota
         self._soft_geocoding_limit = soft_geocoding_limit
         self._period_end_date = period_end_date
@@ -22,6 +23,7 @@ class MapzenGeocoderConfig(object):
         self._mapzen_api_key = mapzen_api_key
         self._username = username
         self._organization = organization
+        self._service_params = service_params
 
     # Kind of generic properties. Note which ones are for actually running the
     # service and which ones are needed for quota stuff.
@@ -72,6 +74,10 @@ class MapzenGeocoderConfig(object):
     def organization(self):
         return self._organization
 
+    @property
+    def service_params(self):
+        return self._service_params
+
     # TODO: for BW compat, remove
     @property
     def google_geocoder(self):
@@ -90,6 +96,7 @@ class MapzenGeocoderConfigBuilder(object):
     def get(self):
         mapzen_server_conf = self._server_conf.get('mapzen_conf')
         mapzen_api_key = mapzen_server_conf['geocoder']['api_key']
+        mapzen_service_params = mapzen_server_conf['geocoder'].get('service', {})
 
         geocoding_quota = self._get_quota(mapzen_server_conf)
         soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit').lower() == 'true'
@@ -107,7 +114,8 @@ class MapzenGeocoderConfigBuilder(object):
                                     log_path,
                                     mapzen_api_key,
                                     self._username,
-                                    self._orgname)
+                                    self._orgname,
+                                    mapzen_service_params)
 
     def _get_quota(self, mapzen_server_conf):
         geocoding_quota = self._org_conf.get('geocoding_quota') or self._user_conf.get('geocoding_quota')

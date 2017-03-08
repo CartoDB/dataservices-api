@@ -52,3 +52,16 @@ class MapzenIsochronesTestCase(unittest.TestCase):
         with self.assertRaises(ServiceException):
             self.mapzen_isochrones.isochrone([-41.484375, 28.993727],
                                              'walk', [300, 900])
+
+    def test_nonstandard_url(self, req_mock):
+        url = 'http://serviceurl.com'
+        req_mock.register_uri('GET', url, text=self.GOOD_RESPONSE)
+        mapzen_isochrones = MapzenIsochrones('matrix-xxxxx', Mock(), {'base_url': url})
+
+        response = mapzen_isochrones.isochrone([-41.484375, 28.993727],
+                                                    'walk', [300, 900])
+        self.assertEqual(len(response), 2)
+        self.assertEqual(response[0].coordinates, [[-3.702579,40.430893],[-3.702193,40.430122],[-3.702579,40.430893]])
+        self.assertEqual(response[0].duration, 15)
+        self.assertEqual(response[1].coordinates, [[-3.703050,40.424995],[-3.702546,40.424694],[-3.703050,40.424995]])
+        self.assertEqual(response[1].duration, 5)

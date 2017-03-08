@@ -142,3 +142,17 @@ class MapzenRoutingTestCase(unittest.TestCase):
         self.assertEqual(response.length, 1.261)
         self.assertEqual(response.duration, 913)
         self.assertEqual(response.shape, self.GOOD_SHAPE_MULTI)
+
+    def test_nonstandard_url(self, req_mock):
+        url = 'http://serviceurl.com'
+        routing = MapzenRouting('api_key', Mock(), {'base_url': url})
+        req_mock.register_uri('GET', url, text=self.GOOD_RESPONSE_SIMPLE)
+        origin = Coordinate('-120.2', '38.5')
+        destination = Coordinate('-126.4', '43.2')
+        waypoints = [origin, destination]
+        response = routing.calculate_route_point_to_point(waypoints,
+                                                               'car')
+
+        self.assertEqual(response.shape, self.GOOD_SHAPE_SIMPLE)
+        self.assertEqual(response.length, 444.59)
+        self.assertEqual(response.duration, 16969)

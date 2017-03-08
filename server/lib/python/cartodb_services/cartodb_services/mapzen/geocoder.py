@@ -17,9 +17,13 @@ class MapzenGeocoder(Traceable):
     CONNECT_TIMEOUT = 10
     MAX_RETRIES = 1
 
-    def __init__(self, app_key, logger, base_url=BASE_URL):
+    def __init__(self, app_key, logger, service_params=None):
+        service_params = service_params or {}
         self._app_key = app_key
-        self._url = base_url
+        self._url = service_params.get('base_url', self.BASE_URL)
+        self._connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
+        self._read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
+        self._max_retries = service_params.get('max_retries', self.MAX_RETRIES)
         self._logger = logger
 
     @qps_retry(qps=20)
@@ -31,9 +35,9 @@ class MapzenGeocoder(Traceable):
         try:
             # TODO Extract HTTP client wrapper
             session = requests.Session()
-            session.mount(self._url, HTTPAdapter(max_retries=self.MAX_RETRIES))
+            session.mount(self._url, HTTPAdapter(max_retries=self._max_retries))
             response = session.get(self._url, params=request_params,
-                                    timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+                                    timeout=(self._connect_timeout, self._read_timeout))
             self.add_response_data(response, self._logger)
             if response.status_code == requests.codes.ok:
                 return self.__parse_response(response.text)

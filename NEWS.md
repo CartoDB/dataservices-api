@@ -1,3 +1,14 @@
+March XX, 2017
+===================
+* Version XXXXXX of the server and version XXXXXX of the python library
+  * New optional configuration parameters for external services can be provided through `cdb_conf`:
+    - In `heremaps_conf`, under `geocoder.service`: `json_url`, `connect_timeout`, `read_timeout`, `max_retries`, `gen`
+    - In `heremaps_conf`, under `isolines.service`: `base_url`, `connect_timeout`, `read_timeout`, `max_retries`, `isoline_path`
+    - In `mapzen_conf`, under `geocoder.service`: `base_url`, `connect_timeout`, `read_timeout`, `max_retries`
+    - In `mapzen_conf`, under `routing.service`: `base_url`, `connect_timeout`, `read_timeout`
+    - In `mapzen_conf`, under `matrix.service`: `one_to_many_url`, `connect_timeout`, `read_timeout`
+    - In `mapzen_conf`, under `isochrones.service`: `base_url`, `connect_timeout`, `read_timeout`, `max_retries`
+
 February 2st, 2017
 ===================
 * Version 0.21.0 of the server and version 0.15.0 of the client
