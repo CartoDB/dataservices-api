@@ -75,6 +75,8 @@ RETURNS Geometry AS $$
   from cartodb_services.here import HereMapsGeocoder
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.tools import RateLimiter
+  from cartodb_services.refactor.config.rate_limits import RateLimitsConfig
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
@@ -82,6 +84,15 @@ RETURNS Geometry AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
+
+  rate_limits_config = RateLimitsConfig('geocoder',
+                                        username,
+                                        user_geocoder_config.rate_limit.get('limit'),
+                                        user_geocoder_config.rate_limit.get('period'))
+  rate_limiter = RateLimiter(rate_limits_config, redis_conn)
+  if not rate_limiter.check():
+     raise Exception('Rate limit exceeded')
+
   # -- Check the quota
   quota_service = QuotaService(user_geocoder_config, redis_conn)
   if not quota_service.check_user_quota():
@@ -115,7 +126,7 @@ RETURNS Geometry AS $$
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  
+
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
@@ -149,6 +160,7 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger
+  from cartodb_services.tools import RateLimiter
   from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
   from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
@@ -156,6 +168,7 @@ RETURNS Geometry AS $$
   from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
   from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
   from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
+  from cartodb_services.refactor.config.rate_limits import RateLimitsConfigBuilder
 
   server_config_backend = ServerConfigBackendFactory().get()
   environment = ServerEnvironmentBuilder(server_config_backend).get()
@@ -166,18 +179,13 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
 
   mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_backend, user_config_backend, org_config_backend, username, orgname).get()
+  rate_limit_config = RateLimiterConfigBuilder(server_config_backend, user_config_backend, org_config_backend, service='geocoder' user=username, org=orgname).get()
 
   redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
 
-  #-- e.g: RateLimit(service='geocoder', user=username, max_requests=2, period=60)
-  #-- rate_limiter = RateLimitBuilder(service='geocoder', user=username)
-  #-- How to pass the redis config along?
-  #-- rate_limiter_geocoder_config = RateLimiterUserConfigFactory(redis_metrics_connection, service='geocoder', user=username)
-  from rratelimit import Limiter
-  rate_limiter = Limiter(redis_metrics_connection, action='geocode', limit=2, period=60)
-  if not rate_limiter.checked_insert(username):
+  rate_limiter = RateLimiter(rate_limit_config, redis_metrics_connection)
+  if not rate_limiter.check():
      raise Exception('Rate limit exceeded')
-
 
   quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
   if not quota_service.check_user_quota():
