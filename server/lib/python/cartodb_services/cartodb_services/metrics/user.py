@@ -118,12 +118,9 @@ class UserMetricsService:
         for date in self.__generate_date_range(date_from, date_to):
             redis_prefix = self.__parse_redis_prefix(key_prefix, entity_name,
                                                      service, metric, date)
-            score = self._redis_connection.zscore(redis_prefix, date.day)
-            aggregated_metric += int(score) if score else 0
             zero_padded_day = date.strftime(self.DAY_OF_MONTH_ZERO_PADDED)
-            if str(date.day) != zero_padded_day:
-                score = self._redis_connection.zscore(redis_prefix, zero_padded_day)
-                aggregated_metric += int(score) if score else 0
+            score = self._redis_connection.zscore(redis_prefix, zero_padded_day)
+            aggregated_metric += int(score) if score else 0
 
         return aggregated_metric
 
