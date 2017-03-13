@@ -7,12 +7,7 @@ It is used from pl/python functions contained in the `cdb_dataservices_server` e
 On the other hand, it is pretty independent from the client, as long as the signatures of the public pl/python functions match.
 
 ## Dependencies
-See the [[`requirements.txt`]] or better the Basically:
-- pip
-- redis and hiredis
-- dateutil
-- googlemaps
-- request
+Take a look at [`requirements.txt`](requirements.txt) for details about the required dependencies.
 
 ## Installation
 Install the requirements:
@@ -40,7 +35,7 @@ OK
 ```
 
 ## Running the integration tests
-See the [[../../../../test/README.md]]. Basically, move to the `/test` directory at the top level of this repo and execute the `run_tests.py` script:
+See this [`README`](../../../../test/README.md) in the `/test` directory for details. Basically, you have to move to the `/test` directory at the top level of this repo and execute the `run_tests.py` script:
 ```sh
 cd $(git rev-parse --show-toplevel)/test
 python run_tests.py --host=$YOUR_HOST $YOUR_USERNAME $YOUR_API_KEY
