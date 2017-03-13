@@ -1,3 +1,8 @@
+March 13th, 2017
+================
+* Version `0.14.1` of the python library:
+  * Clean up code that reads from non zero padded date keys #206
+
 March 8th, 2017
 ===============
 * Version 0.22.0 of the server and version 0.14.0 of the python library
