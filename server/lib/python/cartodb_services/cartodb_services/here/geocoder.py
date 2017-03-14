@@ -52,14 +52,17 @@ class HereMapsGeocoder(Traceable):
         'strictlanguagemode'
         ] + ADDRESS_PARAMS
 
-    def __init__(self, app_id, app_code, logger, maxresults=DEFAULT_MAXRESULTS,
-                 gen=DEFAULT_GEN, host=PRODUCTION_GEOCODE_JSON_URL):
+    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=DEFAULT_MAXRESULTS):
+        service_params = service_params or {}
         self.app_id = app_id
         self.app_code = app_code
         self._logger = logger
         self.maxresults = maxresults
-        self.gen = gen
-        self.host = host
+        self.gen = service_params.get('gen', self.DEFAULT_GEN)
+        self.host = service_params.get('json_url', self.PRODUCTION_GEOCODE_JSON_URL)
+        self.connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
+        self.read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
+        self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
 
     def geocode(self, **kwargs):
         params = {}
@@ -92,9 +95,9 @@ class HereMapsGeocoder(Traceable):
         request_params.update(params)
         # TODO Extract HTTP client wrapper
         session = requests.Session()
-        session.mount(self.host, HTTPAdapter(max_retries=self.MAX_RETRIES))
+        session.mount(self.host, HTTPAdapter(max_retries=self.max_retries))
         response = session.get(self.host, params=request_params,
-                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+                                timeout=(self.connect_timeout, self.read_timeout))
         self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return json.loads(response.text)

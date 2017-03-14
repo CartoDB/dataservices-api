@@ -85,7 +85,7 @@ RETURNS Geometry AS $$
   service_manager.check()
 
   try:
-    geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, logger)
+    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger, user_geocoder_config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -162,7 +162,7 @@ RETURNS Geometry AS $$
   service_manager.check()
 
   try:
-    geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, logger)
+    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger, mapzen_geocoder_config.service_params)
     country_iso3 = None
     if country:
       untry_iso3 = country_to_iso3(country)

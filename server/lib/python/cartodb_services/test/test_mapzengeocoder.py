@@ -109,3 +109,14 @@ class MapzenGeocoderTestCase(unittest.TestCase):
             self.geocoder.geocode(
                 searchtext='Calle Siempreviva 3, Valladolid',
                 country='ESP')
+
+    def test_geocode_address_with_nonstandard_url(self, req_mock):
+        nonstandard_url = 'http://nonstandardmapzen'
+        req_mock.register_uri('GET', nonstandard_url, text=self.GOOD_RESPONSE)
+        geocoder = MapzenGeocoder('search-XXXXXXX', Mock(), { 'base_url': nonstandard_url })
+        response = geocoder.geocode(
+            searchtext='Calle Siempreviva 3, Valldolid',
+            country='ESP')
+
+        self.assertEqual(response[0], -4.730928)
+        self.assertEqual(response[1], 41.669034)

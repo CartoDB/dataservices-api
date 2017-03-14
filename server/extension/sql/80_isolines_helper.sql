@@ -20,7 +20,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, 
+    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id,
       user_isolines_routing_config.heremaps_app_code, logger)
 
     if source:
@@ -81,7 +81,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger)
+    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger, user_isolines_routing_config.mapzen_matrix_service_params)
     mapzen_isolines = MapzenIsolines(client, logger)
 
     if source:
@@ -151,7 +151,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
   try:
     mapzen_isochrones = MapzenIsochrones(user_isolines_routing_config.mapzen_matrix_api_key,
-                                         logger)
+                                         logger, user_isolines_routing_config.mapzen_isochrones_service_params)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']

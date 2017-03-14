@@ -212,3 +212,20 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
         parsed_url = urlparse(req_mock.request_history[0].url)
         url_params = parse_qs(parsed_url.query)
         self.assertEqual(url_params['destination'][0], 'geo!33.0,1.0')
+
+    def test_isodistance_with_nonstandard_url(self, req_mock):
+        base_url = 'http://nonstandard_base'
+        url = "{0}{1}".format(base_url, HereMapsRoutingIsoline.ISOLINE_PATH)
+        routing = HereMapsRoutingIsoline(None, None, Mock(), { 'base_url': base_url })
+        req_mock.register_uri('GET', url, text=self.GOOD_RESPONSE)
+        response = routing.calculate_isodistance('geo!33.0,1.0', 'car',
+                                                      ['1000', '2000'])
+        self.assertEqual(len(response), 2)
+        self.assertEqual(response[0]['range'], 1000)
+        self.assertEqual(response[1]['range'], 2000)
+        self.assertEqual(response[0]['geom'], [u'32.9699707,0.9462833',
+                                               u'32.9699707,0.9458542',
+                                               u'32.9699707,0.9462833'])
+        self.assertEqual(response[1]['geom'], [u'32.9699707,0.9462833',
+                                               u'32.9699707,0.9750366',
+                                               u'32.9699707,0.9462833'])

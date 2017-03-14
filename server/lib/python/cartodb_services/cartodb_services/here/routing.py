@@ -30,12 +30,17 @@ class HereMapsRoutingIsoline(Traceable):
         'quality'
     ]
 
-    def __init__(self, app_id, app_code, logger,
-                 base_url=PRODUCTION_ROUTING_BASE_URL):
+    def __init__(self, app_id, app_code, logger, service_params=None):
+        service_params = service_params or {}
         self._app_id = app_id
         self._app_code = app_code
         self._logger = logger
-        self._url = "{0}{1}".format(base_url, self.ISOLINE_PATH)
+        base_url = service_params.get('base_url', self.PRODUCTION_ROUTING_BASE_URL)
+        isoline_path = service_params.get('isoline_path', self.ISOLINE_PATH)
+        self.connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
+        self.read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
+        self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
+        self._url = "{0}{1}".format(base_url, isoline_path)
 
     def calculate_isodistance(self, source, mode, data_range, options=[]):
         return self.__calculate_isolines(source, mode, data_range, 'distance',
@@ -57,9 +62,9 @@ class HereMapsRoutingIsoline(Traceable):
                                                          parsed_options)
         # TODO Extract HTTP client wrapper
         session = requests.Session()
-        session.mount(self._url, HTTPAdapter(max_retries=self.MAX_RETRIES))
+        session.mount(self._url, HTTPAdapter(max_retries=self.max_retries))
         response = requests.get(self._url, params=request_params,
-                                timeout=(self.CONNECT_TIMEOUT, self.READ_TIMEOUT))
+                                timeout=(self.connect_timeout, self.read_timeout))
         self.add_response_data(response, self._logger)
         if response.status_code == requests.codes.ok:
             return self.__parse_isolines_response(response.text)
