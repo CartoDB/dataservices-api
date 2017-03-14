@@ -9,11 +9,13 @@ class RedisConfigStorage(ConfigBackendInterface):
         self._config_key = config_key
         self._data = None
 
-    def get(self, key):
+    def get(self, key, default=KeyError):
         if not self._data:
             self._data = self._connection.hgetall(self._config_key)
-        return self._data[key]
-
+        if (default == KeyError):
+            return self._data[key]
+        else:
+            return self._data.get(key, default)
 
 class RedisUserConfigStorageBuilder(object):
     def __init__(self, redis_connection, username):

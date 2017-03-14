@@ -50,14 +50,15 @@ class RateLimitsConfigBuilder(object):
     def get(self):
         # Order of precedence is user_conf, org_conf, server_conf
 
-        rate_limit_key = "{0}_rate_limit".format(service)
+        rate_limit_key = "{0}_rate_limit".format(self._service)
         rate_limit_json = self._user_conf.get(rate_limit_key, None) or self._org_conf.get(rate_limit_key, None)
         if (rate_limit_json):
             rate_limit = rate_limit_json and json.loads(rate_limit_json)
         else:
-            rate_limit = self._server_conf.get('rate_limits', {}).get(service, {})
+            rate_limit = self._server_conf.get('rate_limits', {}).get(self._service, {})
 
         return RateLimitsConfig(self._service,
                                 self._username,
-                                self._limit,
-                                self._period)
+                                rate_limit.get('limit', None),
+                                rate_limit.get('period', None))
+

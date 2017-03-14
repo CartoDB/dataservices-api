@@ -72,34 +72,20 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.here import HereMapsGeocoder
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.tools import RateLimiter
-  from cartodb_services.refactor.config.rate_limits import RateLimitsConfig
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  # from cartodb_services.metrics import QuotaService
+  # from cartodb_services.tools import Logger,LoggerConfig
+  # from cartodb_services.tools import RateLimiter
+  # from cartodb_services.refactor.config.rate_limits import RateLimitsConfig
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-
-  rate_limits_config = RateLimitsConfig('geocoder',
-                                        username,
-                                        user_geocoder_config.rate_limit.get('limit'),
-                                        user_geocoder_config.rate_limit.get('period'))
-  rate_limiter = RateLimiter(rate_limits_config, redis_conn)
-  if not rate_limiter.check():
-     raise Exception('Rate limit exceeded')
-
-  # -- Check the quota
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  service_manager.check()
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger)
+    geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -107,15 +93,15 @@ RETURNS Geometry AS $$
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
+    service_manager.quota_service.increment_failed_service_use()
     logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using here maps')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -154,64 +140,48 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  import cartodb_services
-  cartodb_services.init(plpy, GD)
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
-  from cartodb_services.tools import RateLimiter
-  from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
-  from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
-  from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
-  from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
-  from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
-  from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
-  from cartodb_services.refactor.config.rate_limits import RateLimitsConfigBuilder
+  # from cartodb_services.metrics import QuotaService
+  # from cartodb_services.tools import Logger
+  # from cartodb_services.tools import RateLimiter
+  # from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
+  # from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
+  # from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
+  # from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
+  # from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
+  # from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
+  # from cartodb_services.refactor.config.rate_limits import RateLimitsConfigBuilder
 
-  server_config_backend = ServerConfigBackendFactory().get()
-  environment = ServerEnvironmentBuilder(server_config_backend).get()
-  user_config_backend = UserConfigBackendFactory(username, environment, server_config_backend).get()
-  org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_backend).get()
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  logger_config = LoggerConfigBuilder(environment, server_config_backend).get()
-  logger = Logger(logger_config)
-
-  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_backend, user_config_backend, org_config_backend, username, orgname).get()
-  rate_limit_config = RateLimiterConfigBuilder(server_config_backend, user_config_backend, org_config_backend, service='geocoder' user=username, org=orgname).get()
-
-  redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
-
-  rate_limiter = RateLimiter(rate_limit_config, redis_metrics_connection)
-  if not rate_limiter.check():
-     raise Exception('Rate limit exceeded')
-
-  quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
+  service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, username, orgname)
+  service_manager.check()
 
   try:
-    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger)
+    geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, logger)
     country_iso3 = None
     if country:
-      country_iso3 = country_to_iso3(country)
+      untry_iso3 = country_to_iso3(country)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city,
                                    state_province=state_province,
                                    country=country_iso3, search_type='address')
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using mapzen')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
