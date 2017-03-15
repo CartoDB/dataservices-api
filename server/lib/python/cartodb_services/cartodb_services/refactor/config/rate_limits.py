@@ -1,3 +1,4 @@
+import json
 class RateLimitsConfig(object):
     """
     Value object that represents the configuration needed to rate-limit services
