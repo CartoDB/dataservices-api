@@ -1,10 +1,10 @@
 from exceptions import RateLimitExceeded
 
 class ServiceManagerBase:
-    def check(self):
-        if not self.rate_limiter.check():
+    def check(self, quota=True, rate=True):
+        if rate and not self.rate_limiter.check():
             raise RateLimitExceeded()
-        if not self.quota_service.check_user_quota():
+        if quota and not self.quota_service.check_user_quota():
             raise Exception('You have reached the limit of your quota')
 
     @property

@@ -101,33 +101,28 @@ $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import LegacyServiceManager
   from cartodb_services.google import GoogleMapsGeocoder
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
-
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  service_manager.check(quota=False)
 
   try:
-    geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key, logger)
+    geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using google maps')
   finally:
     quota_service.increment_total_service_use()
