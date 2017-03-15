@@ -56,13 +56,6 @@ class ServiceConfig(object):
         else:
             return None
 
-    def _get_rate_limit(self, service):
-        rate_limit_key = "{0}_rate_limit".format(service)
-        rate_limit_json = self._redis_config.get(rate_limit_key, None)
-        if (rate_limit_json):
-            return rate_limit_json and json.loads(rate_limit_json)
-        else:
-            return self._db_config.rate_limits.get(service, {})
 
 class DataObservatoryConfig(ServiceConfig):
 
@@ -405,8 +398,6 @@ class GeocoderConfig(ServiceConfig):
             self._cost_per_hit = 0
             self._mapzen_service_params = db_config.mapzen_geocoder_service_params
 
-        self._rate_limit = self._get_rate_limit('geocoder')
-
     @property
     def service_type(self):
         if self._geocoder_provider == self.GOOGLE_GEOCODER:
@@ -484,10 +475,6 @@ class GeocoderConfig(ServiceConfig):
         return self._geocoder_provider
 
     @property
-    def rate_limit(self):
-        return self._rate_limit
-
-    @property
     def service(self):
         return self._service
 
@@ -504,7 +491,6 @@ class ServicesDBConfig:
         self._get_here_config()
         self._get_mapzen_config()
         self._get_data_observatory_config()
-        self._get_rate_limits_config()
 
     def _get_server_config(self):
         server_config_json = self._get_conf('server_conf')
@@ -562,22 +548,14 @@ class ServicesDBConfig:
             else:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
-    def _get_rate_limits_config(self):
-        # self._rate_limits = json.loads(self._get_conf('rate_limits', default='{}'))
-        rl = self._get_conf('rate_limits', default='{}')
-        self._rate_limits = json.loads(rl)
 
-    def _get_conf(self, key, default=KeyError):
+    def _get_conf(self, key):
         try:
             sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)[0]['conf']
-            if default != KeyError:
-                conf = conf or default
-            return conf
+            conf = self._db_conn.execute(sql, 1)
+            return conf[0]['conf']
         except Exception as e:
-            if (default == KeyError):
-                raise ConfigException("Error trying to get config for {0}: {1}".format(key, e))
-            return default
+            raise ConfigException("Error trying to get config for {0}: {1}".format(key, e))
 
     @property
     def server_environment(self):
@@ -656,10 +634,6 @@ class ServicesDBConfig:
         return self._data_observatory_connection_str
 
     @property
-    def rate_limits(self):
-        return self._rate_limits
-
-    @property
     def logger_config(self):
         logger_conf_json = self._get_conf('logger_conf')
         if not logger_conf_json:
@@ -681,7 +655,6 @@ class ServicesRedisConfig:
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     ISOLINES_PROVIDER_KEY = 'isolines_provider'
     ROUTING_PROVIDER_KEY = 'routing_provider'
-    GEOCODING_RATE_LIMIT_KEY = 'geocoder_rate_limit'
 
     def __init__(self, redis_conn):
         self._redis_connection = redis_conn
@@ -736,6 +709,3 @@ class ServicesRedisConfig:
                 user_config[self.ISOLINES_PROVIDER_KEY] = org_config[self.ISOLINES_PROVIDER_KEY]
             if self.ROUTING_PROVIDER_KEY in org_config:
                 user_config[self.ROUTING_PROVIDER_KEY] = org_config[self.ROUTING_PROVIDER_KEY]
-            # for rate limit parameters, user config has precedence over organization
-            if self.GEOCODING_RATE_LIMIT_KEY in org_config and not self.GEOCODING_RATE_LIMIT_KEY in user_config:
-                user_config[self.GEOCODING_RATE_LIMIT_KEY] = org_config[self.GEOCODING_RATE_LIMIT_KEY]

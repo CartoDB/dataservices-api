@@ -20,26 +20,6 @@ class ServiceManagerBase:
         return self.logger
 
 from cartodb_services.metrics import QuotaService
-from cartodb_services.tools import Logger,LoggerConfig
-from cartodb_services.tools import RateLimiter
-from cartodb_services.refactor.config.rate_limits import RateLimitsConfig
-
-class LegacyServiceManager(ServiceManagerBase):
-
-    def __init__(self, service, username, orgname, gd):
-        redis_conn = gd["redis_connection_{0}".format(username)]['redis_metrics_connection']
-        self.config = gd["user_{0}_config_{1}".format(service, username)]
-        logger_config = gd["logger_config"]
-        self.logger = Logger(logger_config)
-
-        rate_limits_config = RateLimitsConfig(service,
-                                                username,
-                                                self.config.rate_limit.get('limit'),
-                                                self.config.rate_limit.get('period'))
-        self.rate_limiter = RateLimiter(rate_limits_config, redis_conn)
-        self.quota_service = QuotaService(self.config, redis_conn)
-
-from cartodb_services.metrics import QuotaService
 from cartodb_services.tools import Logger
 from cartodb_services.tools import RateLimiter
 from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
@@ -68,3 +48,23 @@ class ServiceManager(ServiceManagerBase):
 
         self.rate_limiter = RateLimiter(rate_limit_config, redis_metrics_connection)
         self.quota_service = QuotaService(self.config, redis_metrics_connection)
+
+from cartodb_services.metrics import QuotaService
+from cartodb_services.tools import Logger,LoggerConfig
+from cartodb_services.tools import RateLimiter
+from cartodb_services.refactor.config.rate_limits import RateLimitsConfigLegacyBuilder
+import plpy
+
+class LegacyServiceManager(ServiceManagerBase):
+
+    def __init__(self, service, username, orgname, gd):
+        redis_conn = gd["redis_connection_{0}".format(username)]['redis_metrics_connection']
+        self.config = gd["user_{0}_config_{1}".format(service, username)]
+        logger_config = gd["logger_config"]
+        self.logger = Logger(logger_config)
+
+        self.quota_service = QuotaService(self.config, redis_conn)
+
+        rate_limit_config = RateLimitsConfigLegacyBuilder(redis_conn, plpy, service=service, user=username, org=orgname).get()
+        self.rate_limiter = RateLimiter(rate_limit_config, redis_conn)
+
