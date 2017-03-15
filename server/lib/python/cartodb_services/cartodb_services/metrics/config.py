@@ -563,17 +563,21 @@ class ServicesDBConfig:
                 self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_rate_limits_config(self):
-        self._rate_limits = json.loads(self._get_conf('rate_limits', default='{}'))
+        # self._rate_limits = json.loads(self._get_conf('rate_limits', default='{}'))
+        rl = self._get_conf('rate_limits', default='{}')
+        self._rate_limits = json.loads(rl)
 
     def _get_conf(self, key, default=KeyError):
         try:
             sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
-            conf = self._db_conn.execute(sql, 1)
-            return conf[0]['conf']
+            conf = self._db_conn.execute(sql, 1)[0]['conf']
+            if default != KeyError:
+                conf = conf or default
+            return conf
         except Exception as e:
-            if (default != KeyError):
-                return default
-            raise ConfigException("Error trying to get config for {0}: {1}".format(key, e))
+            if (default == KeyError):
+                raise ConfigException("Error trying to get config for {0}: {1}".format(key, e))
+            return default
 
     @property
     def server_environment(self):
