@@ -75,17 +75,12 @@ RETURNS Geometry AS $$
   from cartodb_services.tools import ServiceManager
   from cartodb_services.here import HereMapsGeocoder
 
-  # from cartodb_services.metrics import QuotaService
-  # from cartodb_services.tools import Logger,LoggerConfig
-  # from cartodb_services.tools import RateLimiter
-  # from cartodb_services.refactor.config.rate_limits import RateLimitsConfig
-
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
   service_manager.check()
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger, user_geocoder_config.heremaps_service_params)
+    geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       quota_service.increment_success_service_use()
@@ -144,16 +139,6 @@ RETURNS Geometry AS $$
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.mapzen.types import country_to_iso3
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
-  # from cartodb_services.metrics import QuotaService
-  # from cartodb_services.tools import Logger
-  # from cartodb_services.tools import RateLimiter
-  # from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
-  # from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
-  # from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
-  # from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
-  # from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
-  # from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
-  # from cartodb_services.refactor.config.rate_limits import RateLimitsConfigBuilder
 
   import cartodb_services
   cartodb_services.init(plpy, GD)
@@ -162,7 +147,7 @@ RETURNS Geometry AS $$
   service_manager.check()
 
   try:
-    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger, mapzen_geocoder_config.service_params)
+    geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
     country_iso3 = None
     if country:
       untry_iso3 = country_to_iso3(country)
@@ -170,7 +155,7 @@ RETURNS Geometry AS $$
                                    state_province=state_province,
                                    country=country_iso3, search_type='address')
     if coordinates:
-      service_manager.quota_service.quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
