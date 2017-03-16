@@ -1,7 +1,41 @@
-from exceptions import RateLimitExceeded
+from cartodb_services.metrics import QuotaService
+from cartodb_services.tools import Logger
+from cartodb_services.tools import RateLimiter
+from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
+from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
+from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
+from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
+from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
+from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
+from cartodb_services.refactor.config import RateLimitsConfigBuilder
+
+class RateLimitExceeded(Exception):
+    def __str__(self):
+            return repr('Rate limit exceeded')
 
 class ServiceManagerBase:
-    def check(self, quota=True, rate=True):
+    """
+    A Service manager collects the configuration needed to use a service,
+    including thir-party services parameters.
+
+    This abstract class serves as the base for concrete service manager classes;
+    derived class must provide and initialize attributes for ``config``,
+    ``quota_service``, ``logger`` and ``rate_limiter`` (which can be None
+    for no limits).
+
+    It provides an `assert_within_limits` method to check quota and rate limits
+    which raises exceptions when limits are exceeded.
+
+    It exposes properties containing:
+
+    * ``config`` : a configuration object containing the configuration parameters for
+      a given service and provider.
+    * ``quota_service`` a QuotaService object to for quota accounting
+    * ``logger``
+
+    """
+
+    def assert_within_limits(self, quota=True, rate=True):
         if rate and not self.rate_limiter.check():
             raise RateLimitExceeded()
         if quota and not self.quota_service.check_user_quota():
@@ -19,18 +53,12 @@ class ServiceManagerBase:
     def logger(self):
         return self.logger
 
-from cartodb_services.metrics import QuotaService
-from cartodb_services.tools import Logger
-from cartodb_services.tools import RateLimiter
-from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
-from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
-from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
-from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
-from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
-from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
-from cartodb_services.refactor.config.rate_limits import RateLimitsConfigBuilder
-
 class ServiceManager(ServiceManagerBase):
+    """
+    This service manager delegates the configuration parameter details,
+    and the policies about configuration precedence to a configuration-builder class.
+    It uses the refactored configuration classes.
+    """
 
     def __init__(self, service, config_builder, username, orgname):
         server_config_backend = ServerConfigBackendFactory().get()
@@ -48,23 +76,3 @@ class ServiceManager(ServiceManagerBase):
 
         self.rate_limiter = RateLimiter(rate_limit_config, redis_metrics_connection)
         self.quota_service = QuotaService(self.config, redis_metrics_connection)
-
-from cartodb_services.metrics import QuotaService
-from cartodb_services.tools import Logger,LoggerConfig
-from cartodb_services.tools import RateLimiter
-from cartodb_services.refactor.config.rate_limits import RateLimitsConfigLegacyBuilder
-import plpy
-
-class LegacyServiceManager(ServiceManagerBase):
-
-    def __init__(self, service, username, orgname, gd):
-        redis_conn = gd["redis_connection_{0}".format(username)]['redis_metrics_connection']
-        self.config = gd["user_{0}_config_{1}".format(service, username)]
-        logger_config = gd["logger_config"]
-        self.logger = Logger(logger_config)
-
-        self.quota_service = QuotaService(self.config, redis_conn)
-
-        rate_limit_config = RateLimitsConfigLegacyBuilder(redis_conn, plpy, service=service, user=username, org=orgname).get()
-        self.rate_limiter = RateLimiter(rate_limit_config, redis_conn)
-

@@ -36,12 +36,12 @@ class TestServiceManager(TestCase):
     def check_rate_limit(self, service_manager, n, active=True):
         if LUA_AVAILABLE_FOR_MOCKREDIS:
             for _ in xrange(n):
-                service_manager.check()
+                service_manager.assert_within_limits()
             if active:
                 with assert_raises(RateLimitExceeded):
-                    service_manager.check()
+                    service_manager.assert_within_limits()
             else:
-                service_manager.check()
+                service_manager.assert_within_limits()
         else:
             # rratelimit doesn't work with MockRedis because it needs Lua support
             # so, we'll simply perform some sanity check on the configuration of the rate limiter
@@ -59,14 +59,14 @@ class TestServiceManager(TestCase):
           'logger_config' : Mock(min_log_level='debug', log_file_path=None, rollbar_api_key=None, environment=self.environment)
         }
         service_manager = LegacyServiceManager('geocoder', self.username, self.orgname, config_cache)
-        service_manager.check()
+        service_manager.assert_within_limits()
         assert_equal(service_manager.config.service_type, 'geocoder_mapzen')
 
     def test_service_manager(self):
         with patch.object(RedisConnectionBuilder,'get') as get_fn:
             get_fn.return_value = self.redis_conn
             service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, self.username, self.orgname)
-            service_manager.check()
+            service_manager.assert_within_limits()
             assert_equal(service_manager.config.service_type, 'geocoder_mapzen')
 
     def test_no_rate_limit_by_default(self):

@@ -77,7 +77,7 @@ RETURNS Geometry AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  service_manager.check()
+  service_manager.assert_within_limits()
 
   try:
     geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
@@ -106,7 +106,7 @@ RETURNS Geometry AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  service_manager.check(quota=False)
+  service_manager.assert_within_limits(quota=False)
 
   try:
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
@@ -139,7 +139,7 @@ RETURNS Geometry AS $$
   cartodb_services.init(plpy, GD)
 
   service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, username, orgname)
-  service_manager.check()
+  service_manager.assert_within_limits()
 
   try:
     geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
