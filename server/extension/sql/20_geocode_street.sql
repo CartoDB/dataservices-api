@@ -145,7 +145,7 @@ RETURNS Geometry AS $$
     geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
     country_iso3 = None
     if country:
-      untry_iso3 = country_to_iso3(country)
+        country_iso3 = country_to_iso3(country)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city,
                                    state_province=state_province,
                                    country=country_iso3, search_type='address')
