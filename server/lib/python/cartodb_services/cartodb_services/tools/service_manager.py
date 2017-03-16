@@ -53,6 +53,30 @@ class ServiceManagerBase:
     def logger(self):
         return self.logger
 
+
+class ServiceConfiguration:
+    def __init__(self, service, username, orgname):
+        self._server_config_backend = ServerConfigBackendFactory().get()
+        self._environment = ServerEnvironmentBuilder(server_config_backend).get()
+        self._user_config_backend = UserConfigBackendFactory(username, environment, server_config_backend).get()
+        self._org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_backend).get()
+
+    @property
+    def environment(self):
+        return self._environment
+
+    @property
+    def server(self):
+        return self._server_config_backend
+
+    @property
+    def user(self):
+        return self._user_config_backend
+
+    @property
+    def org(self):
+        return self._org_config_backend
+
 class ServiceManager(ServiceManagerBase):
     """
     This service manager delegates the configuration parameter details,
@@ -61,18 +85,15 @@ class ServiceManager(ServiceManagerBase):
     """
 
     def __init__(self, service, config_builder, username, orgname):
-        server_config_backend = ServerConfigBackendFactory().get()
-        environment = ServerEnvironmentBuilder(server_config_backend).get()
-        user_config_backend = UserConfigBackendFactory(username, environment, server_config_backend).get()
-        org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_backend).get()
+        service_config = ServerConfiguration(service, username, orgname)
 
-        logger_config = LoggerConfigBuilder(environment, server_config_backend).get()
+        logger_config = LoggerConfigBuilder(service_config.environment, service_config.server).get()
         self.logger = Logger(logger_config)
 
-        self.config = config_builder(server_config_backend, user_config_backend, org_config_backend, username, orgname).get()
-        rate_limit_config = RateLimitsConfigBuilder(server_config_backend, user_config_backend, org_config_backend, service=service, user=username, org=orgname).get()
+        self.config = config_builder(service_config.server, service_config.user, service_config.org, username, orgname).get()
+        rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, user=username, org=orgname).get()
 
-        redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
+        redis_metrics_connection = RedisMetricsConnectionFactory(service_config.environment, service_config.server).get()
 
         self.rate_limiter = RateLimiter(rate_limit_config, redis_metrics_connection)
         self.quota_service = QuotaService(self.config, redis_metrics_connection)

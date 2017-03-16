@@ -19,3 +19,13 @@ class InDbServerConfigStorage(ConfigBackendInterface):
                 raise KeyError
             else:
                 return default
+
+    def set(self, key, config):
+        json_config = json.dumps(config)
+        quoted_config = cartodb_services.plpy.quote_nullable(json_config)
+        sql = "SELECT cdb_dataservices_server.cdb_conf_setconf('{0}', {0})".format(key, quoted_config)
+        cartodb_services.plpy.execute(sql)
+
+    def remove(self, key):
+        sql = "SELECT cdb_dataservices_server.cdb_conf_removeconf('{0}')".format(key)
+        cartodb_services.plpy.execute(sql)

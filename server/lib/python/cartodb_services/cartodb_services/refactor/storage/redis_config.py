@@ -17,6 +17,12 @@ class RedisConfigStorage(ConfigBackendInterface):
         else:
             return self._data.get(key, default)
 
+   def set(self, key, value):
+        self._connection.hset(self._config_key, key, value)
+
+   def remove(self, key):
+        self._connection.hdel(self._config_key, key)
+
 class RedisUserConfigStorageBuilder(object):
     def __init__(self, redis_connection, username):
         self._redis_connection = redis_connection
