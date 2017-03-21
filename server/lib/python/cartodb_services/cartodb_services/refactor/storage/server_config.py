@@ -10,7 +10,7 @@ class InDbServerConfigStorage(ConfigBackendInterface):
         json_output = None
         try:
             json_output = rows[0]['conf']
-        except IndexError:
+        except (IndexError, KeyError):
             pass
         if (json_output):
             return json.loads(json_output)
@@ -23,7 +23,7 @@ class InDbServerConfigStorage(ConfigBackendInterface):
     def set(self, key, config):
         json_config = json.dumps(config)
         quoted_config = cartodb_services.plpy.quote_nullable(json_config)
-        sql = "SELECT cdb_dataservices_server.cdb_conf_setconf('{0}', {0})".format(key, quoted_config)
+        sql = "SELECT cdb_dataservices_server.cdb_conf_setconf('{0}', {1})".format(key, quoted_config)
         cartodb_services.plpy.execute(sql)
 
     def remove(self, key):
