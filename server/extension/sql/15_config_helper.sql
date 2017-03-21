@@ -17,7 +17,7 @@ RETURNS JSON AS $$
 $$ LANGUAGE SQL STABLE SECURITY DEFINER;
 
 CREATE OR REPLACE
-FUNCTION cartodb.CDB_Conf_SetConf(key text, value JSON)
+FUNCTION cdb_dataservices_server.CDB_Conf_SetConf(key text, value JSON)
     RETURNS void AS $$
 BEGIN
     PERFORM cartodb.CDB_Conf_RemoveConf(key);
@@ -26,7 +26,7 @@ END
 $$ LANGUAGE PLPGSQL VOLATILE;
 
 CREATE OR REPLACE
-FUNCTION cartodb.CDB_Conf_RemoveConf(key text)
+FUNCTION cdb_dataservices_server.CDB_Conf_RemoveConf(key text)
     RETURNS void AS $$
 BEGIN
     EXECUTE 'DELETE FROM cartodb.CDB_CONF WHERE KEY = $1;' USING key;
