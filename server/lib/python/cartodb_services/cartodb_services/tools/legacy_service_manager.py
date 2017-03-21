@@ -1,7 +1,7 @@
 from cartodb_services.metrics import QuotaService
 from cartodb_services.tools import Logger,LoggerConfig
 from cartodb_services.tools import RateLimiter
-from cartodb_services.refactor.config import RateLimitsConfigLegacyBuilder
+from cartodb_services.config import RateLimitsConfigLegacyBuilder
 from cartodb_services.tools.service_manager import ServiceManagerBase
 import plpy
 

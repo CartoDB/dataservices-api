@@ -1,4 +1,7 @@
 import json
+
+from service_configuration import ServiceConfiguration
+
 class RateLimitsConfig(object):
     """
     Value object that represents the configuration needed to rate-limit services
@@ -13,6 +16,9 @@ class RateLimitsConfig(object):
         self._username = username
         self._limit = limit and int(limit)
         self._period = period and int(period)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
     # service this limit applies to
     @property
@@ -43,6 +49,7 @@ class RateLimitsConfigBuilder(object):
     from the user/org/server configuration.
     """
 
+    # TODO: user->username, org->orgname
     def __init__(self, server_conf, user_conf, org_conf, service, user, org):
         self._server_conf = server_conf
         self._user_conf = user_conf
@@ -55,6 +62,7 @@ class RateLimitsConfigBuilder(object):
         # Order of precedence is user_conf, org_conf, server_conf
 
         rate_limit_key = "{0}_rate_limit".format(self._service)
+
         rate_limit_json = self._user_conf.get(rate_limit_key, None) or self._org_conf.get(rate_limit_key, None)
         if (rate_limit_json):
             rate_limit = rate_limit_json and json.loads(rate_limit_json)
@@ -71,34 +79,36 @@ class RateLimitsConfigSetter(object):
 
     def __init__(self, service, username, orgname=None):
         self._service = service
-        self._service_config = ServerConfiguration(service, username, orgname)
+        self._service_config = ServiceConfiguration(service, username, orgname)
 
     def set_user_rate_limits(self, rate_limits_config):
         # Note we allow copying a config from another user/service, so we
         # ignore rate_limits:config.service and rate_limits:config.username
-        rate_limit_key = "{0}_rate_limit".format(service)
+        rate_limit_key = "{0}_rate_limit".format(self._service)
         if rate_limits_config.is_limited():
             rate_limit = {'limit': rate_limits_config.limit, 'period': rate_limits_config.period}
-            self.service_config.user.set(rate_limit_key, rate_limit)
-        else
-            self.service_config.user.remove(rate_limit_key)
+            rate_limit_json = json.dumps(rate_limit)
+            self._service_config.user.set(rate_limit_key, rate_limit_json)
+        else:
+            self._service_config.user.remove(rate_limit_key)
 
     def set_org_rate_limits(self, rate_limits_config):
-        rate_limit_key = "{0}_rate_limit".format(service)
+        rate_limit_key = "{0}_rate_limit".format(self._service)
         if rate_limits_config.is_limited():
             rate_limit = {'limit': rate_limits_config.limit, 'period': rate_limits_config.period}
-            self.service_config.org.set(rate_limit_key, rate_limit)
-        else
-            self.service_config.org.remove(rate_limit_key)
+            rate_limit_json = json.dumps(rate_limit)
+            self._service_config.org.set(rate_limit_key, rate_limit_json)
+        else:
+            self._service_config.org.remove(rate_limit_key)
 
     def set_server_rate_limits(self, rate_limits_config):
-        rate_limits = self.service_config.server.get('rate_limits', {})
+        rate_limits = self._service_config.server.get('rate_limits', {})
         if rate_limits_config.is_limited():
             rate_limits[self._service] = {'limit': rate_limits_config.limit, 'period': rate_limits_config.period}
-        else
+        else:
             rate_limits.pop(self._service, None)
         if rate_limits:
-            self.service_config.server.set('rate_limits', rate_limits)
-        else
-            self.service_config.server.remove('rate_limits')
+            self._service_config.server.set('rate_limits', rate_limits)
+        else:
+            self._service_config.server.remove('rate_limits')
 

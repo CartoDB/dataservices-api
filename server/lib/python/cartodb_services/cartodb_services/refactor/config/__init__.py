@@ -1,2 +1,0 @@
-from rate_limits import RateLimitsConfig, RateLimitsConfigBuilder
-from legacy_rate_limits import RateLimitsConfigLegacyBuilder
