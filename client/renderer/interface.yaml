@@ -421,3 +421,29 @@
   params:
     - { name: service, type: TEXT }
     - { name: input_size, type: NUMERIC }
+
+- name: cdb_service_get_rate_limit
+  return_type: json
+  params:
+    - { name: service,  type: "text" }
+
+- name: cdb_service_set_user_rate_limit
+  private: true
+  return_type: void
+  params:
+    - { name: service,  type: "text" }
+    - { name: rate_limit, type: json }
+
+- name: cdb_service_set_org_rate_limit
+  private: true
+  return_type: void
+  params:
+    - { name: service,  type: "text" }
+    - { name: rate_limit, type: json }
+
+- name: cdb_service_set_server_rate_limit
+  private: true
+  return_type: void
+  params:
+    - { name: service,  type: "text" }
+    - { name: rate_limit, type: json }

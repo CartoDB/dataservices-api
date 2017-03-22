@@ -7,9 +7,8 @@
 CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>.<%= name %> (<%= params_with_type_and_default.join(' ,') %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
-  <% if not multi_row %>ret <%= return_type %>;<% end %>
-  username text;
-  orgname text;
+  <%= return_declaration if not multi_row %>
+  <%= credentials_declaration %>
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
@@ -19,15 +18,7 @@ BEGIN
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
-  <% if multi_row %>
-    RETURN QUERY
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
-  <% elsif multi_field %>
-    SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-    RETURN ret;
-  <% else %>
-    SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-    RETURN ret;
-  <% end %>
+
+  <% return_statement do %><%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= params(true).join(', ') %>)<% end %>
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
