@@ -1,6 +1,6 @@
 # Rate limits
 
-Services can be rate-limited. (currently only gecoding with Mapzen or Here providers is limited)
+Services can be rate-limited. (currently only gecoding is limited)
 
 The rate limits configuration can be established at server, organization or user levels, the latter having precedence over the earlier.
 
