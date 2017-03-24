@@ -42,7 +42,7 @@ Steps to deploy a new Data Services API version :
 - install server and client extensions
 
     ```
-    # in data-services repo root path:
+    # in dataservices-api repo root path:
     cd client && sudo make install
     cd server/extension && sudo make install
     ```
