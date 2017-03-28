@@ -1,3 +1,9 @@
+March 28th, 2017
+================
+
+* Version 0.16.0 of the client, version 0.23.0 of the server and version 0.15.0 of the python library
+  * Added support for rate-limiting the geocoding services. See #365
+
 March 13th, 2017
 ================
 * Version `0.14.1` of the python library:
