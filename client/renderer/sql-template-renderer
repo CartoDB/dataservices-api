@@ -17,7 +17,7 @@ class SqlTemplateRenderer
   end
 
   def render
-    ERB.new(@template, nil, '-').result(binding)
+    ERB.new(@template).result(binding)
   end
 
   def name
