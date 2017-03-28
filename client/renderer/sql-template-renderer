@@ -90,25 +90,25 @@ class SqlTemplateRenderer
 
   def return_statement(&block)
     if block
-      erbout = block.binding.eval('_erbout')
+      erb_out = block.binding.eval('_erbout')
 
       if multi_row
-        erbout << 'RETURN QUERY SELECT * FROM '
+        erb_out << 'RETURN QUERY SELECT * FROM '
       elsif multi_field
-        erbout << 'SELECT * FROM '
+        erb_out << 'SELECT * FROM '
       elsif void_return_type?
-        erbout << 'PERFORM '
+        erb_out << 'PERFORM '
       else
-        erbout << 'SELECT '
+        erb_out << 'SELECT '
       end
       yield
       if multi_row || void_return_type?
-        erbout << ';'
+        erb_out << ';'
       else
-        erbout << ' INTO ret;'
+        erb_out << ' INTO ret;'
       end
       if !multi_row && !void_return_type?
-        erbout << ' RETURN ret;'
+        erb_out << ' RETURN ret;'
       end
     else
       if !multi_row && !void_return_type?
