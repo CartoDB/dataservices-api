@@ -11,7 +11,7 @@ RETURNS JSON AS $$
   cartodb_services.init(plpy, GD)
 
   service_config = ServiceConfiguration(service, username, orgname)
-  rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, user=username, org=orgname).get()
+  rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, username=username, orgname=orgname).get()
   if rate_limit_config.is_limited():
       return json.dumps({'limit': rate_limit_config.limit, 'period': rate_limit_config.period})
   else:

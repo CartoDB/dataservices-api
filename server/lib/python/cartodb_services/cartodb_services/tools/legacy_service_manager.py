@@ -19,5 +19,5 @@ class LegacyServiceManager(ServiceManagerBase):
 
         self.quota_service = QuotaService(self.config, redis_conn)
 
-        rate_limit_config = RateLimitsConfigLegacyBuilder(redis_conn, plpy, service=service, user=username, org=orgname).get()
+        rate_limit_config = RateLimitsConfigLegacyBuilder(redis_conn, plpy, service=service, username=username, orgname=orgname).get()
         self.rate_limiter = RateLimiter(rate_limit_config, redis_conn)

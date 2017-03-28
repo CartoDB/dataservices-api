@@ -62,8 +62,8 @@ class TestRateLimitsConfig(TestCase):
                 user_conf=self.empty_redis_config,
                 org_conf=self.empty_redis_config,
                 service='geocoder',
-                user=self.username,
-                org=self.orgname
+                username=self.username,
+                orgname=self.orgname
             ).get()
             plpy_mock._define_result("CDB_Conf_GetConf\('rate_limits'\)", [])
             assert_equal(read_config, config)
@@ -88,8 +88,8 @@ class TestRateLimitsConfig(TestCase):
                 user_conf=self.empty_redis_config,
                 org_conf=self.org_config,
                 service='geocoder',
-                user=self.username,
-                org=self.orgname
+                username=self.username,
+                orgname=self.orgname
             ).get()
             plpy_mock._define_result("CDB_Conf_GetConf\('rate_limits'\)", [])
             assert_equal(read_config, org_config)
@@ -117,8 +117,8 @@ class TestRateLimitsConfig(TestCase):
                 user_conf=self.user_config,
                 org_conf=self.org_config,
                 service='geocoder',
-                user=self.username,
-                org=self.orgname
+                username=self.username,
+                orgname=self.orgname
             ).get()
             plpy_mock._define_result("CDB_Conf_GetConf\('rate_limits'\)", [])
             assert_equal(read_config, user_config)

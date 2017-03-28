@@ -6,10 +6,10 @@ class RateLimitsConfigLegacyBuilder(object):
     Build a RateLimitsConfig object using the *legacy* configuration classes
     """
 
-    def __init__(self, redis_connection, db_conn, service, user, org):
+    def __init__(self, redis_connection, db_conn, service, username, orgname):
         self._service = service
-        self._username = user
-        self._orgname = org
+        self._username = username
+        self._orgname = orgname
         self._redis_connection = redis_connection
         self._db_conn = db_conn
 

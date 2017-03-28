@@ -49,14 +49,13 @@ class RateLimitsConfigBuilder(object):
     from the user/org/server configuration.
     """
 
-    # TODO: user->username, org->orgname
-    def __init__(self, server_conf, user_conf, org_conf, service, user, org):
+    def __init__(self, server_conf, user_conf, org_conf, service, username, orgname):
         self._server_conf = server_conf
         self._user_conf = user_conf
         self._org_conf = org_conf
         self._service = service
-        self._username = user
-        self._orgname = org
+        self._username = username
+        self._orgname = orgname
 
     def get(self):
         # Order of precedence is user_conf, org_conf, server_conf

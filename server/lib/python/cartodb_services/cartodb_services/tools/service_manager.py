@@ -62,7 +62,7 @@ class ServiceManager(ServiceManagerBase):
         self.logger = Logger(logger_config)
 
         self.config = config_builder(service_config.server, service_config.user, service_config.org, username, orgname).get()
-        rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, user=username, org=orgname).get()
+        rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, username=username, orgname=orgname).get()
 
         redis_metrics_connection = RedisMetricsConnectionFactory(service_config.environment, service_config.server).get()
 
