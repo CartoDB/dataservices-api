@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (<%= ['username text', 'organization_name text'].concat(params_with_type_and_default).join(', ') %>)
+CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (<%= params_with_type_and_default(_with_user_org=true).join(', ') %>)
 RETURNS <%= return_type %> AS $$
   CONNECT <%= DATASERVICES_CLIENT_SCHEMA %>._server_conn_str();
   <% if multi_field %>
-  SELECT * FROM <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (<%= ['username', 'organization_name'].concat(params).join(', ') %>);
+  SELECT * FROM <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (<%= params(_with_user_org=true).join(', ') %>);
   <% else %>
-  SELECT <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (<%= ['username', 'organization_name'].concat(params).join(', ') %>);
+  SELECT <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (<%= params(_with_user_org=true).join(', ') %>);
   <% end %>
 $$ LANGUAGE plproxy;
