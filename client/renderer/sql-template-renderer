@@ -44,29 +44,29 @@ class SqlTemplateRenderer
     @function_signature['geocoder_config_key']
   end
 
-  def parameters_info(with_credentials)
+  def parameters_info(with_user_org)
     parameters = []
-    if with_credentials
+    if with_user_org
       parameters << { 'name' => 'username', 'type' => 'text' }
       parameters << { 'name' => 'orgname',  'type' => 'text' }
     end
     parameters + @function_signature['params'].reject(&:empty?)
   end
 
-  def credentials_declaration()
-    "username text;\n  orgname text;" if public_function?
+  def user_org_declaration()
+    "username text;\n  orgname text;" unless superuser_function?
   end
 
-  def params(with_credentials = !public_function?)
-    parameters_info(with_credentials).map { |p| p['name'].to_s }
+  def params(with_user_org = superuser_function?)
+    parameters_info(with_user_org).map { |p| p['name'].to_s }
   end
 
-  def params_with_type(with_credentials = !public_function?)
-    parameters_info(with_credentials).map { |p| "#{p['name']} #{p['type']}" }
+  def params_with_type(with_user_org = superuser_function?)
+    parameters_info(with_user_org).map { |p| "#{p['name']} #{p['type']}" }
   end
 
-  def params_with_type_and_default(with_credentials = !public_function?)
-    parameters = parameters_info(with_credentials).map do |p|
+  def params_with_type_and_default(with_user_org = superuser_function?)
+    parameters = parameters_info(with_user_org).map do |p|
       if not p['default'].nil?
         "#{p['name']} #{p['type']} DEFAULT #{p['default']}"
       else
@@ -76,8 +76,8 @@ class SqlTemplateRenderer
     return parameters
   end
 
-  def public_function?
-    !@function_signature['private']
+  def superuser_function?
+    !!@function_signature['superuser']
   end
 
   def void_return_type?
