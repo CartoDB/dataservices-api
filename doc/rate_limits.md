@@ -65,6 +65,10 @@ of public functions to get the current configuration and privileged functions to
 
 ### Public functions
 
+These functions are accesible to non-privileged roles, and should only be executed
+using the role corresponding to a CARTO user, since that will determine the
+user and organization to which the rate limits configuration applies.
+
 ### cdb_dataservices_client.cdb_service_get_rate_limit(service)
 
 This function returns the rate limit configuration in effect for the specified service
@@ -76,7 +80,19 @@ existing configuration with most precedence is returned.
 
 The result is a JSON object with the configuration (`period` and `limit` attributes as explained above).
 
-### Privileged function
+#### Example:
+
+```
+SELECT cdb_dataservices_client.cdb_service_get_rate_limit('geocoding');
+
+   cdb_service_get_rate_limit
+---------------------------------
+ {"limit": 1000, "period": 86400}
+(1 row)
+```
+
+
+### Privileged (superuser) functions
 
 Thes functions are not accessible by regular user roles, and the user and organization names must be provided as parameters.
 
@@ -90,6 +106,27 @@ The configuration is provided as a JSON literal. To remove the user-level config
 
 This functions doesn't return any value.
 
+#### Example
+
+This will configure the geocoding service rate limit for  user  `myusername`, a non-organization user.
+The limit will be set at 1000 requests per day. Since the user doesn't belong to any organization,
+`NULL` will be passed to the organization argument; otherwise the name of the user's organization should
+be provided.
+
+```
+SELECT cdb_dataservices_client.cdb_service_set_user_rate_limit(
+    'myusername',
+    NULL,
+    'geocoding',
+    '{"limit":1000,"period":86400}'
+);
+
+ cdb_service_set_user_rate_limit
+---------------------------------
+
+(1 row)
+```
+
 ### cdb_dataservices_client.cdb_service_set_org_rate_limit(username, orgname, service, rate_limit)
 
 This function sets the rate limit configuration for the organization.
@@ -101,6 +138,28 @@ The configuration is provided as a JSON literal. To remove the organization-leve
 
 This functions doesn't return any value.
 
+#### Example
+
+This will configure the geocoding service rate limit for the `myorg` organization.
+The limit will be set at 100 requests per hour.
+Note that even we're setting the default configuration for the whole organization,
+the name of a user of the organization must be provided for technical reasons.
+
+```
+SELECT cdb_dataservices_client.cdb_service_set_org_rate_limit(
+    'myorgadmin',
+    'myorg',
+    'geocoding',
+    '{"limit":100,"period":3600}'
+);
+
+
+ cdb_service_set_org_rate_limit
+---------------------------------
+
+(1 row)
+```
+
 ### cdb_dataservices_client.cdb_service_set_server_rate_limit(username, orgname, service, rate_limit)
 
 This function sets the default rate limit configuration for all users accesing the dataservices server. This is overriden by organization of user configuration.
@@ -110,3 +169,27 @@ The configuration is provided as a JSON literal. To remove the organization-leve
 #### Returns
 
 This functions doesn't return any value.
+
+#### Example
+
+This will configure the default geocoding service rate limit for all users
+accesing the data-services server.
+The limit will be set at 10000 requests per month.
+Note that even we're setting the default configuration for the server,
+the name of a user and the name of the corresponding organization (or NULL)
+must be provided for technical reasons.
+
+```
+SELECT cdb_dataservices_client.cdb_service_set_server_rate_limit(
+    'myorgadmin',
+    'myorg',
+    'geocoding',
+    '{"limit":10000,"period":108000}'
+);
+
+
+ cdb_service_set_server_rate_limit
+---------------------------------
+
+(1 row)
+```
