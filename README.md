@@ -44,6 +44,7 @@ Steps to deploy a new Data Services API version :
     ```
     # in dataservices-api repo root path:
     cd client && sudo make install
+    cd -
     cd server/extension && sudo make install
     ```
 
@@ -51,7 +52,7 @@ Steps to deploy a new Data Services API version :
 
     ```
     # in dataservices-api repo root path:
-    cd server/lib/python/cartodb_services && sudo pip install . --upgrade
+    cd server/lib/python/cartodb_services && pip install -r requirements.txt && sudo pip install . --upgrade
     ```
 
 - install extensions in user database
