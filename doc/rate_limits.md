@@ -67,8 +67,10 @@ of public functions to get the current configuration and privileged functions to
 
 ### cdb_dataservices_client.cdb_service_get_rate_limit(service)
 
-This function returns the rate limit configuration for the specified service
-and the user corresponding to the role which makes the calls.
+This function returns the rate limit configuration in effect for the specified service
+and the user corresponding to the role which makes the calls. The effective configuration
+may come from any of the configuration levels (server/organization/user); only the
+existing configuration with most precedence is returned.
 
 #### Returns
 
