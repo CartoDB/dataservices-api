@@ -264,5 +264,17 @@ RETURNS void AS $$
 
 $$ LANGUAGE plproxy;
 
+
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client.cdb_service_set_user_rate_limit (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client.cdb_service_set_org_rate_limit (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client.cdb_service_set_server_rate_limit (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_user_rate_limit_exception_safe (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_org_rate_limit_exception_safe (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_server_rate_limit_exception_safe (username text ,orgname text ,service text ,rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_get_rate_limit (username text, orgname text, service text) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_user_rate_limit (username text, orgname text, service text, rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_org_rate_limit (username text, orgname text, service text, rate_limit json) FROM PUBLIC, publicuser;
+REVOKE EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_set_server_rate_limit (username text, orgname text, service text, rate_limit json) FROM PUBLIC, publicuser;
+
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_service_get_rate_limit(service text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_service_get_rate_limit_exception_safe(service text )  TO publicuser;
