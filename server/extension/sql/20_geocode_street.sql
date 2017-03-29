@@ -83,7 +83,7 @@ RETURNS Geometry AS $$
     geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
@@ -93,7 +93,7 @@ RETURNS Geometry AS $$
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using here maps')
   finally:
     service_manager.quota_service.increment_total_service_use()
@@ -125,7 +125,7 @@ RETURNS Geometry AS $$
     service_manager.logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using google maps')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
