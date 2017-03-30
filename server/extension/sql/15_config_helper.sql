@@ -20,10 +20,10 @@ CREATE OR REPLACE
 FUNCTION cdb_dataservices_server.CDB_Conf_SetConf(key text, value JSON)
     RETURNS void AS $$
 BEGIN
-    PERFORM cartodb.CDB_Conf_RemoveConf(key);
+    PERFORM cdb_dataservices_server.CDB_Conf_RemoveConf(key);
     EXECUTE 'INSERT INTO cartodb.CDB_CONF (KEY, VALUE) VALUES ($1, $2);' USING key, value;
 END
-$$ LANGUAGE PLPGSQL VOLATILE;
+$$ LANGUAGE PLPGSQL VOLATILE SECURITY DEFINER;
 
 CREATE OR REPLACE
 FUNCTION cdb_dataservices_server.CDB_Conf_RemoveConf(key text)
@@ -31,7 +31,7 @@ FUNCTION cdb_dataservices_server.CDB_Conf_RemoveConf(key text)
 BEGIN
     EXECUTE 'DELETE FROM cartodb.CDB_CONF WHERE KEY = $1;' USING key;
 END
-$$ LANGUAGE PLPGSQL VOLATILE;
+$$ LANGUAGE PLPGSQL VOLATILE SECURITY DEFINER;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text, provider text DEFAULT NULL)
