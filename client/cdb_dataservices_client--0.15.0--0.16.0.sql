@@ -39,8 +39,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -63,8 +62,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -87,8 +85,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -96,6 +93,9 @@ BEGIN
   PERFORM cdb_dataservices_client._cdb_service_set_server_rate_limit(username, orgname, service, rate_limit);
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+--
+-- Exception-safe private DataServices API function
+--
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_service_get_rate_limit_exception_safe (service text)
 RETURNS json AS $$
@@ -110,8 +110,8 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -145,8 +145,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -180,8 +179,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
@@ -215,8 +213,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
-  -- JSON value stored "" is taken as literal
+    -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;

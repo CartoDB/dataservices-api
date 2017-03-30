@@ -1357,7 +1357,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
@@ -1381,7 +1381,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
@@ -1405,7 +1405,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
@@ -3505,7 +3505,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
@@ -3540,7 +3540,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
@@ -3575,7 +3575,7 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
