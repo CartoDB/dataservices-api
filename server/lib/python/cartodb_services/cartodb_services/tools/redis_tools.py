@@ -37,7 +37,7 @@ class RedisDBConfig:
         return self._build(key)
 
     def _build(self, key):
-        conf_query = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(
+        conf_query = "SELECT cdb_dataservices_server.CDB_Conf_GetConf('{0}') as conf".format(
             key)
         conf = self._db_conn.execute(conf_query)[0]['conf']
         if conf is None:

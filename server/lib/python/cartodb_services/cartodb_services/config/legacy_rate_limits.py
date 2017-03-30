@@ -32,7 +32,7 @@ class RateLimitsConfigLegacyBuilder(object):
             rate_limit = json.loads(rate_limit_json)
         else:
             conf_key = 'rate_limits'
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(conf_key)
+            sql = "SELECT cdb_dataservices_server.CDB_Conf_GetConf('{0}') as conf".format(conf_key)
             try:
                 conf = self._db_conn.execute(sql, 1)[0]['conf']
             except Exception:
