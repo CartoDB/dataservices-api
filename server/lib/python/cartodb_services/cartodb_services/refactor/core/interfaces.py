@@ -6,6 +6,6 @@ class ConfigBackendInterface(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def get(self, key):
+    def get(self, key, default=None):
         """Return a value based on the key supplied from some storage"""
         pass

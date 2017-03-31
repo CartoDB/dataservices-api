@@ -5,9 +5,8 @@
 CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>_exception_safe (<%= params_with_type_and_default.join(' ,') %>)
 RETURNS <%= return_type %> AS $$
 DECLARE
-  <% if not multi_row %>ret <%= return_type %>;<% end %>
-  username text;
-  orgname text;
+  <%= return_declaration %>
+  <%= user_org_declaration %>
   _returned_sqlstate TEXT;
   _message_text TEXT;
   _pg_exception_context TEXT;
@@ -15,47 +14,22 @@ BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text);
+  <% unless superuser_function? -%>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text);<% end %>
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
 
-  <% if multi_row %>
-    BEGIN
-      RETURN QUERY
-      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>);
-    EXCEPTION
-      WHEN OTHERS THEN
+
+  BEGIN
+    <% return_statement do %><%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= params(_with_user_org=true).join(', ') %>)<% end %>
+  EXCEPTION
+    WHEN OTHERS THEN
         GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
                                 _message_text = MESSAGE_TEXT,
                                 _pg_exception_context = PG_EXCEPTION_CONTEXT;
         RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
-    END;
-  <% elsif multi_field %>
-    BEGIN
-      SELECT * FROM <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-      RETURN ret;
-    EXCEPTION
-      WHEN OTHERS THEN
-        GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
-                                _message_text = MESSAGE_TEXT,
-                                _pg_exception_context = PG_EXCEPTION_CONTEXT;
-        RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
-        RETURN ret;
-    END;
-  <% else %>
-    BEGIN
-      SELECT <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= ['username', 'orgname'].concat(params).join(', ') %>) INTO ret;
-      RETURN ret;
-    EXCEPTION
-      WHEN OTHERS THEN
-        GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
-                                _message_text = MESSAGE_TEXT,
-                                _pg_exception_context = PG_EXCEPTION_CONTEXT;
-        RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
-        RETURN ret;
-    END;
-  <% end %>
+        <%= return_statement %>
+  END;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;

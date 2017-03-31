@@ -1,74 +1,114 @@
--- Geocodes a street address given a searchtext and a state and/or country
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.metrics import metrics
-  from cartodb_services.tools import Logger,LoggerConfig
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.23.0'" to load this file. \quit
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger):
-    if user_geocoder_config.heremaps_geocoder:
-      here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-      return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-    elif user_geocoder_config.google_geocoder:
-      google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-      return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-    elif user_geocoder_config.mapzen_geocoder:
-      mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-      return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
-    else:
-      raise Exception('Requested geocoder is not available')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_get_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT)
+RETURNS JSON AS $$
+  import json
+  from cartodb_services.config import ServiceConfiguration, RateLimitsConfigBuilder
 
-$$ LANGUAGE plpythonu;
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-
-  if user_geocoder_config.heremaps_geocoder:
-    here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-    return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  service_config = ServiceConfiguration(service, username, orgname)
+  rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, username=username, orgname=orgname).get()
+  if rate_limit_config.is_limited():
+      return json.dumps({'limit': rate_limit_config.limit, 'period': rate_limit_config.period})
   else:
-    raise Exception('Here geocoder is not available for your account.')
-
+      return None
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_user_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
 
-  if user_geocoder_config.google_geocoder:
-    google_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_google_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-    return plpy.execute(google_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
   else:
-    raise Exception('Google geocoder is not available for your account.')
-
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_user_rate_limits(config)
 $$ LANGUAGE plpythonu;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
-RETURNS Geometry AS $$
-  # The configuration is retrieved but no checks are performed on it
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_org_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
 
-  mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
-  return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
+  else:
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_org_rate_limits(config)
 $$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_server_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
+  else:
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_server_rate_limits(config)
+$$ LANGUAGE plpythonu;
+
+CREATE OR REPLACE
+FUNCTION cdb_dataservices_server.CDB_Conf_SetConf(key text, value JSON)
+    RETURNS void AS $$
+BEGIN
+    PERFORM cdb_dataservices_server.CDB_Conf_RemoveConf(key);
+    EXECUTE 'INSERT INTO cartodb.CDB_CONF (KEY, VALUE) VALUES ($1, $2);' USING key, value;
+END
+$$ LANGUAGE PLPGSQL VOLATILE SECURITY DEFINER;
+
+CREATE OR REPLACE
+FUNCTION cdb_dataservices_server.CDB_Conf_RemoveConf(key text)
+    RETURNS void AS $$
+BEGIN
+    EXECUTE 'DELETE FROM cartodb.CDB_CONF WHERE KEY = $1;' USING key;
+END
+$$ LANGUAGE PLPGSQL VOLATILE SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$

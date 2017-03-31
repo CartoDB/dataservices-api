@@ -551,7 +551,7 @@ class ServicesDBConfig:
 
     def _get_conf(self, key):
         try:
-            sql = "SELECT cartodb.CDB_Conf_GetConf('{0}') as conf".format(key)
+            sql = "SELECT cdb_dataservices_server.CDB_Conf_GetConf('{0}') as conf".format(key)
             conf = self._db_conn.execute(sql, 1)
             return conf[0]['conf']
         except Exception as e:

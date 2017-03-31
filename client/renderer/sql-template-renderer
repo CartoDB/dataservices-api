@@ -17,7 +17,7 @@ class SqlTemplateRenderer
   end
 
   def render
-    ERB.new(@template).result(binding)
+    ERB.new(@template, _save_level=nil, _trim_mode='-').result(binding)
   end
 
   def name
@@ -44,16 +44,29 @@ class SqlTemplateRenderer
     @function_signature['geocoder_config_key']
   end
 
-  def params
-    @function_signature['params'].reject(&:empty?).map { |p| "#{p['name']}"}
+  def parameters_info(with_user_org)
+    parameters = []
+    if with_user_org
+      parameters << { 'name' => 'username', 'type' => 'text' }
+      parameters << { 'name' => 'orgname',  'type' => 'text' }
+    end
+    parameters + @function_signature['params'].reject(&:empty?)
   end
 
-  def params_with_type
-    @function_signature['params'].reject(&:empty?).map { |p| "#{p['name']} #{p['type']}" }
+  def user_org_declaration()
+    "username text;\n  orgname text;" unless superuser_function?
   end
 
-  def params_with_type_and_default
-    parameters = @function_signature['params'].reject(&:empty?).map do |p|
+  def params(with_user_org = superuser_function?)
+    parameters_info(with_user_org).map { |p| p['name'].to_s }
+  end
+
+  def params_with_type(with_user_org = superuser_function?)
+    parameters_info(with_user_org).map { |p| "#{p['name']} #{p['type']}" }
+  end
+
+  def params_with_type_and_default(with_user_org = superuser_function?)
+    parameters = parameters_info(with_user_org).map do |p|
       if not p['default'].nil?
         "#{p['name']} #{p['type']} DEFAULT #{p['default']}"
       else
@@ -62,6 +75,49 @@ class SqlTemplateRenderer
     end
     return parameters
   end
+
+  def superuser_function?
+    !!@function_signature['superuser']
+  end
+
+  def void_return_type?
+    return_type.downcase == 'void'
+  end
+
+  def return_declaration
+     "ret #{return_type};" unless void_return_type? || multi_row
+  end
+
+  def return_statement(&block)
+    if block
+      erb_out = block.binding.eval('_erbout')
+
+      if multi_row
+        erb_out << 'RETURN QUERY SELECT * FROM '
+      elsif multi_field
+        erb_out << 'SELECT * FROM '
+      elsif void_return_type?
+        erb_out << 'PERFORM '
+      else
+        erb_out << 'SELECT '
+      end
+      yield
+      if multi_row || void_return_type?
+        erb_out << ';'
+      else
+        erb_out << ' INTO ret;'
+      end
+      if !multi_row && !void_return_type?
+        erb_out << ' RETURN ret;'
+      end
+    else
+      if !multi_row && !void_return_type?
+        ' RETURN ret;'
+      end
+    end
+  end
+
+
 end
 
 
