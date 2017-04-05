@@ -42,7 +42,9 @@ Steps to deploy a new Data Services API version :
 - install server and client extensions
 
     ```
-    # in dataservices-api repo root path:
+    # in your workspace root path
+    git clone https://github.com/CartoDB/dataservices-api.git
+    cd dataservices-api
     cd client && sudo make install
     cd -
     cd server/extension && sudo make install
