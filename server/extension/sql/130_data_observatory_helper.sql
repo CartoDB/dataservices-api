@@ -35,7 +35,7 @@ RETURNS SETOF cdb_dataservices_server.obs_meta_denominator AS $$
   SELECT * FROM cdb_observatory.OBS_GetAvailableDenominators(bounds, filter_tags, numer_id, geom_id, timespan);
 $$ LANGUAGE plproxy;
 
-CREATE TYPE cdb_dataservices_server.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric);
+CREATE TYPE cdb_dataservices_server.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, geom_type text, geom_extra jsonb, geom_tags jsonb, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableGeometries(
   username TEXT,
@@ -50,7 +50,7 @@ RETURNS SETOF cdb_dataservices_server.obs_meta_geometry AS $$
   SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan);
 $$ LANGUAGE plproxy;
 
-CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean);
+CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, timespan_type text, timespan_extra jsonb, timespan_tags jsonb, valid_numer boolean, valid_denom boolean, valid_geom boolean);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableTimespans(
   username TEXT,
