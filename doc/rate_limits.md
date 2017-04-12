@@ -83,7 +83,7 @@ The result is a JSON object with the configuration (`period` and `limit` attribu
 #### Example:
 
 ```
-SELECT cdb_dataservices_client.cdb_service_get_rate_limit('geocoding');
+SELECT cdb_dataservices_client.cdb_service_get_rate_limit('geocoder');
 
    cdb_service_get_rate_limit
 ---------------------------------
@@ -108,16 +108,18 @@ This functions doesn't return any value.
 
 #### Example
 
-This will configure the geocoding service rate limit for  user  `myusername`, a non-organization user.
+This will configure the geocoder service rate limit for  user  `myusername`, a non-organization user.
 The limit will be set at 1000 requests per day. Since the user doesn't belong to any organization,
 `NULL` will be passed to the organization argument; otherwise the name of the user's organization should
 be provided.
+
+Note that the name of the geocoding services is `geocoder` and not `geocoding`.
 
 ```
 SELECT cdb_dataservices_client.cdb_service_set_user_rate_limit(
     'myusername',
     NULL,
-    'geocoding',
+    'geocoder',
     '{"limit":1000,"period":86400}'
 );
 
@@ -140,7 +142,7 @@ This functions doesn't return any value.
 
 #### Example
 
-This will configure the geocoding service rate limit for the `myorg` organization.
+This will configure the geocoder service rate limit for the `myorg` organization.
 The limit will be set at 100 requests per hour.
 Note that even we're setting the default configuration for the whole organization,
 the name of a user of the organization must be provided for technical reasons.
@@ -149,7 +151,7 @@ the name of a user of the organization must be provided for technical reasons.
 SELECT cdb_dataservices_client.cdb_service_set_org_rate_limit(
     'myorgadmin',
     'myorg',
-    'geocoding',
+    'geocoder',
     '{"limit":100,"period":3600}'
 );
 
@@ -172,7 +174,7 @@ This functions doesn't return any value.
 
 #### Example
 
-This will configure the default geocoding service rate limit for all users
+This will configure the default geocoder service rate limit for all users
 accesing the data-services server.
 The limit will be set at 10000 requests per month.
 Note that even we're setting the default configuration for the server,
@@ -183,7 +185,7 @@ must be provided for technical reasons.
 SELECT cdb_dataservices_client.cdb_service_set_server_rate_limit(
     'myorgadmin',
     'myorg',
-    'geocoding',
+    'geocoder',
     '{"limit":10000,"period":108000}'
 );
 
