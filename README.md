@@ -23,26 +23,12 @@ Steps to deploy a new Data Services API version :
 
 ### Local install instructions
 
-- install data services geocoder extension
-
-    ```
-    git clone https://github.com/CartoDB/data-services.git
-    cd data-services/geocoder/extension
-    sudo make install
-    ```
-
-- install observatory extension
-
-    ```
-    git clone https://github.com/CartoDB/observatory-extension.git
-    cd observatory
-    sudo make install
-    ```
-
 - install server and client extensions
 
     ```
-    # in dataservices-api repo root path:
+    # in your workspace root path
+    git clone https://github.com/CartoDB/dataservices-api.git
+    cd dataservices-api
     cd client && sudo make install
     cd -
     cd server/extension && sudo make install
@@ -55,15 +41,63 @@ Steps to deploy a new Data Services API version :
     cd server/lib/python/cartodb_services && pip install -r requirements.txt && sudo pip install . --upgrade
     ```
 
-- install extensions in user database
+- Create a database to hold all the server part and a user for it
+
+  ```sql
+  CREATE DATABASE dataservices_db ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+  CREATE USER dataservices_user;
+  ```
+
+- Install needed extensions in `dataservices_db` database
 
     ```
-    create extension cdb_geocoder;
-    create extension plproxy;
-    create extension observatory;
-    create extension cdb_dataservices_server;
-    create extension cdb_dataservices_client;
+    psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS plproxy; COMMIT" -e
+    psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS cdb_dataservices_server; COMMIT" -e
     ```
+
+- [optional] install internal geocoder
+   - Make the extension available in postgres
+     ```
+     git clone https://github.com/CartoDB/data-services.git
+     cd data-services/geocoder/extension
+     sudo make install
+     ```
+
+   - Make sure you have `wget` installed because is needed for the next step.
+
+   - Go to `geocoder` folder and execute the `geocoder_dowload_dumps` script to download the internal geocoder data.
+
+   - Once the data is downloaded, execute this command:
+     ```bash
+     geocoder_restore_dump postgres dataservices_db {DOWNLOADED_DUMPS_FOLDER}/*.sql
+     ```
+
+   - Now we have to make available the extension to be installed by postgres. Follow [this](https://github.com/CartoDB/data-services/tree/master/geocoder/extension) instructions.
+
+   - Now install the extension with:
+     ```
+     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS cdb_geocoder; COMMIT" -e
+     ```
+
+- [optional] install data observatory extension
+   - Make the extension available in postgresql to be installed
+     ```
+     git clone https://github.com/CartoDB/observatory-extension.git
+     cd observatory
+     sudo make install
+     ```
+   - This extension needs data, dumps are not available so we're going to use the test fixtures to make it work. Execute:
+     ```
+     psql -U postgres -d dataservices_db -f src/pg/test/fixtures/load_fixtures.sql
+     ```
+   - Give permission to execute and select to the `dataservices_user` user:
+     ```
+     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatoru; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO dataservices_user; COMMIT" -e
+     ```
 
 ### Server configuration
 
