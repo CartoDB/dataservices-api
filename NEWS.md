@@ -1,3 +1,10 @@
+May 9th, 2017
+=============
+* Version `0.17.0` of the client and version `0.24.0` of the server
+    * Fixed some missing return values documented but not present. See #360
+        *  `OBS_GetAvailableGeometries` now returns `geom_type`, `geom_extra` and `geom_tags` in addition to existing values.
+        *  `OBS_GetAvailableTimespans` now returns `timespan_type`, `timespan_extra`, `timespan_tags` in addition to existing values.
+
 March 28th, 2017
 ================
 
