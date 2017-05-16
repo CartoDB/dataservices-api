@@ -619,7 +619,7 @@ RETURNS TABLE (
           quota_service.increment_success_service_use(len(result))
           return result
         else:
-          return None
+          return []
     except BaseException as e:
         import sys
         quota_service.increment_failed_service_use(len(geomvals))
@@ -678,7 +678,7 @@ RETURNS TABLE (
           quota_service.increment_success_service_use(len(result))
           return result
         else:
-          return None
+          return []
     except BaseException as e:
         import sys
         quota_service.increment_failed_service_use(len(geomrefs))
