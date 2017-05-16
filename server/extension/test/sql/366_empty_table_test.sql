@@ -44,3 +44,22 @@ SELECT * FROM cdb_dataservices_server.OBS_GetData(
          'in some states and situations, to allow for census-tract-to-governmental-unit relationships where the governmental boundaries tend to remain unchanged between censuses. State and county boundaries always are census tract boundaries in the standard census geographic hierarchy. Tribal census tracts are a unique geographic entity defined within federally recognized American Indian reservations and off-reservation trust lands and can cross state and county boundaries. Tribal census tracts may be completely different from the census tracts and block groups defined by state and county (see “Tribal Census Tract”).", "denom_description": "The total number of all people living in a given geographic area.  This is a very useful catch-all denominator when calculating rates.", "max_timespan_rank": null, "numer_description": "The number of people identifying as white, non-Hispanic in each'
          'geography.", "geom_t_description": null, "denom_t_description": null, "numer_t_description": null, "geom_geomref_colname": "geoid", "denom_geomref_colname": "geoid", "numer_geomref_colname": "geoid"}]'::json,
      true);
+
+
+
+-- Mock another observatory backend function (overloaded, different params)
+CREATE OR REPLACE FUNCTION cdb_observatory.OBS_GetData(geomrefs TEXT[], params JSON)
+RETURNS TABLE (
+  id INT,
+  data JSON
+) AS $$
+BEGIN
+  -- this will return an empty set
+  RAISE NOTICE 'Mocked OBS_GetData()';
+END;
+$$ LANGUAGE plpgsql;
+GRANT USAGE ON SCHEMA cdb_observatory TO geocoder_api;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO geocoder_api;
+
+-- Test it
+SELECT * FROM cdb_dataservices_server.OBS_GetData('foo', NULL, '{bar, baz}'::TEXT[], '[]'::JSON);
