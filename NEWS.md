@@ -1,3 +1,8 @@
+May 16th, 2017
+=============
+* Version `0.24.1` of the server
+    * Fixed an interface mismatch between DS API and OBS backend, when returning no data. See #366
+
 May 9th, 2017
 =============
 * Version `0.17.0` of the client and version `0.24.0` of the server
