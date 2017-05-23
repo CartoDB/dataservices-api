@@ -18,7 +18,7 @@ These functions are useful in cases when it is undesirable to rollback a transac
 Fo example if a table is geocoded with:
 
 ```sql
-UPDATE table SET the_geom=cdb_geocode_street_point(user,NULL,address,city,NULL,country);
+UPDATE table SET the_geom=cdb_geocode_street_point(address,city,NULL,country);
 ```
 
 In case of the user geocoding quota being exhausted mid-process, the user could
@@ -28,7 +28,7 @@ transaction rollback.
 We can avoid the problem using the corresponding exception-safe function:
 
 ```sql
-UPDATE table SET the_geom=_cdb_geocode_street_point_exception_safe(user,NULL,address,city,NULL,country);
+UPDATE table SET the_geom=_cdb_geocode_street_point_exception_safe(address,city,NULL,country);
 ```
 
 # Addition Information
