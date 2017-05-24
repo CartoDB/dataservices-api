@@ -365,7 +365,7 @@ class GeocoderConfig(ServiceConfig):
                 raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
         elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             if not self.mapzen_api_key:
-                raise ConfigException("""Mapzen config is not setted up""")
+                raise ConfigException("""Mapzen config is not set up""")
 
         return True
 

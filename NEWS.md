@@ -159,7 +159,7 @@ July 25, 2016
 ===========
 * Release server 0.13.3
 * Add provider per service
-* Default provider in case the provider is not setted
+* Default provider in case the provider is not set
 * Refactor and improvements in the multiprovider services functions
 
 https://github.com/CartoDB/dataservices-api/releases/tag/0.13.3-server
@@ -475,7 +475,7 @@ https://github.com/CartoDB/dataservices-api/releases/tag/0.3.0-server
 Feb 4, 2016:
 ===========
 * Release server 0.2.0
-* Logic for the google geocoder so the users with this geocoder setted up can use street level geocoding too
+* Logic for the google geocoder so the users with this geocoder set up can use street level geocoding too
 * Refactor of the python library in order to reflect the change to a services extension more than only geocoder
 
 https://github.com/CartoDB/dataservices-api/releases/tag/0.2.0-server
