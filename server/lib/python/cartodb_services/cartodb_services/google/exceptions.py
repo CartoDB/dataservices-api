@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import json
 
+class InvalidGoogleCredentials(Exception):
+    pass
 
 class BadGeocodingParams(Exception):
     def __init__(self, value):
