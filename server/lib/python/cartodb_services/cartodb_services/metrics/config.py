@@ -359,13 +359,13 @@ class GeocoderConfig(ServiceConfig):
         if self._geocoder_provider == self.NOKIA_GEOCODER:
             if not set(self.NOKIA_GEOCODER_REDIS_MANDATORY_KEYS).issubset(set(filtered_config.keys())) or \
             not self.heremaps_app_id or not self.heremaps_app_code:
-                raise ConfigException("""Some mandatory parameter/s for Nokia geocoder are missing. Check it please""")
+                raise ConfigException("""Heremaps app id or app code is not set up""")
         elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
-                raise ConfigException("""Google geocoder need the mandatory parameter 'google_maps_private_key'""")
+                raise ConfigException("""Google geocoder private key is not set up""")
         elif self._geocoder_provider == self.MAPZEN_GEOCODER:
             if not self.mapzen_api_key:
-                raise ConfigException("""Mapzen config is not setted up""")
+                raise ConfigException("""Mapzen config is not set up""")
 
         return True
 
