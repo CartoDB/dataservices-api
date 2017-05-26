@@ -6,9 +6,7 @@ import requests_mock
 from mock import Mock
 
 from cartodb_services.google import GoogleMapsGeocoder
-from cartodb_services.google.exceptions import BadGeocodingParams
-from cartodb_services.google.exceptions import NoGeocodingParams
-from cartodb_services.google.exceptions import MalformedResult
+from cartodb_services.google.exceptions import MalformedResult, InvalidGoogleCredentials
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
 
@@ -92,7 +90,8 @@ class GoogleGeocoderTestCase(unittest.TestCase):
     def setUp(self):
         logger = Mock()
         self.geocoder = GoogleMapsGeocoder('dummy_client_id',
-                                 'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E', logger)
+                                           'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E',
+                                           logger)
 
     def test_geocode_address_with_valid_params(self, req_mock):
         req_mock.register_uri('GET', self.GOOGLE_MAPS_GEOCODER_URL,
@@ -119,3 +118,9 @@ class GoogleGeocoderTestCase(unittest.TestCase):
                 searchtext='Calle Eloy Gonzalo 27',
                 city='Madrid',
                 country='España')
+
+    def test_invalid_credentials(self, req_mock):
+        with self.assertRaises(InvalidGoogleCredentials):
+            GoogleMapsGeocoder('dummy_client_id',
+                               'lalala',
+                               None)
