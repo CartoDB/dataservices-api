@@ -1,3 +1,12 @@
+May 26th, 2017
+=============
+* Version `0.24.2` of the server
+    * Fixed fallback logic for namedplaces geocoding functions
+
+* Version `0.15.1` of the python library
+    * Fixed some typos and improve exception messages
+    * Added a check for the google client credentials in order to improve the error message
+
 May 16th, 2017
 =============
 * Version `0.24.1` of the server
