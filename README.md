@@ -95,8 +95,10 @@ Steps to deploy a new Data Services API version :
      psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory VERSION 'dev'; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA observatory TO dataservices_user; COMMIT" -e
      ```
 
 ### Server configuration
