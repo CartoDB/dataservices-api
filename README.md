@@ -98,6 +98,14 @@ Steps to deploy a new Data Services API version :
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO dataservices_user; COMMIT" -e
      ```
+     
+   - Configure geocoder API at `config/app_config.yml`:
+     ```
+     host: 'localhost'
+     port: '5432'
+     user: 'dataservices_user'
+     dbname: 'dataservices_db'
+     ```
 
 ### Server configuration
 
