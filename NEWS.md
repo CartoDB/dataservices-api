@@ -1,3 +1,8 @@
+June 28th, 2017
+=============
+* Not version specific, content change only
+    * Removed link to /docs/faqs and enhanced ZCTA note directly in the Postal Coder docs.
+
 May 26th, 2017
 =============
 * Version `0.24.2` of the server
