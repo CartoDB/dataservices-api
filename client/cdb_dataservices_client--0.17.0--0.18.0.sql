@@ -5,7 +5,6 @@
 -- Make sure we have a sane search path to create/update the extension
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
-
 -- Due to an inconsistency between the v0.17.0 script on one side, and the source sql files
 -- (namely 16_custon_types) and incremental migration scripts on the other (from/to 0.16.0),
 -- the order of the fields of the obs_meta_geometry and obs_meta_timespan types
