@@ -21,4 +21,3 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygo
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country);
 $$ LANGUAGE SQL;
-
