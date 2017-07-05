@@ -1,3 +1,8 @@
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code integer)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text);
+$$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
@@ -33,6 +38,12 @@ RETURNS Geometry AS $$
     finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code integer, country text)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text, country)
+$$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -70,6 +81,12 @@ RETURNS Geometry AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
 
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code integer)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text)
+$$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
@@ -105,6 +122,12 @@ RETURNS Geometry AS $$
     finally:
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code integer, country text)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country)
+$$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
