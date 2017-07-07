@@ -42,7 +42,7 @@
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
   params:
-    - { name: postal_code,  type: integer}
+    - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
@@ -54,7 +54,7 @@
 - name: cdb_geocode_postalcode_point
   return_type: Geometry
   params:
-    - { name: postal_code,  type: integer}
+    - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_ipaddress_point

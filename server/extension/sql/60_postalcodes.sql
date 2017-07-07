@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code integer)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text);
 $$ LANGUAGE SQL;
@@ -40,7 +40,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code integer, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision, country text)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text, country)
 $$ LANGUAGE SQL;
@@ -82,7 +82,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code integer)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text)
 $$ LANGUAGE SQL;
@@ -124,7 +124,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code integer, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision, country text)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country)
 $$ LANGUAGE SQL;
