@@ -73,7 +73,7 @@ def increment_service_uses(redis_conn, username, orgname=None,
     yearmonth = date.strftime('%Y%m')
     redis_name = "{0}:{1}:{2}:{3}:{4}".format(prefix, entity_name,
                                               service, metric, yearmonth)
-    redis_conn.zincrby(redis_name, date.day, amount)
+    redis_conn.zincrby(redis_name, date.strftime('%d'), amount)
 
 
 def plpy_mock_config():

@@ -6,8 +6,6 @@ SET search_path TO public,cartodb,cdb_dataservices_client;
 -- it is public, it shall work
 SELECT cdb_geocode_admin0_polygon('Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_admin0_polygon(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin0_polygon invoked with params (test_user, <NULL>, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_admin0_polygon(username, orgname, country_name)"
-PL/pgSQL function cdb_geocode_admin0_polygon(text) line 16 at SQL statement
  cdb_geocode_admin0_polygon 
 ----------------------------
  
@@ -15,8 +13,6 @@ PL/pgSQL function cdb_geocode_admin0_polygon(text) line 16 at SQL statement
 
 SELECT cdb_geocode_admin1_polygon('California');
 NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, California)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name)"
-PL/pgSQL function cdb_geocode_admin1_polygon(text) line 16 at SQL statement
  cdb_geocode_admin1_polygon 
 ----------------------------
  
@@ -24,8 +20,6 @@ PL/pgSQL function cdb_geocode_admin1_polygon(text) line 16 at SQL statement
 
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
 NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, California, United States)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_admin1_polygon(username, orgname, admin1_name, country_name)"
-PL/pgSQL function cdb_geocode_admin1_polygon(text,text) line 16 at SQL statement
  cdb_geocode_admin1_polygon 
 ----------------------------
  
@@ -33,8 +27,6 @@ PL/pgSQL function cdb_geocode_admin1_polygon(text,text) line 16 at SQL statement
 
 SELECT cdb_geocode_namedplace_point('Elx');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
@@ -42,8 +34,6 @@ PL/pgSQL function cdb_geocode_namedplace_point(text) line 16 at SQL statement
 
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx, Valencia)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, country_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text,text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
@@ -51,8 +41,6 @@ PL/pgSQL function cdb_geocode_namedplace_point(text,text) line 16 at SQL stateme
 
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx, Valencia, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, admin1_name, country_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text,text,text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
@@ -60,8 +48,6 @@ PL/pgSQL function cdb_geocode_namedplace_point(text,text,text) line 16 at SQL st
 
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, 03204, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_postalcode_polygon(username, orgname, postal_code, country_name)"
-PL/pgSQL function cdb_geocode_postalcode_polygon(text,text) line 16 at SQL statement
  cdb_geocode_postalcode_polygon 
 --------------------------------
  
@@ -69,8 +55,6 @@ PL/pgSQL function cdb_geocode_postalcode_polygon(text,text) line 16 at SQL state
 
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, 03204, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_postalcode_point(username, orgname, postal_code, country_name)"
-PL/pgSQL function cdb_geocode_postalcode_point(text,text) line 16 at SQL statement
  cdb_geocode_postalcode_point 
 ------------------------------
  
@@ -78,8 +62,6 @@ PL/pgSQL function cdb_geocode_postalcode_point(text,text) line 16 at SQL stateme
 
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
 NOTICE:  cdb_dataservices_client._cdb_geocode_ipaddress_point(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_ipaddress_point invoked with params (test_user, <NULL>, 8.8.8.8)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_ipaddress_point(username, orgname, ip_address)"
-PL/pgSQL function cdb_geocode_ipaddress_point(text) line 16 at SQL statement
  cdb_geocode_ipaddress_point 
 -----------------------------
  
@@ -87,8 +69,6 @@ PL/pgSQL function cdb_geocode_ipaddress_point(text) line 16 at SQL statement
 
 SELECT cdb_geocode_street_point('one street, 1');
 NOTICE:  cdb_dataservices_client._cdb_geocode_street_point(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_geocoder_street_point invoked with params (test_user, <NULL>, one street, 1, <NULL>, <NULL>, <NULL>)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country)"
-PL/pgSQL function cdb_geocode_street_point(text,text,text,text) line 16 at SQL statement
  cdb_geocode_street_point 
 --------------------------
  
@@ -96,8 +76,6 @@ PL/pgSQL function cdb_geocode_street_point(text,text,text,text) line 16 at SQL s
 
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
 NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, kilometers)
-CONTEXT:  SQL statement "SELECT * FROM cdb_dataservices_client._cdb_route_point_to_point(username, orgname, origin, destination, mode, options, units)"
-PL/pgSQL function cdb_route_point_to_point(geometry,geometry,text,text[],text) line 16 at SQL statement
  cdb_route_point_to_point 
 --------------------------
  (,5.33,100)
