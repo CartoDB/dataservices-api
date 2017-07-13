@@ -5,6 +5,7 @@
 -- Make sure we have a sane search path to create/update the extension
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
+
 -- Due to an inconsistency between the v0.17.0 script on one side, and the source sql files
 -- (namely 16_custon_types) and incremental migration scripts on the other (from/to 0.16.0),
 -- the order of the fields of the obs_meta_geometry and obs_meta_timespan types
@@ -68,16 +69,10 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailablegeometries_exception_safe (bounds geometry(Geometry, 4326) DEFAULT NULL ,filter_tags text[] DEFAULT NULL ,numer_id text DEFAULT NULL ,denom_id text DEFAULT NULL ,timespan text DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.obs_meta_geometry AS $$
-=======
--- HERE goes your code to upgrade/downgrade
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getnumerators (bounds geometry(Geometry, 4326) DEFAULT NULL ,section_tags text[] DEFAULT ARRAY[]::TEXT[] ,subsection_tags text[] DEFAULT ARRAY[]::TEXT[] ,other_tags text[] DEFAULT ARRAY[]::TEXT[] ,ids text[] DEFAULT ARRAY[]::TEXT[] ,name text DEFAULT NULL ,denom_id text DEFAULT '' ,geom_id text DEFAULT '' ,timespan text DEFAULT '')
-RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
->>>>>>> New DO function _OBS_GetNumerators
 DECLARE
 
   username text;
   orgname text;
-<<<<<<< HEAD
   _returned_sqlstate TEXT;
   _message_text TEXT;
   _pg_exception_context TEXT;
@@ -204,8 +199,6 @@ DECLARE
   ret Geometry;
   username text;
   orgname text;
-=======
->>>>>>> New DO function _OBS_GetNumerators
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
@@ -216,7 +209,6 @@ BEGIN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
 
-<<<<<<< HEAD
   SELECT cdb_dataservices_client._cdb_geocode_postalcode_polygon(username, orgname, postal_code, country_name) INTO ret; RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
@@ -247,16 +239,6 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_postalcode_polyg
 RETURNS Geometry AS $$
 DECLARE
   ret Geometry;
-=======
-  RETURN QUERY SELECT * FROM cdb_dataservices_client.__obs_getnumerators(username, orgname, bounds, section_tags, subsection_tags, other_tags, ids, name, denom_id, geom_id, timespan);
-END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.__obs_getnumerators_exception_safe (bounds geometry(Geometry, 4326) DEFAULT NULL ,section_tags text[] DEFAULT ARRAY[]::TEXT[] ,subsection_tags text[] DEFAULT ARRAY[]::TEXT[] ,other_tags text[] DEFAULT ARRAY[]::TEXT[] ,ids text[] DEFAULT ARRAY[]::TEXT[] ,name text DEFAULT NULL ,denom_id text DEFAULT '' ,geom_id text DEFAULT '' ,timespan text DEFAULT '')
-RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
-DECLARE
-
->>>>>>> New DO function _OBS_GetNumerators
   username text;
   orgname text;
   _returned_sqlstate TEXT;
@@ -274,18 +256,13 @@ BEGIN
 
 
   BEGIN
-<<<<<<< HEAD
     SELECT cdb_dataservices_client._cdb_geocode_postalcode_polygon(username, orgname, postal_code, country_name) INTO ret; RETURN ret;
-=======
-    RETURN QUERY SELECT * FROM cdb_dataservices_client.__obs_getnumerators(username, orgname, bounds, section_tags, subsection_tags, other_tags, ids, name, denom_id, geom_id, timespan);
->>>>>>> New DO function _OBS_GetNumerators
   EXCEPTION
     WHEN OTHERS THEN
         GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
                                 _message_text = MESSAGE_TEXT,
                                 _pg_exception_context = PG_EXCEPTION_CONTEXT;
         RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
-<<<<<<< HEAD
          RETURN ret;
   END;
 END;
@@ -321,14 +298,10 @@ BEGIN
                                 _pg_exception_context = PG_EXCEPTION_CONTEXT;
         RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
          RETURN ret;
-=======
-
->>>>>>> New DO function _OBS_GetNumerators
   END;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
-<<<<<<< HEAD
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_postalcode_polygon (username text, orgname text, postal_code double precision, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
