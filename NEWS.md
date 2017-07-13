@@ -1,3 +1,14 @@
+July 13th, 2017
+=============
+* Version `0.25.0` of the server
+    * Add postalcode numeric type function. See #387
+
+* Version `0.15.2` of the python library
+    * Fixed some test. See #387
+
+* Version `0.18.0` of the client and version `0.25.0` of the server
+    * Add postalcode numeric type function. See #387
+
 June 28th, 2017
 =============
 * Not version specific, content change only
