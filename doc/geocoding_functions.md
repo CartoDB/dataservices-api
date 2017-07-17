@@ -217,7 +217,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('New York
 
 These functions geocode your data into point, or polygon, geometries for postal codes. The postal code geocoder covers the United States, France, Australia and Canada; a request for a different country will return an empty response.
 
-**Note:** For the USA, US Census [Zip Code Tabulation Areas](https://www.census.gov/geo/reference/zctas.html) (ZCTA) are used to reference geocodes for USPS postal codes service areas. See the [FAQs](https://carto.com/docs/faqs/datasets-and-data/#why-does-carto-use-census-bureau-zctas-and-not-usps-zip-codes-for-postal-codes) about datasets and data for details.
+**Note:** For the USA, US Census Zip Code Tabulation Areas (ZCTA) are used to reference geocodes for USPS postal codes service areas. This is not a CARTO restriction, this is a US Government licensing protection of their zip code data source; which is not publicly available. Additionally, zip codes are considered service areas and are not actually geometric areas. As a solution, the US Census provides ZCTA data, which tabulates GIS postal codes for USPS locations by aggregating census blocks. For details about how ZCTAs are created, see [ZIP Code™ Tabulation Areas (ZCTAs™)](https://www.census.gov/geo/reference/zctas.html). If you are geocoding data and your zip codes fail, ensure you are using ZCTAs for the postal code.
 
 ### cdb_geocode_postalcode_polygon(_postal_code text, country_name text_)
 

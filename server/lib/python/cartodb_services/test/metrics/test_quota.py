@@ -35,7 +35,7 @@ class TestQuotaChecker(TestCase):
             soft_limit = False
         )
         redis_conn = MockRedis()
-        redis_conn.zincrby(self.redis_key, self.period_end_date.day, 999)
+        redis_conn.zincrby(self.redis_key, self.period_end_date.strftime('%d'), 999)
         assert QuotaChecker(user_service_config, redis_conn).check() == True
 
     def test_routing_quota_check_fails_when_quota_exhausted(self):
@@ -48,7 +48,7 @@ class TestQuotaChecker(TestCase):
             soft_limit = False
         )
         redis_conn = MockRedis()
-        redis_conn.zincrby(self.redis_key, self.period_end_date.day, 1001)
+        redis_conn.zincrby(self.redis_key, self.period_end_date.strftime('%d'), 1001)
         checker = QuotaChecker(user_service_config, redis_conn)
         assert checker.check() == False
 
@@ -66,7 +66,7 @@ class TestQuotaChecker(TestCase):
             soft_limit = False
         )
         redis_conn = MockRedis()
-        redis_conn.zincrby(self.redis_key, self.period_end_date.day, 1000)
+        redis_conn.zincrby(self.redis_key, self.period_end_date.strftime('%d'), 1000)
         checker = QuotaChecker(user_service_config, redis_conn)
         assert checker.check() == False
 
@@ -80,6 +80,6 @@ class TestQuotaChecker(TestCase):
             soft_limit = True
         )
         redis_conn = MockRedis()
-        redis_conn.zincrby(self.redis_key, self.period_end_date.day, 1001)
+        redis_conn.zincrby(self.redis_key, self.period_end_date.strftime('%d'), 1001)
         checker = QuotaChecker(user_service_config, redis_conn)
         assert checker.check() == True

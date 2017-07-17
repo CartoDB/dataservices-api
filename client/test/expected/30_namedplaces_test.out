@@ -25,8 +25,6 @@ $$ LANGUAGE 'plpgsql';
 -- Exercise the public and the proxied function
 SELECT cdb_geocode_namedplace_point('Elx');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
@@ -34,8 +32,6 @@ PL/pgSQL function cdb_geocode_namedplace_point(text) line 16 at SQL statement
 
 SELECT cdb_geocode_namedplace_point('Elx', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, country_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text,text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
@@ -43,8 +39,6 @@ PL/pgSQL function cdb_geocode_namedplace_point(text,text) line 16 at SQL stateme
 
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, Elx, Valencia, Spain)
-CONTEXT:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_namedplace_point(username, orgname, city_name, admin1_name, country_name)"
-PL/pgSQL function cdb_geocode_namedplace_point(text,text,text) line 16 at SQL statement
  cdb_geocode_namedplace_point 
 ------------------------------
  
