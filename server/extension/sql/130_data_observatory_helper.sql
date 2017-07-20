@@ -20,6 +20,23 @@ RETURNS SETOF cdb_dataservices_server.obs_meta_numerator AS $$
   SELECT * FROM cdb_observatory.OBS_GetAvailableNumerators(bounds, filter_tags, denom_id, geom_id, timespan);
 $$ LANGUAGE plproxy;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetNumerators(
+  username TEXT,
+  orgname TEXT,
+  bounds geometry(Geometry, 4326) DEFAULT NULL,
+  section_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  subsection_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  other_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  ids TEXT[] DEFAULT ARRAY[]::TEXT[],
+  name TEXT DEFAULT NULL,
+  denom_id TEXT DEFAULT '',
+  geom_id TEXT DEFAULT '',
+  timespan TEXT DEFAULT '')
+RETURNS SETOF cdb_dataservices_server.obs_meta_numerator AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory._OBS_GetNumerators(bounds, section_tags, subsection_tags, other_tags, ids, name, denom_id, geom_id, timespan);
+$$ LANGUAGE plproxy;
+
 CREATE TYPE cdb_dataservices_server.obs_meta_denominator AS (denom_id text, denom_name text, denom_description text, denom_weight text, denom_license text, denom_source text, denom_type text, denom_aggregate text, denom_extra jsonb, denom_tags jsonb, valid_numer boolean, valid_geom boolean, valid_timespan boolean);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableDenominators(

@@ -381,6 +381,21 @@
     - { name: geom_id, type: text, default: 'NULL' }
     - { name: timespan, type: text, default: 'NULL'}
 
+- name: _obs_getnumerators
+  return_type: SETOF cdb_dataservices_client.obs_meta_numerator
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: section_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
+    - { name: subsection_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
+    - { name: other_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
+    - { name: ids, type: "text[]", default: 'ARRAY[]::TEXT[]' }
+    - { name: name, type: text, default: 'NULL' }
+    - { name: denom_id, type: text, default: "''" }
+    - { name: geom_id, type: text, default: "''" }
+    - { name: timespan, type: text, default: "''"}
+
 - name: obs_getavailabledenominators
   return_type: SETOF cdb_dataservices_client.obs_meta_denominator
   multi_row: true
