@@ -1,3 +1,10 @@
+July 20th, 2017
+=============
+* Version `0.26.0` of the server
+    * New private function to be used by the UI, `_obs_getnumerators`. See #386
+* Version `0.19.0` of the client
+    * New private function to be used by the UI, `_obs_getnumerators`. See #386
+
 July 13th, 2017
 =============
 * Version `0.25.0` of the server
