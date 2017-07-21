@@ -147,7 +147,7 @@ class MetricsLogger(object):
                     json.dump(data, logfile)
                     logfile.write('\n')
         except BaseException as e:
-            self._logger("Error dumping metrics to file {0}".format(log_path),
+            self._logger.error("Error dumping metrics to file {0}".format(log_path),
                          exception=e)
 
     def collect_data(self, data):
