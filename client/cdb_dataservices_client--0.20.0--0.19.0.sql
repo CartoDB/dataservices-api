@@ -6,3 +6,7 @@
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
 -- HERE goes your code to upgrade/downgrade
+DROP FUNCTION IF EXISTS _OBS_PreCheck(text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client.obs_metadatavalidation (Geometry(Geometry, 4326), text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_metadatavalidation_exception_safe (Geometry(Geometry, 4326), text, json);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_metadatavalidation (text, text, Geometry(Geometry, 4326), text, json);

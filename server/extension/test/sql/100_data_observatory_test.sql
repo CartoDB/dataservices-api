@@ -172,3 +172,10 @@ SELECT exists(SELECT *
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'obs_legacybuildermetadata'
               AND oidvectortypes(p.proargtypes)  = 'text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'obs_metadatavalidation'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, geometry, text, json, integer');
