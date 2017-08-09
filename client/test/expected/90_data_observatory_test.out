@@ -194,6 +194,13 @@ BEGIN
   RETURN QUERY SELECT '36047'::TEXT AS id, '[{"value" : 10349.1547875017}]'::JSON AS data;
 END;
 $$ LANGUAGE 'plpgsql';
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_metadatavalidation(username text, orgname text, geom_extent geometry(Geometry, 4326), geom_type text, params JSON, target_geoms INTEGER DEFAULT NULL)
+RETURNS TABLE (valid boolean, errors text[]) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_metadatavalidation invoked with params (%, %, %, %, %, %)', username, orgname, geom_extent, geom_type, params, target_geoms;
+  RETURN QUERY SELECT true AS valid, ARRAY[]::TEXT[] AS errors;
+END;
+$$ LANGUAGE 'plpgsql';
 -- Exercise the public and the proxied function
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 NOTICE:  cdb_dataservices_client._obs_get_demographic_snapshot(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_get_demographic_snapshot invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 2009 - 2013, "us.census.tiger".block_group)
@@ -349,5 +356,12 @@ NOTICE:  cdb_dataservices_client._obs_getdata(5): [contrib_regression] REMOTE NO
                 obs_getdata                 
 --------------------------------------------
  (36047,"[{""value"" : 10349.1547875017}]")
+(1 row)
+
+SELECT obs_metadatavalidation(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 'ST_Polygon', '[{"numer_id": "us.census.acs.B01003001"}]', 1000);
+NOTICE:  cdb_dataservices_client._obs_metadatavalidation(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_metadatavalidation invoked with params (test_user, <NULL>, 0101000020E61000009A999999997952C09A99999999594440, ST_Polygon, [{"numer_id": "us.census.acs.B01003001"}], 1000)
+ obs_metadatavalidation 
+------------------------
+ (t,{})
 (1 row)
 

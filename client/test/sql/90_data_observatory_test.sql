@@ -218,6 +218,14 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_metadatavalidation(username text, orgname text, geom_extent geometry(Geometry, 4326), geom_type text, params JSON, target_geoms INTEGER DEFAULT NULL)
+RETURNS TABLE (valid boolean, errors text[]) AS $$
+BEGIN
+  RAISE NOTICE 'cdb_dataservices_server.obs_metadatavalidation invoked with params (%, %, %, %, %, %)', username, orgname, geom_extent, geom_type, params, target_geoms;
+  RETURN QUERY SELECT true AS valid, ARRAY[]::TEXT[] AS errors;
+END;
+$$ LANGUAGE 'plpgsql';
+
 -- Exercise the public and the proxied function
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 SELECT obs_get_segment_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
@@ -241,4 +249,5 @@ SELECT obs_getavailableboundaries(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4
 SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]', 1, 1, 1000);
 SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}]', 1, 1, 1000));
 SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
+SELECT obs_metadatavalidation(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 'ST_Polygon', '[{"numer_id": "us.census.acs.B01003001"}]', 1000);
 
