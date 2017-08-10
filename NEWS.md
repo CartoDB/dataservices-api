@@ -1,3 +1,11 @@
+August th, 2017
+=============
+* Version `0.27.0` of the server
+    * New public DO function to perform metadata validation, `obs_metadatavalidation`. See #392
+* Version `0.20.0` of the client
+    * New private function to precheck the DO requests, `_obs_precheck`. See #392
+    * New public DO function to perform metadata validation, `obs_metadatavalidation`. See #392
+
 July 20th, 2017
 =============
 * Version `0.26.0` of the server
