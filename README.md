@@ -92,7 +92,7 @@ Steps to deploy a new Data Services API version :
      ```
    - Give permission to execute and select to the `dataservices_user` user:
      ```
-     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory version 'dev'; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory VERSION 'dev'; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
@@ -254,7 +254,7 @@ jsonb_set(
 ```
 ### User database configuration
 
-#### Option 1
+#### Option 1 (manually)
 
 User (client) databases need also some configuration so that the client extension can access the server:
 ##### Users/Organizations
@@ -282,7 +282,7 @@ The search path must be configured in order to be able to execute the functions 
 ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservices_client;
 ```
 
-#### Option 2
+#### Option 2 (from builder)
 
 Add the following entry to the `geocoder` entry of the `cartodb/config/app_config.yml` file:
 ```
@@ -301,4 +301,10 @@ enabled:
     isolines: false
     routing: false
     data_observatory: true
+```
+
+Execute the rake tasks to update all the users and organizations:
+```
+bundle exec rake cartodb:db:configure_geocoder_extension_for_organizations['', true]
+bundle exec rake cartodb:db:configure_geocoder_extension_for_non_org_users['', true]
 ```
