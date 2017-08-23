@@ -305,6 +305,16 @@
     - { name: max_score_rank, type: integer, default: 'NULL' }
     - { name: target_geoms, type: integer, default: 'NULL' }
 
+- name: obs_metadatavalidation
+  return_type: TABLE(valid boolean, errors text[])
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: geom_extent,  type: "Geometry(Geometry, 4326)" }
+    - { name: geom_type,  type: text }
+    - { name: params, type: json }
+    - { name: target_geoms, type: integer, default: 'NULL' }
+
 - name: obs_getcategory
   return_type: text
   params:
