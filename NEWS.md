@@ -1,4 +1,4 @@
-August th, 2017
+August 23th, 2017
 =============
 * Version `0.27.0` of the server
     * New public DO function to perform metadata validation, `obs_metadatavalidation`. See #392
