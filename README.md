@@ -284,27 +284,4 @@ ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservi
 
 #### Option 2 (from builder)
 
-Add the following entry to the `geocoder` entry of the `cartodb/config/app_config.yml` file:
-```
-api:
-    host: 'localhost'
-    port: '5432'
-    user: 'dataservices_user'
-    dbname: 'dataservices_db'
-```
-
-In the `cartodb/config/app_config.yml` file, enable the desired dataservices:
-```
-enabled:
-    geocoder_internal: false
-    hires_geocoder: false
-    isolines: false
-    routing: false
-    data_observatory: true
-```
-
-Execute the rake tasks to update all the users and organizations:
-```
-bundle exec rake cartodb:db:configure_geocoder_extension_for_organizations['', true]
-bundle exec rake cartodb:db:configure_geocoder_extension_for_non_org_users['', true]
-```
+See [the **Configuring Dataservices** documentation](http://cartodb.readthedocs.io/en/latest/operations/configure_data_services.html)
