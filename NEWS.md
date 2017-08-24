@@ -1,3 +1,9 @@
+August 24th, 2017
+=============
+* Improved the documentation
+* Version `0.15.3` of the python library
+    * Disabled DO quota check for users that have it configured . See #395
+
 August 23th, 2017
 =============
 * Version `0.27.0` of the server
