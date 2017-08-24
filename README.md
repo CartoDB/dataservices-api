@@ -92,7 +92,7 @@ Steps to deploy a new Data Services API version :
      ```
    - Give permission to execute and select to the `dataservices_user` user:
      ```
-     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory VERSION 'dev'; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
      psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
@@ -254,14 +254,16 @@ jsonb_set(
 ```
 ### User database configuration
 
+#### Option 1 (manually)
+
 User (client) databases need also some configuration so that the client extension can access the server:
-#### Users/Organizations
+##### Users/Organizations
 
 ```sql
 SELECT CDB_Conf_SetConf('user_config', '{"is_organization": false, "entity_name": "<YOUR_USERNAME>"}');
 ```
 
-#### Dataservices server
+##### Dataservices server
 
 The `geocoder_server_config` (the name is not accurate for historical reasons) entry points
 to the dataservices server DB (you can use a specific database for the server or your same user's):
@@ -272,10 +274,14 @@ SELECT CDB_Conf_SetConf(
     '{ "connection_str": "host=localhost port=5432 dbname=<SERVER_DB_NAME> user=postgres"}'
 );
 ```
-#### Search path
+##### Search path
 
 The search path must be configured in order to be able to execute the functions without using the schema:
 
 ```sql
 ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservices_client;
 ```
+
+#### Option 2 (from builder)
+
+See [the **Configuring Dataservices** documentation](http://cartodb.readthedocs.io/en/latest/operations/configure_data_services.html)
