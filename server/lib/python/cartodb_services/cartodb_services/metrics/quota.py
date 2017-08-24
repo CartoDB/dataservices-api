@@ -134,7 +134,10 @@ class QuotaChecker:
         service_type = self._user_service_config.service_type
         current_used = self._user_service.used_quota(service_type, today)
 
-        if soft_limit or (user_quota > 0 and current_used < user_quota):
+        # Quick workaround so we don't take into account numer of credits
+        # spent for users that have defined the quota.
+        # See https://github.com/CartoDB/bigmetadata/issues/215
+        if soft_limit or (user_quota > 0):
             return True
         else:
             return False

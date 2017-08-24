@@ -126,12 +126,15 @@ class TestQuotaService(TestCase):
         qs.increment_isolines_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
+    # Quick workaround so we don't take into account numer of credits
+    # spent for users that have defined the quota.
+    # See https://github.com/CartoDB/bigmetadata/issues/215
     def test_should_check_user_obs_snapshot_quota_correctly(self):
         qs = self.__build_obs_snapshot_quota_service('test_user')
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=100000)
-        assert qs.check_user_quota() is False
+        assert qs.check_user_quota() is True
 
     def test_should_check_org_obs_snapshot_quota_correctly(self):
         qs = self.__build_obs_snapshot_quota_service('test_user',
@@ -139,14 +142,14 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=100000)
-        assert qs.check_user_quota() is False
+        assert qs.check_user_quota() is True
 
     def test_should_check_user_obs_quota_correctly(self):
         qs = self.__build_obs_snapshot_quota_service('test_user')
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=100000)
-        assert qs.check_user_quota() is False
+        assert qs.check_user_quota() is True
 
     def test_should_check_org_obs_quota_correctly(self):
         qs = self.__build_obs_quota_service('test_user',
@@ -154,7 +157,7 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use()
         assert qs.check_user_quota() is True
         qs.increment_success_service_use(amount=100000)
-        assert qs.check_user_quota() is False
+        assert qs.check_user_quota() is True
 
     def __prepare_quota_service(self, username, service, quota, provider,
                                 orgname, soft_limit, end_date):
