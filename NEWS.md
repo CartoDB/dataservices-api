@@ -1,3 +1,8 @@
+August 30th, 2017
+=============
+* Version `0.15.4` of the python library
+    * Fixed invalid geometries for isochrones due to `generalize` option. See #397
+
 August 24th, 2017
 =============
 * Improved the documentation
