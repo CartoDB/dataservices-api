@@ -32,7 +32,7 @@ class QuotaService:
 
     def increment_failed_service_use(self, amount=1):
         self._user_service.increment_service_use(
-            self._user_service_config.service_type, "fail_responses",
+            self._user_service_config.service_type, "failed_responses",
             amount=amount)
         self._log_service_process("fail")
 
