@@ -52,7 +52,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 1
         us.increment_service_use(self.NOKIA_GEOCODER, 'empty_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
-        us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
+        us.increment_service_use(self.NOKIA_GEOCODER, 'failed_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
 
     def test_should_increment_org_used_quota(self):
@@ -61,7 +61,7 @@ class TestUserService(TestCase):
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 1
         us.increment_service_use(self.NOKIA_GEOCODER, 'empty_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
-        us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
+        us.increment_service_use(self.NOKIA_GEOCODER, 'failed_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
 
     def test_should_increment_user_used_quota_in_for_multiples_dates(self):
@@ -81,7 +81,7 @@ class TestUserService(TestCase):
         us.increment_service_use(self.NOKIA_GEOCODER, 'empty_responses',
                                  date=one_day_after)
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
-        us.increment_service_use(self.NOKIA_GEOCODER, 'fail_responses')
+        us.increment_service_use(self.NOKIA_GEOCODER, 'failed_responses')
         assert us.used_quota(self.NOKIA_GEOCODER, date.today()) == 2
 
     @freeze_time("2015-06-01")
