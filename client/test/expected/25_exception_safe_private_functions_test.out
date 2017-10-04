@@ -1,3 +1,4 @@
+\set VERBOSITY terse
 SET client_min_messages TO warning;
 SET search_path TO public,cartodb,cdb_dataservices_client;
 -- Mock the server functions to raise exceptions
@@ -31,8 +32,6 @@ SET ROLE test_regular_user;
 -- Exercise the exception safe and the proxied functions
 SELECT _cdb_geocode_street_point_exception_safe('One street, 1');
 WARNING:  cdb_dataservices_client._cdb_geocode_street_point(6): [contrib_regression] REMOTE ERROR: Not enough quota or any other exception whatsoever.
-DETAIL:  SQL statement "SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country)"
-PL/pgSQL function _cdb_geocode_street_point_exception_safe(text,text,text,text) line 21 at SQL statement
  _cdb_geocode_street_point_exception_safe 
 ------------------------------------------
  
@@ -40,15 +39,12 @@ PL/pgSQL function _cdb_geocode_street_point_exception_safe(text,text,text,text) 
 
 SELECT * FROM _cdb_isodistance_exception_safe('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
 WARNING:  cdb_dataservices_client._cdb_isodistance(6): [contrib_regression] REMOTE ERROR: Not enough quota or any other exception whatsoever.
-DETAIL:  PL/pgSQL function _cdb_isodistance_exception_safe(geometry,text,integer[],text[]) line 21 at RETURN QUERY
  center | data_range | the_geom 
 --------+------------+----------
 (0 rows)
 
 SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.41706163)'::geometry,'POINT(-3.69909883 40.41236875)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
 WARNING:  cdb_dataservices_client._cdb_route_point_to_point(7): [contrib_regression] REMOTE ERROR: Not enough quota or any other exception whatsoever.
-DETAIL:  SQL statement "SELECT * FROM cdb_dataservices_client._cdb_route_point_to_point(username, orgname, origin, destination, mode, options, units)"
-PL/pgSQL function _cdb_route_point_to_point_exception_safe(geometry,geometry,text,text[],text) line 21 at SQL statement
  shape | length | duration 
 -------+--------+----------
        |        |         

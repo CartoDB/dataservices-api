@@ -1,3 +1,4 @@
+\set VERBOSITY terse
 -- Add to the search path the schema
 SET search_path TO public,cartodb,cdb_dataservices_client;
 -- Mock the server function

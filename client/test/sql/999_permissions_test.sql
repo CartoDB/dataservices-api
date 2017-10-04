@@ -1,3 +1,4 @@
+\set VERBOSITY terse
 -- Use regular user role
 SET ROLE test_regular_user;
 
