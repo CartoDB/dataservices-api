@@ -21,7 +21,7 @@ DATA = $(NEW_EXTENSION_ARTIFACT) \
 SOURCES_DATA_DIR = sql/
 
 
-REGRESS = $(notdir $(basename $(wildcard test/sql/*test.sql)))
+REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 TEST_DIR = test/
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)' --user='postgres'
 
