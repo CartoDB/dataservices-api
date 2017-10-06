@@ -30,7 +30,8 @@ class GoogleMapsClientFactory():
             # Only fails if the string dont have a correct padding for b64
             # but this way we could provide a more clear error than
             # TypeError: Incorrect padding
-            base64.b64decode(client_secret)
+            b64_secret = client_secret.replace('-', '+').replace('_', '/')
+            base64.b64decode(b64_secret)
             return True
         except TypeError:
             return False
