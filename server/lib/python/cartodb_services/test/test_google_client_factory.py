@@ -1,6 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
+import googlemaps
 import unittest
 import base64
 
@@ -52,7 +53,9 @@ class GoogleMapsClientFactoryTestCase(unittest.TestCase):
             GoogleMapsClientFactory.get('dummy_client_id', 'lalala')
 
     def test_credentials_with_dashes_can_be_valid(self):
-        GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola-k-ase---')
+        client = GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola-k-ase---')
+        self.assertIsInstance(client, googlemaps.Client)
 
     def test_credentials_with_underscores_can_be_valid(self):
-        GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola_k_ase___')
+        client = GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola_k_ase___')
+        self.assertIsInstance(client, googlemaps.Client)
