@@ -121,7 +121,7 @@ class GoogleGeocoderTestCase(unittest.TestCase):
 
     def test_invalid_credentials(self, req_mock):
         with self.assertRaises(InvalidGoogleCredentials):
-            GoogleMapsGeocoder('another_dummy_client_id',
+            GoogleMapsGeocoder('dummy_client_id',
                                'lalala',
                                None)
 
