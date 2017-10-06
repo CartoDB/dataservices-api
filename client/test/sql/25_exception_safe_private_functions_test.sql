@@ -1,3 +1,4 @@
+\set VERBOSITY terse
 SET client_min_messages TO warning;
 SET search_path TO public,cartodb,cdb_dataservices_client;
 
