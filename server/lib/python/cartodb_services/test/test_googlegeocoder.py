@@ -124,3 +124,13 @@ class GoogleGeocoderTestCase(unittest.TestCase):
             GoogleMapsGeocoder('another_dummy_client_id',
                                'lalala',
                                None)
+
+    def test_credentials_with_dashes_can_be_valid(self, req_mock):
+        GoogleMapsGeocoder('yet_another_dummy_client_id',
+                           'Ola-k-ase---',
+                           None)
+
+    def test_credentials_with_underscores_can_be_valid(self, req_mock):
+        GoogleMapsGeocoder('yet_another_dummy_client_id',
+                           'Ola_k_ase___',
+                           None)
