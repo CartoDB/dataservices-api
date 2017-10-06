@@ -10,13 +10,14 @@ class GoogleMapsClientFactory():
 
     @classmethod
     def get(cls, client_id, client_secret):
-        client = cls.clients.get(client_id)
+        cache_key = "{}:{}".format(client_id, client_secret)
+        client = cls.clients.get(cache_key)
         if not client:
             cls.assert_valid_crendentials(client_secret)
             client = googlemaps.Client(
                 client_id=client_id,
                 client_secret=client_secret)
-            cls.clients[client_id] = client
+            cls.clients[cache_key] = client
         return client
 
     @classmethod
