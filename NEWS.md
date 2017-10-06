@@ -1,3 +1,12 @@
+October 6th, 2017
+=================
+* Version `0.15.5` of the python library
+    * googlemaps dependency updated to v2.5.1
+    * Google geocoder performance boost: client connections are now reused between queries. See #401
+    * Fixed issue with Google keys validity check. See #382
+    * Fixed inconsistency in service usage failed requests tracking. See f0a3249
+* Client extension tests are now compatible with PostgreSQL 9.5 and 9.6
+
 August 30th, 2017
 =============
 * Version `0.15.4` of the python library
