@@ -1,10 +1,9 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-import base64
 import googlemaps
 
-from exceptions import MalformedResult, InvalidGoogleCredentials
+from exceptions import MalformedResult
 from client_factory import GoogleMapsClientFactory
 
 
