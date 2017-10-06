@@ -1,22 +1,19 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-import base64
 import googlemaps
 
-from exceptions import MalformedResult, InvalidGoogleCredentials
+from exceptions import MalformedResult
+from client_factory import GoogleMapsClientFactory
 
 
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
 
     def __init__(self, client_id, client_secret, logger):
-        if not self._valid_credentials(client_secret):
-            raise InvalidGoogleCredentials('Invalid google secret key')
         self.client_id = self._clean_client_id(client_id)
         self.client_secret = client_secret
-        self.geocoder = googlemaps.Client(
-            client_id=self.client_id, client_secret=self.client_secret)
+        self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret)
         self._logger = logger
 
     def geocode(self, searchtext, city=None, state=None,
@@ -52,13 +49,3 @@ class GoogleMapsGeocoder:
     def _clean_client_id(self, client_id):
         # Consistency with how the client_id is saved in metadata
         return client_id.replace('client=', '')
-
-    def _valid_credentials(self, private_key):
-        try:
-            # Only fails if the string dont have a correct padding for b64
-            # but this way we could provide a more clear error than
-            # TypeError: Incorrect padding
-            base64.b64decode(private_key)
-            return True
-        except TypeError:
-            return False
