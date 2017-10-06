@@ -6,7 +6,7 @@ import requests_mock
 from mock import Mock
 
 from cartodb_services.google import GoogleMapsGeocoder
-from cartodb_services.google.exceptions import MalformedResult, InvalidGoogleCredentials
+from cartodb_services.google.exceptions import MalformedResult
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
 
@@ -118,19 +118,3 @@ class GoogleGeocoderTestCase(unittest.TestCase):
                 searchtext='Calle Eloy Gonzalo 27',
                 city='Madrid',
                 country='España')
-
-    def test_invalid_credentials(self, req_mock):
-        with self.assertRaises(InvalidGoogleCredentials):
-            GoogleMapsGeocoder('dummy_client_id',
-                               'lalala',
-                               None)
-
-    def test_credentials_with_dashes_can_be_valid(self, req_mock):
-        GoogleMapsGeocoder('yet_another_dummy_client_id',
-                           'Ola-k-ase---',
-                           None)
-
-    def test_credentials_with_underscores_can_be_valid(self, req_mock):
-        GoogleMapsGeocoder('yet_another_dummy_client_id',
-                           'Ola_k_ase___',
-                           None)

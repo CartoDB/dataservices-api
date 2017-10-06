@@ -5,6 +5,7 @@ import unittest
 import base64
 
 from cartodb_services.google.client_factory import GoogleMapsClientFactory
+from cartodb_services.google.exceptions import InvalidGoogleCredentials
 
 class GoogleMapsClientFactoryTestCase(unittest.TestCase):
 
@@ -45,3 +46,13 @@ class GoogleMapsClientFactoryTestCase(unittest.TestCase):
         client1 = GoogleMapsClientFactory.get(id1, key)
         client2 = GoogleMapsClientFactory.get(id2, key)
         self.assertNotEqual(client1, client2)
+
+    def test_invalid_credentials(self):
+        with self.assertRaises(InvalidGoogleCredentials):
+            GoogleMapsClientFactory.get('dummy_client_id', 'lalala')
+
+    def test_credentials_with_dashes_can_be_valid(self):
+        GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola-k-ase---')
+
+    def test_credentials_with_underscores_can_be_valid(self):
+        GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola_k_ase___')
