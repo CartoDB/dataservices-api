@@ -60,3 +60,6 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 
+DROP FUNCTION cdb_dataservices_client.obs_getavailablegeometries (geometry(Geometry, 4326), text[], text, text, text, integer);
+DROP FUNCTION cdb_dataservices_client._obs_getavailablegeometries_exception_safe (geometry(Geometry, 4326), text[], text, text, text, integer);
+DROP FUNCTION cdb_dataservices_client._obs_getavailablegeometries (text, text, geometry(Geometry, 4326), text[], text, text, text, integer);
