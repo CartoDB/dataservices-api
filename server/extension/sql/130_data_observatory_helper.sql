@@ -61,10 +61,11 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableGeometries(
   filter_tags TEXT[] DEFAULT NULL,
   numer_id TEXT DEFAULT NULL,
   denom_id TEXT DEFAULT NULL,
-  timespan TEXT DEFAULT NULL)
+  timespan TEXT DEFAULT NULL,
+  number_geometries INTEGER DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_server.obs_meta_geometry AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan);
+  SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan, number_geometries);
 $$ LANGUAGE plproxy;
 
 CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb);
