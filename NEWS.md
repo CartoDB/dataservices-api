@@ -1,3 +1,10 @@
+October 18th, 2017
+=================
+* Version `0.21.0` of the client extension
+    * Added new parameter `number_geometries` to the `obs_getavailablegeometries` to improve the score calculation
+* Version `0.28.0` of the server extension
+    * Added new parameter `number_geometries` to the `obs_getavailablegeometries` to improve the score calculation
+
 October 6th, 2017
 =================
 * Version `0.15.5` of the python library
