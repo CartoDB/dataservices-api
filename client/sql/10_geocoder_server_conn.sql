@@ -13,4 +13,4 @@ BEGIN
   SELECT trim(both '"' FROM db_connection_str) INTO db_connection_str;
   RETURN db_connection_str;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql' STABLE PARALLEL SAFE;

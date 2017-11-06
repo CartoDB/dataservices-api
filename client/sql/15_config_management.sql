@@ -34,4 +34,4 @@ BEGIN
     result.organization_name = organization_name;
     RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL SAFE;

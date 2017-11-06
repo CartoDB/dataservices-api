@@ -41,7 +41,7 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(
     table_name text,
@@ -89,7 +89,7 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeasure(
@@ -134,7 +134,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
         )
 
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMeasure(
     username text,
@@ -227,7 +227,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
             fdw_server=plpy.quote_literal(server_name)))
 
     return True
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_ConnectUserTable(
     username text,
@@ -239,7 +239,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_ConnectUserTable(
 )RETURNS cdb_dataservices_client.ds_fdw_metadata AS $$
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_ConnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(
     username text,
@@ -249,7 +249,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_GetReturnMetadata(
 ) RETURNS cdb_dataservices_client.ds_return_metadata AS $$
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_GetReturnMetadata;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_FetchJoinFdwTableData(
     username text,
@@ -261,7 +261,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_FetchJoinFdwTableData(
 ) RETURNS SETOF record AS $$
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
     username text,
@@ -272,4 +272,4 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
 ) RETURNS boolean AS $$
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_DisconnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
