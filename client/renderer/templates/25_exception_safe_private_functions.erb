@@ -32,4 +32,4 @@ BEGIN
         <%= return_statement %>
   END;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
