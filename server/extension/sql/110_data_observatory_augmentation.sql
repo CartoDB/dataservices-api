@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJS
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -79,7 +79,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -135,7 +135,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshotJSON(
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -187,7 +187,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   username TEXT,
@@ -245,7 +245,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasure(geom, measure_id, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   username TEXT,
@@ -301,7 +301,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetCategory(geom, category_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetCategory(
   username TEXT,
@@ -357,7 +357,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusMeasure(geom, name, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   username TEXT,
@@ -413,7 +413,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusCategory(geom, name, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusCategory(
   username TEXT,
@@ -468,7 +468,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetPopulation(geom, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
@@ -523,7 +523,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasureById(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasureById(geom_ref, measure_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasureById(
   username TEXT,
@@ -580,7 +580,7 @@ RETURNS TABLE (
 ) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetData(geomvals, params, merge);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -640,7 +640,7 @@ RETURNS TABLE (
 ) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetData(geomrefs, params);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -701,7 +701,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeta(
 RETURNS JSON AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeta(geom, params, max_timespan_rank, max_score_rank, target_geoms);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeta(
   username TEXT,
@@ -748,7 +748,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_MetadataValidation(
 RETURNS TABLE(valid boolean, errors text[]) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_MetadataValidation(geometry_extent, geometry_type, params, target_geoms);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_MetadataValidation(
   username TEXT,

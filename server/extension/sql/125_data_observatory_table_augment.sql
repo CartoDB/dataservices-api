@@ -14,23 +14,23 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.__DST_ConnectUserTable(userna
 RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_ConnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_GetReturnMetadata;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, servername text)
 RETURNS boolean AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_DisconnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
