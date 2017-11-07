@@ -85,7 +85,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
   return ret
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
@@ -102,4 +102,4 @@ returns BOOLEAN AS $$
       WHERE p.service = service_::cdb_dataservices_server.service_type;
     RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL RESTRICTED;

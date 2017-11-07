@@ -32,12 +32,12 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text);
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
@@ -74,12 +74,12 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision, country text)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text, country);
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
@@ -116,12 +116,12 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text)
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
 
@@ -159,12 +159,12 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision, country text)
 RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country);
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text, country text)
 RETURNS Geometry AS $$
@@ -214,7 +214,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text)
 RETURNS Geometry AS $$
@@ -235,7 +235,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text, country text)
 RETURNS Geometry AS $$
@@ -260,4 +260,4 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
