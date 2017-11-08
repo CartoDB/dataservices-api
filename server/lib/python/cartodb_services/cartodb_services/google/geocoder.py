@@ -5,6 +5,7 @@ import googlemaps
 import re
 
 from exceptions import MalformedResult
+from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
 
@@ -12,6 +13,8 @@ class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
 
     def __init__(self, client_id, client_secret, logger):
+        if client_id is None:
+            raise InvalidGoogleCredentials
         self.client_id = self._clean_client_id(client_id)
         self.client_secret = client_secret
         self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret)
@@ -49,11 +52,5 @@ class GoogleMapsGeocoder:
 
     def _clean_client_id(self, client_id):
         # Consistency with how the client_id is saved in metadata
-        if client_id is None:
-            return ''
-        else:
-            search_result = re.search(r'client=([^&]*).*', client_id)
-            if search_result is None:
-                return client_id
-            else:
-                return search_result.group(1)
+        search_result = re.search(r'(client=)?(?P<client_id>[^&]*).*', client_id)
+        return search_result.groupdict()['client_id']
