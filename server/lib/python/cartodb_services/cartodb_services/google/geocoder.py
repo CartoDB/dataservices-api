@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import googlemaps
+import re
 
 from exceptions import MalformedResult
 from client_factory import GoogleMapsClientFactory
@@ -48,4 +49,11 @@ class GoogleMapsGeocoder:
 
     def _clean_client_id(self, client_id):
         # Consistency with how the client_id is saved in metadata
-        return client_id.replace('client=', '')
+        if client_id is None:
+            return ''
+        else:
+            search_result = re.search(r'client=([^&]*).*', client_id)
+            if search_result is None:
+                return client_id
+            else:
+                return search_result.group(1)
