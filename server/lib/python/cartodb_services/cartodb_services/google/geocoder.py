@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import googlemaps
-import re
+from urlparse import parse_qs
 
 from exceptions import MalformedResult
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
@@ -15,9 +15,11 @@ class GoogleMapsGeocoder:
     def __init__(self, client_id, client_secret, logger):
         if client_id is None:
             raise InvalidGoogleCredentials
-        self.client_id = self._clean_client_id(client_id)
+        arguments = parse_qs(client_id)
+        self.client_id = arguments['client'] if arguments.has_key('client') else client_id
         self.client_secret = client_secret
-        self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret)
+        self.channel = arguments['channel'] if arguments.has_key('channel') else None
+        self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret, self.channel)
         self._logger = logger
 
     def geocode(self, searchtext, city=None, state=None,
@@ -49,8 +51,3 @@ class GoogleMapsGeocoder:
         if country:
             optional_params['country'] = country
         return optional_params
-
-    def _clean_client_id(self, client_id):
-        # Consistency with how the client_id is saved in metadata
-        search_result = re.search(r'(client=)?(?P<client_id>[^&]*).*', client_id)
-        return search_result.groupdict()['client_id']
