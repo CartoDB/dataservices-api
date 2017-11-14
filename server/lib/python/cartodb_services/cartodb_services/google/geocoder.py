@@ -15,10 +15,8 @@ class GoogleMapsGeocoder:
     def __init__(self, client_id, client_secret, logger):
         if client_id is None:
             raise InvalidGoogleCredentials
-        arguments = parse_qs(client_id)
-        self.client_id = arguments['client'] if arguments.has_key('client') else client_id
+        self.client_id, self.channel = self.parse_client_id(client_id)
         self.client_secret = client_secret
-        self.channel = arguments['channel'] if arguments.has_key('channel') else None
         self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret, self.channel)
         self._logger = logger
 
@@ -51,3 +49,9 @@ class GoogleMapsGeocoder:
         if country:
             optional_params['country'] = country
         return optional_params
+
+    def parse_client_id(self, client_id):
+        arguments = parse_qs(client_id)
+        client = arguments['client'][0] if arguments.has_key('client') else client_id
+        channel = arguments['channel'][0] if arguments.has_key('channel') else None
+        return client, channel
