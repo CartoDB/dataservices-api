@@ -1,3 +1,9 @@
+November 17th, 2017
+=================
+* Version `0.15.6` of the python library
+    * Added support for channels for google geocoder #409
+    * Improved the way we manage the client_id #409
+
 October 18th, 2017
 =================
 * Version `0.21.0` of the client extension
