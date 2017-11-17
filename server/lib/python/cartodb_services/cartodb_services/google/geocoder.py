@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import googlemaps
+from urlparse import parse_qs
 
 from exceptions import MalformedResult
+from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
 
@@ -11,9 +13,11 @@ class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
 
     def __init__(self, client_id, client_secret, logger):
-        self.client_id = self._clean_client_id(client_id)
+        if client_id is None:
+            raise InvalidGoogleCredentials
+        self.client_id, self.channel = self.parse_client_id(client_id)
         self.client_secret = client_secret
-        self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret)
+        self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret, self.channel)
         self._logger = logger
 
     def geocode(self, searchtext, city=None, state=None,
@@ -46,6 +50,8 @@ class GoogleMapsGeocoder:
             optional_params['country'] = country
         return optional_params
 
-    def _clean_client_id(self, client_id):
-        # Consistency with how the client_id is saved in metadata
-        return client_id.replace('client=', '')
+    def parse_client_id(self, client_id):
+        arguments = parse_qs(client_id)
+        client = arguments['client'][0] if arguments.has_key('client') else client_id
+        channel = arguments['channel'][0] if arguments.has_key('channel') else None
+        return client, channel
