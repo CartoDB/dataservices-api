@@ -34,7 +34,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin1 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
@@ -72,7 +72,7 @@ RETURNS Geometry AS $$
         raise Exception('Error trying to geocode admin1 polygon')
       finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin1_polygon(admin1_name text, country_name text)
@@ -125,5 +125,5 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 

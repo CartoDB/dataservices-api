@@ -32,7 +32,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin0 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 
 --------------------------------------------------------------------------------
@@ -52,4 +52,4 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;

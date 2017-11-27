@@ -7,6 +7,11 @@ SED = sed
 ERB = erb
 REPLACEMENTS = -i 's/$(EXTVERSION)/$(NEW_VERSION)/g'
 NEW_EXTENSION_ARTIFACT = $(EXTENSION)--$(EXTVERSION).sql
+AWK = awk
+
+# Parallel support macros
+PG_CONFIG         = pg_config
+PG_PARALLEL      := $(shell $(PG_CONFIG) --version | ($(AWK) '{$$2*=1000; if ($$2 >= 9600) print 1; else print 0;}' 2> /dev/null || echo 0))
 
 REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 TEST_DIR = test/
@@ -31,6 +36,13 @@ include $(PGXS)
 $(NEW_EXTENSION_ARTIFACT): $(SOURCES_DATA)
 	rm -f $@
 	cat $(SOURCES_DATA_DIR)/*.sql >> $@
+ifeq ($(PG_PARALLEL), 0)
+# Remove PARALLEL in aggregates and functions
+	$(eval TMPFILE := $(shell mktemp /tmp/$(basename $0).XXXXXXXX))
+	$(SED) -e 's/PARALLEL \= [A-Z]*,/''/g' \
+		-e 's/PARALLEL [A-Z]*/''/g' $@ > $(TMPFILE)
+	mv $(TMPFILE) $@
+endif
 
 .PHONY: all
 all: $(DATA)
@@ -41,6 +53,13 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 	git mv *.sql old_versions
 	$(SED) $(REPLACEMENTS) $(EXTENSION).control
 	cat $(SOURCES_DATA_DIR)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
+ifeq ($(PG_PARALLEL), 0)
+# Remove PARALLEL in aggregates and functions
+	$(eval TMPFILE := $(shell mktemp /tmp/$(basename $0).XXXXXXXX))
+	$(SED) -e 's/PARALLEL \= [A-Z]*,/''/g' \
+		-e 's/PARALLEL [A-Z]*/''/g' $@ > $(TMPFILE)
+	mv $(TMPFILE) $@
+endif
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
 

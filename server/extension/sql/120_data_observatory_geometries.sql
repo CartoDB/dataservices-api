@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundary(
 RETURNS geometry(Geometry, 4326) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundary(geom, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
   username TEXT,
@@ -49,7 +49,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundary')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
   username TEXT,
@@ -60,7 +60,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundaryId(geom, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
   username TEXT,
@@ -102,7 +102,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetBoundaryId')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
   username TEXT,
@@ -113,7 +113,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
 RETURNS geometry(Geometry, 4326) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundaryById(geometry_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
   username TEXT,
@@ -155,7 +155,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundaryById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -167,7 +167,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByGeometry(geom, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -215,7 +215,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -228,7 +228,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndR
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -277,7 +277,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
   username TEXT,
@@ -289,7 +289,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByGeometry(geom, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   username TEXT,
@@ -337,7 +337,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -350,7 +350,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadiu
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -399,4 +399,4 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

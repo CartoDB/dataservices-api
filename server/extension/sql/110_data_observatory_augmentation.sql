@@ -14,7 +14,7 @@ RETURNS text AS $$
   user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   return user_obs_config.connection_str
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJSON(
   username TEXT,
@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJS
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -68,7 +68,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
   username TEXT,
@@ -79,7 +79,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -125,7 +125,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshotJSON(
   username TEXT,
@@ -135,7 +135,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshotJSON(
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -177,7 +177,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_segment_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
   username TEXT,
@@ -187,7 +187,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   username TEXT,
@@ -232,7 +232,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to OBS_GetSegmentSnapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
   username TEXT,
@@ -245,7 +245,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasure(geom, measure_id, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   username TEXT,
@@ -289,7 +289,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetCategory(
   username TEXT,
@@ -301,7 +301,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetCategory(geom, category_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetCategory(
   username TEXT,
@@ -344,7 +344,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
   username TEXT,
@@ -357,7 +357,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusMeasure(geom, name, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   username TEXT,
@@ -401,7 +401,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetUSCensusMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusCategory(
   username TEXT,
@@ -413,7 +413,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusCategory(geom, name, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusCategory(
   username TEXT,
@@ -456,7 +456,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetUSCensusCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
   username TEXT,
@@ -468,7 +468,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetPopulation(geom, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
@@ -511,7 +511,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetPopulation')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasureById(
   username TEXT,
@@ -523,7 +523,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasureById(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasureById(geom_ref, measure_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasureById(
   username TEXT,
@@ -566,7 +566,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetData(
   username TEXT,
@@ -580,7 +580,7 @@ RETURNS TABLE (
 ) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetData(geomvals, params, merge);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -627,7 +627,7 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomvals))
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetData(
   username TEXT,
@@ -640,7 +640,7 @@ RETURNS TABLE (
 ) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetData(geomrefs, params);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -688,7 +688,7 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomrefs))
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeta(
   username TEXT,
@@ -701,7 +701,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeta(
 RETURNS JSON AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeta(geom, params, max_timespan_rank, max_score_rank, target_geoms);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeta(
   username TEXT,
@@ -736,7 +736,7 @@ RETURNS JSON AS $$
         import sys
         logger.error('Error trying to OBS_GetMeta', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to OBS_GetMeta')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_MetadataValidation(
   username TEXT,
@@ -748,7 +748,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_MetadataValidation(
 RETURNS TABLE(valid boolean, errors text[]) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_MetadataValidation(geometry_extent, geometry_type, params, target_geoms);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_MetadataValidation(
   username TEXT,
@@ -782,4 +782,4 @@ RETURNS TABLE(valid boolean, errors text[]) AS $$
         import sys
         logger.error('Error trying to OBS_MetadataValidation', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to OBS_MetadataValidation')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

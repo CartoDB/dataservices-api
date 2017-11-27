@@ -8,29 +8,29 @@ RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     return plpy.execute("SELECT * FROM cdb_dataservices_server.__DST_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {schema}::text, {dbname}::text, {host_addr}::text, {table_name}::text)"
         .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), schema=plpy.quote_literal(input_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name), host_addr=plpy.quote_literal(host_addr))
         )[0]
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.__DST_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, host_addr text, table_name text)
 RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_ConnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_GetReturnMetadata;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, servername text)
 RETURNS boolean AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_DisconnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;

@@ -6,4 +6,4 @@ RETURNS <%= return_type %> AS $$
   <% else %>
   SELECT <%= DATASERVICES_SERVER_SCHEMA %>.<%= name %> (<%= params(_with_user_org=true).join(', ') %>);
   <% end %>
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;

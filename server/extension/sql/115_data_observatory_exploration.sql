@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_Search(
 RETURNS TABLE(id text, description text, name text, aggregate text, source text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_Search(search_term, relevant_boundary);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_Search(
   username TEXT,
@@ -55,7 +55,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
         raise Exception('Error trying to OBS_Search')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAvailableBoundaries(
   username TEXT,
@@ -65,7 +65,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAvailableBoundaries(
 RETURNS TABLE(boundary_id text, description text, time_span text, tablename text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetAvailableBoundaries(geom, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableBoundaries(
   username TEXT,
@@ -113,4 +113,4 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
