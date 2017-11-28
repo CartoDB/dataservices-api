@@ -73,13 +73,6 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 	$(SED) $(REPLACEMENTS) $(EXTENSION).control
 	git add $(EXTENSION).control
 	cat $(SOURCES_DATA_DIR)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
-ifeq ($(PG_PARALLEL), 0)
-# Remove PARALLEL in aggregates and functions
-	$(eval TMPFILE := $(shell mktemp /tmp/$(basename $0).XXXXXXXX))
-	$(SED) -e 's/PARALLEL \= [A-Z]*,/''/g' \
-		-e 's/PARALLEL [A-Z]*/''/g' $@ > $(TMPFILE)
-	mv $(TMPFILE) $@
-endif
 	git add $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
@@ -89,3 +82,18 @@ endif
 devclean:
 	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
+	
+# If needed remove PARALLEL tags from the release files
+release_remove_parallel_deploy:
+ifeq ($(PG_PARALLEL), 0)
+	for n in $(wildcard old_versions/*.sql *.sql); do \
+		$(eval TMPFILE := $(shell mktemp /tmp/XXXXXXXXXX)) \
+		$(SED) -e 's/PARALLEL \= [A-Z]*,/''/g' -e 's/PARALLEL [A-Z]*/''/g' $$n > $(TMPFILE); \
+		mv $(TMPFILE) $$n; \
+	done
+endif
+
+# Install the current release into the PostgreSQL extensions directory
+deploy: release_remove_parallel_deploy
+	$(INSTALL_DATA) $(EXTENSION).control '$(DESTDIR)$(datadir)/extension/'
+	$(INSTALL_DATA) old_versions/*.sql *.sql '$(DESTDIR)$(datadir)/extension/'
