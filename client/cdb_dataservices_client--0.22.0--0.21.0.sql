@@ -21,11 +21,7 @@ BEGIN
   SELECT trim(both '"' FROM db_connection_str) INTO db_connection_str;
   RETURN db_connection_str;
 END;
-$$ LANGUAGE 'plpgsql';CREATE TYPE cdb_dataservices_client._entity_config AS (
-    username text,
-    organization_name text
-);
-
+$$ LANGUAGE 'plpgsql';
 --
 -- Get entity config function
 --
@@ -57,43 +53,7 @@ BEGIN
     result.organization_name = organization_name;
     RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER;CREATE TYPE cdb_dataservices_client.isoline AS (
-    center geometry(Geometry,4326),
-    data_range integer,
-    the_geom geometry(Multipolygon,4326)
-);
-
-CREATE TYPE cdb_dataservices_client.simple_route AS (
-    shape geometry(LineString,4326),
-    length real,
-    duration integer
-);
-
--- For the OBS_Meta functions
-CREATE TYPE cdb_dataservices_client.obs_meta_numerator AS (numer_id text, numer_name text, numer_description text, numer_weight text, numer_license text, numer_source text, numer_type text, numer_aggregate text, numer_extra jsonb, numer_tags jsonb, valid_denom boolean, valid_geom boolean, valid_timespan boolean);
-
-CREATE TYPE cdb_dataservices_client.obs_meta_denominator AS (denom_id text, denom_name text, denom_description text, denom_weight text, denom_license text, denom_source text, denom_type text, denom_aggregate text, denom_extra jsonb, denom_tags jsonb, valid_numer boolean, valid_geom boolean, valid_timespan boolean);
-
-CREATE TYPE cdb_dataservices_client.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric, geom_type text, geom_extra jsonb, geom_tags jsonb);
-
-CREATE TYPE cdb_dataservices_client.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb);
-
-
--- For quotas and services configuration
-CREATE TYPE cdb_dataservices_client.service_type AS ENUM (
-    'isolines',
-    'hires_geocoder',
-    'routing',
-    'observatory'
-);
-
-CREATE TYPE cdb_dataservices_client.service_quota_info AS (
-    service cdb_dataservices_client.service_type,
-    monthly_quota NUMERIC,
-    used_quota NUMERIC,
-    soft_limit BOOLEAN,
-    provider TEXT
-);
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
 --
 -- Public dataservices API function
 --
@@ -1516,8 +1476,6 @@ BEGIN
   PERFORM cdb_dataservices_client._cdb_service_set_server_rate_limit(username, orgname, service, rate_limit);
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-CREATE TYPE cdb_dataservices_client.ds_fdw_metadata as (schemaname text, tabname text, servername text);
-CREATE TYPE cdb_dataservices_client.ds_return_metadata as (colnames text[], coltypes text[]);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(
     output_table_name text,
