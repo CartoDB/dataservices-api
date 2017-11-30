@@ -52,9 +52,15 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 	test -n "$(NEW_VERSION)"  # $$NEW_VERSION VARIABLE MISSING. Eg. make release NEW_VERSION=0.x.0
 	git mv *.sql old_versions
 	$(SED) $(REPLACEMENTS) $(EXTENSION).control
+	git add $(EXTENSION).control
 	cat $(SOURCES_DATA_DIR)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
+	git add $(EXTENSION)--$(NEW_VERSION).sql
+	@echo
+	@echo "Please review the file $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql and add any code needed to upgrade $(EXTVERSION) to $(NEW_VERSION)"
+	@echo "Please review the file $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql and add any code needed to downgrade $(NEW_VERSION) to $(EXTVERSION)"
+	@echo
 
 # Only meant for development time, do not use once a version is released
 .PHONY: devclean
