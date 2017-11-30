@@ -76,13 +76,17 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 	git add $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
+	@echo
+	@echo "Please review the file $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql and add any code needed to upgrade $(EXTVERSION) to $(NEW_VERSION)"
+	@echo "Please review the file $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql and add any code needed to downgrade $(NEW_VERSION) to $(EXTVERSION)"
+	@echo
 
 # Only meant for development time, do not use once a version is released
 .PHONY: devclean
 devclean:
 	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
-	
+
 # If needed remove PARALLEL tags from the release files
 release_remove_parallel_deploy:
 ifeq ($(PG_PARALLEL), 0)
