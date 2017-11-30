@@ -2716,7 +2716,6 @@ RETURNS Geometry AS $$
     RETURN ret;
 END
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
-CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), data_range integer, the_geom geometry(Multipolygon,4326));
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -3013,18 +3012,3 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   return result
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT *
-        FROM   pg_catalog.pg_user
-        WHERE  usename = 'geocoder_api') THEN
-
-            CREATE USER geocoder_api;
-    END IF;
-    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_dataservices_server TO geocoder_api;
-    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO geocoder_api;
-    GRANT USAGE ON SCHEMA cdb_dataservices_server TO geocoder_api;
-    GRANT USAGE ON SCHEMA public TO geocoder_api;
-    GRANT SELECT ON ALL TABLES IN SCHEMA public TO geocoder_api;
-END$$;
