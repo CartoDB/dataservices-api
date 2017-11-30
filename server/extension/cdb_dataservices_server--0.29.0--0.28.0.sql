@@ -3,8 +3,7 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.28.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
--- Complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "CREATE EXTENSION cdb_dataservices_server" to load this file. \quit
+
 CREATE TYPE cdb_dataservices_server.simple_route AS (
     shape geometry(LineString,4326),
     length real,
