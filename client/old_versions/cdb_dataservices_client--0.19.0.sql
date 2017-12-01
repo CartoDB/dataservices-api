@@ -3777,7 +3777,7 @@ BEGIN
   END;
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER;
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_admin0_polygon (username text, orgname text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocode_admin0_polygon (username text, organization_name text, country_name text)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
