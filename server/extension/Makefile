@@ -69,7 +69,7 @@ devclean:
 
 # If needed remove PARALLEL tags from the release files
 release_remove_parallel_deploy:
-ifeq ($(PG_PARALLEL), 1)
+ifeq ($(PG_PARALLEL), 0)
 	for n in $(wildcard old_versions/*.sql *.sql); do \
 		$(eval TMPFILE := $(shell mktemp /tmp/XXXXXXXXXX)) \
 		$(SED) -e 's/PARALLEL \= [A-Z]*,/''/g' -e 's/PARALLEL [A-Z]*/''/g' $$n > $(TMPFILE); \
