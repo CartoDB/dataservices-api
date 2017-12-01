@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (<%= params_with_type_and_default(true).join(', ') %>);
 CREATE OR REPLACE FUNCTION <%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %> (<%= params_with_type_and_default(_with_user_org=true).join(', ') %>)
 RETURNS <%= return_type %> AS $$
   CONNECT <%= DATASERVICES_CLIENT_SCHEMA %>._server_conn_str();
