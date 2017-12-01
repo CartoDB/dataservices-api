@@ -1,3 +1,10 @@
+December 1st, 2017
+==================
+* Version `0.29.0` of the server extension
+    * Functions qualified with PARALLEL and volatility
+* Version `0.22.0` of the client
+    * Functions qualified with PARALLEL and volatility
+
 November 17th, 2017
 =================
 * Version `0.15.6` of the python library
