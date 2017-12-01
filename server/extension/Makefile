@@ -81,3 +81,5 @@ endif
 deploy: release_remove_parallel_deploy
 	$(INSTALL_DATA) $(EXTENSION).control '$(DESTDIR)$(datadir)/extension/'
 	$(INSTALL_DATA) old_versions/*.sql *.sql '$(DESTDIR)$(datadir)/extension/'
+
+install: deploy
