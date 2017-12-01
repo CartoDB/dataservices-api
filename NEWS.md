@@ -4,6 +4,7 @@ December 1st, 2017
     * Functions qualified with PARALLEL and volatility
 * Version `0.22.0` of the client
     * Functions qualified with PARALLEL and volatility
+    * Fixed an issue with upgrades from older versions. See #417
 
 November 17th, 2017
 =================
