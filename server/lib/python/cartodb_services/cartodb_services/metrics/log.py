@@ -10,7 +10,7 @@ from urlparse import urlparse
 
 
 @contextmanager
-def metrics(function, service_config, logger=None):
+def metrics(function, service_config, params=None, logger=None):
     try:
         start_time = time.time()
         yield
@@ -18,6 +18,7 @@ def metrics(function, service_config, logger=None):
         end_time = time.time()
         MetricsDataGatherer.add('uuid', str(uuid.uuid1()))
         MetricsDataGatherer.add('function_name', function)
+        MetricsDataGatherer.add('function_params', params)
         MetricsDataGatherer.add('function_execution_time', (end_time - start_time))
         metrics_logger = MetricsServiceLoggerFactory.build(service_config,
                                                            logger)
@@ -155,6 +156,7 @@ class MetricsLogger(object):
             "uuid": data.get('uuid', uuid.uuid1()),
             "type": 'function',
             "function_name": data.get('function_name', None),
+            "function_params": data.get('function_params', None),
             "function_execution_time": data.get('function_execution_time',
                                                 None),
             "service": self._service_config.service_type,
