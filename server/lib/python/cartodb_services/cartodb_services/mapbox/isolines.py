@@ -37,9 +37,8 @@ class MapboxIsolines():
     Python wrapper for Mapbox services based isolines.
     '''
 
-    def __init__(self, matrix_client, routing_client):
+    def __init__(self, matrix_client):
         self._matrix_client = matrix_client
-        self._routing_client = routing_client
 
     def _calculate_matrix_cost(self, origin, targets, isorange,
                                profile=DEFAULT_PROFILE,

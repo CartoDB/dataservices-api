@@ -14,8 +14,7 @@ class MapboxIsolinesTestCase(unittest.TestCase):
 
     def setUp(self):
         matrix_client = MapboxMatrixClient()
-        routing_client = MapboxRouting()
-        self.mapbox_isolines = MapboxIsolines(matrix_client, routing_client)
+        self.mapbox_isolines = MapboxIsolines(matrix_client)
 
     def test_calculate_isochrone(self):
         time_range = 10 * 60  # 10 minutes
