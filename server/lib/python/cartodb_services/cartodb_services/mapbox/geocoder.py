@@ -7,6 +7,7 @@ import requests
 from mapbox import Geocoder
 from cartodb_services.metrics import Traceable
 from cartodb_services.mapbox.exceptions import ServiceException
+from cartodb_services.tools.qps import qps_retry
 
 ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
 
@@ -48,6 +49,7 @@ class MapboxGeocoder(Traceable):
         latitude = location[1]
         return [longitude, latitude]
 
+    @qps_retry(qps=10)
     def geocode(self, address, country=None):
         response = self._geocoder.forward(address=address,
                                           country=country,

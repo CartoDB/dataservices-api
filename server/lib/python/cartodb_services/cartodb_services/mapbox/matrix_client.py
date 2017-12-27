@@ -7,6 +7,7 @@ from cartodb_services.metrics import Traceable
 from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
 from exceptions import ServiceException
+from cartodb_services.tools.qps import qps_retry
 
 ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
 
@@ -57,6 +58,7 @@ class MapboxMatrixClient(Traceable):
     def _parse_matrix_response(self, response):
         return response
 
+    @qps_retry(qps=1)
     def matrix(self, coordinates, profile=DEFAULT_PROFILE):
         validate_profile(profile)
         validate_coordinates(coordinates,

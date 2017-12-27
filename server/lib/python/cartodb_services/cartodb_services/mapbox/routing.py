@@ -9,6 +9,7 @@ from cartodb_services.tools import PolyLine
 from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
 from cartodb_services.mapbox.exceptions import ServiceException
+from cartodb_services.tools.qps import qps_retry
 
 ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
 
@@ -70,6 +71,7 @@ class MapboxRouting(Traceable):
 
         return MapboxRoutingResponse(geometry, distance, duration)
 
+    @qps_retry(qps=1)
     def directions(self, waypoints, profile=DEFAULT_PROFILE):
         self._validate_profile(profile)
         validate_coordinates(waypoints, NUM_WAYPOINTS_MIN, NUM_WAYPOINTS_MAX)
