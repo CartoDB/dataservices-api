@@ -9,8 +9,6 @@ from cartodb_services.tools.coordinates import (validate_coordinates,
 from exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
-ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
-
 BASEURI = ('https://api.mapbox.com/directions-matrix/v1/mapbox/{profile}/'
            '{coordinates}'
            '?access_token={token}'
@@ -48,15 +46,14 @@ class MapboxMatrixClient(Traceable):
     Python wrapper for the Mapbox Time Matrix service.
     '''
 
-    def __init__(self, token=ACCESS_TOKEN):
-        self.token = token
+    def __init__(self, token, logger, service_params=None):
+        service_params = service_params or {}
+        self._token = token
+        self._logger = logger
 
     def _uri(self, coordinates, profile=DEFAULT_PROFILE):
         return BASEURI.format(profile=profile, coordinates=coordinates,
-                              token=self.token)
-
-    def _parse_matrix_response(self, response):
-        return response
+                              token=self._token)
 
     @qps_retry(qps=1)
     def matrix(self, coordinates, profile=DEFAULT_PROFILE):
@@ -70,6 +67,6 @@ class MapboxMatrixClient(Traceable):
         response = requests.get(uri)
 
         if response.status_code == requests.codes.ok:
-            return self._parse_matrix_response(response.text)
+            return response.text
         else:
             raise ServiceException(response.status_code, response.content)

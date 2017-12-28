@@ -1,9 +1,11 @@
 import unittest
+from mock import Mock
 from cartodb_services.mapbox import MapboxRouting
 from cartodb_services.mapbox.routing import DEFAULT_PROFILE
 from cartodb_services.mapbox import ServiceException
 from cartodb_services.tools import Coordinate
 
+VALID_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
 INVALID_TOKEN = 'invalid_token'
 VALID_WAYPOINTS = [Coordinate(-73.989, 40.733), Coordinate(-74, 40.733)]
 NUM_WAYPOINTS_MAX = 25
@@ -29,7 +31,7 @@ WELL_KNOWN_LENGTH = 1317.9
 
 class MapboxRoutingTestCase(unittest.TestCase):
     def setUp(self):
-        self.routing = MapboxRouting()
+        self.routing = MapboxRouting(token=VALID_TOKEN, logger=Mock())
 
     def test_invalid_profile(self):
         with self.assertRaises(ValueError):
@@ -48,7 +50,7 @@ class MapboxRoutingTestCase(unittest.TestCase):
             self.routing.directions(INVALID_WAYPOINTS_MAX, VALID_PROFILE)
 
     def test_invalid_token(self):
-        invalid_routing = MapboxRouting(token=INVALID_TOKEN)
+        invalid_routing = MapboxRouting(token=INVALID_TOKEN, logger=Mock())
         with self.assertRaises(ServiceException):
             invalid_routing.directions(VALID_WAYPOINTS,
                                        VALID_PROFILE)

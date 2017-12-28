@@ -9,8 +9,7 @@ from cartodb_services.metrics import Traceable
 from cartodb_services.mapbox.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
-ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
-
+GEOCODER_NAME = 'geocoder_name'
 EPHEMERAL_GEOCODER = 'mapbox.places'
 PERMANENT_GEOCODER = 'mapbox.places-permanent'
 DEFAULT_GEOCODER = EPHEMERAL_GEOCODER
@@ -28,9 +27,14 @@ class MapboxGeocoder(Traceable):
     Python wrapper for the Mapbox Geocoder service.
     '''
 
-    def __init__(self, token=ACCESS_TOKEN, name=DEFAULT_GEOCODER):
+    def __init__(self, token, logger, service_params=None):
+        service_params = service_params or {}
         self._token = token
-        self._geocoder = Geocoder(access_token=self._token, name=name)
+        self._logger = logger
+        self._geocoder_name = service_params.get(GEOCODER_NAME,
+                                                 EPHEMERAL_GEOCODER)
+        self._geocoder = Geocoder(access_token=self._token,
+                                  name=self._geocoder_name)
 
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)

@@ -11,8 +11,6 @@ from cartodb_services.tools.coordinates import (validate_coordinates,
 from cartodb_services.mapbox.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
-ACCESS_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
-
 BASEURI = ('https://api.mapbox.com/directions/v5/mapbox/{profile}/'
            '{coordinates}'
            '?access_token={token}'
@@ -45,8 +43,10 @@ class MapboxRouting(Traceable):
     Python wrapper for the Mapbox Routing service.
     '''
 
-    def __init__(self, token=ACCESS_TOKEN):
+    def __init__(self, token, logger, service_params=None):
+        service_params = service_params or {}
         self._token = token
+        self._logger = logger
 
     def _uri(self, coordinates, profile=DEFAULT_PROFILE,
              overview=DEFAULT_OVERVIEW):
