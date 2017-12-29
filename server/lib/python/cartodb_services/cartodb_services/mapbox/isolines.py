@@ -60,22 +60,28 @@ class MapboxIsolines():
 
         return costs
 
-    def calculate_isochrone(self, origin, time_range,
+    def calculate_isochrone(self, origin, time_ranges,
                             profile=DEFAULT_PROFILE):
         validate_profile(profile)
 
         max_speed = MAX_SPEEDS[profile]
-        upper_rmax = max_speed * time_range  # an upper bound for the radius
 
-        return self.calculate_isoline(origin=origin,
-                                      isorange=time_range,
-                                      upper_rmax=upper_rmax,
-                                      cost_method=self._calculate_matrix_cost,
-                                      profile=profile,
-                                      unit_factor=UNIT_FACTOR_ISOCHRONE,
-                                      number_of_angles=MATRIX_NUM_ANGLES,
-                                      max_iterations=MATRIX_MAX_ITERS,
-                                      tolerance=MATRIX_TOLERANCE)
+        isochrones = []
+        for time_range in time_ranges:
+            upper_rmax = max_speed * time_range  # an upper bound for the radius
+
+            coordinates = self.calculate_isoline(origin=origin,
+                                                 isorange=time_range,
+                                                 upper_rmax=upper_rmax,
+                                                 cost_method=self._calculate_matrix_cost,
+                                                 profile=profile,
+                                                 unit_factor=UNIT_FACTOR_ISOCHRONE,
+                                                 number_of_angles=MATRIX_NUM_ANGLES,
+                                                 max_iterations=MATRIX_MAX_ITERS,
+                                                 tolerance=MATRIX_TOLERANCE)
+            isochrones.append(MapboxIsochronesResponse(coordinates,
+                                                       time_range))
+        return isochrones
 
     def calculate_isodistance(self, origin, distance_range,
                               profile=DEFAULT_PROFILE):
@@ -85,7 +91,7 @@ class MapboxIsolines():
         time_range = distance_range / max_speed
 
         return self.calculate_isochrone(origin=origin,
-                                        time_range=time_range,
+                                        time_ranges=[time_range],
                                         profile=profile)
 
     def calculate_isoline(self, origin, isorange, upper_rmax,
@@ -145,3 +151,18 @@ class MapboxIsolines():
                 location_estimates_filtered.append(location_estimates[i])
 
         return location_estimates_filtered
+
+
+class MapboxIsochronesResponse:
+
+    def __init__(self, coordinates, duration):
+        self._coordinates = coordinates
+        self._duration = duration
+
+    @property
+    def coordinates(self):
+        return self._coordinates
+
+    @property
+    def duration(self):
+        return self._duration

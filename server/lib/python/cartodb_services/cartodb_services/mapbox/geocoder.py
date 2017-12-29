@@ -54,8 +54,15 @@ class MapboxGeocoder(Traceable):
         return [longitude, latitude]
 
     @qps_retry(qps=10)
-    def geocode(self, address, country=None):
-        response = self._geocoder.forward(address=address,
+    def geocode(self, searchtext, city=None, state_province=None,
+                country=None):
+        address = [searchtext]
+        if city:
+            address.append(city)
+        if state_province:
+            address.append(state_province)
+
+        response = self._geocoder.forward(address=', '.join(address),
                                           country=country,
                                           limit=1)
 

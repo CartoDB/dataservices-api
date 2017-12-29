@@ -19,11 +19,11 @@ class MapboxIsolinesTestCase(unittest.TestCase):
         self.mapbox_isolines = MapboxIsolines(matrix_client, logger=Mock())
 
     def test_calculate_isochrone(self):
-        time_range = 10 * 60  # 10 minutes
+        time_ranges = [300, 900]
         solution = self.mapbox_isolines.calculate_isochrone(
             origin=VALID_ORIGIN,
             profile=DEFAULT_PROFILE,
-            time_range=time_range)
+            time_ranges=time_ranges)
 
         assert solution
 
