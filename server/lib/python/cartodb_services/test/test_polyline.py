@@ -35,5 +35,3 @@ class TestPolyline(TestCase):
         decoded_polyline_3 = self.polyline.decode('ax_~Jv`d~\wrcMa`qj}@dfqaBngtcAhb~Zncc}y@')
 
         assert decoded_polyline_3 == original_polyline_3
-
-

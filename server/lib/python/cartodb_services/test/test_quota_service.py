@@ -97,6 +97,23 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
+    def test_should_check_user_mapbox_geocoder_quota_correctly(self):
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 provider='mapbox')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is False
+
+    def test_should_check_org_mapbox_geocoder_quota_correctly(self):
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 orgname='testorg',
+                                                 provider='mapbox')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is False
+
     def test_should_check_user_routing_quota_correctly(self):
         qs = self.__build_routing_quota_service('test_user')
         qs.increment_success_service_use()
@@ -179,7 +196,7 @@ class TestQuotaService(TestCase):
                                          username, orgname)
         return QuotaService(geocoder_config, redis_connection=self.redis_conn)
 
-    def __build_routing_quota_service(self, username, provider='mapzen',
+    def __build_routing_quota_service(self, username, provider='mapbox',
                                       orgname=None, soft_limit=False,
                                       quota=100, end_date=datetime.today()):
         self.__prepare_quota_service(username, 'routing', quota, provider,
@@ -188,7 +205,7 @@ class TestQuotaService(TestCase):
                                        username, orgname)
         return QuotaService(routing_config, redis_connection=self.redis_conn)
 
-    def __build_isolines_quota_service(self, username, provider='mapzen',
+    def __build_isolines_quota_service(self, username, provider='mapbox',
                                       orgname=None, soft_limit=False,
                                       quota=100, end_date=datetime.today()):
         self.__prepare_quota_service(username, 'isolines', quota, provider,

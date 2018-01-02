@@ -48,7 +48,7 @@ class PolyLine:
 
 
 def polyline_to_linestring(polyline):
-    """Convert a Mapzen polyline shape to a PostGIS multipolygon"""
+    """Convert a Mapzen polyline shape to a PostGIS linestring"""
     coordinates = []
     for point in polyline:
         # Divide by 10 because mapzen uses one more decimal than the
