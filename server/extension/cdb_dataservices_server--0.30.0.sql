@@ -15,6 +15,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoi
 RETURNS cdb_dataservices_server.simple_route AS $$
   import json
   from cartodb_services.mapbox import MapboxRouting, MapboxRoutingResponse
+  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools import Logger,LoggerConfig
@@ -50,7 +51,9 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
       waypoint_coords.append(Coordinate(lon,lat))
 
-    resp = client.directions(waypoint_coords, mode)
+    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+
+    resp = client.directions(waypoint_coords, profile)
     if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
       if shape_linestring:
@@ -1506,6 +1509,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
     finally:
         quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+
 CREATE TYPE cdb_dataservices_server.ds_fdw_metadata as (schemaname text, tabname text, servername text);
 
 CREATE TYPE cdb_dataservices_server.ds_return_metadata as (colnames text[], coltypes text[]);
@@ -2048,6 +2052,7 @@ RETURNS Geometry AS $$
   from cartodb_services.mapbox import MapboxGeocoder
   from cartodb_services.metrics import QuotaService, metrics
   from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.tools.country import country_to_iso3
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -2064,9 +2069,14 @@ RETURNS Geometry AS $$
   with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
     try:
       geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger, user_geocoder_config.mapbox_service_params)
+
+      country_iso3 = None
+      if country:
+        country_iso3 = country_to_iso3(country)
+
       coordinates = geocoder.geocode(searchtext=searchtext, city=city,
-                                    state_province=state_province,
-                                    country=country)
+                                     state_province=state_province,
+                                     country=country_iso3)
       if coordinates:
         quota_service.increment_success_service_use()
         plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
@@ -2399,6 +2409,7 @@ RETURNS Geometry AS $$
   from cartodb_services.mapbox import MapboxGeocoder
   from cartodb_services.metrics import QuotaService, metrics
   from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.mapzen.types import country_to_iso3
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -2415,9 +2426,14 @@ RETURNS Geometry AS $$
   with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
     try:
       geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger)
+
+      country_iso3 = None
+      if country_name:
+        country_iso3 = country_to_iso3(country_name)
+
       coordinates = geocoder.geocode(searchtext=city_name, city=None,
                                      state_province=admin1_name,
-                                     country=country)
+                                     country=country_iso3)
       if coordinates:
         quota_service.increment_success_service_use()
         plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
@@ -2920,6 +2936,7 @@ RETURNS Geometry AS $$
     RETURN ret;
 END
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
+
 CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), data_range integer, the_geom geometry(Multipolygon,4326));
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
@@ -2989,6 +3006,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
+  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
   from cartodb_services.tools import Coordinate
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -3014,10 +3032,12 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
+    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+
     # -- TODO Support options properly
     isolines = {}
     for r in data_range:
-        isoline = mapbox_isolines.calculate_isodistance(origin, r, mode)
+        isoline = mapbox_isolines.calculate_isodistance(origin, r, profile)
         isolines[r] = isoline
 
     result = []
@@ -3122,6 +3142,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
+  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
   from cartodb_services.metrics import QuotaService
@@ -3149,7 +3170,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    resp = mapbox_isolines.calculate_isochrone(origin, data_range, mode)
+    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+
+    resp = mapbox_isolines.calculate_isochrone(origin, data_range, profile)
 
     if resp:
       result = []

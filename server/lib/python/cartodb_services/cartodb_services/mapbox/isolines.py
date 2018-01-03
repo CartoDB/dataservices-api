@@ -92,7 +92,7 @@ class MapboxIsolines():
 
         return self.calculate_isochrone(origin=origin,
                                         time_ranges=[time_range],
-                                        profile=profile)
+                                        profile=profile)[0].coordinates
 
     def calculate_isoline(self, origin, isorange, upper_rmax,
                           cost_method=_calculate_matrix_cost,
