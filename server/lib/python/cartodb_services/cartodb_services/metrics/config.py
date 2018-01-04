@@ -599,19 +599,19 @@ class ServicesDBConfig:
     def _get_mapbox_config(self):
         mapbox_conf_json = self._get_conf('mapbox_conf')
         if not mapbox_conf_json:
-            raise ConfigException('Mapzen configuration missing')
+            raise ConfigException('Mapbox configuration missing')
         else:
-            mapzen_conf = json.loads(mapbox_conf_json)
-            self._mapbox_matrix_api_key = mapzen_conf['matrix']['api_key']
-            self._mapbox_matrix_quota = mapzen_conf['matrix']['monthly_quota']
-            self._mapbox_matrix_service_params = mapzen_conf['matrix'].get('service', {})
-            self._mapbox_isochrones_service_params = mapzen_conf.get('isochrones', {}).get('service', {})
-            self._mapbox_routing_api_key = mapzen_conf['routing']['api_key']
-            self._mapbox_routing_quota = mapzen_conf['routing']['monthly_quota']
-            self._mapbox_routing_service_params = mapzen_conf['routing'].get('service', {})
-            self._mapbox_geocoder_api_key = mapzen_conf['geocoder']['api_key']
-            self._mapbox_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
-            self._mapbox_geocoder_service_params = mapzen_conf['geocoder'].get('service', {})
+            mapbox_conf = json.loads(mapbox_conf_json)
+            self._mapbox_matrix_api_key = mapbox_conf['matrix']['api_key']
+            self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
+            self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})
+            self._mapbox_isochrones_service_params = mapbox_conf.get('isochrones', {}).get('service', {})
+            self._mapbox_routing_api_key = mapbox_conf['routing']['api_key']
+            self._mapbox_routing_quota = mapbox_conf['routing']['monthly_quota']
+            self._mapbox_routing_service_params = mapbox_conf['routing'].get('service', {})
+            self._mapbox_geocoder_api_key = mapbox_conf['geocoder']['api_key']
+            self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
+            self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
 
     def _get_data_observatory_config(self):
         do_conf_json = self._get_conf('data_observatory_conf')

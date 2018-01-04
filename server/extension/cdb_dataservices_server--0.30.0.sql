@@ -2013,7 +2013,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_po
 RETURNS Geometry AS $$
   from cartodb_services.tools import ServiceManager
   from cartodb_services.mapzen import MapzenGeocoder
-  from cartodb_services.mapzen.types import country_to_iso3
+  from cartodb_services.tools.country import country_to_iso3
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
 
   import cartodb_services
@@ -2409,7 +2409,7 @@ RETURNS Geometry AS $$
   from cartodb_services.mapbox import MapboxGeocoder
   from cartodb_services.metrics import QuotaService, metrics
   from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.mapzen.types import country_to_iso3
+  from cartodb_services.tools.country import country_to_iso3
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -2454,7 +2454,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.mapzen import MapzenGeocoder
-  from cartodb_services.mapzen.types import country_to_iso3
+  from cartodb_services.tools.country import country_to_iso3
   from cartodb_services.metrics import QuotaService, metrics
   from cartodb_services.tools import Logger,LoggerConfig
 

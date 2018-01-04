@@ -1,6 +1,6 @@
 import requests
 import json
-from qps import qps_retry
+from cartodb_services.tools.qps import qps_retry
 from exceptions import ServiceException
 from cartodb_services.metrics import Traceable
 

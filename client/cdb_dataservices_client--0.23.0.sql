@@ -450,7 +450,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_geocode_street_point (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_geocode_street_point (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
 DECLARE
   ret Geometry;
@@ -550,7 +550,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_isochrone (source geometry(Geometry, 4326) ,mode text ,range integer[] ,options text[] DEFAULT ARRAY[]::text[])
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_isochrone (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
@@ -600,7 +600,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_isodistance (source geometry(Geometry, 4326) ,mode text ,range integer[] ,options text[] DEFAULT ARRAY[]::text[])
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapbox_isodistance (source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
@@ -2374,7 +2374,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- Exception-safe private DataServices API function
 --
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_geocode_street_point_exception_safe (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_geocode_street_point_exception_safe (searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
 DECLARE
   ret Geometry;
@@ -2518,7 +2518,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- Exception-safe private DataServices API function
 --
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_isochrone_exception_safe (source geometry(Geometry, 4326) ,mode text ,range integer[] ,options text[] DEFAULT ARRAY[]::text[])
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_isochrone_exception_safe(source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
@@ -2590,7 +2590,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- Exception-safe private DataServices API function
 --
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_isodistance_exception_safe (source geometry(Geometry, 4326) ,mode text ,range integer[] ,options text[] DEFAULT ARRAY[]::text[])
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_isodistance_exception_safe(source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
 DECLARE
   
