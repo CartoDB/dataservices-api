@@ -3,7 +3,9 @@ import json
 import re
 
 from requests.adapters import HTTPAdapter
-from exceptions import WrongParams, MalformedResult, ServiceException
+from cartodb_services.tools.exceptions import (WrongParams,
+                                               MalformedResult,
+                                               ServiceException)
 from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools import Coordinate, PolyLine
 from cartodb_services.metrics import Traceable

@@ -1,7 +1,7 @@
 import unittest
 from mock import Mock
 from cartodb_services.mapbox import MapboxGeocoder
-from cartodb_services.mapbox import ServiceException
+from cartodb_services.tools.exceptions import ServiceException
 
 VALID_TOKEN = 'pk.eyJ1IjoiYWNhcmxvbiIsImEiOiJjamJuZjQ1Zjc0Ymt4Mnh0YmFrMmhtYnY4In0.gt9cw0VeKc3rM2mV5pcEmg'
 INVALID_TOKEN = 'invalid_token'

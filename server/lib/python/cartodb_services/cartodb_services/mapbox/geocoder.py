@@ -6,7 +6,7 @@ import json
 import requests
 from mapbox import Geocoder
 from cartodb_services.metrics import Traceable
-from cartodb_services.mapbox.exceptions import ServiceException
+from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
 GEOCODER_NAME = 'geocoder_name'
@@ -69,4 +69,4 @@ class MapboxGeocoder(Traceable):
         if response.status_code == requests.codes.ok:
             return self._parse_geocoder_response(response.text)
         else:
-            raise ServiceException(response.status_code, response.content)
+            raise ServiceException(response.status_code, response)

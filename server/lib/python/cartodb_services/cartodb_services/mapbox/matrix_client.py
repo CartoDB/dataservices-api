@@ -6,7 +6,7 @@ import requests
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
-from exceptions import ServiceException
+from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
 BASEURI = ('https://api.mapbox.com/directions-matrix/v1/mapbox/{profile}/'
@@ -69,4 +69,4 @@ class MapboxMatrixClient(Traceable):
         if response.status_code == requests.codes.ok:
             return response.text
         else:
-            raise ServiceException(response.status_code, response.content)
+            raise ServiceException(response.status_code, response)

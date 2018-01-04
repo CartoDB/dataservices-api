@@ -8,7 +8,7 @@ from cartodb_services.metrics import Traceable
 from cartodb_services.tools import PolyLine
 from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
-from cartodb_services.mapbox.exceptions import ServiceException
+from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 
 BASEURI = ('https://api.mapbox.com/directions/v5/mapbox/{profile}/'
@@ -86,7 +86,7 @@ class MapboxRouting(Traceable):
         elif response.status_code == requests.codes.bad_request:
             return MapboxRoutingResponse(None, None, None)
         else:
-            raise ServiceException(response.status_code, response.content)
+            raise ServiceException(response.status_code, response)
 
 
 class MapboxRoutingResponse:
