@@ -134,7 +134,6 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
   orgname TEXT,
@@ -187,7 +186,6 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
     return [result[0]['shape'],result[0]['length'], result[0]['duration']]
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
 -- Get the connection to redis from cache or create a new one
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
@@ -1509,7 +1507,6 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
     finally:
         quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
 CREATE TYPE cdb_dataservices_server.ds_fdw_metadata as (schemaname text, tabname text, servername text);
 
 CREATE TYPE cdb_dataservices_server.ds_return_metadata as (colnames text[], coltypes text[]);
@@ -1864,6 +1861,7 @@ returns BOOLEAN AS $$
   END
 $$ LANGUAGE plpgsql STABLE PARALLEL RESTRICTED;
 -- Geocodes a street address given a searchtext and a state and/or country
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
@@ -2066,7 +2064,7 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
+  with metrics('cdb_mapbox_geocode_street_point', user_geocoder_config, logger):
     try:
       geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger, user_geocoder_config.mapbox_service_params)
 
@@ -2936,7 +2934,6 @@ RETURNS Geometry AS $$
     RETURN ret;
 END
 $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
-
 CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), data_range integer, the_geom geometry(Multipolygon,4326));
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
@@ -2987,6 +2984,72 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       quota_service.increment_empty_service_use()
       return []
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to get mapzen isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isolines')
+  finally:
+    quota_service.increment_total_service_use()
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isodistance(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  import json
+  from cartodb_services.mapzen import MatrixClient, MapzenIsolines
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    raise Exception('You have reached the limit of your quota')
+
+  try:
+    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger, user_isolines_routing_config.mapzen_matrix_service_params)
+    mapzen_isolines = MapzenIsolines(client, logger)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = {'lat': lat, 'lon': lon}
+    else:
+      raise Exception('source is NULL')
+
+    # -- TODO Support options properly
+    isolines = {}
+    for r in data_range:
+        isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
+        isolines[r] = isoline
+
+    result = []
+    for r in data_range:
+
+      if len(isolines[r]) >= 3:
+        # -- TODO encapsulate this block into a func/method
+        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+        wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
+        sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
+        multipolygon = plpy.execute(sql, 1)[0]['geom']
+      else:
+        multipolygon = None
+
+      result.append([source, r, multipolygon])
+
+    quota_service.increment_success_service_use()
+    quota_service.increment_isolines_service_use(len(isolines))
+    return result
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
@@ -3066,7 +3129,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isodistance(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
    username TEXT,
    orgname TEXT,
    source geometry(Geometry, 4326),
@@ -3075,9 +3138,10 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isodistance(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
-  from cartodb_services.mapzen import MatrixClient, MapzenIsolines
+  from cartodb_services.mapzen import MatrixClient, MapzenIsochrones
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.mapzen.types import coordinates_to_polygon
 
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
@@ -3085,13 +3149,14 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
+  # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger, user_isolines_routing_config.mapzen_matrix_service_params)
-    mapzen_isolines = MapzenIsolines(client, logger)
+    mapzen_isochrones = MapzenIsochrones(user_isolines_routing_config.mapzen_matrix_api_key,
+                                         logger, user_isolines_routing_config.mapzen_isochrones_service_params)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -3100,34 +3165,29 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    # -- TODO Support options properly
-    isolines = {}
-    for r in data_range:
-        isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
-        isolines[r] = isoline
+    resp = mapzen_isochrones.isochrone(origin, mode, data_range)
 
-    result = []
-    for r in data_range:
-
-      if len(isolines[r]) >= 3:
-        # -- TODO encapsulate this block into a func/method
-        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
-        wkt_coordinates = ','.join(["%f %f" % (l['lon'], l['lat']) for l in locations])
-        sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
-        multipolygon = plpy.execute(sql, 1)[0]['geom']
-      else:
-        multipolygon = None
-
-      result.append([source, r, multipolygon])
-
-    quota_service.increment_success_service_use()
-    quota_service.increment_isolines_service_use(len(isolines))
-    return result
+    if resp:
+      result = []
+      for isochrone in resp:
+        result_polygon = coordinates_to_polygon(isochrone.coordinates)
+        if result_polygon:
+          quota_service.increment_success_service_use()
+          result.append([source, isochrone.duration, result_polygon])
+        else:
+          quota_service.increment_empty_service_use()
+          result.append([source, isochrone.duration, None])
+      quota_service.increment_success_service_use()
+      quota_service.increment_isolines_service_use(len(result))
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return []
   except BaseException as e:
     import sys
     quota_service.increment_failed_service_use()
-    logger.error('Error trying to get mapzen isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to get mapzen isolines')
+    logger.error('Error trying to get mapzen isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isochrones')
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
@@ -3198,70 +3258,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   finally:
     quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
-   username TEXT,
-   orgname TEXT,
-   source geometry(Geometry, 4326),
-   mode TEXT,
-   data_range integer[],
-   options text[])
-RETURNS SETOF cdb_dataservices_server.isoline AS $$
-  import json
-  from cartodb_services.mapzen import MatrixClient, MapzenIsochrones
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.mapzen.types import coordinates_to_polygon
-
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
-
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  # -- Check the quota
-  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  try:
-    mapzen_isochrones = MapzenIsochrones(user_isolines_routing_config.mapzen_matrix_api_key,
-                                         logger, user_isolines_routing_config.mapzen_isochrones_service_params)
-
-    if source:
-      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
-      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
-      origin = {'lat': lat, 'lon': lon}
-    else:
-      raise Exception('source is NULL')
-
-    resp = mapzen_isochrones.isochrone(origin, mode, data_range)
-
-    if resp:
-      result = []
-      for isochrone in resp:
-        result_polygon = coordinates_to_polygon(isochrone.coordinates)
-        if result_polygon:
-          quota_service.increment_success_service_use()
-          result.append([source, isochrone.duration, result_polygon])
-        else:
-          quota_service.increment_empty_service_use()
-          result.append([source, isochrone.duration, None])
-      quota_service.increment_success_service_use()
-      quota_service.increment_isolines_service_use(len(result))
-      return result
-    else:
-      quota_service.increment_empty_service_use()
-      return []
-  except BaseException as e:
-    import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to get mapzen isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to get mapzen isochrones')
-  finally:
-    quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.metrics import metrics
@@ -3334,7 +3330,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
   return result
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.metrics import metrics
@@ -3405,7 +3400,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
   return result
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
 DO $$
 BEGIN
     IF NOT EXISTS (
