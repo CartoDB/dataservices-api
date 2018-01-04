@@ -4,7 +4,7 @@ By using CARTO libraries and the SQL API, you can apply location data services t
 
 **Note:** Based on your account plan, some of these data services are subject to different [quota limitations](https://carto.com/docs/carto-engine/dataservices-api/quota-information/#quota-information).
 
-_The Data Services API is collaborating with [Mapzen](https://mapzen.com/), and several other geospatial service providers, in order to supply the best location data services from within our CARTO Engine._
+_In order to supply the best location data services from within our CARTO Engine, the Data Services API collaborates with [Mapbox](https://www.mapbox.com/) and several other geospatial service providers. [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account._
 
 ## Data Services Integration
 
