@@ -38,9 +38,13 @@ class MapboxGeocoder(Traceable):
 
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
-        feature = json_response[ENTRY_FEATURES][0]
 
-        return self._extract_lng_lat_from_feature(feature)
+        if json_response:
+            feature = json_response[ENTRY_FEATURES][0]
+
+            return self._extract_lng_lat_from_feature(feature)
+        else:
+            return []
 
     def _extract_lng_lat_from_feature(self, feature):
         geometry = feature[ENTRY_GEOMETRY]
@@ -62,11 +66,26 @@ class MapboxGeocoder(Traceable):
         if state_province:
             address.append(state_province)
 
-        response = self._geocoder.forward(address=', '.join(address),
-                                          country=country,
-                                          limit=1)
+        try:
+            response = self._geocoder.forward(address=', '.join(address),
+                                              country=country,
+                                              limit=1)
 
-        if response.status_code == requests.codes.ok:
-            return self._parse_geocoder_response(response.text)
-        else:
-            raise ServiceException(response.status_code, response)
+            if response.status_code == requests.codes.ok:
+                return self._parse_geocoder_response(response.text)
+            elif response.status_code == requests.codes.bad_request:
+                return []
+            else:
+                raise ServiceException(response.status_code, response)
+        except requests.Timeout as te:
+            # In case of timeout we want to stop the job because the server
+            # could be down
+            self._logger.error('Timeout connecting to Mapbox geocoding server',
+                               te)
+            raise ServiceException('Error geocoding {0} using Mapbox'.format(
+                searchtext), None)
+        except requests.ConnectionError as ce:
+            # Don't raise the exception to continue with the geocoding job
+            self._logger.error('Error connecting to Mapbox geocoding server',
+                               exception=ce)
+            return []

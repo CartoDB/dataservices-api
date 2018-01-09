@@ -167,12 +167,20 @@ class RoutingConfig(ServiceConfig):
         return self._routing_provider
 
     @property
+    def mapzen_provider(self):
+        return self._routing_provider == self.MAPZEN_PROVIDER
+
+    @property
     def mapzen_api_key(self):
         return self._mapzen_api_key
 
     @property
     def mapzen_service_params(self):
         return self._mapzen_service_params
+
+    @property
+    def mapbox_provider(self):
+        return self._routing_provider == self.MAPBOX_PROVIDER
 
     @property
     def mapbox_api_key(self):

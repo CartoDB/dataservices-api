@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoi
 RETURNS cdb_dataservices_server.simple_route AS $$
   import json
   from cartodb_services.mapbox import MapboxRouting, MapboxRoutingResponse
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools import Logger,LoggerConfig
@@ -48,7 +48,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
       waypoint_coords.append(Coordinate(lon,lat))
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     resp = client.directions(waypoint_coords, profile)
     if resp and resp.shape:

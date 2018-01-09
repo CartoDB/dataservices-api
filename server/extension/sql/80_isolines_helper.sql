@@ -133,7 +133,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -159,7 +159,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     # -- TODO Support options properly
     isolines = {}
@@ -266,7 +266,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
   from cartodb_services.metrics import QuotaService
@@ -294,7 +294,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     resp = mapbox_isolines.calculate_isochrone(origin, data_range, profile)
 

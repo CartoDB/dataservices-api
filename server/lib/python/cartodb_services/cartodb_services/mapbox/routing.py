@@ -63,13 +63,17 @@ class MapboxRouting(Traceable):
 
     def _parse_routing_response(self, response):
         json_response = json.loads(response)
-        route = json_response[ENTRY_ROUTES][0]  # Force the first route
 
-        geometry = PolyLine().decode(route[ENTRY_GEOMETRY])
-        distance = route[ENTRY_DISTANCE]
-        duration = route[ENTRY_DURATION]
+        if json_response:
+            route = json_response[ENTRY_ROUTES][0]  # Force the first route
 
-        return MapboxRoutingResponse(geometry, distance, duration)
+            geometry = PolyLine().decode(route[ENTRY_GEOMETRY])
+            distance = route[ENTRY_DISTANCE]
+            duration = route[ENTRY_DURATION]
+
+            return MapboxRoutingResponse(geometry, distance, duration)
+        else:
+            return MapboxRoutingResponse(None, None, None)
 
     @qps_retry(qps=1)
     def directions(self, waypoints, profile=DEFAULT_PROFILE):
@@ -79,14 +83,28 @@ class MapboxRouting(Traceable):
         coordinates = marshall_coordinates(waypoints)
 
         uri = self._uri(coordinates, profile)
-        response = requests.get(uri)
 
-        if response.status_code == requests.codes.ok:
-            return self._parse_routing_response(response.text)
-        elif response.status_code == requests.codes.bad_request:
+        try:
+            response = requests.get(uri)
+
+            if response.status_code == requests.codes.ok:
+                return self._parse_routing_response(response.text)
+            elif response.status_code == requests.codes.bad_request:
+                return MapboxRoutingResponse(None, None, None)
+            else:
+                raise ServiceException(response.status_code, response)
+        except requests.Timeout as te:
+            # In case of timeout we want to stop the job because the server
+            # could be down
+            self._logger.error('Timeout connecting to Mapbox routing service',
+                               te)
+            raise ServiceException('Error getting routing data from Mapbox',
+                                   None)
+        except requests.ConnectionError as ce:
+            # Don't raise the exception to continue with the geocoding job
+            self._logger.error('Error connecting to Mapbox routing service',
+                               exception=ce)
             return MapboxRoutingResponse(None, None, None)
-        else:
-            raise ServiceException(response.status_code, response)
 
 
 class MapboxRoutingResponse:

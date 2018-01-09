@@ -1,4 +1,4 @@
-MODE_TO_MAPBOX_PROFILE = {
+TRANSPORT_MODE_TO_MAPBOX = {
     'car': 'driving',
     'walk': 'walking',
 }

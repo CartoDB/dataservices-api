@@ -20,9 +20,17 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
   with metrics('cdb_route_with_point', user_routing_config, logger):
     waypoints = [origin, destination]
-    mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
-    result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 
@@ -46,7 +54,14 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger = Logger(logger_config)
 
   with metrics('cdb_route_with_waypoints', user_routing_config, logger):
-    mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
-    result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

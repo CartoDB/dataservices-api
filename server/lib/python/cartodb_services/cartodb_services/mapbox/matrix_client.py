@@ -64,9 +64,25 @@ class MapboxMatrixClient(Traceable):
         coords = marshall_coordinates(coordinates)
 
         uri = self._uri(coords, profile)
-        response = requests.get(uri)
 
-        if response.status_code == requests.codes.ok:
-            return response.text
-        else:
-            raise ServiceException(response.status_code, response)
+        try:
+            response = requests.get(uri)
+
+            if response.status_code == requests.codes.ok:
+                return response.text
+            elif response.status_code == requests.codes.bad_request:
+                return '{}'
+            else:
+                raise ServiceException(response.status_code, response)
+        except requests.Timeout as te:
+            # In case of timeout we want to stop the job because the server
+            # could be down
+            self._logger.error('Timeout connecting to Mapbox matrix service',
+                               te)
+            raise ServiceException('Error getting matrix data from Mapbox',
+                                   None)
+        except requests.ConnectionError as ce:
+            # Don't raise the exception to continue with the geocoding job
+            self._logger.error('Error connecting to Mapbox matrix service',
+                               exception=ce)
+            return '{}'

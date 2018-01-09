@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoi
 RETURNS cdb_dataservices_server.simple_route AS $$
   import json
   from cartodb_services.mapbox import MapboxRouting, MapboxRoutingResponse
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools import Logger,LoggerConfig
@@ -47,7 +47,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
       waypoint_coords.append(Coordinate(lon,lat))
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     resp = client.directions(waypoint_coords, profile)
     if resp and resp.shape:
@@ -92,9 +92,17 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
   with metrics('cdb_route_with_point', user_routing_config, logger):
     waypoints = [origin, destination]
-    mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
-    result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -117,9 +125,16 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger = Logger(logger_config)
 
   with metrics('cdb_route_with_waypoints', user_routing_config, logger):
-    mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
-    result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -222,7 +237,7 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
+  with metrics('cdb_mapbox_geocode_street_point', user_geocoder_config, logger):
     try:
       geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger, user_geocoder_config.mapbox_service_params)
 
@@ -388,7 +403,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Logger,LoggerConfig
@@ -414,7 +429,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     # -- TODO Support options properly
     isolines = {}
@@ -458,7 +473,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
-  from cartodb_services.mapbox.types import MODE_TO_MAPBOX_PROFILE
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
   from cartodb_services.metrics import QuotaService
@@ -486,7 +501,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     else:
       raise Exception('source is NULL')
 
-    profile = MODE_TO_MAPBOX_PROFILE.get(mode)
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
 
     resp = mapbox_isolines.calculate_isochrone(origin, data_range, profile)
 
