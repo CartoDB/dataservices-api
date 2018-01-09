@@ -136,7 +136,7 @@ class RoutingConfig(ServiceConfig):
     ROUTING_PROVIDER_KEY = 'routing_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
-    DEFAULT_PROVIDER = MAPBOX_PROVIDER
+    DEFAULT_PROVIDER = MAPZEN_PROVIDER
     QUOTA_KEY = 'mapzen_routing_quota'
     SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
     METRICS_LOG_KEY = 'routing_log_path'
@@ -226,7 +226,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
     HEREMAPS_PROVIDER = 'heremaps'
-    DEFAULT_PROVIDER = MAPBOX_PROVIDER
+    DEFAULT_PROVIDER = MAPZEN_PROVIDER
     METRICS_LOG_KEY = 'isolines_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
@@ -391,7 +391,7 @@ class GeocoderConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
-    DEFAULT_PROVIDER = MAPBOX_GEOCODER
+    DEFAULT_PROVIDER = MAPZEN_GEOCODER
     METRICS_LOG_KEY = 'geocoder_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None, forced_provider=None):
