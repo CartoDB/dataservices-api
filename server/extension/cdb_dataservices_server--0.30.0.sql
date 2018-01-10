@@ -2385,10 +2385,17 @@ $$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
   import spiexceptions
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
   try:
-    mapbox_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
-    return plpy.execute(mapbox_plan, [username, orgname, city_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3) as point;", ["text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
@@ -2397,10 +2404,17 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
 RETURNS Geometry AS $$
   import spiexceptions
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
   try:
-    mapbox_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
-    return plpy.execute(mapbox_plan, [username, orgname, city_name, country_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, NULL, $4) as point;", ["text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
@@ -2409,10 +2423,17 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   import spiexceptions
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
   try:
-    mapbox_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
-    return plpy.execute(mapbox_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, $4, $5) as point;", ["text", "text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name, admin1_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
