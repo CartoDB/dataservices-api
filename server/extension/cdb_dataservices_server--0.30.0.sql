@@ -2395,6 +2395,7 @@ RETURNS Geometry AS $$
     street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3) as point;", ["text", "text", "text"])
     return plpy.execute(street_point, [username, orgname, city_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
@@ -2414,6 +2415,7 @@ RETURNS Geometry AS $$
     street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, NULL, $4) as point;", ["text", "text", "text", "text"])
     return plpy.execute(street_point, [username, orgname, city_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
@@ -2433,6 +2435,7 @@ RETURNS Geometry AS $$
     street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, $4, $5) as point;", ["text", "text", "text", "text", "text"])
     return plpy.execute(street_point, [username, orgname, city_name, admin1_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
+    import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
