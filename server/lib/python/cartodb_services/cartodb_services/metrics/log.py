@@ -10,7 +10,7 @@ from urlparse import urlparse
 
 
 @contextmanager
-def metrics(function, service_config, params=None, logger=None):
+def metrics(function, service_config, logger=None, params=None):
     try:
         start_time = time.time()
         yield
