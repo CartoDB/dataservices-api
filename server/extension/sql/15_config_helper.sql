@@ -117,3 +117,32 @@ RETURNS boolean AS $$
     GD[cache_key] = obs_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_apikey(
+    username TEXT,
+    orgname TEXT,
+    service TEXT)
+RETURNS TEXT AS $$
+  import json
+  from cartodb_services.mapbox.types import MAPBOX_ROUTING_APIKEY_ROUNDRROBIN, MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN, MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
+
+  if service == 'routing':
+    round_robin_service = MAPBOX_ROUTING_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_routing_config_{0}".format(username)].mapbox_api_keys
+  elif service == 'geocoder':
+    round_robin_service = MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_geocoder_config_{0}".format(username)].mapbox_api_keys
+  elif service == 'isolines':
+    round_robin_service = MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_isolines_routing_config_{0}".format(username)].mapbox_matrix_api_keys
+  else:
+    return None
+
+  round_robin = GD[round_robin_service] if round_robin_service in GD else 0
+
+  api_key = api_keys[round_robin]
+
+  GD[round_robin_service] = round_robin + 1 if round_robin < len(api_keys) - 1 else 0
+
+  return api_key
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;

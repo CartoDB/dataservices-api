@@ -148,8 +148,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+
   try:
-    client = MapboxMatrixClient(user_isolines_routing_config.mapbox_matrix_api_key, logger, user_isolines_routing_config.mapbox_matrix_service_params)
+    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
     mapbox_isolines = MapboxIsolines(client, logger)
 
     if source:
@@ -283,8 +286,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+
   try:
-    client = MapboxMatrixClient(user_isolines_routing_config.mapbox_matrix_api_key, logger, user_isolines_routing_config.mapbox_matrix_service_params)
+    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
     mapbox_isolines = MapboxIsolines(client, logger)
 
     if source:

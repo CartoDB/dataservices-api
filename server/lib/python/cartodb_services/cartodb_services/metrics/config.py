@@ -149,7 +149,7 @@ class RoutingConfig(ServiceConfig):
             self._routing_provider = self.DEFAULT_PROVIDER
         self._mapzen_api_key = self._db_config.mapzen_routing_api_key
         self._mapzen_service_params = self._db_config.mapzen_routing_service_params
-        self._mapbox_api_key = self._db_config.mapbox_routing_api_key
+        self._mapbox_api_keys = self._db_config.mapbox_routing_api_keys
         self._mapbox_service_params = self._db_config.mapbox_routing_service_params
         self._set_monthly_quota()
         self._set_soft_limit()
@@ -183,8 +183,8 @@ class RoutingConfig(ServiceConfig):
         return self._routing_provider == self.MAPBOX_PROVIDER
 
     @property
-    def mapbox_api_key(self):
-        return self._mapbox_api_key
+    def mapbox_api_keys(self):
+        return self._mapbox_api_keys
 
     @property
     def mapbox_service_params(self):
@@ -255,7 +255,7 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapzen_matrix_service_params = db_config.mapzen_matrix_service_params
             self._mapzen_isochrones_service_params = db_config.mapzen_isochrones_service_params
         elif self._isolines_provider == self.MAPBOX_PROVIDER:
-            self._mapbox_matrix_api_key = self._db_config.mapbox_matrix_api_key
+            self._mapbox_matrix_api_keys = self._db_config.mapbox_matrix_api_keys
             self._mapbox_matrix_service_params = db_config.mapbox_matrix_service_params
             self._mapbox_isochrones_service_params = db_config.mapbox_isochrones_service_params
 
@@ -313,8 +313,8 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._isolines_provider == self.MAPZEN_PROVIDER
 
     @property
-    def mapbox_matrix_api_key(self):
-        return self._mapbox_matrix_api_key
+    def mapbox_matrix_api_keys(self):
+        return self._mapbox_matrix_api_keys
 
     @property
     def mapbox_matrix_service_params(self):
@@ -385,7 +385,7 @@ class GeocoderConfig(ServiceConfig):
     MAPZEN_GEOCODER_API_KEY = 'mapzen_geocoder_api_key'
     GEOCODER_PROVIDER = 'geocoder_provider'
     MAPBOX_GEOCODER = 'mapbox'
-    MAPBOX_GEOCODER_API_KEY = 'mapbox_geocoder_api_key'
+    MAPBOX_GEOCODER_API_KEYS = 'mapbox_geocoder_api_keys'
     QUOTA_KEY = 'geocoding_quota'
     SOFT_LIMIT_KEY = 'soft_geocoding_limit'
     USERNAME_KEY = 'username'
@@ -413,7 +413,7 @@ class GeocoderConfig(ServiceConfig):
             if not self.mapzen_api_key:
                 raise ConfigException("""Mapzen config is not set up""")
         elif self._geocoder_provider == self.MAPBOX_GEOCODER:
-            if not self.mapbox_api_key:
+            if not self.mapbox_api_keys:
                 raise ConfigException("""Mapbox config is not set up""")
 
         return True
@@ -447,7 +447,7 @@ class GeocoderConfig(ServiceConfig):
             self._cost_per_hit = 0
             self._mapzen_service_params = db_config.mapzen_geocoder_service_params
         elif self._geocoder_provider == self.MAPBOX_GEOCODER:
-            self._mapbox_api_key = db_config.mapbox_geocoder_api_key
+            self._mapbox_api_keys = db_config.mapbox_geocoder_api_keys
             self._cost_per_hit = 0
             self._mapbox_service_params = db_config.mapbox_geocoder_service_params
 
@@ -522,8 +522,8 @@ class GeocoderConfig(ServiceConfig):
         return self._mapzen_service_params
 
     @property
-    def mapbox_api_key(self):
-        return self._mapbox_api_key
+    def mapbox_api_keys(self):
+        return self._mapbox_api_keys
 
     @property
     def mapbox_service_params(self):
@@ -610,14 +610,14 @@ class ServicesDBConfig:
             raise ConfigException('Mapbox configuration missing')
         else:
             mapbox_conf = json.loads(mapbox_conf_json)
-            self._mapbox_matrix_api_key = mapbox_conf['matrix']['api_key']
+            self._mapbox_matrix_api_keys = mapbox_conf['matrix']['api_keys']
             self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
             self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})
             self._mapbox_isochrones_service_params = mapbox_conf.get('isochrones', {}).get('service', {})
-            self._mapbox_routing_api_key = mapbox_conf['routing']['api_key']
+            self._mapbox_routing_api_keys = mapbox_conf['routing']['api_keys']
             self._mapbox_routing_quota = mapbox_conf['routing']['monthly_quota']
             self._mapbox_routing_service_params = mapbox_conf['routing'].get('service', {})
-            self._mapbox_geocoder_api_key = mapbox_conf['geocoder']['api_key']
+            self._mapbox_geocoder_api_keys = mapbox_conf['geocoder']['api_keys']
             self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
             self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
 
@@ -715,8 +715,8 @@ class ServicesDBConfig:
         return self._mapzen_geocoder_service_params
 
     @property
-    def mapbox_matrix_api_key(self):
-        return self._mapbox_matrix_api_key
+    def mapbox_matrix_api_keys(self):
+        return self._mapbox_matrix_api_keys
 
     @property
     def mapbox_matrix_monthly_quota(self):
@@ -731,8 +731,8 @@ class ServicesDBConfig:
         return self._mapbox_isochrones_service_params
 
     @property
-    def mapbox_routing_api_key(self):
-        return self._mapbox_routing_api_key
+    def mapbox_routing_api_keys(self):
+        return self._mapbox_routing_api_keys
 
     @property
     def mapbox_routing_monthly_quota(self):
@@ -743,8 +743,8 @@ class ServicesDBConfig:
         return self._mapbox_routing_service_params
 
     @property
-    def mapbox_geocoder_api_key(self):
-        return self._mapbox_geocoder_api_key
+    def mapbox_geocoder_api_keys(self):
+        return self._mapbox_geocoder_api_keys
 
     @property
     def mapbox_geocoder_monthly_quota(self):

@@ -29,8 +29,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'routing'])
+
   try:
-    client = MapboxRouting(user_routing_config.mapbox_api_key, logger, user_routing_config.mapbox_service_params)
+    client = MapboxRouting(mapbox_apikey[0]['apikey'], logger, user_routing_config.mapbox_service_params)
 
     if not waypoints or len(waypoints) < 2:
       logger.info("Empty origin or destination")

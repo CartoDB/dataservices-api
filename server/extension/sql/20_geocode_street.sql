@@ -202,9 +202,12 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'geocoder'])
+
   with metrics('cdb_mapbox_geocode_street_point', user_geocoder_config, logger):
     try:
-      geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger, user_geocoder_config.mapbox_service_params)
+      geocoder = MapboxGeocoder(mapbox_apikey[0]['apikey'], logger, user_geocoder_config.mapbox_service_params)
 
       country_iso3 = None
       if country:

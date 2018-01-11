@@ -2,6 +2,35 @@
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.30.0'" to load this file. \quit
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_apikey(
+    username TEXT,
+    orgname TEXT,
+    service TEXT)
+RETURNS TEXT AS $$
+  import json
+  from cartodb_services.mapbox.types import MAPBOX_ROUTING_APIKEY_ROUNDRROBIN, MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN, MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
+
+  if service == 'routing':
+    round_robin_service = MAPBOX_ROUTING_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_routing_config_{0}".format(username)].mapbox_api_keys
+  elif service == 'geocoder':
+    round_robin_service = MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_geocoder_config_{0}".format(username)].mapbox_api_keys
+  elif service == 'isolines':
+    round_robin_service = MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
+    api_keys = GD["user_isolines_routing_config_{0}".format(username)].mapbox_matrix_api_keys
+  else:
+    return None
+
+  round_robin = GD[round_robin_service] if round_robin_service in GD else 0
+
+  api_key = api_keys[round_robin]
+
+  GD[round_robin_service] = round_robin + 1 if round_robin < len(api_keys) - 1 else 0
+
+  return api_key
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
 -- HERE goes your code to upgrade/downgrade
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoints(
   username TEXT,
@@ -28,8 +57,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'routing'])
+
   try:
-    client = MapboxRouting(user_routing_config.mapbox_api_key, logger, user_routing_config.mapbox_service_params)
+    client = MapboxRouting(mapbox_apikey[0]['apikey'], logger, user_routing_config.mapbox_service_params)
 
     if not waypoints or len(waypoints) < 2:
       logger.info("Empty origin or destination")
@@ -237,9 +269,12 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'geocoder'])
+
   with metrics('cdb_mapbox_geocode_street_point', user_geocoder_config, logger):
     try:
-      geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger, user_geocoder_config.mapbox_service_params)
+      geocoder = MapboxGeocoder(mapbox_apikey[0]['apikey'], logger, user_geocoder_config.mapbox_service_params)
 
       country_iso3 = None
       if country:
@@ -344,9 +379,12 @@ RETURNS Geometry AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'geocoder'])
+
   with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
     try:
-      geocoder = MapboxGeocoder(user_geocoder_config.mapbox_api_key, logger)
+      geocoder = MapboxGeocoder(mapbox_apikey[0]['apikey'], logger)
 
       country_iso3 = None
       if country_name:
@@ -442,8 +480,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+
   try:
-    client = MapboxMatrixClient(user_isolines_routing_config.mapbox_matrix_api_key, logger, user_isolines_routing_config.mapbox_matrix_service_params)
+    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
     mapbox_isolines = MapboxIsolines(client, logger)
 
     if source:
@@ -514,8 +555,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
+  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
+  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+
   try:
-    client = MapboxMatrixClient(user_isolines_routing_config.mapbox_matrix_api_key, logger, user_isolines_routing_config.mapbox_matrix_service_params)
+    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
     mapbox_isolines = MapboxIsolines(client, logger)
 
     if source:
