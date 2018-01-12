@@ -3,74 +3,36 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.30.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_apikey(
-    username TEXT,
-    orgname TEXT,
-    service TEXT)
-RETURNS TEXT AS $$
-  import json
-  from cartodb_services.mapbox.types import MAPBOX_ROUTING_APIKEY_ROUNDRROBIN, MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN, MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
-
-  if service == 'routing':
-    round_robin_service = MAPBOX_ROUTING_APIKEY_ROUNDRROBIN
-    api_keys = GD["user_routing_config_{0}".format(username)].mapbox_api_keys
-  elif service == 'geocoder':
-    round_robin_service = MAPBOX_GEOCODER_APIKEY_ROUNDRROBIN
-    api_keys = GD["user_geocoder_config_{0}".format(username)].mapbox_api_keys
-  elif service == 'isolines':
-    round_robin_service = MAPBOX_ISOLINES_APIKEY_ROUNDRROBIN
-    api_keys = GD["user_isolines_routing_config_{0}".format(username)].mapbox_matrix_api_keys
-  else:
-    return None
-
-  round_robin = GD[round_robin_service] if round_robin_service in GD else 0
-
-  api_key = api_keys[round_robin]
-
-  GD[round_robin_service] = round_robin + 1 if round_robin < len(api_keys) - 1 else 0
-
-  return api_key
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoints(
   username TEXT,
   orgname TEXT,
   waypoints geometry(Point, 4326)[],
   mode TEXT)
 RETURNS cdb_dataservices_server.simple_route AS $$
-  import json
-  from cartodb_services.mapbox import MapboxRouting, MapboxRoutingResponse
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.mapbox import MapboxRouting
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
-  from cartodb_services.metrics import QuotaService
   from cartodb_services.tools import Coordinate
-  from cartodb_services.tools import Logger,LoggerConfig
   from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.refactor.service.mapbox_routing_config import MapboxRoutingConfigBuilder
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-
-  quota_service = QuotaService(user_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'routing'])
+  service_manager = ServiceManager('routing', MapboxRoutingConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
   try:
-    client = MapboxRouting(mapbox_apikey[0]['apikey'], logger, user_routing_config.mapbox_service_params)
+    client = MapboxRouting(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
     if not waypoints or len(waypoints) < 2:
-      logger.info("Empty origin or destination")
-      quota_service.increment_empty_service_use()
+      service_manager.logger.info("Empty origin or destination")
+      service_manager.quota_service.increment_empty_service_use()
       return [None, None, None]
 
     if len(waypoints) > 25:
-      logger.info("Too many waypoints (max 25)")
-      quota_service.increment_empty_service_use()
+      service_manager.logger.info("Too many waypoints (max 25)")
+      service_manager.quota_service.increment_empty_service_use()
       return [None, None, None]
 
     waypoint_coords = []
@@ -85,21 +47,21 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
       if shape_linestring:
-        quota_service.increment_success_service_use()
+        service_manager.quota_service.increment_success_service_use()
         return [shape_linestring, resp.length, int(round(resp.duration))]
       else:
-        quota_service.increment_empty_service_use()
+        service_manager.quota_service.increment_empty_service_use()
         return [None, None, None]
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return [None, None, None]
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to calculate Mapbox routing', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to calculate Mapbox routing', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to calculate Mapbox routing')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
@@ -252,52 +214,42 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxGeocoder
-  from cartodb_services.metrics import QuotaService, metrics
-  from cartodb_services.tools import Logger,LoggerConfig
   from cartodb_services.tools.country import country_to_iso3
+  from cartodb_services.refactor.service.mapbox_geocoder_config import MapboxGeocoderConfigBuilder
 
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1}, {2})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname), plpy.quote_nullable('mapbox')))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
+  service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'geocoder'])
+  try:
+    geocoder = MapboxGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
-  with metrics('cdb_mapbox_geocode_street_point', user_geocoder_config, logger):
-    try:
-      geocoder = MapboxGeocoder(mapbox_apikey[0]['apikey'], logger, user_geocoder_config.mapbox_service_params)
+    country_iso3 = None
+    if country:
+      country_iso3 = country_to_iso3(country)
 
-      country_iso3 = None
-      if country:
-        country_iso3 = country_to_iso3(country)
-
-      coordinates = geocoder.geocode(searchtext=searchtext, city=city,
-                                     state_province=state_province,
-                                     country=country_iso3)
-      if coordinates:
-        quota_service.increment_success_service_use()
-        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        return point['st_setsrid']
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode street point using mapbox', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode street point using mapbox')
-    finally:
-      quota_service.increment_total_service_use()
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city,
+                                    state_province=state_province,
+                                    country=country_iso3)
+    if coordinates:
+      service_manager.quota_service.increment_success_service_use()
+      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+      return point['st_setsrid']
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return None
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using mapbox', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using mapbox')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text)
@@ -360,101 +312,6 @@ RETURNS Geometry AS $$
     return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.mapbox import MapboxGeocoder
-  from cartodb_services.metrics import QuotaService, metrics
-  from cartodb_services.tools import Logger,LoggerConfig
-  from cartodb_services.tools.country import country_to_iso3
-
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1}, {2})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname), plpy.quote_nullable('mapbox')))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'geocoder'])
-
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
-    try:
-      geocoder = MapboxGeocoder(mapbox_apikey[0]['apikey'], logger)
-
-      country_iso3 = None
-      if country_name:
-        country_iso3 = country_to_iso3(country_name)
-
-      coordinates = geocoder.geocode(searchtext=city_name, city=None,
-                                     state_province=admin1_name,
-                                     country=country_iso3)
-      if coordinates:
-        quota_service.increment_success_service_use()
-        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        return point['st_setsrid']
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode city point using mapbox', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode city point using mapbox')
-    finally:
-      quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.mapzen import MapzenGeocoder
-  from cartodb_services.tools.country import country_to_iso3
-  from cartodb_services.metrics import QuotaService, metrics
-  from cartodb_services.tools import Logger,LoggerConfig
-
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1}, {2})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname), plpy.quote_nullable('mapzen')))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
-    try:
-      geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key, logger)
-      country_iso3 = None
-      if country_name:
-        country_iso3 = country_to_iso3(country_name)
-      coordinates = geocoder.geocode(searchtext=city_name, city=None,
-                                    state_province=admin1_name,
-                                    country=country_iso3, search_type='locality')
-      if coordinates:
-        quota_service.increment_success_service_use()
-        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        return point['st_setsrid']
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode city point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode city point using mapzen')
-    finally:
-      quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    username TEXT,
    orgname TEXT,
@@ -463,29 +320,21 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    data_range integer[],
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
-  import json
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
-    mapbox_isolines = MapboxIsolines(client, logger)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -516,16 +365,16 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
       result.append([source, r, multipolygon])
 
-    quota_service.increment_success_service_use()
-    quota_service.increment_isolines_service_use(len(isolines))
+    service_manager.quota_service.increment_success_service_use()
+    service_manager.quota_service.increment_isolines_service_use(len(isolines))
     return result
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to get Mapbox isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to get Mapbox isolines')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
@@ -536,31 +385,22 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    data_range integer[],
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
-  import json
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  # -- Check the quota
-  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
-    mapbox_isolines = MapboxIsolines(client, logger)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -578,24 +418,24 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       for isochrone in resp:
         result_polygon = coordinates_to_polygon(isochrone.coordinates)
         if result_polygon:
-          quota_service.increment_success_service_use()
+          service_manager.quota_service.increment_success_service_use()
           result.append([source, isochrone.duration, result_polygon])
         else:
-          quota_service.increment_empty_service_use()
+          service_manager.quota_service.increment_empty_service_use()
           result.append([source, isochrone.duration, None])
-      quota_service.increment_success_service_use()
-      quota_service.increment_isolines_service_use(len(result))
+      service_manager.quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_isolines_service_use(len(result))
       return result
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return []
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to get Mapbox isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to get Mapbox isochrones')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])

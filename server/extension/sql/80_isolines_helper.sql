@@ -131,29 +131,21 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    data_range integer[],
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
-  import json
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
-    mapbox_isolines = MapboxIsolines(client, logger)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -184,16 +176,16 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
       result.append([source, r, multipolygon])
 
-    quota_service.increment_success_service_use()
-    quota_service.increment_isolines_service_use(len(isolines))
+    service_manager.quota_service.increment_success_service_use()
+    service_manager.quota_service.increment_isolines_service_use(len(isolines))
     return result
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to get Mapbox isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to get Mapbox isolines')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
@@ -267,31 +259,22 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    data_range integer[],
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
-  import json
+  from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  # -- Check the quota
-  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
-
-  mapbox_apikey_query = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_apikey($1, $2, $3) as apikey;", ["text", "text", "text"])
-  mapbox_apikey = plpy.execute(mapbox_apikey_query, [username, orgname, 'isolines'])
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(mapbox_apikey[0]['apikey'], logger, user_isolines_routing_config.mapbox_matrix_service_params)
-    mapbox_isolines = MapboxIsolines(client, logger)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -309,22 +292,22 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       for isochrone in resp:
         result_polygon = coordinates_to_polygon(isochrone.coordinates)
         if result_polygon:
-          quota_service.increment_success_service_use()
+          service_manager.quota_service.increment_success_service_use()
           result.append([source, isochrone.duration, result_polygon])
         else:
-          quota_service.increment_empty_service_use()
+          service_manager.quota_service.increment_empty_service_use()
           result.append([source, isochrone.duration, None])
-      quota_service.increment_success_service_use()
-      quota_service.increment_isolines_service_use(len(result))
+      service_manager.quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_isolines_service_use(len(result))
       return result
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return []
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to get Mapbox isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to get Mapbox isochrones')
   finally:
-    quota_service.increment_total_service_use()
+    service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
