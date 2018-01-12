@@ -172,9 +172,11 @@ SELECT CDB_Conf_SetConf(
 ```sql
 SELECT CDB_Conf_SetConf(
     'logger_conf',
-    '{"geocoder_log_path": "/tmp/geocodings.log", [ "min_log_level": "[debug|info|warning|error]", "rollbar_api_key": "SERVER_SIDE_API_KEY", "log_file_path": "LOG_FILE_PATH"]}'
+    '{"geocoder_log_path": "/tmp/geocodings.log", "min_log_level": "LOG_LEVEL", "rollbar_api_key": "SERVER_SIDE_API_KEY", "log_file_path": "LOG_FILE_PATH"}'
 );
 ```
+
+Where `LOG_LEVEL` can be `debug`, `info`, `warning` or `error`.
 
 #### Environment
 
