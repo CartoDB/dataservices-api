@@ -1764,7 +1764,6 @@ RETURNS boolean AS $$
     GD[cache_key] = obs_config
     return True
 $$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
-
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_type') THEN
