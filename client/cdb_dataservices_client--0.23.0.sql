@@ -4135,7 +4135,6 @@ RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_google_geocode_street_point (username, orgname, searchtext, city, state_province, country);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_mapbox_geocode_street_point (username text, orgname text, searchtext text, city text, state_province text, country text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_geocode_street_point (username text, orgname text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -4167,7 +4166,6 @@ RETURNS SETOF cdb_dataservices_client.isoline AS $$
   SELECT * FROM cdb_dataservices_server.cdb_isochrone (username, orgname, source, mode, range, options);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_mapbox_isochrone (username text, orgname text, source geometry(Geometry, 4326), mode text, range integer[], options text[]);
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_mapbox_isochrone (username text, orgname text, source geometry(Geometry, 4326), mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF cdb_dataservices_client.isoline AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
