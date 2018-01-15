@@ -608,7 +608,7 @@ RETURNS TABLE (
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getdata', user_obs_config, logger):
+  with metrics('obs_getdata', user_obs_config, logger, params):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetData($1, $2, $3, $4, $5);", ["text", "text", "geomval[]", "json", "boolean"])
         result = plpy.execute(obs_plan, [username, orgname, geomvals, params, merge])
@@ -667,7 +667,7 @@ RETURNS TABLE (
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
-  with metrics('obs_getdata', user_obs_config, logger):
+  with metrics('obs_getdata', user_obs_config, logger, params):
     try:
         obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetData($1, $2, $3, $4);", ["text", "text", "text[]", "json"])
         result = plpy.execute(obs_plan, [username, orgname, geomrefs, params])
@@ -724,7 +724,7 @@ RETURNS JSON AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('obs_getmeta', user_obs_config, logger):
+  with metrics('obs_getmeta', user_obs_config, logger, params):
     try:
         obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetMeta($1, $2, $3, $4, $5, $6, $7) as meta;", ["text", "text", "Geometry (Geometry, 4326)", "json", "integer", "integer", "integer"])
         result = plpy.execute(obs_plan, [username, orgname, geom, params, max_timespan_rank, max_score_rank, target_geoms])

@@ -9,7 +9,7 @@ from urlparse import urlparse, parse_qs
 from mock import Mock
 
 from cartodb_services.mapzen import MapzenRouting, MapzenRoutingResponse
-from cartodb_services.mapzen.exceptions import WrongParams
+from cartodb_services.tools.exceptions import WrongParams
 from cartodb_services.tools import Coordinate
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'

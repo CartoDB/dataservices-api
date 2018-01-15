@@ -78,7 +78,13 @@ class QuotaChecker:
         elif re.match('mapzen_isolines',
                       self._user_service_config.service_type) is not None:
             return self.__check_isolines_quota()
+        elif re.match('mapbox_isolines',
+                      self._user_service_config.service_type) is not None:
+            return self.__check_isolines_quota()
         elif re.match('routing_mapzen',
+                      self._user_service_config.service_type) is not None:
+            return self.__check_routing_quota()
+        elif re.match('routing_mapbox',
                       self._user_service_config.service_type) is not None:
             return self.__check_routing_quota()
         elif re.match('obs_*',

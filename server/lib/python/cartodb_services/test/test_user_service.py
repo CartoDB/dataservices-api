@@ -97,7 +97,6 @@ class TestUserService(TestCase):
                 super(MockRedisWithCounter, self).__init__()
                 self._zscore_counter = 0
             def zscore(self, *args):
-                print args
                 self._zscore_counter += 1
                 return super(MockRedisWithCounter, self).zscore(*args)
             def zscore_counter(self):

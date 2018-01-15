@@ -4,6 +4,67 @@ CREATE TYPE cdb_dataservices_server.simple_route AS (
     duration integer
 );
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoints(
+  username TEXT,
+  orgname TEXT,
+  waypoints geometry(Point, 4326)[],
+  mode TEXT)
+RETURNS cdb_dataservices_server.simple_route AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.mapbox import MapboxRouting
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.refactor.service.mapbox_routing_config import MapboxRoutingConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('routing', MapboxRoutingConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    client = MapboxRouting(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if not waypoints or len(waypoints) < 2:
+      service_manager.logger.info("Empty origin or destination")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    if len(waypoints) > 25:
+      service_manager.logger.info("Too many waypoints (max 25)")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    waypoint_coords = []
+    for waypoint in waypoints:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % waypoint)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
+      waypoint_coords.append(Coordinate(lon,lat))
+
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
+
+    resp = client.directions(waypoint_coords, profile)
+    if resp and resp.shape:
+      shape_linestring = polyline_to_linestring(resp.shape)
+      if shape_linestring:
+        service_manager.quota_service.increment_success_service_use()
+        return [shape_linestring, resp.length, int(round(resp.duration))]
+      else:
+        service_manager.quota_service.increment_empty_service_use()
+        return [None, None, None]
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to calculate Mapbox routing', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to calculate Mapbox routing')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_with_waypoints(
   username TEXT,
   orgname TEXT,

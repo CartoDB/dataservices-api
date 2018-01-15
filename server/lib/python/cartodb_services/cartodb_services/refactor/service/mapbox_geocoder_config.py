@@ -1,8 +1,11 @@
 from dateutil.parser import parse as date_parse
+from cartodb_services.refactor.service.utils import round_robin
+from cartodb_services.mapbox.types import MAPBOX_GEOCODER_APIKEY_ROUNDROBIN
 
-class MapzenGeocoderConfig(object):
+
+class MapboxGeocoderConfig(object):
     """
-    Value object that represents the configuration needed to operate the mapzen service.
+    Configuration needed to operate the Mapbox geocoder service.
     """
 
     def __init__(self,
@@ -11,29 +14,29 @@ class MapzenGeocoderConfig(object):
                  period_end_date,
                  cost_per_hit,
                  log_path,
-                 mapzen_api_key,
+                 mapbox_api_keys,
                  username,
                  organization,
-                 service_params):
+                 service_params,
+                 GD):
         self._geocoding_quota = geocoding_quota
         self._soft_geocoding_limit = soft_geocoding_limit
         self._period_end_date = period_end_date
         self._cost_per_hit = cost_per_hit
         self._log_path = log_path
-        self._mapzen_api_key = mapzen_api_key
+        self._mapbox_api_keys = mapbox_api_keys
         self._username = username
         self._organization = organization
         self._service_params = service_params
+        self._GD = GD
 
-    # Kind of generic properties. Note which ones are for actually running the
-    # service and which ones are needed for quota stuff.
     @property
     def service_type(self):
-        return 'geocoder_mapzen'
+        return 'geocoder_mapbox'
 
     @property
     def provider(self):
-        return 'mapzen'
+        return 'mapbox'
 
     @property
     def is_high_resolution(self):
@@ -55,17 +58,15 @@ class MapzenGeocoderConfig(object):
     def cost_per_hit(self):
         return self._cost_per_hit
 
-    # Server config, TODO: locate where this is actually used
     @property
     def log_path(self):
         return self._log_path
 
-    # This is actually the specific one to run requests against the remote endpoitn
     @property
-    def mapzen_api_key(self):
-        return self._mapzen_api_key
+    def mapbox_api_key(self):
+        return round_robin(self._mapbox_api_keys, self._GD,
+                           MAPBOX_GEOCODER_APIKEY_ROUNDROBIN)
 
-    # These two identify the user
     @property
     def username(self):
         return self._username
@@ -84,21 +85,22 @@ class MapzenGeocoderConfig(object):
         return False
 
 
-class MapzenGeocoderConfigBuilder(object):
+class MapboxGeocoderConfigBuilder(object):
 
-    def __init__(self, server_conf, user_conf, org_conf, username, orgname, GD=None):
+    def __init__(self, server_conf, user_conf, org_conf, username, orgname, GD):
         self._server_conf = server_conf
         self._user_conf = user_conf
         self._org_conf = org_conf
         self._username = username
         self._orgname = orgname
+        self._GD = GD
 
     def get(self):
-        mapzen_server_conf = self._server_conf.get('mapzen_conf')
-        mapzen_api_key = mapzen_server_conf['geocoder']['api_key']
-        mapzen_service_params = mapzen_server_conf['geocoder'].get('service', {})
+        mapbox_server_conf = self._server_conf.get('mapbox_conf')
+        mapbox_api_keys = mapbox_server_conf['geocoder']['api_keys']
+        mapbox_service_params = mapbox_server_conf['geocoder'].get('service', {})
 
-        geocoding_quota = self._get_quota(mapzen_server_conf)
+        geocoding_quota = self._get_quota()
         soft_geocoding_limit = self._user_conf.get('soft_geocoding_limit').lower() == 'true'
         cost_per_hit = 0
         period_end_date_str = self._org_conf.get('period_end_date') or self._user_conf.get('period_end_date')
@@ -107,17 +109,18 @@ class MapzenGeocoderConfigBuilder(object):
         logger_conf = self._server_conf.get('logger_conf')
         log_path = logger_conf.get('geocoder_log_path', None)
 
-        return MapzenGeocoderConfig(geocoding_quota,
+        return MapboxGeocoderConfig(geocoding_quota,
                                     soft_geocoding_limit,
                                     period_end_date,
                                     cost_per_hit,
                                     log_path,
-                                    mapzen_api_key,
+                                    mapbox_api_keys,
                                     self._username,
                                     self._orgname,
-                                    mapzen_service_params)
+                                    mapbox_service_params,
+                                    self._GD)
 
-    def _get_quota(self, mapzen_server_conf):
+    def _get_quota(self):
         geocoding_quota = self._org_conf.get('geocoding_quota') or self._user_conf.get('geocoding_quota')
         if geocoding_quota is '':
             return 0
