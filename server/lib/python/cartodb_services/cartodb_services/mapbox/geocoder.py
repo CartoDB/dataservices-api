@@ -66,6 +66,8 @@ class MapboxGeocoder(Traceable):
         if state_province:
             address.append(state_province)
 
+        country = [country] if country else None
+
         try:
             response = self._geocoder.forward(address=', '.join(address),
                                               country=country,
