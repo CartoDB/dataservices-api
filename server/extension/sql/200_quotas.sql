@@ -1,6 +1,8 @@
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_type') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_type inner join pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+                 WHERE pg_type.typname = 'service_type'
+                 AND pg_namespace.nspname = 'cdb_dataservices_server') THEN
     CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
       'isolines',
       'hires_geocoder',
@@ -12,7 +14,9 @@ END $$;
 
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_quota_info') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_type inner join pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+                 WHERE pg_type.typname = 'service_quota_info'
+                 AND pg_namespace.nspname = 'cdb_dataservices_server') THEN
     CREATE TYPE cdb_dataservices_server.service_quota_info AS (
       service cdb_dataservices_server.service_type,
       monthly_quota NUMERIC,
