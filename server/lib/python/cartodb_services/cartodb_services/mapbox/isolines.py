@@ -6,23 +6,17 @@ Uses the Mapbox Time Matrix service.
 import json
 from cartodb_services.tools.spherical import (get_angles,
                                               calculate_dest_location)
-
-PROFILE_DRIVING_TRAFFIC = 'driving-traffic'
-PROFILE_DRIVING = 'driving'
-PROFILE_CYCLING = 'cycling'
-PROFILE_WALKING = 'walking'
-DEFAULT_PROFILE = PROFILE_DRIVING
-
-VALID_PROFILES = [PROFILE_DRIVING_TRAFFIC,
-                  PROFILE_DRIVING,
-                  PROFILE_CYCLING,
-                  PROFILE_WALKING]
+from cartodb_services.mapbox.matrix_client import (validate_profile,
+                                                   DEFAULT_PROFILE,
+                                                   PROFILE_WALKING,
+                                                   PROFILE_DRIVING,
+                                                   PROFILE_CYCLING,
+                                                   ENTRY_DURATIONS)
 
 MAX_SPEEDS = {
     PROFILE_WALKING: 3.3333333,  # In m/s, assuming 12km/h walking speed
     PROFILE_CYCLING: 16.67,  # In m/s, assuming 60km/h max speed
-    PROFILE_DRIVING: 41.67,  # In m/s, assuming 140km/h max speed
-    PROFILE_DRIVING_TRAFFIC: 41.67,  # In m/s, assuming 140km/h max speed
+    PROFILE_DRIVING: 41.67  # In m/s, assuming 140km/h max speed
 }
 
 DEFAULT_NUM_ANGLES = 24
@@ -37,8 +31,6 @@ UNIT_FACTOR_ISOCHRONE = 1.0
 UNIT_FACTOR_ISODISTANCE = 1000.0
 DEFAULT_UNIT_FACTOR = UNIT_FACTOR_ISOCHRONE
 
-ENTRY_DURATIONS = 'durations'
-
 
 class MapboxIsolines():
     '''
@@ -49,14 +41,6 @@ class MapboxIsolines():
         service_params = service_params or {}
         self._matrix_client = matrix_client
         self._logger = logger
-
-    def _validate_profile(self, profile):
-        if profile not in VALID_PROFILES:
-            raise ValueError('{profile} is not a valid profile. '
-                             'Valid profiles are: {valid_profiles}'.format(
-                                 profile=profile,
-                                 valid_profiles=', '.join(
-                                     [x for x in VALID_PROFILES])))
 
     def _calculate_matrix_cost(self, origin, targets, isorange,
                                profile=DEFAULT_PROFILE,
@@ -78,7 +62,7 @@ class MapboxIsolines():
 
     def calculate_isochrone(self, origin, time_ranges,
                             profile=DEFAULT_PROFILE):
-        self._validate_profile(profile)
+        validate_profile(profile)
 
         max_speed = MAX_SPEEDS[profile]
 
@@ -101,7 +85,7 @@ class MapboxIsolines():
 
     def calculate_isodistance(self, origin, distance_range,
                               profile=DEFAULT_PROFILE):
-        self._validate_profile(profile)
+        validate_profile(profile)
 
         max_speed = MAX_SPEEDS[profile]
         time_range = distance_range / max_speed

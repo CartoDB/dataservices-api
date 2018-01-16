@@ -29,6 +29,17 @@ VALID_PROFILES = [PROFILE_DRIVING_TRAFFIC,
                   PROFILE_CYCLING,
                   PROFILE_WALKING]
 
+ENTRY_DURATIONS = 'durations'
+
+
+def validate_profile(profile):
+    if profile not in VALID_PROFILES:
+        raise ValueError('{profile} is not a valid profile. '
+                         'Valid profiles are: {valid_profiles}'.format(
+                             profile=profile,
+                             valid_profiles=', '.join(
+                                 [x for x in VALID_PROFILES])))
+
 
 class MapboxMatrixClient(Traceable):
     '''
@@ -40,21 +51,13 @@ class MapboxMatrixClient(Traceable):
         self._token = token
         self._logger = logger
 
-    def _validate_profile(self, profile):
-        if profile not in VALID_PROFILES:
-            raise ValueError('{profile} is not a valid profile. '
-                             'Valid profiles are: {valid_profiles}'.format(
-                                 profile=profile,
-                                 valid_profiles=', '.join(
-                                     [x for x in VALID_PROFILES])))
-
     def _uri(self, coordinates, profile=DEFAULT_PROFILE):
         return BASEURI.format(profile=profile, coordinates=coordinates,
                               token=self._token)
 
     @qps_retry(qps=1)
     def matrix(self, coordinates, profile=DEFAULT_PROFILE):
-        self._validate_profile(profile)
+        validate_profile(profile)
         validate_coordinates(coordinates,
                              NUM_COORDINATES_MIN, NUM_COORDINATES_MAX)
 
