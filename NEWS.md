@@ -1,3 +1,13 @@
+January 17th, 2018
+==================
+* Version `0.16.0` of the python library
+    * Added Mapbox provider for routing, geocoding and isolines
+* Version `0.30.0` of the server extension
+    * Added Mapbox provider for routing, geocoding and isolines
+    * Fixed a bug that makes impossible to install server side if the client is already installed due a namespace problem
+* Version `0.23.0` of the client
+    * Added Mapbox provider for routing, geocoding and isolines
+
 December 1st, 2017
 ==================
 * Version `0.29.0` of the server extension
