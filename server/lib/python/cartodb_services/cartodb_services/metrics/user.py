@@ -21,7 +21,9 @@ class UserMetricsService:
     SERVICE_GEOCODER_CACHE = 'geocoder_cache'
     SERVICE_HERE_ISOLINES = 'here_isolines'
     SERVICE_MAPZEN_ISOLINES = 'mapzen_isolines'
+    SERVICE_MAPBOX_ISOLINES = 'mapbox_isolines'
     SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
+    SERVICE_MAPBOX_ROUTING = 'routing_mapbox'
     SERVICE_OBSERVATORY = 'obs_general'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
@@ -32,11 +34,12 @@ class UserMetricsService:
         self._orgname = user_geocoder_config.organization
 
     def used_quota(self, service_type, date):
-        if service_type == self.SERVICE_HERE_ISOLINES:
+        if service_type in [self.SERVICE_HERE_ISOLINES,
+                            self.SERVICE_MAPZEN_ISOLINES,
+                            self.SERVICE_MAPBOX_ISOLINES]:
             return self.__used_isolines_quota(service_type, date)
-        if service_type == self.SERVICE_MAPZEN_ISOLINES:
-            return self.__used_isolines_quota(service_type, date)
-        elif service_type == self.SERVICE_MAPZEN_ROUTING:
+        elif service_type in [self.SERVICE_MAPZEN_ROUTING,
+                              self.SERVICE_MAPBOX_ROUTING]:
             return self.__used_routing_quota(service_type, date)
         elif service_type == self.SERVICE_OBSERVATORY:
             return self.__used_observatory_quota(service_type, date)

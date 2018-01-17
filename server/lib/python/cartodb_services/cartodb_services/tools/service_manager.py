@@ -5,9 +5,11 @@ from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
 from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
 from cartodb_services.config import ServiceConfiguration, RateLimitsConfigBuilder
 
+
 class RateLimitExceeded(Exception):
     def __str__(self):
             return repr('Rate limit exceeded')
+
 
 class ServiceManagerBase:
     """
@@ -48,6 +50,8 @@ class ServiceManagerBase:
     @property
     def logger(self):
         return self.logger
+
+
 class ServiceManager(ServiceManagerBase):
     """
     This service manager delegates the configuration parameter details,
@@ -55,13 +59,13 @@ class ServiceManager(ServiceManagerBase):
     It uses the refactored configuration classes.
     """
 
-    def __init__(self, service, config_builder, username, orgname):
+    def __init__(self, service, config_builder, username, orgname, GD=None):
         service_config = ServiceConfiguration(service, username, orgname)
 
         logger_config = LoggerConfigBuilder(service_config.environment, service_config.server).get()
         self.logger = Logger(logger_config)
 
-        self.config = config_builder(service_config.server, service_config.user, service_config.org, username, orgname).get()
+        self.config = config_builder(service_config.server, service_config.user, service_config.org, username, orgname, GD).get()
         rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, username=username, orgname=orgname).get()
 
         redis_metrics_connection = RedisMetricsConnectionFactory(service_config.environment, service_config.server).get()

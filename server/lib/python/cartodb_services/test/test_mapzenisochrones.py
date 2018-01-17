@@ -4,7 +4,7 @@ import requests_mock
 from mock import Mock
 
 from cartodb_services.mapzen import MapzenIsochrones
-from cartodb_services.mapzen.exceptions import ServiceException
+from cartodb_services.tools.exceptions import ServiceException
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
 

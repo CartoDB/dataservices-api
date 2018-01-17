@@ -86,6 +86,14 @@
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: cdb_mapbox_geocode_street_point
+  return_type: Geometry
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
 - name: cdb_mapzen_geocode_street_point
   return_type: Geometry
   params:
@@ -114,7 +122,27 @@
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
 
+- name: cdb_mapbox_isochrone
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
 - name: cdb_mapzen_isochrone
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
+- name: cdb_mapbox_isodistance
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true

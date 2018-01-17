@@ -6,7 +6,8 @@ from exceptions import TimeoutException
 DEFAULT_RETRY_TIMEOUT = 60
 DEFAULT_QUERIES_PER_SECOND = 10
 
-def qps_retry(original_function=None,**options):
+
+def qps_retry(original_function=None, **options):
     """ Query Per Second retry decorator
         The intention of this decorator is to retry requests against third
         party services that has QPS restriction.
@@ -55,7 +56,7 @@ class QPSService:
 
     def retry(self, first_request_time, retry_count):
         elapsed = datetime.now() - first_request_time
-        if elapsed.total_seconds()  > self._retry_timeout:
+        if elapsed.total_seconds() > self._retry_timeout:
             raise TimeoutException()
 
         # inverse qps * (1.5 ^ i) is an increased sleep time of 1.5x per

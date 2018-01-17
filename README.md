@@ -158,6 +158,15 @@ SELECT CDB_Conf_SetConf(
 );
 ```
 
+#### Mapbox configuration
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'mapbox_conf',
+    '{"routing": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "matrix": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
+);
+```
+
 #### Data Observatory
 
 ```sql

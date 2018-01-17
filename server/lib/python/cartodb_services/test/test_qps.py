@@ -2,12 +2,14 @@ import requests
 from unittest import TestCase
 from nose.tools import assert_raises
 from datetime import datetime, date
-from cartodb_services.mapzen.qps import qps_retry
-from cartodb_services.mapzen.exceptions import ServiceException, TimeoutException
+from cartodb_services.tools.qps import qps_retry
+from cartodb_services.tools.exceptions import (ServiceException,
+                                               TimeoutException)
 import requests_mock
 import mock
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
+
 
 @requests_mock.Mocker()
 class TestQPS(TestCase):
@@ -26,7 +28,7 @@ class TestQPS(TestCase):
             return self.QPS_ERROR_MESSAGE
 
         req_mock.register_uri('GET', 'http://localhost/test_qps',
-                       text=_text_cb)
+                              text=_text_cb)
         with self.assertRaises(TimeoutException):
             c = TestClass()
             c.test()
