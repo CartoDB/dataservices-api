@@ -69,7 +69,7 @@ class MapboxGeocoder(Traceable):
         country = [country] if country else None
 
         try:
-            response = self._geocoder.forward(address=', '.join(address),
+            response = self._geocoder.forward(address=', '.join(address).decode('utf-8'),
                                               country=country,
                                               limit=1)
 
