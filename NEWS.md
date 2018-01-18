@@ -1,3 +1,9 @@
+
+January 18th, 2018
+==================
+* Version `0.16.1` of the python library
+    * Fixed encoding problem with Mapbox geocoding (using the Mapbox Python library)
+
 January 17th, 2018
 ==================
 * Version `0.16.0` of the python library
