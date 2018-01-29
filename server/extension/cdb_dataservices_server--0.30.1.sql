@@ -2078,7 +2078,8 @@ RETURNS Geometry AS $$
     country_iso3166 = None
     if country:
       country_iso3 = country_to_iso3(country)
-      country_iso3166 = countries.get(country_iso3).alpha2.lower()
+      if country_iso3:
+        country_iso3166 = countries.get(country_iso3).alpha2.lower()
 
     coordinates = geocoder.geocode(searchtext=searchtext, city=city,
                                    state_province=state_province,
