@@ -5,4 +5,5 @@ MAPBOX_ISOLINES_APIKEY_ROUNDROBIN = 'mapbox_isolines_apikey_roundrobin'
 TRANSPORT_MODE_TO_MAPBOX = {
     'car': 'driving',
     'walk': 'walking',
+    'bicycle': 'cycling',
 }
