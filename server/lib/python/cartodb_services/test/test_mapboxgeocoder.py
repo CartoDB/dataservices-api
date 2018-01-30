@@ -22,8 +22,8 @@ class MapboxGeocoderTestCase(unittest.TestCase):
     def test_valid_request(self):
         place = self.geocoder.geocode(VALID_ADDRESS)
 
-        self.assertEqual(place[0], WELL_KNOWN_LONGITUDE)
-        self.assertEqual(place[1], WELL_KNOWN_LATITUDE)
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE)
 
     def test_valid_request_namedplace(self):
         place = self.geocoder.geocode(searchtext='Barcelona')

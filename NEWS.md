@@ -2,6 +2,8 @@ January 29th, 2018
 ==================
 * Version `0.30.1` of server side
     * Fix for Mapbox geocoding function due to the iso3166 library doesn't support UTF-8 names for the countries
+* Version `0.16.2` of the python library
+    * Fix for Mapbox cycling profile
 
 January 18th, 2018
 ==================
