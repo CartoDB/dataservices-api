@@ -296,3 +296,6 @@ ALTER ROLE "<USER_ROLE>" SET search_path="$user", public, cartodb, cdb_dataservi
 #### Option 2 (from builder)
 
 See [the **Configuring Dataservices** documentation](http://cartodb.readthedocs.io/en/latest/operations/configure_data_services.html)
+
+### Rate limits
+See [docs](https://github.com/CartoDB/dataservices-api/blob/master/doc/rate_limits.md)
