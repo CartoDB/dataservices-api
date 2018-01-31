@@ -1,4 +1,4 @@
-January 29th, 2018
+January 31th, 2018
 ==================
 * Version `0.16.3` of the python library
     * Fix for Mapbox geocoder to handle empty requests and empty responses
