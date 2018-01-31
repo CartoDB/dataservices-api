@@ -118,3 +118,18 @@ class GoogleGeocoderTestCase(unittest.TestCase):
                 searchtext='Calle Eloy Gonzalo 27',
                 city='Madrid',
                 country='España')
+
+    def test_client_data_extraction(self, req_mock):
+        client_id, channel = self.geocoder.parse_client_id('dummy_client_id')
+        self.assertEqual(client_id, 'dummy_client_id')
+        self.assertEqual(channel, None)
+
+    def test_client_data_extraction_with_client_parameter(self, req_mock):
+        client_id, channel = self.geocoder.parse_client_id('client=gme-test')
+        self.assertEqual(client_id, 'gme-test')
+        self.assertEqual(channel, None)
+
+    def test_client_data_extraction_with_client_and_channel_parameter(self, req_mock):
+        client_id, channel = self.geocoder.parse_client_id('client=gme-test&channel=testchannel')
+        self.assertEqual(client_id, 'gme-test')
+        self.assertEqual(channel, 'testchannel')

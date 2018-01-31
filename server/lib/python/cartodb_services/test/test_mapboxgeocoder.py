@@ -34,3 +34,18 @@ class MapboxGeocoderTestCase(unittest.TestCase):
         place = self.geocoder.geocode(searchtext='New York', country='us')
 
         assert place
+
+    def test_empty_request(self):
+        place = self.geocoder.geocode(searchtext='', country=None, city=None, state_province=None)
+
+        assert place == []
+
+    def test_empty_search_text_request(self):
+        place = self.geocoder.geocode(searchtext='     ', country='us', city=None, state_province="")
+
+        assert place == []
+
+    def test_unknown_place_request(self):
+        place = self.geocoder.geocode(searchtext='[unknown]', country='ch', state_province=None, city=None)
+
+        assert place == []
