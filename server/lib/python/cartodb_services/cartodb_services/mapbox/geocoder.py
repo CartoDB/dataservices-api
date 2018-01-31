@@ -60,7 +60,10 @@ class MapboxGeocoder(Traceable):
     @qps_retry(qps=10)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        address = [searchtext]
+        if not searchtext:
+            return []
+        else:
+            address = [searchtext]
         if city:
             address.append(city)
         if state_province:
