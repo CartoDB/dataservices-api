@@ -70,7 +70,7 @@ class HereMapsGeocoder(Traceable):
             if value:
                 params[key] = value
         if not params:
-            raise NoGeocodingParams()
+            return []
         return self._execute_geocode(params)
 
     def _execute_geocode(self, params):

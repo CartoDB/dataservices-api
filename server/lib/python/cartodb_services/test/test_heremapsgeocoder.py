@@ -128,8 +128,8 @@ class HereMapsGeocoderTestCase(unittest.TestCase):
     def test_geocode_address_with_no_params(self, req_mock):
         req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
                        text=self.GOOD_RESPONSE)
-        with self.assertRaises(NoGeocodingParams):
-            self.geocoder.geocode()
+        result = self.geocoder.geocode()
+        self.assertEqual(result, [])
 
     def test_geocode_address_empty_response(self, req_mock):
         req_mock.register_uri('GET', HereMapsGeocoder.PRODUCTION_GEOCODE_JSON_URL,
