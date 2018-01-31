@@ -67,10 +67,10 @@ class HereMapsGeocoder(Traceable):
     def geocode(self, **kwargs):
         params = {}
         for key, value in kwargs.iteritems():
-            if value:
+            if value and value.strip():
                 params[key] = value
         if not params:
-            raise NoGeocodingParams()
+            return []
         return self._execute_geocode(params)
 
     def _execute_geocode(self, params):
