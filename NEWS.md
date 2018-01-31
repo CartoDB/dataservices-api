@@ -2,6 +2,9 @@ January 29th, 2018
 ==================
 * Version `0.16.3` of the python library
     * Fix for Mapbox geocoder to handle empty requests and empty responses
+    * Remove raising an exception when non parameters are passed to the HERE geocoder
+    * Fix for HERE geocoder with non empty requests
+    * Added more coverage to the google geocoder credentials parse logic
 
 January 29th, 2018
 ==================
