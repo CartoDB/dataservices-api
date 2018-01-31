@@ -39,7 +39,7 @@ class MapboxGeocoder(Traceable):
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
 
-        if json_response:
+        if json_response and json_response[ENTRY_FEATURES]:
             feature = json_response[ENTRY_FEATURES][0]
 
             return self._extract_lng_lat_from_feature(feature)
