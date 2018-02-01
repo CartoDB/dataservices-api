@@ -90,6 +90,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.tools import QuotaExceededException
   from cartodb_services.here import HereMapsGeocoder
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
@@ -107,6 +108,8 @@ RETURNS Geometry AS $$
     else:
       service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    return None
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()
@@ -147,7 +150,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  from cartodb_services.tools import ServiceManager
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
   from cartodb_services.mapzen import MapzenGeocoder
   from cartodb_services.tools.country import country_to_iso3
   from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
@@ -174,6 +177,8 @@ RETURNS Geometry AS $$
     else:
       service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    return None
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()
@@ -186,7 +191,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from iso3166 import countries
-  from cartodb_services.tools import ServiceManager
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
   from cartodb_services.mapbox import MapboxGeocoder
   from cartodb_services.tools.country import country_to_iso3
   from cartodb_services.refactor.service.mapbox_geocoder_config import MapboxGeocoderConfigBuilder
@@ -217,6 +222,8 @@ RETURNS Geometry AS $$
     else:
       service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    return None
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()
