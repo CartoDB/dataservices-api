@@ -109,6 +109,7 @@ RETURNS Geometry AS $$
       service_manager.quota_service.increment_empty_service_use()
       return None
   except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
     return None
   except BaseException as e:
     import sys
@@ -178,6 +179,7 @@ RETURNS Geometry AS $$
       service_manager.quota_service.increment_empty_service_use()
       return None
   except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
     return None
   except BaseException as e:
     import sys
@@ -223,6 +225,7 @@ RETURNS Geometry AS $$
       service_manager.quota_service.increment_empty_service_use()
       return None
   except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
     return None
   except BaseException as e:
     import sys
