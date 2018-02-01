@@ -95,9 +95,9 @@ RETURNS Geometry AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
@@ -127,9 +127,9 @@ RETURNS Geometry AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  service_manager.assert_within_limits(quota=False)
 
   try:
+    service_manager.assert_within_limits(quota=False)
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
@@ -140,6 +140,9 @@ RETURNS Geometry AS $$
     else:
       service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()
@@ -160,9 +163,9 @@ RETURNS Geometry AS $$
   cartodb_services.init(plpy, GD)
 
   service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, username, orgname)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
     country_iso3 = None
     if country:
@@ -202,9 +205,9 @@ RETURNS Geometry AS $$
   cartodb_services.init(plpy, GD)
 
   service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = MapboxGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
     country_iso3166 = None

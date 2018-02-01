@@ -11,9 +11,9 @@ RETURNS Geometry AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
@@ -36,6 +36,38 @@ RETURNS Geometry AS $$
     service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.google import GoogleMapsGeocoder
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+
+  try:
+    service_manager.assert_within_limits(quota=False)
+    geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
+    if coordinates:
+      service_manager.quota_service.increment_success_service_use()
+      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+      return point['st_setsrid']
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using google maps')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.tools import ServiceManager, QuotaExceededException
@@ -47,9 +79,9 @@ RETURNS Geometry AS $$
   cartodb_services.init(plpy, GD)
 
   service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, username, orgname)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
     country_iso3 = None
     if country:
@@ -89,9 +121,9 @@ RETURNS Geometry AS $$
   cartodb_services.init(plpy, GD)
 
   service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
-  service_manager.assert_within_limits()
 
   try:
+    service_manager.assert_within_limits()
     geocoder = MapboxGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
     country_iso3166 = None
