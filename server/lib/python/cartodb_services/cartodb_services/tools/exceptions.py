@@ -1,6 +1,5 @@
 import json
 
-
 class TimeoutException(Exception):
     def __str__(self):
         return repr('Timeout requesting to server')
@@ -29,3 +28,11 @@ class WrongParams(Exception):
 class MalformedResult(Exception):
     def __str__(self):
             return repr('Result structure is malformed')
+
+class RateLimitExceeded(Exception):
+    def __str__(self):
+            return repr('Rate limit exceeded')
+
+class QuotaExceededException(Exception):
+    def __str__(self):
+            return repr('You have reached the limit of your quota')
