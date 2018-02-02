@@ -91,6 +91,8 @@ class MapboxRouting(Traceable):
                 return self._parse_routing_response(response.text)
             elif response.status_code == requests.codes.bad_request:
                 return MapboxRoutingResponse(None, None, None)
+            elif response.status_code == requests.codes.unprocessable_entity:
+                return MapboxRoutingResponse(None, None, None)
             else:
                 raise ServiceException(response.status_code, response)
         except requests.Timeout as te:

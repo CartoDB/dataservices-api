@@ -80,6 +80,8 @@ class MapboxGeocoder(Traceable):
                 return self._parse_geocoder_response(response.text)
             elif response.status_code == requests.codes.bad_request:
                 return []
+            elif response.status_code == requests.codes.unprocessable_entity:
+                return []
             else:
                 raise ServiceException(response.status_code, response)
         except requests.Timeout as te:
