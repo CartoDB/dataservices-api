@@ -122,7 +122,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.tools import LegacyServiceManager, QuotaExceededException
   from cartodb_services.google import GoogleMapsGeocoder
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
