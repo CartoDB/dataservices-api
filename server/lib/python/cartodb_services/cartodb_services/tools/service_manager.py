@@ -1,18 +1,10 @@
 from cartodb_services.metrics import QuotaService
 from cartodb_services.tools import Logger
 from cartodb_services.tools import RateLimiter
+from cartodb_services.tools import QuotaExceededException, RateLimitExceeded
 from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
 from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
 from cartodb_services.config import ServiceConfiguration, RateLimitsConfigBuilder
-
-
-class RateLimitExceeded(Exception):
-    def __str__(self):
-            return repr('Rate limit exceeded')
-
-class QuotaExceededException(Exception):
-    def __str__(self):
-            return repr('You have reached the limit of your quota')
 
 
 class ServiceManagerBase:
