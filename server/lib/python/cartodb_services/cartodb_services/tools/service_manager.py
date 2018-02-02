@@ -10,6 +10,10 @@ class RateLimitExceeded(Exception):
     def __str__(self):
             return repr('Rate limit exceeded')
 
+class QuotaExceededException(Exception):
+    def __str__(self):
+            return repr('You have reached the limit of your quota')
+
 
 class ServiceManagerBase:
     """
@@ -37,7 +41,7 @@ class ServiceManagerBase:
         if rate and not self.rate_limiter.check():
             raise RateLimitExceeded()
         if quota and not self.quota_service.check_user_quota():
-            raise Exception('You have reached the limit of your quota')
+            raise QuotaExceededException()
 
     @property
     def config(self):
