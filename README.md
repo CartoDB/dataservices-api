@@ -45,7 +45,7 @@ Steps to deploy a new Data Services API version :
 
   ```sql
   CREATE DATABASE dataservices_db ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
-  CREATE USER dataservices_user;
+  CREATE USER geocoder_api;
   ```
 
 - Install needed extensions in `dataservices_db` database
@@ -90,15 +90,15 @@ Steps to deploy a new Data Services API version :
      ```
      psql -U postgres -d dataservices_db -f src/pg/test/fixtures/load_fixtures.sql
      ```
-   - Give permission to execute and select to the `dataservices_user` user:
+   - Give permission to execute and select to the `geocoder_api` user:
      ```
      psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory VERSION 'dev'; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA cdb_observatory TO dataservices_user; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO dataservices_user; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO dataservices_user; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA observatory TO dataservices_user; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO geocoder_api; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO geocoder_api; COMMIT" -e
+     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA observatory TO geocoder_api; COMMIT" -e
      ```
 
 ### Server configuration
