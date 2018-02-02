@@ -105,6 +105,8 @@ Steps to deploy a new Data Services API version :
 
 Configuration for the different services must be stored in the server database using `CDB_Conf_SetConf()`.
 
+**All the configuration inside brackets [] is optional**
+
 #### Redis configuration
 
 If sentinel is used:
