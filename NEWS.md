@@ -1,3 +1,11 @@
+February 2th, 2018
+==================
+* Version `0.16.4` of the python library
+    * Create a QuotaExceededException instead of using a generic one
+* Version `0.30.2` of server side
+    * Return empty value when the quota is exceeded and don't send the exception to external loggers
+      to avoid noise
+
 January 31th, 2018
 ==================
 * Version `0.16.3` of the python library
