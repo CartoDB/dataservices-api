@@ -1,3 +1,10 @@
+February 5th, 2018
+==================
+* Version `0.16.5` of the python library
+    * Fix displaced routing shape #443
+    * Check for empty coordinates object before converting it to polygon
+    * 422 errors that come from Mapbox now returns an empty result because is a bad input from the user data
+
 February 2th, 2018
 ==================
 * Version `0.16.4` of the python library
