@@ -45,6 +45,8 @@ def marshall_coordinates(coordinates):
 
 def coordinates_to_polygon(coordinates):
     """Convert a Coordinate array coordinates to a PostGIS polygon"""
+    if not coordinates:
+        return None
     coordinates.append(coordinates[0])  # Close the ring
     result_coordinates = []
     for coordinate in coordinates:
