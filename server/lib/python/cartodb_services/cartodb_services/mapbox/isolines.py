@@ -49,6 +49,8 @@ class MapboxIsolines():
         response = self._matrix_client.matrix([origin] + targets,
                                               profile)
         json_response = json.loads(response)
+        if not json_response:
+            return []
 
         costs = [None] * number_of_angles
 
@@ -124,6 +126,9 @@ class MapboxIsolines():
                                 isorange=isorange, profile=profile,
                                 unit_factor=unit_factor,
                                 number_of_angles=number_of_angles)
+
+            if not costs:
+                continue
 
             errors = [(cost - isorange) / float(isorange) for cost in costs]
             max_abs_error = max([abs(e) for e in errors])
