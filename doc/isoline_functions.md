@@ -10,7 +10,7 @@ You can use the isoline functions to retrieve, for example, isochrone lines from
 https://{username}.carto.com/api/v2/sql?q=INSERT INTO {table} (the_geom) SELECT  the_geom FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, 'car', ARRAY[300, 600, 900]::integer[])&api_key={api_key}
 ```
 
-The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [HERE](https://developer.here.com/coverage-info) maps.
+The following functions provide an isoline generator service, based on time or distance. This service uses the isolines service defined for your account. The default service limits the usage of displayed polygons represented on top of [Mapbox](https://www.mapbox.com/) maps.
 
 ## cdb_isodistance(_source geometry, mode text, range integer[], [options text[]]_)
 

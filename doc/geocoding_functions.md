@@ -4,7 +4,7 @@ The [geocoder](https://carto.com/data/geocoder-api/) functions allow you to matc
 
 _**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
 
-Here is an example of how to geocode a single country:
+The following example displays how to geocode a single country:
 
 ```bash
 https://{username}.carto.com/api/v2/sql?q=SELECT cdb_geocode_admin0_polygon('USA')&api_key={api_key}
@@ -312,7 +312,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34
 
 ## Street-Level Geocoder
 
-This function geocodes your data into a point geometry for a street address. CARTO uses several different service providers for street-level geocoding, depending on your platform. If you access CARTO on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [HERE geocoding services](https://developer.here.com/rest-apis/documentation/geocoder/topics/quick-start.html). Additional service providers will be implemented in the future.
+This function geocodes your data into a point geometry for a street address. CARTO uses several different service providers for street-level geocoding, depending on your platform. If you access CARTO on a Google Cloud Platform, [Google Maps geocoding](https://developers.google.com/maps/documentation/geocoding/intro) is applied. All other platform users are provided with [Mapbox geocoding services](https://www.mapbox.com/). [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account._.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) for details and recommendations about quota consumption.
 
