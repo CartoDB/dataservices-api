@@ -3,7 +3,7 @@ from cartodb_services.geocoder.cacheable_geocoder import is_geocoder_cacheable, 
 from cartodb_services.geocoder.geocoder_mapbox import MapboxGeocoder
 from types import MAPBOX, GOOGLE, HERE
 
-# MAPBOX_APIKEY = 'YOUR_MAPBOX_API_KEY'  # We need to pass this as a parameter
+MAPBOX_APIKEY = 'YOUR_MAPBOX_API_KEY'  # We need to pass this as a parameter
 
 
 class GeocoderProxy(Traceable):
