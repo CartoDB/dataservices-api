@@ -1,19 +1,31 @@
 from cartodb_services.metrics import Traceable
 from cartodb_services.geocoder.cacheable_geocoder import is_geocoder_cacheable, CacheableGeocoder
+from cartodb_services.geocoder.geocoder_mapbox import MapboxGeocoder
 from types import MAPBOX, GOOGLE, HERE
+
+# MAPBOX_APIKEY = 'YOUR_MAPBOX_API_KEY'  # We need to pass this as a parameter
 
 
 class GeocoderProxy(Traceable):
-    def __init__(self, geocoderStrategy, logger):
+    def __init__(self, geocoderStrategy, dbconn, logger):
         self._logger = logger
-        geocoder_name = geocoderStrategy.findGeocoder()
-        cacheable = is_geocoder_cacheable(geocoder_name)
+        self._geocoder_name = geocoderStrategy.findGeocoder()
+        cacheable = is_geocoder_cacheable(self._geocoder_name)
+        geocoder = self._get_geocoder(self._geocoder_name)
 
-        self._cacheable_geocoder = CacheableGeocoder(my_geocoder, cacheable, cacheable)
+        self._cacheable_geocoder = CacheableGeocoder(geocoder, dbconn,
+                                                     cacheable, cacheable)
 
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        return self._cacheable_geocoder.geocode(searchtext, city, state_province, country)
+        return self._cacheable_geocoder.geocode(searchtext, city,
+                                                state_province, country)
+
+    def _get_geocoder(self, geocoder_name):
+        if geocoder_name == MAPBOX:
+            return MapboxGeocoder(MAPBOX_APIKEY, self._logger, None)
+
+        return None
 
 
 class GeocoderStrategy():

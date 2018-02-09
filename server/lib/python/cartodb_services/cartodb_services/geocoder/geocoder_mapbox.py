@@ -1,14 +1,20 @@
+'''
+This is a shameless copy of the Mapbox geocoder.
+We will need to refactor it to return the whole response
+and then delete this file.
+'''
 import json
 import requests
 from mapbox import Geocoder
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
+from types import MAPBOX
 
 GEOCODER_NAME = 'geocoder_name'
 EPHEMERAL_GEOCODER = 'mapbox.places'
 PERMANENT_GEOCODER = 'mapbox.places-permanent'
-DEFAULT_GEOCODER = EPHEMERAL_GEOCODER
+DEFAULT_GEOCODER = PERMANENT_GEOCODER
 
 ENTRY_FEATURES = 'features'
 ENTRY_CENTER = 'center'
@@ -28,9 +34,13 @@ class MapboxGeocoder(Traceable):
         self._token = token
         self._logger = logger
         self._geocoder_name = service_params.get(GEOCODER_NAME,
-                                                 EPHEMERAL_GEOCODER)
+                                                 DEFAULT_GEOCODER)
         self._geocoder = Geocoder(access_token=self._token,
                                   name=self._geocoder_name)
+
+    @property
+    def name(self):
+        return MAPBOX
 
     def _extract_lng_lat_from_feature(self, feature):
         geometry = feature[ENTRY_GEOMETRY]
