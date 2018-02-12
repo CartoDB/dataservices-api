@@ -12,7 +12,7 @@ from cartodb_services.tools.qps import qps_retry
 GEOCODER_NAME = 'geocoder_name'
 EPHEMERAL_GEOCODER = 'mapbox.places'
 PERMANENT_GEOCODER = 'mapbox.places-permanent'
-DEFAULT_GEOCODER = EPHEMERAL_GEOCODER
+DEFAULT_GEOCODER = PERMANENT_GEOCODER
 
 ENTRY_FEATURES = 'features'
 ENTRY_CENTER = 'center'
@@ -32,7 +32,7 @@ class MapboxGeocoder(Traceable):
         self._token = token
         self._logger = logger
         self._geocoder_name = service_params.get(GEOCODER_NAME,
-                                                 EPHEMERAL_GEOCODER)
+                                                 DEFAULT_GEOCODER)
         self._geocoder = Geocoder(access_token=self._token,
                                   name=self._geocoder_name)
 
