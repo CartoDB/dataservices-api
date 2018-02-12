@@ -1,3 +1,8 @@
+February 12th, 2018
+==================
+* Version `0.16.6` of the python library
+    * Using Mapbox permanent geocoder #455
+
 February 5th, 2018
 ==================
 * Version `0.16.5` of the python library
