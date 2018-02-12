@@ -59,9 +59,9 @@ Result:
 ```sql
     service     | monthly_quota | used_quota | soft_limit |     provider
 ----------------+---------------+------------+------------+------------------
- isolines       |           100 |          0 | f          | mapzen
- hires_geocoder |           100 |          0 | f          | mapzen
- routing        |            50 |          0 | f          | mapzen
+ isolines       |           100 |          0 | f          | mapbox
+ hires_geocoder |           100 |          0 | f          | mapbox
+ routing        |            50 |          0 | f          | mapbox
  observatory    |             0 |          0 | f          | data observatory
 (4 rows)
 
@@ -100,7 +100,7 @@ Suppose you want to geocode a whole table. In order to check that you have enoug
 SELECT COUNT(*) FROM {tablename} WHERE {street_name_column} IS NOT NULL;
 ```
 
-Result: here's a sample result of 10000 records:
+Result: A sample result of 10000 records:
 
 ```sql
  count
