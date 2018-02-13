@@ -4,7 +4,7 @@ from cartodb_services.mapbox import MapboxMatrixClient
 from cartodb_services.mapbox.matrix_client import DEFAULT_PROFILE
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools import Coordinate
-import credentials
+from credentials import mapbox_api_key
 
 INVALID_TOKEN = 'invalid_token'
 VALID_ORIGIN = Coordinate(-73.989, 40.733)
@@ -22,7 +22,7 @@ INVALID_PROFILE = 'invalid_profile'
 
 class MapboxMatrixTestCase(unittest.TestCase):
     def setUp(self):
-        self.matrix_client = MapboxMatrixClient(token=credentials.mapbox_api_key(),
+        self.matrix_client = MapboxMatrixClient(token=mapbox_api_key(),
                                                 logger=Mock())
 
     def test_invalid_profile(self):

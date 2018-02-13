@@ -4,7 +4,7 @@ from cartodb_services.mapbox import MapboxRouting
 from cartodb_services.mapbox.routing import DEFAULT_PROFILE
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools import Coordinate
-import credentials
+from credentials import mapbox_api_key
 
 INVALID_TOKEN = 'invalid_token'
 VALID_WAYPOINTS = [Coordinate(-73.989, 40.733), Coordinate(-74, 40.733)]
@@ -31,7 +31,7 @@ WELL_KNOWN_LENGTH = 1317.9
 
 class MapboxRoutingTestCase(unittest.TestCase):
     def setUp(self):
-        self.routing = MapboxRouting(token=credentials.mapbox_api_key(), logger=Mock())
+        self.routing = MapboxRouting(token=mapbox_api_key(), logger=Mock())
 
     def test_invalid_profile(self):
         with self.assertRaises(ValueError):

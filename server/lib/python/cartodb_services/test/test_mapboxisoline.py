@@ -7,7 +7,7 @@ from cartodb_services.mapbox.routing import MapboxRouting
 from cartodb_services.tools import Coordinate
 from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
-import credentials
+from credentials import mapbox_api_key
 
 VALID_ORIGIN = Coordinate(-73.989, 40.733)
 
@@ -15,7 +15,7 @@ VALID_ORIGIN = Coordinate(-73.989, 40.733)
 class MapboxIsolinesTestCase(unittest.TestCase):
 
     def setUp(self):
-        matrix_client = MapboxMatrixClient(token=credentials.mapbox_api_key(), logger=Mock())
+        matrix_client = MapboxMatrixClient(token=mapbox_api_key(), logger=Mock())
         self.mapbox_isolines = MapboxIsolines(matrix_client, logger=Mock())
 
     def test_calculate_isochrone(self):

@@ -2,7 +2,7 @@ import unittest
 from mock import Mock
 from cartodb_services.mapbox import MapboxGeocoder
 from cartodb_services.tools.exceptions import ServiceException
-import credentials
+from credentials import mapbox_api_key
 
 INVALID_TOKEN = 'invalid_token'
 VALID_ADDRESS = 'Calle Siempreviva 3, Valladolid'
@@ -12,7 +12,7 @@ WELL_KNOWN_LATITUDE = 41.668654
 
 class MapboxGeocoderTestCase(unittest.TestCase):
     def setUp(self):
-        self.geocoder = MapboxGeocoder(token=credentials.mapbox_api_key(), logger=Mock())
+        self.geocoder = MapboxGeocoder(token=mapbox_api_key(), logger=Mock())
 
     def test_invalid_token(self):
         invalid_geocoder = MapboxGeocoder(token=INVALID_TOKEN, logger=Mock())
