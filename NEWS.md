@@ -1,3 +1,10 @@
+
+February 13th, 2018
+==================
+* Version `0.16.7` of the python library
+    * Pick the first result when Mapbox geocoder returns multiple results #462
+    * Normalize input for Mapbox geocoder #462
+
 February 12th, 2018
 ==================
 * Version `0.16.6` of the python library

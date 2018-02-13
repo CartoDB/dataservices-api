@@ -8,6 +8,7 @@ from mapbox import Geocoder
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
+from cartodb_services.tools.normalize import normalize
 
 GEOCODER_NAME = 'geocoder_name'
 EPHEMERAL_GEOCODER = 'mapbox.places'
@@ -39,10 +40,16 @@ class MapboxGeocoder(Traceable):
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
 
-        if json_response and json_response[ENTRY_FEATURES]:
-            feature = json_response[ENTRY_FEATURES][0]
+        # If Mapbox returns more that one result, take the first one
+        if json_response:
+            if type(json_response) == list:
+                json_response = json_response[0]
 
-            return self._extract_lng_lat_from_feature(feature)
+            if json_response[ENTRY_FEATURES]:
+                feature = json_response[ENTRY_FEATURES][0]
+                return self._extract_lng_lat_from_feature(feature)
+            else:
+                return []
         else:
             return []
 
@@ -61,11 +68,11 @@ class MapboxGeocoder(Traceable):
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
         if searchtext and searchtext.strip():
-            address = [searchtext]
+            address = [normalize(searchtext)]
             if city:
-                address.append(city)
+                address.append(normalize(city))
             if state_province:
-                address.append(state_province)
+                address.append(normalize(state_province))
         else:
             return []
 

@@ -35,6 +35,11 @@ class MapboxGeocoderTestCase(unittest.TestCase):
 
         assert place
 
+    def test_odd_characters(self):
+        place = self.geocoder.geocode(searchtext='Barcelona; &quot;Spain&quot;')
+
+        assert place
+
     def test_empty_request(self):
         place = self.geocoder.geocode(searchtext='', country=None, city=None, state_province=None)
 
