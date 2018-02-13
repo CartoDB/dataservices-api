@@ -15,7 +15,7 @@ VALID_ORIGIN = Coordinate(-73.989, 40.733)
 class MapboxIsolinesTestCase(unittest.TestCase):
 
     def setUp(self):
-        matrix_client = MapboxMatrixClient(token=credentials.api_key(), logger=Mock())
+        matrix_client = MapboxMatrixClient(token=credentials.mapbox_api_key(), logger=Mock())
         self.mapbox_isolines = MapboxIsolines(matrix_client, logger=Mock())
 
     def test_calculate_isochrone(self):

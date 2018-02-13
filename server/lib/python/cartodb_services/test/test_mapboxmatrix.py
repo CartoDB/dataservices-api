@@ -22,7 +22,7 @@ INVALID_PROFILE = 'invalid_profile'
 
 class MapboxMatrixTestCase(unittest.TestCase):
     def setUp(self):
-        self.matrix_client = MapboxMatrixClient(token=credentials.api_key(),
+        self.matrix_client = MapboxMatrixClient(token=credentials.mapbox_api_key(),
                                                 logger=Mock())
 
     def test_invalid_profile(self):

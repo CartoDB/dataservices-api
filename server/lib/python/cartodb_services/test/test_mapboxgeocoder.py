@@ -12,7 +12,7 @@ WELL_KNOWN_LATITUDE = 41.668654
 
 class MapboxGeocoderTestCase(unittest.TestCase):
     def setUp(self):
-        self.geocoder = MapboxGeocoder(token=credentials.api_key(), logger=Mock())
+        self.geocoder = MapboxGeocoder(token=credentials.mapbox_api_key(), logger=Mock())
 
     def test_invalid_token(self):
         invalid_geocoder = MapboxGeocoder(token=INVALID_TOKEN, logger=Mock())

@@ -31,7 +31,7 @@ WELL_KNOWN_LENGTH = 1317.9
 
 class MapboxRoutingTestCase(unittest.TestCase):
     def setUp(self):
-        self.routing = MapboxRouting(token=credentials.api_key(), logger=Mock())
+        self.routing = MapboxRouting(token=credentials.mapbox_api_key(), logger=Mock())
 
     def test_invalid_profile(self):
         with self.assertRaises(ValueError):
