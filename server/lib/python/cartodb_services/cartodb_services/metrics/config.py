@@ -589,8 +589,9 @@ class ServicesDBConfig:
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
+        # We dont use mapzen anymore so we don't need to check for its configuration
         if not mapzen_conf_json:
-            raise ConfigException('Mapzen configuration missing')
+            return
         else:
             mapzen_conf = json.loads(mapzen_conf_json)
             self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
