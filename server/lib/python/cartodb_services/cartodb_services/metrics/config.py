@@ -136,7 +136,7 @@ class RoutingConfig(ServiceConfig):
     ROUTING_PROVIDER_KEY = 'routing_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
-    DEFAULT_PROVIDER = MAPZEN_PROVIDER
+    DEFAULT_PROVIDER = MAPBOX_PROVIDER
     QUOTA_KEY = 'mapzen_routing_quota'
     SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
     METRICS_LOG_KEY = 'routing_log_path'
@@ -226,7 +226,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
     HEREMAPS_PROVIDER = 'heremaps'
-    DEFAULT_PROVIDER = MAPZEN_PROVIDER
+    DEFAULT_PROVIDER = MAPBOX_PROVIDER
     METRICS_LOG_KEY = 'isolines_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None):
@@ -391,7 +391,7 @@ class GeocoderConfig(ServiceConfig):
     USERNAME_KEY = 'username'
     ORGNAME_KEY = 'orgname'
     PERIOD_END_DATE = 'period_end_date'
-    DEFAULT_PROVIDER = MAPZEN_GEOCODER
+    DEFAULT_PROVIDER = MAPBOX_GEOCODER
     METRICS_LOG_KEY = 'geocoder_log_path'
 
     def __init__(self, redis_connection, db_conn, username, orgname=None, forced_provider=None):
@@ -576,50 +576,51 @@ class ServicesDBConfig:
         heremaps_conf_json = self._get_conf('heremaps_conf')
         if not heremaps_conf_json:
             raise ConfigException('Here maps configuration missing')
-        else:
-            heremaps_conf = json.loads(heremaps_conf_json)
-            self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
-            self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
-            self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
-                'geocoder_cost_per_hit']
-            self._heremaps_geocoder_service_params = heremaps_conf['geocoder'].get('service', {})
-            self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
-            self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
-            self._heremaps_isolines_service_params = heremaps_conf['isolines'].get('service', {})
+
+        heremaps_conf = json.loads(heremaps_conf_json)
+        self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
+        self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
+        self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
+            'geocoder_cost_per_hit']
+        self._heremaps_geocoder_service_params = heremaps_conf['geocoder'].get('service', {})
+        self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
+        self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
+        self._heremaps_isolines_service_params = heremaps_conf['isolines'].get('service', {})
 
     def _get_mapzen_config(self):
         mapzen_conf_json = self._get_conf('mapzen_conf')
+        # We dont use mapzen anymore so we don't need to check for its configuration
         if not mapzen_conf_json:
-            raise ConfigException('Mapzen configuration missing')
-        else:
-            mapzen_conf = json.loads(mapzen_conf_json)
-            self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
-            self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
-            self._mapzen_matrix_service_params = mapzen_conf['matrix'].get('service', {})
-            self._mapzen_isochrones_service_params = mapzen_conf.get('isochrones', {}).get('service', {})
-            self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
-            self._mapzen_routing_quota = mapzen_conf['routing']['monthly_quota']
-            self._mapzen_routing_service_params = mapzen_conf['routing'].get('service', {})
-            self._mapzen_geocoder_api_key = mapzen_conf['geocoder']['api_key']
-            self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
-            self._mapzen_geocoder_service_params = mapzen_conf['geocoder'].get('service', {})
+            return
+
+        mapzen_conf = json.loads(mapzen_conf_json)
+        self._mapzen_matrix_api_key = mapzen_conf['matrix']['api_key']
+        self._mapzen_matrix_quota = mapzen_conf['matrix']['monthly_quota']
+        self._mapzen_matrix_service_params = mapzen_conf['matrix'].get('service', {})
+        self._mapzen_isochrones_service_params = mapzen_conf.get('isochrones', {}).get('service', {})
+        self._mapzen_routing_api_key = mapzen_conf['routing']['api_key']
+        self._mapzen_routing_quota = mapzen_conf['routing']['monthly_quota']
+        self._mapzen_routing_service_params = mapzen_conf['routing'].get('service', {})
+        self._mapzen_geocoder_api_key = mapzen_conf['geocoder']['api_key']
+        self._mapzen_geocoder_quota = mapzen_conf['geocoder']['monthly_quota']
+        self._mapzen_geocoder_service_params = mapzen_conf['geocoder'].get('service', {})
 
     def _get_mapbox_config(self):
         mapbox_conf_json = self._get_conf('mapbox_conf')
         if not mapbox_conf_json:
             raise ConfigException('Mapbox configuration missing')
-        else:
-            mapbox_conf = json.loads(mapbox_conf_json)
-            self._mapbox_matrix_api_keys = mapbox_conf['matrix']['api_keys']
-            self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
-            self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})
-            self._mapbox_isochrones_service_params = mapbox_conf.get('isochrones', {}).get('service', {})
-            self._mapbox_routing_api_keys = mapbox_conf['routing']['api_keys']
-            self._mapbox_routing_quota = mapbox_conf['routing']['monthly_quota']
-            self._mapbox_routing_service_params = mapbox_conf['routing'].get('service', {})
-            self._mapbox_geocoder_api_keys = mapbox_conf['geocoder']['api_keys']
-            self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
-            self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
+
+        mapbox_conf = json.loads(mapbox_conf_json)
+        self._mapbox_matrix_api_keys = mapbox_conf['matrix']['api_keys']
+        self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
+        self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})
+        self._mapbox_isochrones_service_params = mapbox_conf.get('isochrones', {}).get('service', {})
+        self._mapbox_routing_api_keys = mapbox_conf['routing']['api_keys']
+        self._mapbox_routing_quota = mapbox_conf['routing']['monthly_quota']
+        self._mapbox_routing_service_params = mapbox_conf['routing'].get('service', {})
+        self._mapbox_geocoder_api_keys = mapbox_conf['geocoder']['api_keys']
+        self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
+        self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
 
     def _get_data_observatory_config(self):
         do_conf_json = self._get_conf('data_observatory_conf')

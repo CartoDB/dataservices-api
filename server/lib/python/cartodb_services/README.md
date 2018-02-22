@@ -24,7 +24,7 @@ NOTE: a system installation is required at present because the library is meant 
 
 
 ## Running the unit tests
-Just run `nosetests test/`
+Just run `MAPBOX_API_KEY=xxx nosetests test/`
 ```shell
 $ nosetests test/
 ......................................................................................................

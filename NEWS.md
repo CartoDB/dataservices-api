@@ -1,3 +1,8 @@
+February 22th, 2018
+==================
+* Version `0.17.0` of the python library
+    * Change default provider to Mapbox
+    * Remove the obligatory nature of the Mapzen configuration due to its deprecation as provider
 
 February 13th, 2018
 ==================

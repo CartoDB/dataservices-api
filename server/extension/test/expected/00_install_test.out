@@ -1,3 +1,5 @@
+-- Only show warning or error messages in the tests output
+SET client_min_messages TO WARNING;
 -- Install dependencies
 CREATE EXTENSION postgis;
 CREATE EXTENSION plpythonu;
