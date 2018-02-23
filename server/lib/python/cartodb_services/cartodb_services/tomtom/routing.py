@@ -11,25 +11,18 @@ from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
+from types import (DEFAULT_PROFILE, VALID_PROFILES, DEFAULT_DEPARTAT)
 
 BASEURI = ('https://api.tomtom.com/routing/1/calculateRoute/'
            '{coordinates}'
            '/json'
            '?key={apikey}'
            '&travelMode={travelmode}'
+           '&departAt={departat}'
            '&computeBestOrder=true')
 
 NUM_WAYPOINTS_MIN = 2
 NUM_WAYPOINTS_MAX = 20
-
-PROFILE_DRIVING = 'car'
-PROFILE_CYCLING = 'bicycle'
-PROFILE_WALKING = 'pedestrian'
-DEFAULT_PROFILE = PROFILE_DRIVING
-
-VALID_PROFILES = [PROFILE_DRIVING,
-                  PROFILE_CYCLING,
-                  PROFILE_WALKING]
 
 ENTRY_ROUTES = 'routes'
 ENTRY_SUMMARY = 'summary'
@@ -51,10 +44,12 @@ class TomTomRouting(Traceable):
         self._apikey = apikey
         self._logger = logger
 
-    def _uri(self, coordinates, profile=DEFAULT_PROFILE):
+    def _uri(self, coordinates, profile=DEFAULT_PROFILE,
+             date_time=DEFAULT_DEPARTAT):
         uri = URITemplate(BASEURI).expand(apikey=self._apikey,
                                           coordinates=coordinates,
-                                          travelmode=profile)
+                                          travelmode=profile,
+                                          departat=date_time)
         return uri
 
     def _validate_profile(self, profile):
@@ -95,13 +90,14 @@ class TomTomRouting(Traceable):
         return geometry
 
     @qps_retry(qps=5)
-    def directions(self, waypoints, profile=DEFAULT_PROFILE):
+    def directions(self, waypoints, profile=DEFAULT_PROFILE,
+                   date_time=DEFAULT_DEPARTAT):
         self._validate_profile(profile)
         validate_coordinates(waypoints, NUM_WAYPOINTS_MIN, NUM_WAYPOINTS_MAX)
 
         coordinates = self._marshall_coordinates(waypoints)
 
-        uri = self._uri(coordinates, profile)
+        uri = self._uri(coordinates, profile, date_time)
 
         try:
             response = requests.get(uri)
