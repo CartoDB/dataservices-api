@@ -4,6 +4,7 @@ Uses the Mapbox Time Matrix service.
 '''
 
 import json
+from cartodb_services.tools import Coordinate
 from cartodb_services.tools.spherical import (get_angles,
                                               calculate_dest_location)
 from cartodb_services.mapbox.matrix_client import (validate_profile,
@@ -11,7 +12,9 @@ from cartodb_services.mapbox.matrix_client import (validate_profile,
                                                    PROFILE_WALKING,
                                                    PROFILE_DRIVING,
                                                    PROFILE_CYCLING,
-                                                   ENTRY_DURATIONS)
+                                                   ENTRY_DURATIONS,
+                                                   ENTRY_DESTINATIONS,
+                                                   ENTRY_LOCATION)
 
 MAX_SPEEDS = {
     PROFILE_WALKING: 3.3333333,  # In m/s, assuming 12km/h walking speed
@@ -53,6 +56,7 @@ class MapboxIsolines():
             return []
 
         costs = [None] * number_of_angles
+        destinations = [None] * number_of_angles
 
         for idx, cost in enumerate(json_response[ENTRY_DURATIONS][0][1:]):
             if cost:
@@ -60,7 +64,11 @@ class MapboxIsolines():
             else:
                 costs[idx] = isorange
 
-        return costs
+        for idx, destination in enumerate(json_response[ENTRY_DESTINATIONS][1:]):
+            destinations[idx] = Coordinate(destination[ENTRY_LOCATION][0],
+                                           destination[ENTRY_LOCATION][1])
+
+        return costs, destinations
 
     def calculate_isochrone(self, origin, time_ranges,
                             profile=DEFAULT_PROFILE):
@@ -122,10 +130,12 @@ class MapboxIsolines():
             # NOTE: sometimes it cannot calculate the cost and returns None.
             #   Just assume isorange and stop the calculations there
 
-            costs = cost_method(origin=origin, targets=location_estimates,
-                                isorange=isorange, profile=profile,
-                                unit_factor=unit_factor,
-                                number_of_angles=number_of_angles)
+            costs, destinations = cost_method(origin=origin,
+                                              targets=location_estimates,
+                                              isorange=isorange,
+                                              profile=profile,
+                                              unit_factor=unit_factor,
+                                              number_of_angles=number_of_angles)
 
             if not costs:
                 continue
@@ -153,7 +163,7 @@ class MapboxIsolines():
         location_estimates_filtered = []
         for i, c in enumerate(costs):
             if c != isorange:
-                location_estimates_filtered.append(location_estimates[i])
+                location_estimates_filtered.append(destinations[i])
 
         return location_estimates_filtered
 
