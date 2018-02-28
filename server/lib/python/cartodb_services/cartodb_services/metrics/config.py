@@ -147,10 +147,12 @@ class RoutingConfig(ServiceConfig):
         self._routing_provider = self._redis_config[self.ROUTING_PROVIDER_KEY]
         if not self._routing_provider:
             self._routing_provider = self.DEFAULT_PROVIDER
-        self._mapzen_api_key = self._db_config.mapzen_routing_api_key
-        self._mapzen_service_params = self._db_config.mapzen_routing_service_params
-        self._mapbox_api_keys = self._db_config.mapbox_routing_api_keys
-        self._mapbox_service_params = self._db_config.mapbox_routing_service_params
+        if self._routing_provider == self.MAPZEN_PROVIDER:
+            self._mapzen_api_key = self._db_config.mapzen_routing_api_key
+            self._mapzen_service_params = self._db_config.mapzen_routing_service_params
+        elif self._routing_provider == self.MAPBOX_PROVIDER:
+            self._mapbox_api_keys = self._db_config.mapbox_routing_api_keys
+            self._mapbox_service_params = self._db_config.mapbox_routing_service_params
         self._set_monthly_quota()
         self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
