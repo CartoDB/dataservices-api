@@ -1,3 +1,9 @@
+
+February 27th, 2018
+==================
+* Version `0.17.1` of the python library
+    * Fix bug when the mapzen credentials are not in the db config and we keep getting them
+
 February 22th, 2018
 ==================
 * Version `0.17.0` of the python library
