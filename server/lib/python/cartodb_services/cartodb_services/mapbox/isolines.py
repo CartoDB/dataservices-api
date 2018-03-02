@@ -162,7 +162,7 @@ class MapboxIsolines():
         # delete points that got None
         location_estimates_filtered = []
         for i, c in enumerate(costs):
-            if c != isorange:
+            if c < isorange * (1 + tolerance):
                 location_estimates_filtered.append(destinations[i])
 
         return location_estimates_filtered
