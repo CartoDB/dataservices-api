@@ -18,3 +18,9 @@ MAX_SPEEDS = {
     PROFILE_CYCLING: 16.67,  # In m/s, assuming 60km/h max speed
     PROFILE_DRIVING: 41.67  # In m/s, assuming 140km/h max speed
 }
+
+TRANSPORT_MODE_TO_TOMTOM = {
+    'car': 'car',
+    'walk': 'pedestrian',
+    'bicycle': 'bicycle',
+}

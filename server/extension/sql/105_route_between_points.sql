@@ -29,6 +29,10 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
       result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(tomtom_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
@@ -61,6 +65,10 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     elif user_routing_config.mapbox_provider:
       mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
       result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
+      result = plpy.execute(tomtom_plan, [username, orgname, waypoints, mode])
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
