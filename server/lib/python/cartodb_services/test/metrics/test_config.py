@@ -7,7 +7,7 @@ from cartodb_services.metrics.config import *
 
 class TestGeocoderUserConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -27,6 +27,9 @@ class TestGeocoderUserConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'mapbox':
                 assert geocoder_config.mapbox_geocoder is True
+                assert geocoder_config.geocoding_quota == 100
+            elif geocoder_provider == 'tomtom':
+                assert geocoder_config.tomtom_geocoder is True
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
@@ -81,7 +84,7 @@ class TestGeocoderUserConfig(TestCase):
 
 class TestGeocoderOrgConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -106,6 +109,9 @@ class TestGeocoderOrgConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'mapbox':
                 assert geocoder_config.mapbox_geocoder is True
+                assert geocoder_config.geocoding_quota == 200
+            elif geocoder_provider == 'tomtom':
+                assert geocoder_config.tomtom_geocoder is True
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
@@ -167,7 +173,7 @@ class TestGeocoderOrgConfig(TestCase):
 
 
 class TestIsolinesUserConfig(TestCase):
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox']
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -183,6 +189,8 @@ class TestIsolinesUserConfig(TestCase):
                 assert isolines_config.service_type is 'mapzen_isolines'
             elif isolines_provider is 'mapbox':
                 assert isolines_config.service_type is 'mapbox_isolines'
+            elif isolines_provider is 'tomtom':
+                assert isolines_config.service_type is 'tomtom_isolines'
             else:
                 assert isolines_config.service_type is 'here_isolines'
             assert isolines_config.isolines_quota == 100
@@ -226,7 +234,7 @@ class TestIsolinesUserConfig(TestCase):
 
 class TestIsolinesOrgConfig(TestCase):
 
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox']
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()

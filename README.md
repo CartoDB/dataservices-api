@@ -171,6 +171,15 @@ SELECT CDB_Conf_SetConf(
 );
 ```
 
+#### TomTom configuration
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'tomtom_conf',
+    '{"routing": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "isolines": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
+);
+```
+
 #### Data Observatory
 
 ```sql

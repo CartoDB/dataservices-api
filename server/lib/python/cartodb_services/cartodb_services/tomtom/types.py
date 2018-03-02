@@ -1,3 +1,7 @@
+TOMTOM_ROUTING_APIKEY_ROUNDROBIN = 'tomtom_routing_apikey_roundrobin'
+TOMTOM_GEOCODER_APIKEY_ROUNDROBIN = 'tomtom_geocoder_apikey_roundrobin'
+TOMTOM_ISOLINES_APIKEY_ROUNDROBIN = 'tomtom_isolines_apikey_roundrobin'
+
 PROFILE_DRIVING = 'car'
 PROFILE_CYCLING = 'bicycle'
 PROFILE_WALKING = 'pedestrian'
