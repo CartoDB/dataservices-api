@@ -54,7 +54,7 @@ class TomTomIsolines():
                                      [x for x in VALID_PROFILES])))
 
     def _parse_coordinates(self, boundary):
-        return [Coordinate(c[ENTRY_LONGITUDE], c[ENTRY_LONGITUDE]) for c in boundary]
+        return [Coordinate(c[ENTRY_LONGITUDE], c[ENTRY_LATITUDE]) for c in boundary]
 
     def _parse_reachablerange_response(self, response):
         json_response = json.loads(response)
@@ -107,7 +107,6 @@ class TomTomIsolines():
                                                   time_range=time_range,
                                                   profile=profile,
                                                   date_time=date_time)
-
             isochrones.append(TomTomIsochronesResponse(coordinates,
                                                        time_range))
         return isochrones
