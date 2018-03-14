@@ -30,7 +30,7 @@ class TestQuotaChecker(TestCase):
             username = self.username,
             organization = None,
             service_type = self.service_type,
-            monthly_quota = 1000,
+            routing_quota = 1000,
             period_end_date = datetime.today(),
             soft_limit = False
         )
@@ -43,7 +43,7 @@ class TestQuotaChecker(TestCase):
             username = self.username,
             organization = None,
             service_type = self.service_type,
-            monthly_quota = 1000,
+            routing_quota = 1000,
             period_end_date = datetime.today(),
             soft_limit = False
         )
@@ -61,7 +61,7 @@ class TestQuotaChecker(TestCase):
             username = self.username,
             organization = None,
             service_type = self.service_type,
-            monthly_quota = 1000,
+            routing_quota = 1000,
             period_end_date = datetime.today(),
             soft_limit = False
         )
@@ -75,7 +75,7 @@ class TestQuotaChecker(TestCase):
             username = self.username,
             organization = None,
             service_type = self.service_type,
-            monthly_quota = 1000,
+            routing_quota = 1000,
             period_end_date = datetime.today(),
             soft_limit = True
         )
