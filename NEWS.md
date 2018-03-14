@@ -1,4 +1,9 @@
 
+March 14th, 2018
+==================
+* Version `0.30.3` of server side
+    * Avoid reaching provider for empty geocodings. Stopping in the server side PL/Python functions
+
 February 22th, 2018
 ==================
 * Version `0.17.2` of the python library
