@@ -1,4 +1,9 @@
 
+March 14th, 2018
+================
+* Version `0.17.3` of the python library
+    * Fix bug with Mapbox routing not using the proper quota value
+
 February 22th, 2018
 ==================
 * Version `0.17.2` of the python library
