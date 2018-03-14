@@ -301,7 +301,7 @@ class TestRoutingConfig(TestCase):
         self._redis_conn.hset(self._user_key, 'mapzen_routing_quota', 1000)
         orgname = None
         config = RoutingConfig(self._redis_conn, self._db_conn, self._username, orgname)
-        assert config.monthly_quota == 1000
+        assert config.routing_quota == 1000
 
     def test_org_quota_overrides_user_quota(self):
         self._redis_conn.hset(self._user_key, 'mapzen_routing_quota', 1000)
@@ -315,7 +315,7 @@ class TestRoutingConfig(TestCase):
         self._redis_conn.hset(orgname_key, 'here_isolines_quota', 0)
 
         config = RoutingConfig(self._redis_conn, self._db_conn, self._username, orgname)
-        assert config.monthly_quota == 5000
+        assert config.routing_quota == 5000
 
     def test_should_have_soft_limit_false_by_default(self):
         orgname = None

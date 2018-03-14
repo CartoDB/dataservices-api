@@ -1,6 +1,8 @@
 
 March 14th, 2018
 ==================
+* Version `0.17.3` of the python library
+    * Fix bug with Mapbox routing not using the proper quota value
 * Version `0.30.3` of server side
     * Avoid reaching provider for empty geocodings. Stopping in the server side PL/Python functions
 
