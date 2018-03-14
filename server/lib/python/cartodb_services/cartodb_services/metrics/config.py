@@ -197,6 +197,10 @@ class RoutingConfig(ServiceConfig):
         return self._routing_quota
 
     @property
+    def monthly_quota(self):
+        return self._routing_quota
+
+    @property
     def period_end_date(self):
         return self._period_end_date
 
