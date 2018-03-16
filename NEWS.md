@@ -1,4 +1,9 @@
 
+March 16th, 2018
+================
+* Version `0.30.3` of server side
+    * Fix problem with invalid Mapbox isolines
+
 March 14th, 2018
 ================
 * Version `0.17.4` of the python library
