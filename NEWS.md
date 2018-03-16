@@ -1,8 +1,20 @@
 
-March 14th, 2018
-==================
+March 16th, 2018
+================
+* Version `0.30.4` of server side
+    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries
+
+March 16th, 2018
+================
 * Version `0.30.3` of server side
-    * Avoid reaching provider for empty geocodings. Stopping in the server side PL/Python functions
+    * Fix problem with invalid Mapbox isolines
+
+March 14th, 2018
+================
+* Version `0.17.4` of the python library
+    * Fix bug with previous version when checking quotas
+* Version `0.17.3` of the python library
+    * Fix bug with Mapbox routing not using the proper quota value
 
 February 22th, 2018
 ==================
