@@ -1,6 +1,6 @@
 --DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.30.2'" to load this file. \quit
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.30.4'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
 DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_tomtom_route_with_waypoints(TEXT, TEXT, geometry(Point, 4326)[], TEXT);

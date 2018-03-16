@@ -157,7 +157,7 @@ class RoutingConfig(ServiceConfig):
         elif self._routing_provider == self.TOMTOM_PROVIDER:
             self._tomtom_api_keys = self._db_config.tomtom_routing_api_keys
             self._tomtom_service_params = self._db_config.tomtom_routing_service_params
-        self._set_monthly_quota()
+        self._routing_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
         self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
 
@@ -211,8 +211,12 @@ class RoutingConfig(ServiceConfig):
         return self._tomtom_service_params
 
     @property
+    def routing_quota(self):
+        return self._routing_quota
+
+    @property
     def monthly_quota(self):
-        return self._monthly_quota
+        return self._routing_quota
 
     @property
     def period_end_date(self):
@@ -221,9 +225,6 @@ class RoutingConfig(ServiceConfig):
     @property
     def soft_limit(self):
         return self._soft_limit
-
-    def _set_monthly_quota(self):
-        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
 
     def _set_soft_limit(self):
         if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':

@@ -128,7 +128,7 @@ class QuotaChecker:
             return False
 
     def __check_routing_quota(self):
-        user_quota = self._user_service_config.monthly_quota
+        user_quota = self._user_service_config.routing_quota
         today = date.today()
         service_type = self._user_service_config.service_type
         current_used = self._user_service.used_quota(service_type, today)

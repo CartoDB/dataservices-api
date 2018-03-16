@@ -276,7 +276,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
         # -- TODO encapsulate this block into a func/method
         locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
         wkt_coordinates = ','.join(["%f %f" % (l.longitude, l.latitude) for l in locations])
-        sql = "SELECT ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326) as geom".format(wkt_coordinates)
+        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3) as geom".format(wkt_coordinates)
         multipolygon = plpy.execute(sql, 1)[0]['geom']
       else:
         multipolygon = None

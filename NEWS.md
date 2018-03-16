@@ -1,4 +1,26 @@
 
+March 16th, 2018
+================
+* Version `0.30.4` of server side
+    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries
+
+March 16th, 2018
+================
+* Version `0.30.3` of server side
+    * Fix problem with invalid Mapbox isolines
+
+March 14th, 2018
+================
+* Version `0.17.4` of the python library
+    * Fix bug with previous version when checking quotas
+* Version `0.17.3` of the python library
+    * Fix bug with Mapbox routing not using the proper quota value
+
+February 22th, 2018
+==================
+* Version `0.17.2` of the python library
+    * Fix bug with Mapbox isolines not stopping at the seacoast
+
 February 27th, 2018
 ==================
 * Version `0.17.1` of the python library
