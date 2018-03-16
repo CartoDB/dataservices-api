@@ -1,6 +1,11 @@
 
 March 16th, 2018
 ================
+* Version `0.30.4` of server side
+    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries
+
+March 16th, 2018
+================
 * Version `0.30.3` of server side
     * Fix problem with invalid Mapbox isolines
 
