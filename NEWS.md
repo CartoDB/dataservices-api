@@ -1,3 +1,9 @@
+
+March 28th, 2018
+================
+* Version `0.30.5` of server side and `0.17.6` of the python library
+    * All the returned polygons are now always MULTIPOLYGON #488
+
 March 27th, 2018
 ================
 * Version `0.17.5` of python library
