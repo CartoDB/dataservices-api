@@ -64,17 +64,30 @@ class MapboxGeocoder(Traceable):
         latitude = location[1]
         return [longitude, latitude]
 
+    def _validate_input(self, searchtext, city=None, state_province=None,
+                        country=None):
+        if searchtext and searchtext.strip():
+            return True
+        elif city:
+            return True
+        elif state_province:
+            return True
+
+        return False
+
     @qps_retry(qps=10)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        if searchtext and searchtext.strip():
-            address = [normalize(searchtext)]
-            if city:
-                address.append(normalize(city))
-            if state_province:
-                address.append(normalize(state_province))
-        else:
+        if not self._validate_input(searchtext, city, state_province, country):
             return []
+
+        address = []
+        if searchtext and searchtext.strip():
+            address.append(normalize(searchtext))
+        if city:
+            address.append(normalize(city))
+        if state_province:
+            address.append(normalize(state_province))
 
         country = [country] if country else None
 

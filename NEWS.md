@@ -1,25 +1,32 @@
 
-March 16th, 2018
+March 28th, 2018
 ================
-* Version `0.30.4` of server side
-    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries
+* Version `0.30.5` of server side and `0.17.6` of the python library
+    * All the returned polygons are now always MULTIPOLYGON #488
+
+March 27th, 2018
+================
+* Version `0.17.5` of python library
+    * Avoid reaching provider for empty geocodings (but still incrementing empty service use) #476
 
 March 16th, 2018
 ================
 * Version `0.30.3` of server side
-    * Fix problem with invalid Mapbox isolines
+    * Fix problem with invalid Mapbox isolines #483
+* Version `0.30.4` of server side
+    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries #486
 
 March 14th, 2018
 ================
 * Version `0.17.4` of the python library
-    * Fix bug with previous version when checking quotas
+    * Fix bug with previous version when checking quotas #480
 * Version `0.17.3` of the python library
-    * Fix bug with Mapbox routing not using the proper quota value
+    * Fix bug with Mapbox routing not using the proper quota value #477
 
 February 22th, 2018
 ==================
 * Version `0.17.2` of the python library
-    * Fix bug with Mapbox isolines not stopping at the seacoast
+    * Fix bug with Mapbox isolines not stopping at the seacoast #471
 
 February 27th, 2018
 ==================

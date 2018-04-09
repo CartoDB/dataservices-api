@@ -28,7 +28,7 @@ def coordinates_to_polygon(coordinates):
     wkt_coordinates = ','.join(result_coordinates)
 
     try:
-        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MakePolygon(ST_GeomFromText('LINESTRING({0})', 4326))),3) as geom".format(wkt_coordinates)
+        sql = "SELECT st_multi(ST_CollectionExtract(ST_MakeValid(ST_MakePolygon(ST_GeomFromText('LINESTRING({0})', 4326))),3)) as geom".format(wkt_coordinates)
         geometry = plpy.execute(sql, 1)[0]['geom']
     except BaseException as e:
         plpy.warning("Can't generate POLYGON from coordinates: {0}".format(e))
