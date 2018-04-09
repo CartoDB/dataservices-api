@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 from mock import Mock
 from cartodb_services.tomtom import TomTomGeocoder
@@ -5,7 +7,7 @@ from cartodb_services.tools.exceptions import ServiceException
 from credentials import tomtom_api_key
 
 INVALID_APIKEY = 'invalid_apikey'
-VALID_ADDRESS = 'Plaza Mayor 3, Valladolid'
+VALID_ADDRESS = u'Mantería 3, Valladolid'.encode('utf-8')
 
 
 class TomTomGeocoderTestCase(unittest.TestCase):

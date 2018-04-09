@@ -1,3 +1,6 @@
+#!/usr/local/bin/python
+# -*- coding: utf-8 -*-
+
 import json
 import requests
 from uritemplate import URITemplate
@@ -62,6 +65,15 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
+        if searchtext:
+            searchtext = searchtext.decode('utf-8')
+        if city:
+            city = city.decode('utf-8')
+        if state_province:
+            state_province = state_province.decode('utf-8')
+        if country:
+            country = country.decode('utf-8')
+
         if not self._validate_input(searchtext, city, state_province, country):
             return []
 
