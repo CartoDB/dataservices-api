@@ -12,7 +12,9 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger):
+  params = {'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
+
+  with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.heremaps_geocoder:
       here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
       return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']

@@ -154,7 +154,9 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger):
+  params = {'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
+
+  with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.heremaps_geocoder:
       here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
       return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
@@ -379,7 +381,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.google_services_user:
     raise Exception('This service is not available for google service users.')
 
-  with metrics('cb_isodistance', user_isolines_config, logger):
+  params = {'source': source, 'mode': mode, 'range': range, 'options': options}
+
+  with metrics('cdb_isodistance', user_isolines_config, logger, params):
     if user_isolines_config.heremaps_provider:
       here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
@@ -428,7 +432,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.google_services_user:
     raise Exception('This service is not available for google service users.')
 
-  with metrics('cb_isochrone', user_isolines_config, logger):
+  params = {'source': source, 'mode': mode, 'range': range, 'options': options}
+
+  with metrics('cdb_isochrone', user_isolines_config, logger, params):
     if user_isolines_config.heremaps_provider:
       here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(here_plan, [username, orgname, source, mode, range, options])

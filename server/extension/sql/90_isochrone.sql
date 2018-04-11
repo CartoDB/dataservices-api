@@ -14,7 +14,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.google_services_user:
     raise Exception('This service is not available for google service users.')
 
-  with metrics('cb_isochrone', user_isolines_config, logger):
+  params = {'source': source, 'mode': mode, 'range': range, 'options': options}
+
+  with metrics('cdb_isochrone', user_isolines_config, logger, params):
     if user_isolines_config.heremaps_provider:
       here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
