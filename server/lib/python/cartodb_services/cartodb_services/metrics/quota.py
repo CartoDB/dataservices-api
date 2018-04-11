@@ -72,7 +72,7 @@ class QuotaChecker:
         if re.match('^geocoder_',
                     self._user_service_config.service_type) is not None:
             return self.__check_geocoder_quota()
-        elif re.match('_isolines$',
+        elif re.match('.*_isolines$',
                       self._user_service_config.service_type) is not None:
             return self.__check_isolines_quota()
         elif re.match('^routing_',
