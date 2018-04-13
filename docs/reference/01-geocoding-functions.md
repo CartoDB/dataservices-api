@@ -1,3 +1,30 @@
+## Introduction
+
+The CARTO Data Services API offers a set of location based services that can be used to programatically customize subsets of data for your visualizations.
+
+The contents described in this document are subject to CARTO's [Terms of Service](https://carto.com/legal/)
+
+## Authentication
+
+Data Services API, like any other CARTO platform's component, requires using an API Key. From your CARTO dashboard, click _[Your API keys](https://carto.com/login)_ from the avatar drop-down menu to view your uniquely generated API Key for managing data with CARTO Engine.
+
+![Your API Keys](../img/avatar.gif)
+
+Learn more about the [basics of authorization]({{site.fundamental_docs}}/authorization/), or dig into the details of [Auth API]({{site.authapi_docs}}/), if you want to know more about this part of CARTO platform.
+
+The examples in this documentation may include a placeholder for the API Key. Ensure that you modify any placeholder parameters with your own credentials.
+
+## Versioning
+
+Data Services API uses [Semantic Versioning](http://semver.org/). View our Github repository to find tags for each [release](https://github.com/CartoDB/data-services-api/releases).
+
+## Error handling
+
+Most of the errors fired by the API are handled by the API itself. It triggers a `CartoError` every time an error happens.
+
+A cartoError is an object containing a single `message` field with a string explaining the error.
+
+
 ## Geocoding Functions
 
 The [geocoder](https://carto.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CARTO SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CARTO provides functions for several different categories of geocoding through the Data Services API.
