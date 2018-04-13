@@ -1,6 +1,6 @@
 ## Authentication
 
-Data Services API, like any other [CARTO platform's component]({{site.fundamental_docs}}/authorization/), requires using an API Key. From your CARTO dashboard, click _[Your API keys](https://carto.com/login)_ from the avatar drop-down menu to view your uniquely generated API Key for managing data with CARTO Engine.
+Data Services API, like any other [CARTO platform's component]({{site.fundamental_docs}}/components/), requires using an API Key. From your CARTO dashboard, click _[Your API keys](https://carto.com/login)_ from the avatar drop-down menu to view your uniquely generated API Key for managing data with CARTO Engine.
 
 ![Your API Keys](../img/avatar.gif)
 
