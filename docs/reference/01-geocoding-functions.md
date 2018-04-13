@@ -2,7 +2,7 @@
 
 The [geocoder](https://carto.com/data/geocoder-api/) functions allow you to match your data with geometries on your map. This geocoding service can be used programatically to geocode datasets via the CARTO SQL API. It is fed from _Open Data_ and it serves geometries for countries, provinces, states, cities, postal codes, IP addresses and street addresses. CARTO provides functions for several different categories of geocoding through the Data Services API.
 
-_**This service is subject to quota limitations and extra fees may apply**. View the [Quota Information](https://carto.com/docs/carto-engine/dataservices-api/quota-information/) section for details and recommendations about to quota consumption._
+**Warning:** This service is subject to quota limitations and extra fees may apply. View the [Quota Information]({{site.dataservicesapi_docs}}/support/quota-information/) section for details and recommendations about to quota consumption.
 
 The following example displays how to geocode a single country:
 
@@ -43,16 +43,12 @@ Name | Type | Description
 
 Geometry (polygon, EPSG 4326) or null
 
-##### Example
-
-###### Update the geometry of a table to geocode it
-
+**Example:**
+Update the geometry of a table to geocode it
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ```
-
-###### Insert a geocoded row into a table
-
+Insert a geocoded row into a table
 ```bash
 INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin0_polygon('France')
 ```
