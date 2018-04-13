@@ -43,12 +43,15 @@ Name | Type | Description
 
 Geometry (polygon, EPSG 4326) or null
 
-**Example:**
-Update the geometry of a table to geocode it
+### Example
+
+#### Update the geometry of a table to geocode it
+
 ```bash
 UPDATE {tablename} SET the_geom = cdb_geocode_admin0_polygon({country_column})
 ```
-Insert a geocoded row into a table
+
+#### Insert a geocoded row into a table
 ```bash
 INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_admin0_polygon('France')
 ```
