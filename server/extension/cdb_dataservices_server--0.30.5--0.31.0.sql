@@ -4,4 +4,4 @@
 
 -- HERE goes your code to upgrade/downgrade
 ALTER TYPE cdb_dataservices_server.obs_meta_timespan ADD ATTRIBUTE timespan_alias text;
-ALTER TYPE cdb_dataservices_server.obs_meta_timespan ADD ATTRIBUTE timespan_range datarange;
+ALTER TYPE cdb_dataservices_server.obs_meta_timespan ADD ATTRIBUTE timespan_range daterange;
