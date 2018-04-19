@@ -68,7 +68,7 @@ RETURNS SETOF cdb_dataservices_server.obs_meta_geometry AS $$
   SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan, number_geometries);
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
-CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb);
+CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb, timespan_alias text, timespan_range daterange);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableTimespans(
   username TEXT,

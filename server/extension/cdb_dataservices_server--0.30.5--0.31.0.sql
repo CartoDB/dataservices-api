@@ -3,3 +3,5 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.31.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
+ALTER TYPE cdb_dataservices_server.obs_meta_timespan ADD ATTRIBUTE timespan_alias text;
+ALTER TYPE cdb_dataservices_server.obs_meta_timespan ADD ATTRIBUTE timespan_range datarange;
