@@ -1,3 +1,7 @@
+April xxth, 2018
+================
+* Version `0.31.0` of server side and `0.24.0` of the client side
+    * Added two new attributes to the meta_timespan custom type
 
 March 28th, 2018
 ================
