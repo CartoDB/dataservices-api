@@ -18,7 +18,9 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_route_with_point', user_routing_config, logger):
+  params = {'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
+
+  with metrics('cdb_route_with_point', user_routing_config, logger, params):
     waypoints = [origin, destination]
 
     if user_routing_config.mapzen_provider:
@@ -57,7 +59,9 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_route_with_waypoints', user_routing_config, logger):
+  params = {'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
+
+  with metrics('cdb_route_with_waypoints', user_routing_config, logger, params):
     if user_routing_config.mapzen_provider:
       mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4) as route;", ["text", "text", "geometry(Point, 4326)[]", "text"])
       result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode])
