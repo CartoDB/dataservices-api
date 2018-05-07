@@ -136,6 +136,7 @@ class RoutingConfig(ServiceConfig):
     ROUTING_PROVIDER_KEY = 'routing_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
+    TOMTOM_PROVIDER = 'tomtom'
     DEFAULT_PROVIDER = MAPBOX_PROVIDER
     QUOTA_KEY = 'mapzen_routing_quota'
     SOFT_LIMIT_KEY = 'soft_mapzen_routing_limit'
@@ -153,6 +154,9 @@ class RoutingConfig(ServiceConfig):
         elif self._routing_provider == self.MAPBOX_PROVIDER:
             self._mapbox_api_keys = self._db_config.mapbox_routing_api_keys
             self._mapbox_service_params = self._db_config.mapbox_routing_service_params
+        elif self._routing_provider == self.TOMTOM_PROVIDER:
+            self._tomtom_api_keys = self._db_config.tomtom_routing_api_keys
+            self._tomtom_service_params = self._db_config.tomtom_routing_service_params
         self._routing_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
         self._set_soft_limit()
         self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
@@ -163,6 +167,8 @@ class RoutingConfig(ServiceConfig):
             return 'routing_mapzen'
         elif self._routing_provider == self.MAPBOX_PROVIDER:
             return 'routing_mapbox'
+        elif self._routing_provider == self.TOMTOM_PROVIDER:
+            return 'routing_tomtom'
 
     @property
     def provider(self):
@@ -191,6 +197,18 @@ class RoutingConfig(ServiceConfig):
     @property
     def mapbox_service_params(self):
         return self._mapbox_service_params
+
+    @property
+    def tomtom_provider(self):
+        return self._routing_provider == self.TOMTOM_PROVIDER
+
+    @property
+    def tomtom_api_keys(self):
+        return self._tomtom_api_keys
+
+    @property
+    def tomtom_service_params(self):
+        return self._tomtom_service_params
 
     @property
     def routing_quota(self):
@@ -228,6 +246,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
+    TOMTOM_PROVIDER = 'tomtom'
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = MAPBOX_PROVIDER
     METRICS_LOG_KEY = 'isolines_log_path'
@@ -261,6 +280,9 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapbox_matrix_api_keys = self._db_config.mapbox_matrix_api_keys
             self._mapbox_matrix_service_params = db_config.mapbox_matrix_service_params
             self._mapbox_isochrones_service_params = db_config.mapbox_isochrones_service_params
+        elif self._isolines_provider == self.TOMTOM_PROVIDER:
+            self._tomtom_isolinesx_api_keys = self._db_config.tomtom_isolines_api_keys
+            self._tomtom_isolines_service_params = db_config.tomtom_isolines_service_params
 
     @property
     def service_type(self):
@@ -270,6 +292,8 @@ class IsolinesRoutingConfig(ServiceConfig):
             return 'mapzen_isolines'
         elif self._isolines_provider == self.MAPBOX_PROVIDER:
             return 'mapbox_isolines'
+        elif self._isolines_provider == self.TOMTOM_PROVIDER:
+            return 'tomtom_isolines'
 
     @property
     def google_services_user(self):
@@ -332,6 +356,18 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._isolines_provider == self.MAPBOX_PROVIDER
 
     @property
+    def tomtom_isolines_api_keys(self):
+        return self._tomtom_isolines_api_keys
+
+    @property
+    def tomtom_isolines_service_params(self):
+        return self._tomtom_isolines_service_params
+
+    @property
+    def tomtom_provider(self):
+        return self._isolines_provider == self.TOMTOM_PROVIDER
+
+    @property
     def heremaps_provider(self):
         return self._isolines_provider == self.HEREMAPS_PROVIDER
 
@@ -389,6 +425,8 @@ class GeocoderConfig(ServiceConfig):
     GEOCODER_PROVIDER = 'geocoder_provider'
     MAPBOX_GEOCODER = 'mapbox'
     MAPBOX_GEOCODER_API_KEYS = 'mapbox_geocoder_api_keys'
+    TOMTOM_GEOCODER = 'tomtom'
+    TOMTOM_GEOCODER_API_KEYS = 'tomtom_geocoder_api_keys'
     QUOTA_KEY = 'geocoding_quota'
     SOFT_LIMIT_KEY = 'soft_geocoding_limit'
     USERNAME_KEY = 'username'
@@ -418,6 +456,9 @@ class GeocoderConfig(ServiceConfig):
         elif self._geocoder_provider == self.MAPBOX_GEOCODER:
             if not self.mapbox_api_keys:
                 raise ConfigException("""Mapbox config is not set up""")
+        elif self._geocoder_provider == self.TOMTOM_GEOCODER:
+            if not self.tomtom_api_keys:
+                raise ConfigException("""TomTom config is not set up""")
 
         return True
 
@@ -453,6 +494,10 @@ class GeocoderConfig(ServiceConfig):
             self._mapbox_api_keys = db_config.mapbox_geocoder_api_keys
             self._cost_per_hit = 0
             self._mapbox_service_params = db_config.mapbox_geocoder_service_params
+        elif self._geocoder_provider == self.TOMTOM_GEOCODER:
+            self._tomtom_api_keys = db_config.tomtom_geocoder_api_keys
+            self._cost_per_hit = 0
+            self._tomtom_service_params = db_config.tomtom_geocoder_service_params
 
     @property
     def service_type(self):
@@ -462,6 +507,8 @@ class GeocoderConfig(ServiceConfig):
             return 'geocoder_mapzen'
         elif self._geocoder_provider == self.MAPBOX_GEOCODER:
             return 'geocoder_mapbox'
+        elif self._geocoder_provider == self.TOMTOM_GEOCODER:
+            return 'geocoder_tomtom'
         elif self._geocoder_provider == self.NOKIA_GEOCODER:
             return 'geocoder_here'
 
@@ -480,6 +527,10 @@ class GeocoderConfig(ServiceConfig):
     @property
     def mapbox_geocoder(self):
         return self._geocoder_provider == self.MAPBOX_GEOCODER
+
+    @property
+    def tomtom_geocoder(self):
+        return self._geocoder_provider == self.TOMTOM_GEOCODER
 
     @property
     def google_client_id(self):
@@ -533,6 +584,14 @@ class GeocoderConfig(ServiceConfig):
         return self._mapbox_service_params
 
     @property
+    def tomtom_api_keys(self):
+        return self._tomtom_api_keys
+
+    @property
+    def tomtom_service_params(self):
+        return self._tomtom_service_params
+
+    @property
     def is_high_resolution(self):
         return True
 
@@ -562,6 +621,7 @@ class ServicesDBConfig:
         self._get_here_config()
         self._get_mapzen_config()
         self._get_mapbox_config()
+        self._get_tomtom_config()
         self._get_data_observatory_config()
 
     def _get_server_config(self):
@@ -624,6 +684,22 @@ class ServicesDBConfig:
         self._mapbox_geocoder_api_keys = mapbox_conf['geocoder']['api_keys']
         self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
         self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
+
+    def _get_tomtom_config(self):
+        tomtom_conf_json = self._get_conf('tomtom_conf')
+        if not tomtom_conf_json:
+            raise ConfigException('TomTom configuration missing')
+        else:
+            tomtom_conf = json.loads(tomtom_conf_json)
+            self._tomtom_isolines_api_keys = tomtom_conf['isolines']['api_keys']
+            self._tomtom_isolines_quota = tomtom_conf['isolines']['monthly_quota']
+            self._tomtom_isolines_service_params = tomtom_conf.get('isolines', {}).get('service', {})
+            self._tomtom_routing_api_keys = tomtom_conf['routing']['api_keys']
+            self._tomtom_routing_quota = tomtom_conf['routing']['monthly_quota']
+            self._tomtom_routing_service_params = tomtom_conf['routing'].get('service', {})
+            self._tomtom_geocoder_api_keys = tomtom_conf['geocoder']['api_keys']
+            self._tomtom_geocoder_quota = tomtom_conf['geocoder']['monthly_quota']
+            self._tomtom_geocoder_service_params = tomtom_conf['geocoder'].get('service', {})
 
     def _get_data_observatory_config(self):
         do_conf_json = self._get_conf('data_observatory_conf')
@@ -757,6 +833,42 @@ class ServicesDBConfig:
     @property
     def mapbox_geocoder_service_params(self):
         return self._mapbox_geocoder_service_params
+
+    @property
+    def tomtom_isolines_api_keys(self):
+        return self._tomtom_isolines_api_keys
+
+    @property
+    def tomtom_isolines_monthly_quota(self):
+        return self._tomtom_isolines_quota
+
+    @property
+    def tomtom_isolines_service_params(self):
+        return self._tomtom_isolines_service_params
+
+    @property
+    def tomtom_routing_api_keys(self):
+        return self._tomtom_routing_api_keys
+
+    @property
+    def tomtom_routing_monthly_quota(self):
+        return self._tomtom_routing_quota
+
+    @property
+    def tomtom_routing_service_params(self):
+        return self._tomtom_routing_service_params
+
+    @property
+    def tomtom_geocoder_api_keys(self):
+        return self._tomtom_geocoder_api_keys
+
+    @property
+    def tomtom_geocoder_monthly_quota(self):
+        return self._tomtom_geocoder_quota
+
+    @property
+    def tomtom_geocoder_service_params(self):
+        return self._tomtom_geocoder_service_params
 
     @property
     def data_observatory_connection_str(self):
