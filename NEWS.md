@@ -1,6 +1,6 @@
 May 7th, 2018
 =============
-* Version `0.24.0` of the client, `0.31.0` of the server, and ' 0.18.0` of the python library.
+* Version `0.24.0` of the client, `0.31.0` of the server, and `0.18.0` of the python library.
     * Support for TomTom routing, geocoding and isolines.
 
 March 28th, 2018
