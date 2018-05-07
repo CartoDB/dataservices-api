@@ -22,8 +22,10 @@ class UserMetricsService:
     SERVICE_HERE_ISOLINES = 'here_isolines'
     SERVICE_MAPZEN_ISOLINES = 'mapzen_isolines'
     SERVICE_MAPBOX_ISOLINES = 'mapbox_isolines'
+    SERVICE_TOMTOM_ISOLINES = 'tomtom_isolines'
     SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
     SERVICE_MAPBOX_ROUTING = 'routing_mapbox'
+    SERVICE_TOMTOM_ROUTING = 'routing_tomtom'
     SERVICE_OBSERVATORY = 'obs_general'
     DAY_OF_MONTH_ZERO_PADDED = '%d'
 
@@ -36,10 +38,12 @@ class UserMetricsService:
     def used_quota(self, service_type, date):
         if service_type in [self.SERVICE_HERE_ISOLINES,
                             self.SERVICE_MAPZEN_ISOLINES,
-                            self.SERVICE_MAPBOX_ISOLINES]:
+                            self.SERVICE_MAPBOX_ISOLINES,
+                            self.SERVICE_TOMTOM_ISOLINES]:
             return self.__used_isolines_quota(service_type, date)
         elif service_type in [self.SERVICE_MAPZEN_ROUTING,
-                              self.SERVICE_MAPBOX_ROUTING]:
+                              self.SERVICE_MAPBOX_ROUTING,
+                              self.SERVICE_TOMTOM_ROUTING]:
             return self.__used_routing_quota(service_type, date)
         elif service_type == self.SERVICE_OBSERVATORY:
             return self.__used_observatory_quota(service_type, date)
