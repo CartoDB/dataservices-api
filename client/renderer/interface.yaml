@@ -75,7 +75,7 @@
   multi_row: true
   multi_field: true
   params:
-    - { name: searchtext,  type: jsonb}
+    - { name: searchtext,  type: jsonb }
 
 - name: cdb_here_geocode_street_point
   return_type: Geometry

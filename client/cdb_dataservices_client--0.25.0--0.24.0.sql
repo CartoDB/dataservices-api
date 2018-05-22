@@ -6,3 +6,7 @@
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
 -- HERE goes your code to upgrade/downgrade
+DROP FUNCTION IF EXISTS cdb_dataservices_client.cdb_bulk_geocode_street_point (searchtext jsonb);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_bulk_geocode_street_point (username text, orgname text, searchtext jsonb);
+DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_bulk_geocode_street_point_exception_safe (searchtext jsonb);
+DROP TYPE IF EXISTS cdb_dataservices_client.geocoding;
