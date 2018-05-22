@@ -3,7 +3,7 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.32.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
-CREATE TYPE cdb_dataservices_client.geocoding AS (
+CREATE TYPE cdb_dataservices_server.geocoding AS (
     cartodb_id integer,
     the_geom geometry(Multipolygon,4326),
     metadata jsonb
@@ -23,10 +23,11 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
   params = {'searchtext': searchtext}
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
+  with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
-      google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "text", "text", "text", "text"])
-      return plpy.execute(google_plan, [username, orgname, searchtext], 1)
+      google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
+      result = plpy.execute(google_plan, [username, orgname, searchtext])
+      return result
     else:
       raise Exception('Requested geocoder is not available')
 
@@ -44,21 +45,21 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   try:
     service_manager.assert_within_limits(quota=False)
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
-    results = geocoder.bulk_geocode(searchtext=searchtext)
-    if results:
-      result = []
-      for result in results:
+    geocode_results = geocoder.bulk_geocode(searchtext=searchtext)
+    if geocode_results:
+      results = []
+      for result in geocode_results:
         plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [results[1][0], results[1][1]], 1)[0]
-        result.append(result[0], point['the_geom'], None)
-      service_manager.quota_service.increment_success_service_use(len(result))
-      return result
+        point = plpy.execute(plan, result[1], 1)[0]
+        results.append([result[0], point['the_geom'], None])
+      service_manager.quota_service.increment_success_service_use(len(results))
+      return results
     else:
       service_manager.quota_service.increment_empty_service_use(len(searchtext))
-      return None
+      return []
   except QuotaExceededException as qe:
     service_manager.quota_service.increment_failed_service_use(len(searchtext))
-    return None
+    return []
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()

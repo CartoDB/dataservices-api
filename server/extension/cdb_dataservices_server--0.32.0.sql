@@ -2341,14 +2341,13 @@ RETURNS VOID AS $$
   config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
   config_setter.set_server_rate_limits(config)
 $$ LANGUAGE plpythonu VOLATILE PARALLEL UNSAFE;
--- Geocodes a street address given a searchtext and a state and/or country
-CREATE TYPE cdb_dataservices_client.geocoding AS (
+CREATE TYPE cdb_dataservices_server.geocoding AS (
     cartodb_id integer,
     the_geom geometry(Multipolygon,4326),
     metadata jsonb
 );
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger,LoggerConfig
@@ -2362,10 +2361,11 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
   params = {'searchtext': searchtext}
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
+  with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
-      google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "text", "text", "text", "text"])
-      return plpy.execute(google_plan, [username, orgname, searchtext], 1)
+      google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
+      result = plpy.execute(google_plan, [username, orgname, searchtext])
+      return result
     else:
       raise Exception('Requested geocoder is not available')
 
@@ -2383,21 +2383,21 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   try:
     service_manager.assert_within_limits(quota=False)
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
-    coordinates = geocoder.bulk_geocode(searchtext=searchtext)
-    if coordinates:
-      result = []
-      for result in results:
+    geocode_results = geocoder.bulk_geocode(searchtext=searchtext)
+    if geocode_results:
+      results = []
+      for result in geocode_results:
         plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        result.append(result['cartodb_id'], point['the_geom'] result['metatada'])
-      service_manager.quota_service.increment_success_service_use(len(result))
-      return result
+        point = plpy.execute(plan, result[1], 1)[0]
+        results.append([result[0], point['the_geom'], None])
+      service_manager.quota_service.increment_success_service_use(len(results))
+      return results
     else:
       service_manager.quota_service.increment_empty_service_use(len(searchtext))
-      return None
+      return []
   except QuotaExceededException as qe:
     service_manager.quota_service.increment_failed_service_use(len(searchtext))
-    return None
+    return []
   except BaseException as e:
     import sys
     service_manager.quota_service.increment_failed_service_use()

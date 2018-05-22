@@ -11,12 +11,12 @@ from client_factory import GoogleMapsClientFactory
 from multiprocessing import Pool, TimeoutError
 import time
 import os
+import json
 
 def async_geocoder(geocoder, searchtext):
-    print("PID: {}".format(os.getpid()))
-    results = geocoder.geocode(address=searchtext)
+    results = geocoder.geocode(address=searchtext['address'])
     if results:
-        return [searchtext['cartodb_id'], results]
+        return [searchtext['id'], results]
     else:
         return []
 
@@ -50,7 +50,8 @@ class GoogleMapsGeocoder:
         pool = Pool(processes=13)
         bulk_results = []
         results = []
-        for search in searchtext:
+        decoded_searchtext = json.loads(searchtext)
+        for search in decoded_searchtext:
             bulk_results.append(pool.apply_async(async_geocoder, (self.geocoder, search)))
         pool.close()
         pool.join()
@@ -59,7 +60,7 @@ class GoogleMapsGeocoder:
                 result = bulk_result.get()
                 results.append([result[0], self._extract_lng_lat_from_result(result[1][0]), []])
             return results
-        except KeyError:
+        except KeyError as e:
             raise MalformedResult()
 
     def _extract_lng_lat_from_result(self, result):

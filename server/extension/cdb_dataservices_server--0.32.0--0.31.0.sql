@@ -5,4 +5,4 @@
 -- HERE goes your code to upgrade/downgrade
 DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb);
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb);
-DROP TYPE IF EXISTS cdb_dataservices_client.geocoding;
+DROP TYPE IF EXISTS cdb_dataservices_server.geocoding;
