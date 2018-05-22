@@ -1,11 +1,10 @@
--- Geocodes a street address given a searchtext and a state and/or country
 CREATE TYPE cdb_dataservices_client.geocoding AS (
     cartodb_id integer,
     the_geom geometry(Multipolygon,4326),
     metadata jsonb
 );
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger,LoggerConfig
@@ -40,13 +39,13 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   try:
     service_manager.assert_within_limits(quota=False)
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
-    coordinates = geocoder.bulk_geocode(searchtext=searchtext)
-    if coordinates:
+    results = geocoder.bulk_geocode(searchtext=searchtext)
+    if results:
       result = []
       for result in results:
         plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        result.append(result['cartodb_id'], point['the_geom'] result['metatada'])
+        point = plpy.execute(plan, [results[1][0], results[1][1]], 1)[0]
+        result.append(result[0], point['the_geom'], None)
       service_manager.quota_service.increment_success_service_use(len(result))
       return result
     else:
