@@ -14,14 +14,17 @@ import os
 import json
 
 def async_geocoder(geocoder, searchtext):
-    if not searchtext['address']:
-        return []
-    else:
-        results = geocoder.geocode(address=searchtext['address'])
-        if results:
-            return [searchtext['id'], results]
+    try:
+        if not searchtext['address']:
+            return []
         else:
-            return [searchtext['id'], []]
+            results = geocoder.geocode(address=searchtext['address'])
+            if results:
+                return [searchtext['id'], results]
+            else:
+                return [searchtext['id'], []]
+    except BaseException:
+        return [searchtext['id'], []]
 
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
