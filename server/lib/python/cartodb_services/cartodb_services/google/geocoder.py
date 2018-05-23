@@ -14,11 +14,14 @@ import os
 import json
 
 def async_geocoder(geocoder, searchtext):
-    results = geocoder.geocode(address=searchtext['address'])
-    if results:
-        return [searchtext['id'], results]
-    else:
+    if not searchtext['address']:
         return []
+    else:
+        results = geocoder.geocode(address=searchtext['address'])
+        if results:
+            return [searchtext['id'], results]
+        else:
+            return [searchtext['id'], []]
 
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
@@ -58,9 +61,12 @@ class GoogleMapsGeocoder:
         try:
             for bulk_result in bulk_results:
                 result = bulk_result.get()
-                results.append([result[0], self._extract_lng_lat_from_result(result[1][0]), []])
+                if result[1]:
+                    results.append([result[0], self._extract_lng_lat_from_result(result[1][0]), []])
+                else:
+                    results.append([result[0], [], []])
             return results
-        except KeyError as e:
+        except KeyError:
             raise MalformedResult()
 
     def _extract_lng_lat_from_result(self, result):

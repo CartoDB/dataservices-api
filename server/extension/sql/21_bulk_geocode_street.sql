@@ -44,9 +44,12 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
     if geocode_results:
       results = []
       for result in geocode_results:
-        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-        point = plpy.execute(plan, result[1], 1)[0]
-        results.append([result[0], point['the_geom'], None])
+        if result[1]:
+          plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
+          point = plpy.execute(plan, result[1], 1)[0]
+          results.append([result[0], point['the_geom'], None])
+        else:
+          results.append([result[0], None, None])
       service_manager.quota_service.increment_success_service_use(len(results))
       return results
     else:
