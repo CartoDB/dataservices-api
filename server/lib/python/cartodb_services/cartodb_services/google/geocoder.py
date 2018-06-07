@@ -8,9 +8,17 @@ from exceptions import MalformedResult
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
+from multiprocessing import Pool, TimeoutError
+
+import json
+
+def async_geocoder(geocoder, address):
+    results = geocoder.geocode(address=address)
+    return results if results else []
 
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
+    PARALLEL_PROCESSES = 13
 
     def __init__(self, client_id, client_secret, logger):
         if client_id is None:
@@ -32,6 +40,45 @@ class GoogleMapsGeocoder:
                 return []
         except KeyError:
             raise MalformedResult()
+
+    def bulk_geocode(self, searchtext):
+        try:
+            decoded_searchtext = json.loads(searchtext)
+        except Exception as e:
+            self._logger.error('General error', exception=e)
+            raise e
+
+        bulk_results = {}
+        pool = Pool(processes=self.PARALLEL_PROCESSES)
+        for search in decoded_searchtext:
+            search_id, address = [search[k] for k in ['id', 'address']]
+            if address:
+                result = pool.apply_async(async_geocoder,
+                                          (self.geocoder, address))
+            else:
+                result = []
+            bulk_results[search_id] = result
+        pool.close()
+        pool.join()
+
+        try:
+            results = []
+            for search_id, bulk_result in bulk_results.items():
+                try:
+                    result = bulk_result.get()
+                except Exception as e:
+                    self._logger.error('Error at Google async_geocoder', e)
+                    result = []
+
+                lng_lat = self._extract_lng_lat_from_result(result[0]) if result else []
+                results.append([search_id, lng_lat, []])
+            return results
+        except KeyError as e:
+            self._logger.error('KeyError error', exception=e)
+            raise MalformedResult()
+        except Exception as e:
+            self._logger.error('General error', exception=e)
+            raise e
 
     def _extract_lng_lat_from_result(self, result):
         location = result['geometry']['location']
