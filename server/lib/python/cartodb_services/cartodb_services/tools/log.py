@@ -35,28 +35,28 @@ class Logger:
             return
         self._send_to_rollbar('debug', text, exception, data)
         self._send_to_log_file('debug', text, exception, data)
-        self._send_to_plpy('debug', text)
+        self._send_to_plpy('debug', text, exception)
 
     def info(self, text, exception=None, data={}):
         if not self._check_min_level('info'):
             return
         self._send_to_rollbar('info', text, exception, data)
         self._send_to_log_file('info', text, exception, data)
-        self._send_to_plpy('info', text)
+        self._send_to_plpy('info', text, exception)
 
     def warning(self, text, exception=None, data={}):
         if not self._check_min_level('warning'):
             return
         self._send_to_rollbar('warning', text, exception, data)
         self._send_to_log_file('warning', text, exception, data)
-        self._send_to_plpy('warning', text)
+        self._send_to_plpy('warning', text, exception)
 
     def error(self, text, exception=None, data={}):
         if not self._check_min_level('error'):
             return
         self._send_to_rollbar('error', text, exception, data)
         self._send_to_log_file('error', text, exception, data)
-        self._send_to_plpy('error', text)
+        self._send_to_plpy('error', text, exception)
 
     def _check_min_level(self, level):
         return True if self.LEVELS[level] >= self._min_level else False
@@ -85,18 +85,20 @@ class Logger:
             elif level == 'error':
                 self._file_logger.error(text, extra=extra_data)
 
-    def _send_to_plpy(self, level, text):
+    def _send_to_plpy(self, level, text, exception=None):
+        exception_message = '. Exception: {}'.format(str(exception)) if exception else ''
+        message = '{}{}'.format(text, exception_message)
         if self._check_plpy():
             if level == 'debug':
-                plpy.debug(text)
+                plpy.debug(message)
             elif level == 'info':
-                plpy.info(text)
+                plpy.info(message)
             elif level == 'warning':
-                plpy.warning(text)
+                plpy.warning(message)
             elif level == 'error':
                 # Plpy.error and fatal raises exceptions and we only want to
                 # log an error, exceptions should be raise explicitly
-                plpy.warning(text)
+                plpy.warning(message)
 
     def _parse_log_extra_data(self, exception, data):
         extra_data = {}
