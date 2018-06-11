@@ -63,6 +63,12 @@ CREATE TYPE cdb_dataservices_client.isoline AS (
     the_geom geometry(Multipolygon,4326)
 );
 
+CREATE TYPE cdb_dataservices_client.geocoding AS (
+    cartodb_id integer,
+    the_geom geometry(Multipolygon,4326),
+    metadata jsonb
+);
+
 CREATE TYPE cdb_dataservices_client.simple_route AS (
     shape geometry(LineString,4326),
     length real,
@@ -392,6 +398,31 @@ BEGIN
   END IF;
 
   SELECT cdb_dataservices_client._cdb_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret; RETURN ret;
+END;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+--
+-- Public dataservices API function
+--
+-- These are the only ones with permissions to publicuser role
+-- and should also be the only ones with SECURITY DEFINER
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (searchtext jsonb)
+RETURNS SETOF cdb_dataservices_client.geocoding AS $$
+DECLARE
+  
+  username text;
+  orgname text;
+BEGIN
+  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
+    RAISE EXCEPTION 'The api_key must be provided';
+  END IF;
+  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
+
+  RETURN QUERY SELECT * FROM cdb_dataservices_client._cdb_bulk_geocode_street_point(username, orgname, searchtext);
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 --
@@ -2377,6 +2408,42 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- Exception-safe private DataServices API function
 --
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point_exception_safe (searchtext jsonb)
+RETURNS SETOF cdb_dataservices_client.geocoding AS $$
+DECLARE
+  
+  username text;
+  orgname text;
+  _returned_sqlstate TEXT;
+  _message_text TEXT;
+  _pg_exception_context TEXT;
+BEGIN
+  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
+    RAISE EXCEPTION 'The api_key must be provided';
+  END IF;
+  SELECT u, o INTO username, orgname FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text);
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
+
+
+  BEGIN
+    RETURN QUERY SELECT * FROM cdb_dataservices_client._cdb_bulk_geocode_street_point(username, orgname, searchtext);
+  EXCEPTION
+    WHEN OTHERS THEN
+        GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
+                                _message_text = MESSAGE_TEXT,
+                                _pg_exception_context = PG_EXCEPTION_CONTEXT;
+        RAISE WARNING USING ERRCODE = _returned_sqlstate, MESSAGE = _message_text, DETAIL = _pg_exception_context;
+        
+  END;
+END;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+--
+-- Exception-safe private DataServices API function
+--
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_here_geocode_street_point_exception_safe (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
 RETURNS Geometry AS $$
 DECLARE
@@ -4302,6 +4369,14 @@ RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_street_point (username, orgname, searchtext, city, state_province, country);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_bulk_geocode_street_point (username text, orgname text, searchtext jsonb);
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point (username text, orgname text, searchtext jsonb)
+RETURNS SETOF cdb_dataservices_client.geocoding AS $$
+  CONNECT cdb_dataservices_client._server_conn_str();
+  
+  SELECT * FROM cdb_dataservices_server.cdb_bulk_geocode_street_point (username, orgname, searchtext);
+  
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_here_geocode_street_point (username text, orgname text, searchtext text, city text, state_province text, country text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_here_geocode_street_point (username text, orgname text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -4808,6 +4883,9 @@ GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_geocode_ipaddress_point_e
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_geocode_street_point_exception_safe(searchtext text, city text, state_province text, country text )  TO publicuser;
+
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point(searchtext jsonb) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point_exception_safe(searchtext jsonb )  TO publicuser;
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_here_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_here_geocode_street_point_exception_safe(searchtext text, city text, state_province text, country text )  TO publicuser;

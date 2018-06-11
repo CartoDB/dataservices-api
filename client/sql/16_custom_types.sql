@@ -4,6 +4,12 @@ CREATE TYPE cdb_dataservices_client.isoline AS (
     the_geom geometry(Multipolygon,4326)
 );
 
+CREATE TYPE cdb_dataservices_client.geocoding AS (
+    cartodb_id integer,
+    the_geom geometry(Multipolygon,4326),
+    metadata jsonb
+);
+
 CREATE TYPE cdb_dataservices_client.simple_route AS (
     shape geometry(LineString,4326),
     length real,

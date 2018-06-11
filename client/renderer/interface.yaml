@@ -70,6 +70,13 @@
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: cdb_bulk_geocode_street_point
+  return_type: SETOF cdb_dataservices_client.geocoding
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: searchtext,  type: jsonb }
+
 - name: cdb_here_geocode_street_point
   return_type: Geometry
   params:

@@ -2341,6 +2341,13 @@ RETURNS VOID AS $$
   config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
   config_setter.set_server_rate_limits(config)
 $$ LANGUAGE plpythonu VOLATILE PARALLEL UNSAFE;
+-- TODO: could cartodb_id be replaced by rowid, maybe needing extra care for offset?
+CREATE TYPE cdb_dataservices_server.geocoding AS (
+    cartodb_id integer,
+    the_geom geometry(Multipolygon,4326),
+    metadata jsonb
+);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
