@@ -5,3 +5,5 @@ cartodb_services.egg-info/
 build/
 dist/
 .vscode/
+.idea/
+venv/

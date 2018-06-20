@@ -12,7 +12,12 @@ from multiprocessing import Pool, TimeoutError
 
 import json
 
+import time, random
+
 def async_geocoder(geocoder, address):
+    # time.sleep(.3 + random.random())
+    # return [{ 'geometry': { 'location': { 'lng': 1, 'lat': 2 } } }]
+
     results = geocoder.geocode(address=address)
     return results if results else []
 
