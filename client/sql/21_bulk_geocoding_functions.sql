@@ -9,6 +9,8 @@ DECLARE
   batches_n integer;
   BATCHES_SIZE CONSTANT numeric := 100;
   current_row_count integer ;
+
+  temp_table_name text;
 BEGIN
   EXECUTE format('SELECT COUNT(1) from (%s) _x', query) INTO query_row_count;
 
@@ -23,8 +25,11 @@ BEGIN
 
   RAISE DEBUG 'batches_n: %', batches_n;
 
-  CREATE TEMPORARY TABLE bulk_geocode_street_point
-      (cartodb_id integer, the_geom geometry(Multipolygon,4326), metadata jsonb);
+  temp_table_name := 'bulk_geocode_street_' || md5(random()::text);
+
+  EXECUTE format('CREATE TEMPORARY TABLE %s ' ||
+   '(cartodb_id integer, the_geom geometry(Multipolygon,4326), metadata jsonb)',
+   temp_table_name);
 
   FOR cartodb_id_batch in 0..(batches_n - 1)
   LOOP
@@ -35,10 +40,10 @@ BEGIN
       '      json_build_object(''id'', cartodb_id, ''address'', %s, ''city'', %s, ''state'', %s, ''country'', %s) as data , ' ||
       '      floor((cartodb_id-1)::float/$1) as batch' ||
       '   FROM (%s) _x' ||
-      ')' ||
-      'INSERT INTO bulk_geocode_street_point SELECT (cdb_dataservices_client._cdb_bulk_geocode_street_point(jsonb_agg(data))).* ' ||
+      ') ' ||
+      'INSERT INTO %s SELECT (cdb_dataservices_client._cdb_bulk_geocode_street_point(jsonb_agg(data))).* ' ||
       'FROM geocoding_data ' ||
-      'WHERE batch = $2', street_column, city_column, state_column, country_column, query)
+      'WHERE batch = $2', street_column, city_column, state_column, country_column, query, temp_table_name)
     USING BATCHES_SIZE, cartodb_id_batch;
 
     GET DIAGNOSTICS current_row_count = ROW_COUNT;
@@ -46,6 +51,6 @@ BEGIN
 
   END LOOP;
 
-  RETURN QUERY SELECT * FROM bulk_geocode_street_point;
+  RETURN QUERY EXECUTE 'SELECT * FROM ' || quote_ident(temp_table_name);
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
