@@ -1989,29 +1989,21 @@ $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text, searchtext text)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
-  monthly_quota integer;
-  used_quota integer;
-  soft_limit boolean;
-  provider text;
-
-  remaining_quota integer;
-  estimated_row_count integer;
+  query_row_count integer;
+  enough_quota boolean;
 
   cartodb_id_batch integer;
   batches_n integer;
   BATCHES_SIZE CONSTANT numeric := 100;
   current_row_count integer ;
 BEGIN
-  SELECT csqi.monthly_quota, csqi.used_quota, csqi.soft_limit, csqi.provider
-  into monthly_quota, used_quota, soft_limit, provider
-  FROM cdb_dataservices_client.cdb_service_quota_info() csqi WHERE service = 'hires_geocoder';
+  EXECUTE format('SELECT COUNT(1) from (%s) _x', query) INTO query_row_count;
 
-  remaining_quota := monthly_quota - used_quota;
-  estimated_row_count := count_estimate(query);
-  RAISE DEBUG 'cdb_bulk_geocode_street_point --> estimated: %, remaining: %, monthly_quota: %, used_quota: %, soft_limit: %, provider: %',
-      estimated_row_count, remaining_quota, monthly_quota, used_quota, soft_limit, provider;
-  IF estimated_row_count > remaining_quota THEN
-    RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, estimated_row_count;
+  RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; searchtext: %',
+      query_row_count, query, searchtext;
+  SELECT cdb_dataservices_client.cdb_enough_quota('hires_geocoder', query_row_count) INTO enough_quota;
+  IF enough_quota IS NOT NULL AND enough_quota THEN
+    RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, query_row_count;
   END IF;
 
   EXECUTE format('SELECT ceil(max(cartodb_id)::float/%s) FROM (%s) _x', BATCHES_SIZE, query) INTO batches_n;
