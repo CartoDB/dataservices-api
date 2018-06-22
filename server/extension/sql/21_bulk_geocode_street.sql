@@ -32,7 +32,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.tools import LegacyServiceManager,QuotaExceededException,Logger
   from cartodb_services.google import GoogleMapsGeocoder
@@ -46,7 +46,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   try:
     service_manager.assert_within_limits(quota=False)
     geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
-    geocode_results = geocoder.bulk_geocode(searchtext=searchtext)
+    geocode_results = geocoder.bulk_geocode(searches=searches)
     if geocode_results:
       results = []
       for result in geocode_results:
@@ -59,10 +59,10 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
       service_manager.quota_service.increment_success_service_use(len(results))
       return results
     else:
-      service_manager.quota_service.increment_empty_service_use(len(searchtext))
+      service_manager.quota_service.increment_empty_service_use(len(searches))
       return []
   except QuotaExceededException as qe:
-    service_manager.quota_service.increment_failed_service_use(len(searchtext))
+    service_manager.quota_service.increment_failed_service_use(len(searches))
     return []
   except BaseException as e:
     import sys

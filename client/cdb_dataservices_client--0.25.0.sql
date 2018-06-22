@@ -1986,7 +1986,8 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_DisconnectUserTable(
     CONNECT cdb_dataservices_client._server_conn_str();
     TARGET cdb_dataservices_server._DST_DisconnectUserTable;
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text, searchtext text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text,
+    country_column text, state_column text, city_column text, street_column text)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
   query_row_count integer;
@@ -1999,8 +2000,8 @@ DECLARE
 BEGIN
   EXECUTE format('SELECT COUNT(1) from (%s) _x', query) INTO query_row_count;
 
-  RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; searchtext: %',
-      query_row_count, query, searchtext;
+  RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; country: %; state: %; city: %; street: %',
+      query_row_count, query, country_column, state_column, city_column, street_column;
   SELECT cdb_dataservices_client.cdb_enough_quota('hires_geocoder', query_row_count) INTO enough_quota;
   IF enough_quota IS NOT NULL AND enough_quota THEN
     RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, query_row_count;
@@ -2018,12 +2019,14 @@ BEGIN
 
     EXECUTE format(
       'WITH geocoding_data as (' ||
-      '   SELECT json_build_object(''id'', cartodb_id, ''address'', %s) as data , floor((cartodb_id-1)::float/$1) as batch' ||
+      '   SELECT ' ||
+      '      json_build_object(''id'', cartodb_id, ''address'', %s, ''city'', %s, ''state'', %s, ''country'', %s) as data , ' ||
+      '      floor((cartodb_id-1)::float/$1) as batch' ||
       '   FROM (%s) _x' ||
       ')' ||
       'INSERT INTO bulk_geocode_street_point SELECT (cdb_dataservices_client._cdb_bulk_geocode_street_point(jsonb_agg(data))).* ' ||
       'FROM geocoding_data ' ||
-      'WHERE batch = $2', searchtext, query)
+      'WHERE batch = $2', street_column, city_column, state_column, country_column, query)
     USING BATCHES_SIZE, cartodb_id_batch;
 
     GET DIAGNOSTICS current_row_count = ROW_COUNT;

@@ -14,16 +14,18 @@ import json
 
 import time, random
 
-def async_geocoder(geocoder, address):
+def async_geocoder(geocoder, address, components):
+    # TODO: clean this and previous import
     # time.sleep(.3 + random.random())
     # return [{ 'geometry': { 'location': { 'lng': 1, 'lat': 2 } } }]
 
-    results = geocoder.geocode(address=address)
+    results = geocoder.geocode(address=address, components=components)
     return results if results else []
 
 class GoogleMapsGeocoder:
     """A Google Maps Geocoder wrapper for python"""
     PARALLEL_PROCESSES = 13
+    SEARCH_KEYS = ['id', 'address', 'city', 'state', 'country']
 
     def __init__(self, client_id, client_secret, logger):
         if client_id is None:
@@ -46,20 +48,23 @@ class GoogleMapsGeocoder:
         except KeyError:
             raise MalformedResult()
 
-    def bulk_geocode(self, searchtext):
+    def bulk_geocode(self, searches):
         try:
-            decoded_searchtext = json.loads(searchtext)
+            decoded_searches = json.loads(searches)
         except Exception as e:
             self._logger.error('General error', exception=e)
             raise e
 
         bulk_results = {}
         pool = Pool(processes=self.PARALLEL_PROCESSES)
-        for search in decoded_searchtext:
-            search_id, address = [search[k] for k in ['id', 'address']]
+        for search in decoded_searches:
+            search_id, address, city, state, country = \
+                [search.get(k, None) for k in self.SEARCH_KEYS]
+            opt_params = self._build_optional_parameters(city, state, country)
             if address:
+                self._logger.debug('async geocoding --> {} {}'.format(address.encode('utf-8'), opt_params))
                 result = pool.apply_async(async_geocoder,
-                                          (self.geocoder, address))
+                                          (self.geocoder, address, opt_params))
             else:
                 result = []
             bulk_results[search_id] = result
