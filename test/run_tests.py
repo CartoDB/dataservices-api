@@ -74,11 +74,11 @@ def set_environment_variables(username, api_key, table_name, host, schema):
 
 
 def clean_environment_variables():
-    del os.environ["GEOCODER_API_TEST_USERNAME"]
-    del os.environ["GEOCODER_API_TEST_API_KEY"]
-    del os.environ["GEOCODER_API_TEST_TABLE_NAME"]
-    del os.environ["GEOCODER_API_TEST_HOST"]
-    del os.environ["GEOCODER_API_TEST_SCHEMA"]
+    os.environ.pop("GEOCODER_API_TEST_USERNAME", None)
+    os.environ.pop("GEOCODER_API_TEST_API_KEY", None)
+    os.environ.pop("GEOCODER_API_TEST_TABLE_NAME", None)
+    os.environ.pop("GEOCODER_API_TEST_HOST", None)
+    os.environ.pop("GEOCODER_API_TEST_SCHEMA", None)
 
 if __name__ == "__main__":
     main()
