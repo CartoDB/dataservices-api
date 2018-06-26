@@ -22,13 +22,15 @@ class IntegrationTestHelper:
         }
 
     @classmethod
-    def execute_query(cls, sql_api_url, query):
+    def execute_query_raw(cls, sql_api_url, query):
         requests.packages.urllib3.disable_warnings()
         query_url = "{0}?q={1}".format(sql_api_url, query)
         print "Executing query: {0}".format(query_url)
         query_response = requests.get(query_url)
         if query_response.status_code != 200:
             raise Exception(json.loads(query_response.text)['error'])
-        query_response_data = json.loads(query_response.text)
+        return json.loads(query_response.text)
 
-        return query_response_data['rows'][0]
+    @classmethod
+    def execute_query(cls, sql_api_url, query):
+        return cls.execute_query_raw(sql_api_url, query)['rows'][0]
