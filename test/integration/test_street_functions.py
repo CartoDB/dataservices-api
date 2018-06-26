@@ -51,7 +51,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "select 2 as cartodb_id, ''Spain'' as country, " \
                 "''Castilla y León'' as state, ''Valladolid'' as city, " \
                 "''Paseo Zorrilla'' as street' " \
-                ", 'country', 'state', 'city', 'street')"
+                ", 'street', 'city', 'state', 'country')"
         response = self._run_authenticated(query)
 
         assert_equal(response['total_rows'], 2)
@@ -66,7 +66,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'select * from jsonb_to_recordset(''[" \
                 "{\"cartodb_id\": 1, \"address\": \"1901 amphitheatre parkway, mountain view, ca, us\"}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
-                "'''''', '''''', '''''', 'address')"
+                "'address', '''''', '''''', '''''')"
         response = self._run_authenticated(query)
 
         assert_equal(response['total_rows'], 1)
@@ -80,7 +80,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'select * from jsonb_to_recordset(''[" \
                 "{\"cartodb_id\": 1, \"address\": \"1901 amphitheatre parkway, mountain view, ca, us\"}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
-                "null, null, null, 'address')"
+                "'address')"
         response = self._run_authenticated(query)
 
         assert_equal(response['total_rows'], 1)
@@ -96,9 +96,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "{\"cartodb_id\": 2, \"address\": \"1901 amphitheatre parkway, mountain view, ca, us\"}," \
                 "{\"cartodb_id\": 3, \"address\": \"1902 amphitheatre parkway, mountain view, ca, us\"}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
-                "null, null, null, 'address', 2)"
+                "'address', null, null, null, 2)"
         response = self._run_authenticated(query)
-        # from nose.tools import set_trace; set_trace()
 
         assert_equal(response['total_rows'], 3)
 
@@ -106,6 +105,24 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         self._assert_x_y(row_by_cartodb_id[1], -122.0875324, 37.4227968)
         self._assert_x_y(row_by_cartodb_id[2], -122.0885504, 37.4238657)
         self._assert_x_y(row_by_cartodb_id[3], -122.0876674, 37.4235729)
+
+
+    def test_city_column_geocoding(self):
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{\"cartodb_id\": 1, \"city\": \"Valladolid\"}," \
+                "{\"cartodb_id\": 2, \"city\": \"Madrid\"}" \
+                "]''::jsonb) as (cartodb_id integer, city text)', " \
+                "'city')"
+        response = self._run_authenticated(query)
+        # from nose.tools import set_trace; set_trace()
+
+        assert_equal(response['total_rows'], 2)
+
+        row_by_cartodb_id = self._row_by_cartodb_id(response)
+        self._assert_x_y(row_by_cartodb_id[1], -4.7245321, 41.652251)
+        self._assert_x_y(row_by_cartodb_id[2], -3.7037902, 40.4167754)
 
 
     def _run_authenticated(self, query):

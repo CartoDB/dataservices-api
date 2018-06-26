@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text,
-    country_column text, state_column text, city_column text, street_column text, batch_size integer DEFAULT 100)
+    street_column text, city_column text default null, state_column text default null, country_column text default null, batch_size integer DEFAULT 100)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
   query_row_count integer;
