@@ -106,7 +106,6 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         self._assert_x_y(row_by_cartodb_id[2], -122.0885504, 37.4238657)
         self._assert_x_y(row_by_cartodb_id[3], -122.0876674, 37.4235729)
 
-
     def test_city_column_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
@@ -116,13 +115,28 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "]''::jsonb) as (cartodb_id integer, city text)', " \
                 "'city')"
         response = self._run_authenticated(query)
-        # from nose.tools import set_trace; set_trace()
 
         assert_equal(response['total_rows'], 2)
 
         row_by_cartodb_id = self._row_by_cartodb_id(response)
         self._assert_x_y(row_by_cartodb_id[1], -4.7245321, 41.652251)
         self._assert_x_y(row_by_cartodb_id[2], -3.7037902, 40.4167754)
+
+    def test_free_text_geocoding(self):
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from (" \
+                "select 1 as cartodb_id, ''W 26th Street'' as address, " \
+                "null as city , null as state , null as country" \
+                ")_x', " \
+                "'''Logroño, La Rioja, Spain''')"
+        response = self._run_authenticated(query)
+        # from nose.tools import set_trace; set_trace()
+
+        assert_equal(response['total_rows'], 1)
+
+        row_by_cartodb_id = self._row_by_cartodb_id(response)
+        self._assert_x_y(row_by_cartodb_id[1], -2.4449852, 42.4627195)
 
 
     def _run_authenticated(self, query):
