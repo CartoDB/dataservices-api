@@ -75,7 +75,7 @@
   multi_row: true
   multi_field: true
   params:
-    - { name: searchtext,  type: jsonb }
+    - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
 
 - name: cdb_here_geocode_street_point
   return_type: Geometry

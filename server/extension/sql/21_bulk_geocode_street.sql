@@ -5,7 +5,7 @@ CREATE TYPE cdb_dataservices_server.geocoding AS (
     metadata jsonb
 );
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger
@@ -20,12 +20,12 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'searchtext': searchtext}
+  params = {'searches': searches}
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
       google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
-      result = plpy.execute(google_plan, [username, orgname, searchtext])
+      result = plpy.execute(google_plan, [username, orgname, searches])
       return result
     else:
       raise Exception('Requested geocoder is not available')

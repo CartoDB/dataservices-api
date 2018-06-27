@@ -420,7 +420,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point (searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point (searches jsonb)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
   
@@ -436,7 +436,7 @@ BEGIN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
   END IF;
 
-  RETURN QUERY SELECT * FROM cdb_dataservices_client.__cdb_bulk_geocode_street_point(username, orgname, searchtext);
+  RETURN QUERY SELECT * FROM cdb_dataservices_client.__cdb_bulk_geocode_street_point(username, orgname, searches);
 END;
 $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 --
@@ -2490,7 +2490,7 @@ $$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
 -- Exception-safe private DataServices API function
 --
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point_exception_safe (searchtext jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point_exception_safe (searches jsonb)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
   
@@ -2511,7 +2511,7 @@ BEGIN
 
 
   BEGIN
-    RETURN QUERY SELECT * FROM cdb_dataservices_client.__cdb_bulk_geocode_street_point(username, orgname, searchtext);
+    RETURN QUERY SELECT * FROM cdb_dataservices_client.__cdb_bulk_geocode_street_point(username, orgname, searches);
   EXCEPTION
     WHEN OTHERS THEN
         GET STACKED DIAGNOSTICS _returned_sqlstate = RETURNED_SQLSTATE,
@@ -4451,12 +4451,12 @@ RETURNS Geometry AS $$
   SELECT cdb_dataservices_server.cdb_geocode_street_point (username, orgname, searchtext, city, state_province, country);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client.__cdb_bulk_geocode_street_point (username text, orgname text, searchtext jsonb);
-CREATE OR REPLACE FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point (username text, orgname text, searchtext jsonb)
+DROP FUNCTION IF EXISTS cdb_dataservices_client.__cdb_bulk_geocode_street_point (username text, orgname text, searches jsonb);
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point (username text, orgname text, searches jsonb)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
   
-  SELECT * FROM cdb_dataservices_server._cdb_bulk_geocode_street_point (username, orgname, searchtext);
+  SELECT * FROM cdb_dataservices_server._cdb_bulk_geocode_street_point (username, orgname, searches);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_here_geocode_street_point (username text, orgname text, searchtext text, city text, state_province text, country text);
@@ -4966,8 +4966,8 @@ GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_geocode_ipaddress_point_e
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_geocode_street_point_exception_safe(searchtext text, city text, state_province text, country text )  TO publicuser;
 
-GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point(searchtext jsonb) TO publicuser;
-GRANT EXECUTE ON FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point_exception_safe(searchtext jsonb )  TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_bulk_geocode_street_point(searches jsonb) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point_exception_safe(searches jsonb )  TO publicuser;
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_here_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_here_geocode_street_point_exception_safe(searchtext text, city text, state_province text, country text )  TO publicuser;
