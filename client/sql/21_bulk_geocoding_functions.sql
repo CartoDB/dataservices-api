@@ -24,7 +24,7 @@ BEGIN
   RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; country: %; state: %; city: %; street: %',
       query_row_count, query, country_column, state_column, city_column, street_column;
   SELECT cdb_dataservices_client.cdb_enough_quota('hires_geocoder', query_row_count) INTO enough_quota;
-  IF enough_quota IS NOT NULL AND enough_quota THEN
+  IF enough_quota IS NOT NULL AND NOT enough_quota THEN
     RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, query_row_count;
   END IF;
 
