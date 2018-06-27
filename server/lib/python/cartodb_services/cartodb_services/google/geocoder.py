@@ -61,6 +61,8 @@ class GoogleMapsGeocoder:
             search_id, address, city, state, country = \
                 [search.get(k, None) for k in self.SEARCH_KEYS]
             opt_params = self._build_optional_parameters(city, state, country)
+            # Geocoding works better if components are also inside the address
+            address = ', '.join(filter(None, [address, city, state, country]))
             if address:
                 self._logger.debug('async geocoding --> {} {}'.format(address.encode('utf-8'), opt_params))
                 result = pool.apply_async(async_geocoder,
