@@ -148,13 +148,30 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'select 2 as cartodb_id, ''Logroño'' as city', " \
                 "'city || '', '' || ''Argentina''')"
         response = self._run_authenticated(query)
-        # from nose.tools import set_trace; set_trace()
 
         assert_equal(response['total_rows'], 2)
 
         row_by_cartodb_id = self._row_by_cartodb_id(response)
         self._assert_x_y(row_by_cartodb_id[1], -2.4449852, 42.4627195)
         self._assert_x_y(row_by_cartodb_id[2], -61.6961807, -29.5031057)
+
+    def test_template_with_two_columns_geocoding(self):
+        query = "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
+                "cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
+                "    'select * from (' ||" \
+                "    '  select 1 as cartodb_id, ''Valladolid'' as city, ''Mexico'' as country ' ||" \
+                "    '  union all '  ||" \
+                "    '  select 2, ''Valladolid'', ''Spain''' ||" \
+                "    ') _x'," \
+                "'city || '', '' || country')"
+        response = self._run_authenticated(query)
+        # from nose.tools import set_trace; set_trace()
+
+        assert_equal(response['total_rows'], 2)
+
+        row_by_cartodb_id = self._row_by_cartodb_id(response)
+        self._assert_x_y(row_by_cartodb_id[1], -88.2022488, 20.68964)
+        self._assert_x_y(row_by_cartodb_id[2], -4.7245321, 41.652251)
 
 
     def _run_authenticated(self, query):
