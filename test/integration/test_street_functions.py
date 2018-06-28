@@ -57,7 +57,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         assert_equal(response['total_rows'], 2)
 
         row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -3.7074009, 40.415511)
+        self._assert_x_y(row_by_cartodb_id[1], -4.728252, 41.6517025);
         self._assert_x_y(row_by_cartodb_id[2], -4.7404453, 41.6314339)
 
     def test_empty_columns(self):
