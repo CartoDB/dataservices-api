@@ -1992,6 +1992,7 @@ RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 DECLARE
   query_row_count integer;
   enough_quota boolean;
+  remaining_quota integer;
 
   cartodb_id_batch integer;
   batches_n integer;
@@ -2002,7 +2003,7 @@ DECLARE
   temp_table_name text;
 BEGIN
   IF batch_size IS NULL THEN
-    batch_size := DEFAULT_BATCH_SIZE;
+    RAISE EXCEPTION 'batch_size can''t be null';
   ELSIF batch_size > MAX_BATCH_SIZE THEN
     RAISE EXCEPTION 'batch_size must be lower than %', MAX_BATCH_SIZE + 1;
   END IF;
@@ -2012,7 +2013,11 @@ BEGIN
   RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; country: %; state: %; city: %; street: %',
       query_row_count, query, country_column, state_column, city_column, street_column;
   SELECT cdb_dataservices_client.cdb_enough_quota('hires_geocoder', query_row_count) INTO enough_quota;
-  IF enough_quota IS NOT NULL AND enough_quota THEN
+  IF enough_quota IS NOT NULL AND NOT enough_quota THEN
+    SELECT csqi.monthly_quota - csqi.used_quota AS remaining_quota
+    INTO remaining_quota
+    FROM cdb_dataservices_client.cdb_service_quota_info() csqi
+    WHERE service = 'hires_geocoder';
     RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, query_row_count;
   END IF;
 
