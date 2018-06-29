@@ -68,9 +68,10 @@ class HereMapsGeocoder(Traceable, StreetPointBulkGeocoder):
     def _bulk_geocode(self, searches):
         results = []
         for search in searches:
-            result = ()
+            (search_id, address, city, state, country) = search
+            coordinates = self.geocode(searchtext=address, city=city, state=state, country=country)
+            results.append((search_id, coordinates, []))
         return results
-        coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
 
     def geocode(self, **kwargs):
         params = {}
