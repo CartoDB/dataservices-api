@@ -5,12 +5,11 @@ import googlemaps
 from urlparse import parse_qs
 
 from exceptions import MalformedResult
+from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
 from multiprocessing import Pool, TimeoutError
-
-import json
 
 import time, random
 
@@ -22,10 +21,9 @@ def async_geocoder(geocoder, address, components):
     results = geocoder.geocode(address=address, components=components)
     return results if results else []
 
-class GoogleMapsGeocoder:
+class GoogleMapsGeocoder(StreetPointBulkGeocoder):
     """A Google Maps Geocoder wrapper for python"""
     PARALLEL_PROCESSES = 13
-    SEARCH_KEYS = ['id', 'address', 'city', 'state', 'country']
 
     def __init__(self, client_id, client_secret, logger):
         if client_id is None:
@@ -48,18 +46,11 @@ class GoogleMapsGeocoder:
         except KeyError:
             raise MalformedResult()
 
-    def bulk_geocode(self, searches):
-        try:
-            decoded_searches = json.loads(searches)
-        except Exception as e:
-            self._logger.error('General error', exception=e)
-            raise e
-
+    def _bulk_geocode(self, searches):
         bulk_results = {}
         pool = Pool(processes=self.PARALLEL_PROCESSES)
-        for search in decoded_searches:
-            search_id, address, city, state, country = \
-                [search.get(k, None) for k in self.SEARCH_KEYS]
+        for search in searches:
+            (search_id, address, city, state, country) = search
             opt_params = self._build_optional_parameters(city, state, country)
             # Geocoding works better if components are also inside the address
             address = ', '.join(filter(None, [address, city, state, country]))
@@ -83,7 +74,7 @@ class GoogleMapsGeocoder:
                     result = []
 
                 lng_lat = self._extract_lng_lat_from_result(result[0]) if result else []
-                results.append([search_id, lng_lat, []])
+                results.append((search_id, lng_lat, []))
             return results
         except KeyError as e:
             self._logger.error('KeyError error', exception=e)
