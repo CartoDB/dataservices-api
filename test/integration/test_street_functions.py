@@ -214,6 +214,25 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         }
         assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
+    def test_large_batches(self):
+        """
+        Useful just to test a good batch size
+        """
+        n = 10
+        streets = []
+        for i in range(0, n):
+            streets.append('{{"cartodb_id": {}, "address": "{} Yonge Street, ' \
+                           'Toronto, Canada"}}'.format(i, i))
+
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{}" \
+                "]''::jsonb) as (cartodb_id integer, address text)', " \
+                "'address', null, null, null, {})".format(','.join(streets), n)
+        response = self._run_authenticated(query)
+        assert_equal(n - 1, len(response['rows']))
+
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
                                                      self.env_variables[

@@ -9,7 +9,7 @@ DECLARE
   cartodb_id_batch integer;
   batches_n integer;
   DEFAULT_BATCH_SIZE CONSTANT numeric := 100;
-  MAX_BATCH_SIZE CONSTANT numeric := 1000;
+  MAX_BATCH_SIZE CONSTANT numeric := 10000;
   current_row_count integer ;
 
   temp_table_name text;

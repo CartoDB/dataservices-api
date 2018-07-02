@@ -71,6 +71,6 @@ class StreetPointBulkGeocoder:
             search_id, address, city, state, country = \
                 [search.get(k, None) for k in self.SEARCH_KEYS]
             street_geocoder_searches.append(
-                (search_id, address, city, state, country))
+                StreetGeocoderSearch(search_id, address, city, state, country))
 
         return self._bulk_geocode(street_geocoder_searches)

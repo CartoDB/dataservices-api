@@ -2393,10 +2393,10 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_heremaps_geocode_st
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services import run_street_point_geocoder
   from cartodb_services.tools import LegacyServiceManager
-  from cartodb_services.here import HereMapsGeocoder
+  from cartodb_services.here import HereMapsBulkGeocoder
 
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
+  geocoder = HereMapsBulkGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 

@@ -6,11 +6,10 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from exceptions import *
-from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.metrics import Traceable
 
 
-class HereMapsGeocoder(Traceable, StreetPointBulkGeocoder):
+class HereMapsGeocoder(Traceable):
     'A Here Maps Geocoder wrapper for python'
 
     PRODUCTION_GEOCODE_JSON_URL = 'https://geocoder.api.here.com/6.2/geocode.json'
@@ -64,14 +63,6 @@ class HereMapsGeocoder(Traceable, StreetPointBulkGeocoder):
         self.connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
         self.read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
-
-    def _bulk_geocode(self, searches):
-        results = []
-        for search in searches:
-            (search_id, address, city, state, country) = search
-            coordinates = self.geocode(searchtext=address, city=city, state=state, country=country)
-            results.append((search_id, coordinates, []))
-        return results
 
     def geocode(self, **kwargs):
         params = {}
