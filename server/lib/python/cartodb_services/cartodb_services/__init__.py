@@ -33,3 +33,5 @@ def _reset():
 
     plpy = None
     GD = None
+
+from geocoder import run_street_point_geocoder, StreetPointBulkGeocoder

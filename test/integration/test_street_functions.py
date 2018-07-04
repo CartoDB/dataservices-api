@@ -5,7 +5,7 @@ from unittest import TestCase
 from nose.tools import assert_raises
 from nose.tools import assert_not_equal, assert_equal
 from ..helpers.integration_test_helper import IntegrationTestHelper
-
+from ..helpers.integration_test_helper import assert_close_enough
 
 class TestStreetFunctionsSetUp(TestCase):
 
@@ -40,6 +40,52 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
 
 
 class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
+    provider = None
+    fixture_points = None
+
+    GOOGLE_POINTS = {
+        'Plaza Mayor, Valladolid': [-4.728252, 41.6517025],
+        'Paseo Zorrilla, Valladolid': [-4.7404453, 41.6314339],
+        '1900 amphitheatre parkway': [-122.0875324, 37.4227968],
+        '1901 amphitheatre parkway': [-122.0885504, 37.4238657],
+        '1902 amphitheatre parkway': [-122.0876674, 37.4235729],
+        'Valladolid': [-4.7245321, 41.652251],
+        'Valladolid, Spain': [-4.7245321, 41.652251],
+        'Valladolid, Mexico': [-88.2022488, 20.68964],
+        'Madrid': [-3.7037902, 40.4167754],
+        'Logroño, Spain': [-2.4449852, 42.4627195],
+        'Logroño, Argentina': [-61.6961807, -29.5031057]
+    }
+
+    HERE_POINTS = {
+        'Plaza Mayor, Valladolid': [-4.72979, 41.65258],
+        'Paseo Zorrilla, Valladolid': [-4.73869, 41.63817],
+        '1900 amphitheatre parkway': [-122.0879468, 37.4234763],
+        '1901 amphitheatre parkway': [-122.0879253, 37.4238725],
+        '1902 amphitheatre parkway': [-122.0879531, 37.4234775],
+        'Valladolid': [-4.73214, 41.6542],
+        'Valladolid, Spain': [-4.73214, 41.6542],
+        'Valladolid, Mexico': [-88.20117, 20.69021],
+        'Madrid': [-3.70578, 40.42028],
+        'Logroño, Spain': [-2.45194, 42.46592],
+        'Logroño, Argentina': [-61.69604, -29.50425]
+    }
+
+    FIXTURE_POINTS = {
+         'google': GOOGLE_POINTS,
+         'heremaps': HERE_POINTS
+    }
+
+    def setUp(self):
+        TestStreetFunctionsSetUp.setUp(self)
+
+        if not self.fixture_points:
+            query = "select provider from " \
+                    "cdb_dataservices_client.cdb_service_quota_info() " \
+                    "where service = 'hires_geocoder'"
+            response = self._run_authenticated(query)
+            provider = response['rows'][0]['provider']
+            self.fixture_points = self.FIXTURE_POINTS[provider]
 
     def test_full_spec(self):
         query = "select cartodb_id, st_x(the_geom), st_y(the_geom) " \
@@ -54,11 +100,11 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 ", 'street', 'city', 'state', 'country')"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 2)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -4.728252, 41.6517025);
-        self._assert_x_y(row_by_cartodb_id[2], -4.7404453, 41.6314339)
+        points_by_cartodb_id = {
+            1: self.fixture_points['Plaza Mayor, Valladolid'],
+            2: self.fixture_points['Paseo Zorrilla, Valladolid']
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_empty_columns(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -69,10 +115,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'address', '''''', '''''', '''''')"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 1)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -122.0885504, 37.4238657)
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
+                     self.fixture_points['1901 amphitheatre parkway'])
 
     def test_null_columns(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -83,10 +127,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'address')"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 1)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -122.0885504, 37.4238657)
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
+                     self.fixture_points['1901 amphitheatre parkway'])
 
     def test_batching(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -99,12 +141,12 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'address', null, null, null, 2)"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 3)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -122.0875324, 37.4227968)
-        self._assert_x_y(row_by_cartodb_id[2], -122.0885504, 37.4238657)
-        self._assert_x_y(row_by_cartodb_id[3], -122.0876674, 37.4235729)
+        points_by_cartodb_id = {
+            1: self.fixture_points['1900 amphitheatre parkway'],
+            2: self.fixture_points['1901 amphitheatre parkway'],
+            3: self.fixture_points['1902 amphitheatre parkway'],
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_city_column_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -118,9 +160,11 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
 
         assert_equal(response['total_rows'], 2)
 
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -4.7245321, 41.652251)
-        self._assert_x_y(row_by_cartodb_id[2], -3.7037902, 40.4167754)
+        points_by_cartodb_id = {
+            1: self.fixture_points['Valladolid'],
+            2: self.fixture_points['Madrid']
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_free_text_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -132,10 +176,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'''Logroño, La Rioja, Spain''')"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 1)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -2.4449852, 42.4627195)
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
+                     self.fixture_points['Logroño, Spain'])
 
     def test_templating_geocoding(self):
         query = "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
@@ -149,11 +191,11 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'city || '', '' || ''Argentina''')"
         response = self._run_authenticated(query)
 
-        assert_equal(response['total_rows'], 2)
-
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -2.4449852, 42.4627195)
-        self._assert_x_y(row_by_cartodb_id[2], -61.6961807, -29.5031057)
+        points_by_cartodb_id = {
+            1: self.fixture_points['Logroño, Spain'],
+            2: self.fixture_points['Logroño, Argentina']
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_template_with_two_columns_geocoding(self):
         query = "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
@@ -165,14 +207,31 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "    ') _x'," \
                 "'city || '', '' || country')"
         response = self._run_authenticated(query)
-        # from nose.tools import set_trace; set_trace()
 
-        assert_equal(response['total_rows'], 2)
+        points_by_cartodb_id = {
+            1: self.fixture_points['Valladolid, Mexico'],
+            2: self.fixture_points['Valladolid, Spain']
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
-        row_by_cartodb_id = self._row_by_cartodb_id(response)
-        self._assert_x_y(row_by_cartodb_id[1], -88.2022488, 20.68964)
-        self._assert_x_y(row_by_cartodb_id[2], -4.7245321, 41.652251)
+    def test_large_batches(self):
+        """
+        Useful just to test a good batch size
+        """
+        n = 10
+        streets = []
+        for i in range(0, n):
+            streets.append('{{"cartodb_id": {}, "address": "{} Yonge Street, ' \
+                           'Toronto, Canada"}}'.format(i, i))
 
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{}" \
+                "]''::jsonb) as (cartodb_id integer, address text)', " \
+                "'address', null, null, null, {})".format(','.join(streets), n)
+        response = self._run_authenticated(query)
+        assert_equal(n - 1, len(response['rows']))
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
@@ -181,10 +240,12 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         return IntegrationTestHelper.execute_query_raw(self.sql_api_url,
                                                        authenticated_query)
 
-    def _row_by_cartodb_id(self, response):
-        return {r['cartodb_id']: r for r in response['rows']}
+    @staticmethod
+    def _x_y_by_cartodb_id(response):
+        return {r['cartodb_id']: [r['st_x'], r['st_y']]
+                for r in response['rows']}
 
-    def _assert_x_y(self, row, expected_x, expected_y):
-        assert_equal(row['st_x'], expected_x)
-        assert_equal(row['st_y'], expected_y)
-
+    @staticmethod
+    def assert_close_points(points_a_by_cartodb_id, points_b_by_cartodb_id):
+        for cartodb_id, point in points_a_by_cartodb_id.iteritems():
+            assert_close_enough(point, points_b_by_cartodb_id[cartodb_id])

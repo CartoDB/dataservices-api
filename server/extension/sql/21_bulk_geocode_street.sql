@@ -24,52 +24,36 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
-      google_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
-      result = plpy.execute(google_plan, [username, orgname, searches])
-      return result
+      plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
+    elif user_geocoder_config.heremaps_geocoder:
+      plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_heremaps_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
     else:
       raise Exception('Requested geocoder is not available')
+
+    result = plpy.execute(plan, [username, orgname, searches])
+    return result
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
-  from cartodb_services.tools import LegacyServiceManager,QuotaExceededException,Logger
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import LegacyServiceManager
   from cartodb_services.google import GoogleMapsGeocoder
 
-  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-
-  logger = Logger(logger_config)
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-  try:
-    service_manager.assert_within_limits(quota=False)
-    geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
-    geocode_results = geocoder.bulk_geocode(searches=searches)
-    if geocode_results:
-      results = []
-      for result in geocode_results:
-        if result[1]:
-          plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-          point = plpy.execute(plan, result[1], 1)[0]
-          results.append([result[0], point['the_geom'], None])
-        else:
-          results.append([result[0], None, None])
-      service_manager.quota_service.increment_success_service_use(len(results))
-      return results
-    else:
-      service_manager.quota_service.increment_empty_service_use(len(searches))
-      return []
-  except QuotaExceededException as qe:
-    service_manager.quota_service.increment_failed_service_use(len(searches))
-    return []
-  except BaseException as e:
-    import sys
-    service_manager.quota_service.increment_failed_service_use()
-    service_manager.logger.error('Error trying to bulk geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to bulk geocode street point using google maps')
-  finally:
-    service_manager.quota_service.increment_total_service_use()
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_heremaps_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.here import HereMapsBulkGeocoder
+
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  geocoder = HereMapsBulkGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
