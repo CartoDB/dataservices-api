@@ -16,12 +16,12 @@ HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status'
 
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
     BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
-    MAX_BATCH_SIZE = 1000000 # From the docs
+    MAX_BATCH_SIZE = 1000000  # From the docs
     # https://developer.here.com/documentation/batch-geocoder/topics/read-batch-request-output.html
     META_COLS = ['relevance', 'matchType', 'matchCode', 'matchLevel', 'matchQualityStreet']
     MAX_STALLED_RETRIES = 100
     BATCH_RETRY_SLEEP_S = 5
-    MIN_BATCHED_SEARCH = 100 # Under this, serial will be used
+    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
     JOB_FINAL_STATES = ['completed', 'cancelled', 'deleted', 'failed']
 
     def __init__(self, app_id, app_code, logger, service_params=None, maxresults=HereMapsGeocoder.DEFAULT_MAXRESULTS):

@@ -47,7 +47,7 @@ StreetGeocoderSearch = namedtuple('StreetGeocoderSearch', 'id address city state
 class StreetPointBulkGeocoder:
     """
     Classes extending StreetPointBulkGeocoder should implement:
-        * _bulk_geocode(decoded_searches)
+        * _bulk_geocode(street_geocoder_searches)
     """
 
     SEARCH_KEYS = ['id', 'address', 'city', 'state', 'country']
@@ -74,3 +74,9 @@ class StreetPointBulkGeocoder:
                 StreetGeocoderSearch(search_id, address, city, state, country))
 
         return self._bulk_geocode(street_geocoder_searches)
+
+    def _bulk_geocode(self, street_geocoder_searches):
+        """
+        Subclasses must implement _bulk_geocode
+        """
+        raise NotImplementedError('Subclasses must implement _bulk_geocode')
