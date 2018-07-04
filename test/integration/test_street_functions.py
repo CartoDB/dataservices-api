@@ -5,7 +5,7 @@ from unittest import TestCase
 from nose.tools import assert_raises
 from nose.tools import assert_not_equal, assert_equal
 from ..helpers.integration_test_helper import IntegrationTestHelper
-
+from ..helpers.integration_test_helper import assert_close_enough
 
 class TestStreetFunctionsSetUp(TestCase):
 
@@ -104,7 +104,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             1: self.fixture_points['Plaza Mayor, Valladolid'],
             2: self.fixture_points['Paseo Zorrilla, Valladolid']
         }
-        assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_empty_columns(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -115,7 +115,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'address', '''''', '''''', '''''')"
         response = self._run_authenticated(query)
 
-        assert_equal(self._x_y_by_cartodb_id(response)[1],
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
                      self.fixture_points['1901 amphitheatre parkway'])
 
     def test_null_columns(self):
@@ -127,7 +127,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'address')"
         response = self._run_authenticated(query)
 
-        assert_equal(self._x_y_by_cartodb_id(response)[1],
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
                      self.fixture_points['1901 amphitheatre parkway'])
 
     def test_batching(self):
@@ -146,7 +146,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             2: self.fixture_points['1901 amphitheatre parkway'],
             3: self.fixture_points['1902 amphitheatre parkway'],
         }
-        assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_city_column_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -164,7 +164,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             1: self.fixture_points['Valladolid'],
             2: self.fixture_points['Madrid']
         }
-        assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_free_text_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
@@ -176,7 +176,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'''Logroño, La Rioja, Spain''')"
         response = self._run_authenticated(query)
 
-        assert_equal(self._x_y_by_cartodb_id(response)[1],
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
                      self.fixture_points['Logroño, Spain'])
 
     def test_templating_geocoding(self):
@@ -195,7 +195,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             1: self.fixture_points['Logroño, Spain'],
             2: self.fixture_points['Logroño, Argentina']
         }
-        assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_template_with_two_columns_geocoding(self):
         query = "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
@@ -212,7 +212,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             1: self.fixture_points['Valladolid, Mexico'],
             2: self.fixture_points['Valladolid, Spain']
         }
-        assert_equal(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
     def test_large_batches(self):
         """
@@ -245,3 +245,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         return {r['cartodb_id']: [r['st_x'], r['st_y']]
                 for r in response['rows']}
 
+    @staticmethod
+    def assert_close_points(points_a_by_cartodb_id, points_b_by_cartodb_id):
+        for cartodb_id, point in points_a_by_cartodb_id.iteritems():
+            assert_close_enough(point, points_b_by_cartodb_id[cartodb_id])

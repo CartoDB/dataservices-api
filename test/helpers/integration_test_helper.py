@@ -2,6 +2,29 @@ import os
 import requests
 import json
 
+from nose.tools import assert_true
+
+
+# From https://www.python.org/dev/peps/pep-0485/#proposed-implementation
+def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+
+def assert_close_enough(xy_a, xy_b, rel_tol=0.0001, abs_tol=0.0005):
+    """
+    Asserts that the given points are "close enough", in a square.
+    :param xy_a: Array of 2 elements, X and Y.
+    :param xy_b:  Array of 2 elements, X and Y.
+    :param rel_tol: Relative tolerance. Default: 0.001 (0.1%).
+    :param abs_tol: Absolute tolerance. Default: 0.0005.
+    """
+
+    for i in [0, 1]:
+        assert_true(isclose(xy_a[i], xy_b[i], rel_tol, abs_tol),
+                    "Coord {} error: {} and {} are not closer than {}, {}".format(
+                        i, xy_a[i], xy_b[i], rel_tol, abs_tol
+                    ))
+
 
 class IntegrationTestHelper:
 
@@ -34,3 +57,5 @@ class IntegrationTestHelper:
     @classmethod
     def execute_query(cls, sql_api_url, query):
         return cls.execute_query_raw(sql_api_url, query)['rows'][0]
+
+
