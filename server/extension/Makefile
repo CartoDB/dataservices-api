@@ -83,3 +83,6 @@ deploy: release_remove_parallel_deploy
 	$(INSTALL_DATA) old_versions/*.sql *.sql '$(DESTDIR)$(datadir)/extension/'
 
 install: deploy
+
+reinstall: install
+	psql -U postgres -d dataservices_db -c "drop extension if exists cdb_dataservices_server; create extension cdb_dataservices_server;"
