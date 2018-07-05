@@ -247,5 +247,6 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
 
     @staticmethod
     def assert_close_points(points_a_by_cartodb_id, points_b_by_cartodb_id):
+        assert_equal(len(points_a_by_cartodb_id), len(points_b_by_cartodb_id))
         for cartodb_id, point in points_a_by_cartodb_id.iteritems():
             assert_close_enough(point, points_b_by_cartodb_id[cartodb_id])
