@@ -97,7 +97,8 @@ class TomTomGeocoder(Traceable):
             elif response.status_code == requests.codes.unprocessable_entity:
                 return []
             else:
-                raise ServiceException(response.status_code, response)
+                msg = 'Unknown response: {}'.format(str(response.status_code))
+                raise ServiceException(msg, response)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
