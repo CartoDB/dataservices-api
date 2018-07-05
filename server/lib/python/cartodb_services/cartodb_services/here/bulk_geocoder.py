@@ -36,7 +36,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
 
     def _bulk_geocode(self, searches):
         if len(searches) > self.MAX_BATCH_SIZE:
-            raise "Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE)
+            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
         if self._should_use_batch(searches):
             self._logger.debug('--> Batch geocode')
             return self._batch_geocode(searches)
