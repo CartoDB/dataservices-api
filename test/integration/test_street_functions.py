@@ -233,6 +233,13 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         response = self._run_authenticated(query)
         assert_equal(n - 1, len(response['rows']))
 
+    def test_missing_components_on_private_function(self):
+        query = "SELECT _cdb_bulk_geocode_street_point(" \
+                "   '[{\"id\": \"1\", \"address\": \"Amphitheatre Parkway 22\"}]' " \
+                ")"
+        response = self._run_authenticated(query)
+        assert_equal(1, len(response['rows']))
+
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
                                                      self.env_variables[

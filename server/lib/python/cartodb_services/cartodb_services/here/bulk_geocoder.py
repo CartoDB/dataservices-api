@@ -93,7 +93,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         for search in searches:
             fields = [search.address, search.city, search.state]
             search_text = ', '.join(filter(None, fields))
-            row = [s.encode("utf-8")
+            row = [s.encode("utf-8") if s else ''
                    for s in [str(search.id), search_text, search.country]]
             writer.writerow(row)
 
