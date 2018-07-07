@@ -81,10 +81,21 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         'Logroño, Spain': [-2.44998, 42.46592],
     })
 
+    MAPBOX_POINTS = GOOGLE_POINTS.copy()
+    MAPBOX_POINTS.update({
+        'Logroño, Spain': [-2.44556, 42.47],
+        'Logroño, Argentina': [-70.687195, -33.470901],  # TODO: huge mismatch
+        'Valladolid': [-4.72856, 41.652251],
+        'Valladolid, Spain': [-4.72856, 41.652251],
+        '1902 amphitheatre parkway': [-118.03, 34.06],  # TODO: huge mismatch
+        'Madrid': [-3.69194, 40.4167754],
+    })
+
     FIXTURE_POINTS = {
         'google': GOOGLE_POINTS,
         'heremaps': HERE_POINTS,
-        'tomtom': TOMTOM_POINTS
+        'tomtom': TOMTOM_POINTS,
+        'mapbox': MAPBOX_POINTS
     }
 
     def setUp(self):
