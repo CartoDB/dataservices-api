@@ -6,6 +6,7 @@ from urlparse import parse_qs
 
 from exceptions import MalformedResult
 from cartodb_services import StreetPointBulkGeocoder
+from cartodb_services.geocoder import compose_address
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
@@ -36,8 +37,9 @@ class GoogleMapsGeocoder(StreetPointBulkGeocoder):
     def geocode(self, searchtext, city=None, state=None,
                 country=None):
         try:
+            address = compose_address(searchtext, city, state, country)
             opt_params = self._build_optional_parameters(city, state, country)
-            results = self.geocoder.geocode(address=searchtext,
+            results = self.geocoder.geocode(address=address,
                                             components=opt_params)
             if results:
                 return self._extract_lng_lat_from_result(results[0])
@@ -50,10 +52,10 @@ class GoogleMapsGeocoder(StreetPointBulkGeocoder):
         bulk_results = {}
         pool = Pool(processes=self.PARALLEL_PROCESSES)
         for search in searches:
-            (search_id, address, city, state, country) = search
+            (search_id, street, city, state, country) = search
             opt_params = self._build_optional_parameters(city, state, country)
             # Geocoding works better if components are also inside the address
-            address = ', '.join(filter(None, [address, city, state, country]))
+            address = compose_address(street, city, state, country)
             if address:
                 self._logger.debug('async geocoding --> {} {}'.format(address.encode('utf-8'), opt_params))
                 result = pool.apply_async(async_geocoder,

@@ -6,6 +6,10 @@ from collections import namedtuple
 import json
 
 
+def compose_address(street, city=None, state=None, country=None):
+    return ', '.join(filter(None, [street, city, state, country]))
+
+
 def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches):
     plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
     logger_config = GD["logger_config"]

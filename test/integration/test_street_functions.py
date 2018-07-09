@@ -18,11 +18,18 @@ class TestStreetFunctionsSetUp(TestCase):
             self.env_variables['api_key']
         )
 
+    def _run_authenticated(self, query):
+        authenticated_query = "{}&api_key={}".format(query,
+                                                     self.env_variables[
+                                                         'api_key'])
+        return IntegrationTestHelper.execute_query_raw(self.sql_api_url,
+                                                       authenticated_query)
+
 
 class TestStreetFunctions(TestStreetFunctionsSetUp):
 
     def test_if_select_with_street_point_is_ok(self):
-        query = "SELECT cdb_geocode_street_point(street) " \
+        query = "SELECT cdb_dataservices_client.cdb_geocode_street_point(street) " \
                 "as geometry FROM {0} LIMIT 1&api_key={1}".format(
             self.env_variables['table_name'],
             self.env_variables['api_key'])
@@ -39,6 +46,15 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
             assert_equal(e.message[0],
                          "permission denied for relation {}".format(table))
 
+    def test_component_aggregation(self):
+        query = "select st_x(the_geom), st_y(the_geom) from (" \
+                "select cdb_dataservices_client.cdb_geocode_street_point( " \
+                "'Plaza España 1', 'Barcelona', null, 'Spain') as the_geom) _x"
+        response = self._run_authenticated(query)
+        row = response['rows'][0]
+        x_y = [row['st_x'], row['st_y']]
+        # Wrong coordinates (Plaza España, Madrid): [-3.7138975, 40.4256762]
+        assert_close_enough(x_y, [2.1482563, 41.375485])
 
 class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
     provider = None
