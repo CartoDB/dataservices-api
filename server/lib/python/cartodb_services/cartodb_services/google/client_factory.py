@@ -13,12 +13,16 @@ class GoogleMapsClientFactory():
         cache_key = "{}:{}:{}".format(client_id, client_secret, channel)
         client = cls.clients.get(cache_key)
         if not client:
-            cls.assert_valid_crendentials(client_secret)
-            client = googlemaps.Client(
-                client_id=client_id,
-                client_secret=client_secret,
-                channel=channel)
-            cls.clients[cache_key] = client
+            if not client_id:
+                client = googlemaps.Client(key=client_secret)
+                cls.clients[cache_key] = client
+            else:
+                cls.assert_valid_crendentials(client_secret)
+                client = googlemaps.Client(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    channel=channel)
+                cls.clients[cache_key] = client
         return client
 
     @classmethod
