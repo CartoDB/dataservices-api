@@ -59,11 +59,7 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
 
     def _batch_geocode(self, searches):
         if len(searches) == 1:
-            # A single search can take advantage of country fixing
-            search = searches[0]
-            elements = self._encoded_elements(search)
-            coordinates = self._geocode_search(*elements)
-            return [(search[0], coordinates, [])]
+            return self._serial_geocode(searches)
         else:
             frees = []
             for search in searches:
