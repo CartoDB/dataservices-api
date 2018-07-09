@@ -113,7 +113,7 @@ class MapboxGeocoder(Traceable):
         :return: list of [x, y] on success, [] on error
         """
         try:
-            free_search = ';'.join(free_searches)
+            free_search = ';'.join([self._escape(fs) for fs in free_searches])
             self._logger.debug('--> free search: {}'.format(free_search))
             response = self._geocoder.forward(address=free_search.decode('utf-8'),
                                               country=country,
@@ -139,3 +139,10 @@ class MapboxGeocoder(Traceable):
             self._logger.error('Error connecting to Mapbox geocoding server',
                                exception=ce)
             return []
+
+    def _escape(self, free_search):
+        # Semicolon is used to separate batch geocoding; there's no documented
+        # way to pass actual semicolons, and %3B or &#59; won't work (check
+        # TestBulkStreetFunctions.test_semicolon and the docs,
+        # https://www.mapbox.com/api-documentation/#batch-requests)
+        return free_search.replace(';', ',')

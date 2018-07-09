@@ -262,6 +262,19 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         response = self._run_authenticated(query)
         assert_equal(1, len(response['rows']))
 
+    def test_semicolon(self):
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{\"cartodb_id\": 1, \"address\": \"1900 amphitheatre parkway; mountain view; ca; us\"}," \
+                "{\"cartodb_id\": 2, \"address\": \"1900 amphitheatre parkway, mountain view, ca, us\"}" \
+                "]''::jsonb) as (cartodb_id integer, address text)', " \
+                "'address', null, null, null)"
+        response = self._run_authenticated(query)
+
+        x_y_by_cartodb_id = self._x_y_by_cartodb_id(response)
+        assert_equal(x_y_by_cartodb_id[1], x_y_by_cartodb_id[2])
+
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
                                                      self.env_variables[
