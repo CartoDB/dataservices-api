@@ -30,13 +30,14 @@ class TomTomGeocoder(Traceable):
         self._apikey = apikey
         self._logger = logger
 
-    def _uri(self, searchtext, countries=None):
-        return API_BASEURI + self._request_uri(searchtext, countries, self._apikey)
+    def _uri(self, searchtext, country=None):
+        return HOST + API_BASEURI + \
+               self._request_uri(searchtext, country, self._apikey)
 
-    def _request_uri(self, searchtext, countries=None, apiKey=None):
+    def _request_uri(self, searchtext, country=None, apiKey=None):
         baseuri = REQUEST_BASEURI
-        if countries:
-            baseuri += '&countrySet={}'.format(countries)
+        if country:
+            baseuri += '&countrySet={}'.format(country)
         baseuri = baseuri + '&key={apiKey}' if apiKey else baseuri
         return URITemplate(baseuri).expand(apiKey=apiKey,
                                            searchtext=searchtext.encode('utf-8'))
@@ -81,7 +82,7 @@ class TomTomGeocoder(Traceable):
         if state_province:
             address.append(normalize(state_province))
 
-        uri = HOST + self._uri(searchtext=', '.join(address), countries=country)
+        uri = self._uri(searchtext=', '.join(address), country=country)
 
         try:
             response = requests.get(uri)

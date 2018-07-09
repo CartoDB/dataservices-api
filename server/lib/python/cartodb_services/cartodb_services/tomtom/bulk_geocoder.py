@@ -106,7 +106,7 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
     def _query(self, search):
         (search_id, address, city, state, country) = search
         searchtext = ', '.join(filter(None, [address, city, state]))
-        return self._request_uri(searchtext=searchtext, countries=country)
+        return self._request_uri(searchtext=searchtext, country=country)
 
     def _parse_results(self, json_body):
         return [self._parse_response(item['statusCode'], item['response'])
