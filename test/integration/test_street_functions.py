@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from unittest import TestCase
-from nose.tools import assert_raises
-from nose.tools import assert_not_equal, assert_equal
+from nose.tools import assert_not_equal, assert_equal, assert_true
 from ..helpers.integration_test_helper import IntegrationTestHelper
-from ..helpers.integration_test_helper import assert_close_enough
+from ..helpers.integration_test_helper import assert_close_enough, isclose
 
 class TestStreetFunctionsSetUp(TestCase):
     provider = None
@@ -321,6 +320,16 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         assert_equal(len(response['rows']), count)
         assert_not_equal(response['rows'][0]['st_x'], None)
 
+    def test_relevance(self):
+        query = "select metadata " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
+                "'select 1 as cartodb_id, ''Spain'' as country, " \
+                "''Barcelona'' as city, " \
+                "''Plaza España 1'' as street' " \
+                ", 'street', 'city', NULL, 'country')"
+        response = self._run_authenticated(query)
+
+        assert_true(isclose(response['rows'][0]['metadata']['relevance'], 1))
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,

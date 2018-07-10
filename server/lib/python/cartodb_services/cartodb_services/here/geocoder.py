@@ -65,12 +65,15 @@ class HereMapsGeocoder(Traceable):
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
 
     def geocode(self, **kwargs):
+        return self.geocode_meta(**kwargs)[0]
+
+    def geocode_meta(self, **kwargs):
         params = {}
         for key, value in kwargs.iteritems():
             if value and value.strip():
                 params[key] = value
         if not params:
-            return []
+            return [[], {}]
         return self._execute_geocode(params)
 
     def _execute_geocode(self, params):
@@ -78,10 +81,11 @@ class HereMapsGeocoder(Traceable):
             raise BadGeocodingParams(params)
         try:
             response = self._perform_request(params)
-            results = response['Response']['View'][0]['Result'][0]
-            return self._extract_lng_lat_from_result(results)
+            result = response['Response']['View'][0]['Result'][0]
+            return [self._extract_lng_lat_from_result(result),
+                    self._extract_metadata_from_result(result)]
         except IndexError:
-            return []
+            return [[], {}]
         except KeyError:
             raise MalformedResult()
 
@@ -118,3 +122,8 @@ class HereMapsGeocoder(Traceable):
         latitude = location['DisplayPosition']['Latitude']
 
         return [longitude, latitude]
+
+    def _extract_metadata_from_result(self, result):
+        return {
+            'relevance': result['Relevance']
+        }

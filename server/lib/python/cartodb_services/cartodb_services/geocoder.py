@@ -22,12 +22,18 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         if geocode_results:
             results = []
             for result in geocode_results:
+                if len(result) > 2:
+                    metadata = json.dumps(result[2])
+                else:
+                    logger.warning('Geocoding for {} without metadata'.format(username))
+                    metadata = '{}'
+
                 if result[1] and len(result[1]) == 2:
                     plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
                     point = plpy.execute(plan, result[1], 1)[0]
-                    results.append([result[0], point['the_geom'], None])
+                    results.append([result[0], point['the_geom'], metadata])
                 else:
-                    results.append([result[0], None, None])
+                    results.append([result[0], None, metadata])
             service_manager.quota_service.increment_success_service_use(len(results))
             return results
         else:

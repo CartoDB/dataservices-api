@@ -16,7 +16,7 @@ HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status'
 
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
     MAX_BATCH_SIZE = 1000000  # From the docs
-    MIN_BATCHED_SEARCH = 1000  # Under this, serial will be used
+    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
     BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     # https://developer.here.com/documentation/batch-geocoder/topics/read-batch-request-output.html
     META_COLS = ['relevance', 'matchType', 'matchCode', 'matchLevel', 'matchQualityStreet']
@@ -41,8 +41,8 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (search_id, address, city, state, country) = search
-            coordinates = self.geocode(searchtext=address, city=city, state=state, country=country)
-            results.append((search_id, coordinates, []))
+            result = self.geocode_meta(searchtext=address, city=city, state=state, country=country)
+            results.append((search_id, result[0], result[1]))
         return results
 
     def _batch_geocode(self, searches):
@@ -140,7 +140,11 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                 reader = csv.DictReader(root_zip.open(name), delimiter='|')
                 for row in reader:
                     if row['SeqNumber'] == '1':  # First per requested data
-                        results.append((row['recId'], [row['displayLongitude'], row['displayLatitude']]))
+                        results.append((row['recId'],
+                                        [row['displayLongitude'], row['displayLatitude']],
+                                        {
+                                            'relevance': float(row['relevance'])
+                                        }))
 
         return results
 
