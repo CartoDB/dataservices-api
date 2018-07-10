@@ -71,9 +71,20 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         'Logroño, Argentina': [-61.69604, -29.50425]
     }
 
+    TOMTOM_POINTS = HERE_POINTS.copy()
+    TOMTOM_POINTS.update({
+        'Plaza Mayor, Valladolid': [-4.72183, 41.5826],
+        'Paseo Zorrilla, Valladolid': [-4.74031, 41.63181],
+        'Valladolid': [-4.72838, 41.6542],
+        'Valladolid, Spain': [-4.72838, 41.6542],
+        'Madrid': [-3.70035, 40.42028],
+        'Logroño, Spain': [-2.44998, 42.46592],
+    })
+
     FIXTURE_POINTS = {
-         'google': GOOGLE_POINTS,
-         'heremaps': HERE_POINTS
+        'google': GOOGLE_POINTS,
+        'heremaps': HERE_POINTS,
+        'tomtom': TOMTOM_POINTS
     }
 
     def setUp(self):

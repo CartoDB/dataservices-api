@@ -9,10 +9,11 @@ from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools.normalize import normalize
 
-BASEURI = ('https://api.tomtom.com/search/2/geocode/'
-           '{searchtext}.JSON'
-           '?key={apiKey}'
-           '&limit=1')
+HOST = 'https://api.tomtom.com'
+API_BASEURI = '/search/2'
+REQUEST_BASEURI = ('/geocode/'
+               '{searchtext}.json'
+               '?limit=1')
 ENTRY_RESULTS = 'results'
 ENTRY_POSITION = 'position'
 ENTRY_LON = 'lon'
@@ -29,21 +30,17 @@ class TomTomGeocoder(Traceable):
         self._apikey = apikey
         self._logger = logger
 
-    def _uri(self, searchtext, countries=None):
-        baseuri = BASEURI + '&countrySet={}'.format(countries) \
-                  if countries else BASEURI
-        uri = URITemplate(baseuri).expand(apiKey=self._apikey,
-                                          searchtext=searchtext.encode('utf-8'))
-        return uri
+    def _uri(self, searchtext, country=None):
+        return HOST + API_BASEURI + \
+               self._request_uri(searchtext, country, self._apikey)
 
-    def _parse_geocoder_response(self, response):
-        json_response = json.loads(response)
-
-        if json_response and json_response[ENTRY_RESULTS]:
-            result = json_response[ENTRY_RESULTS][0]
-            return self._extract_lng_lat_from_feature(result)
-        else:
-            return []
+    def _request_uri(self, searchtext, country=None, apiKey=None):
+        baseuri = REQUEST_BASEURI
+        if country:
+            baseuri += '&countrySet={}'.format(country)
+        baseuri = baseuri + '&key={apiKey}' if apiKey else baseuri
+        return URITemplate(baseuri).expand(apiKey=apiKey,
+                                           searchtext=searchtext.encode('utf-8'))
 
     def _extract_lng_lat_from_feature(self, result):
         position = result[ENTRY_POSITION]
@@ -85,19 +82,11 @@ class TomTomGeocoder(Traceable):
         if state_province:
             address.append(normalize(state_province))
 
-        uri = self._uri(searchtext=', '.join(address), countries=country)
+        uri = self._uri(searchtext=', '.join(address), country=country)
 
         try:
             response = requests.get(uri)
-
-            if response.status_code == requests.codes.ok:
-                return self._parse_geocoder_response(response.text)
-            elif response.status_code == requests.codes.bad_request:
-                return []
-            elif response.status_code == requests.codes.unprocessable_entity:
-                return []
-            else:
-                raise ServiceException(response.status_code, response)
+            return self._parse_response(response.status_code, response.text)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
@@ -110,3 +99,25 @@ class TomTomGeocoder(Traceable):
             self._logger.error('Error connecting to TomTom geocoding server',
                                exception=ce)
             return []
+
+    def _parse_response(self, status_code, text):
+        if status_code == requests.codes.ok:
+            return self._parse_geocoder_response(text)
+        elif status_code == requests.codes.bad_request:
+            return []
+        elif status_code == requests.codes.unprocessable_entity:
+            return []
+        else:
+            msg = 'Unknown response {}: {}'.format(str(status_code), text)
+            raise ServiceException(msg, None)
+
+    def _parse_geocoder_response(self, response):
+        json_response = json.loads(response) \
+            if type(response) != dict else response
+
+        if json_response and json_response[ENTRY_RESULTS]:
+            result = json_response[ENTRY_RESULTS][0]
+            return self._extract_lng_lat_from_feature(result)
+        else:
+            return []
+

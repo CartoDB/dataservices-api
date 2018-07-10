@@ -2367,12 +2367,15 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
-      plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_google_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
+      provider_function = "_cdb_bulk_google_geocode_street_point";
     elif user_geocoder_config.heremaps_geocoder:
-      plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_bulk_heremaps_geocode_street_point($1, $2, $3); ", ["text", "text", "jsonb"])
+      provider_function = "_cdb_bulk_heremaps_geocode_street_point";
+    elif user_geocoder_config.tomtom_geocoder:
+      provider_function = "_cdb_bulk_tomtom_geocode_street_point";
     else:
       raise Exception('Requested geocoder is not available')
 
+    plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
     result = plpy.execute(plan, [username, orgname, searches])
     return result
 
@@ -2397,6 +2400,23 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
 
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
   geocoder = HereMapsBulkGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_tomtom_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.refactor.service.tomtom_geocoder_config import TomTomGeocoderConfigBuilder
+  from cartodb_services.tomtom import TomTomBulkGeocoder
+  from cartodb_services.tools import Logger
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  service_manager = ServiceManager('geocoder', TomTomGeocoderConfigBuilder, username, orgname, GD)
+  geocoder = TomTomBulkGeocoder(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 

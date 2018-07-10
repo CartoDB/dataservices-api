@@ -1,3 +1,4 @@
 from geocoder import TomTomGeocoder
+from bulk_geocoder import TomTomBulkGeocoder
 from routing import TomTomRouting, TomTomRoutingResponse
 from isolines import TomTomIsolines, TomTomIsochronesResponse
