@@ -16,7 +16,7 @@ HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status'
 
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
     MAX_BATCH_SIZE = 1000000  # From the docs
-    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
+    MIN_BATCHED_SEARCH = 1000  # Under this, serial will be used
     BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     # https://developer.here.com/documentation/batch-geocoder/topics/read-batch-request-output.html
     META_COLS = ['relevance', 'matchType', 'matchCode', 'matchLevel', 'matchQualityStreet']
@@ -55,14 +55,17 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         while True:
             job_info = self._job_status(request_id)
             if job_info.processed_count == last_processed:
+                self._logger.debug('--> no progress ({})'.format(last_processed))
                 stalled_retries += 1
                 if stalled_retries > self.MAX_STALLED_RETRIES:
                     raise Exception('Too many retries for job {}'.format(request_id))
             else:
+                self._logger.debug('--> progress ({} != {})'.format(job_info.processed_count, last_processed))
                 stalled_retries = 0
                 last_processed = job_info.processed_count
 
-            self._logger.debug('--> Job poll check: {}'.format(job_info))
+            self._logger.debug('--> Job poll check ({}): {}'.format(
+                stalled_retries, job_info))
             if job_info.status in self.JOB_FINAL_STATES:
                 break
             else:
@@ -95,7 +98,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         request_params.update({
             'gen': 8,
             'action': 'run',
-            #'mailto': 'juanignaciosl@carto.com',
+            # 'mailto': 'juanignaciosl@carto.com',
             'header': 'true',
             'inDelim': '|',
             'outDelim': '|',
@@ -121,8 +124,8 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                                 timeout=(self.connect_timeout, self.read_timeout))
         polling_root = ET.fromstring(polling_r.text)
         return HereJobStatus(
-            total_count=polling_root.find('./Response/TotalCount').text,
-            processed_count=polling_root.find('./Response/ProcessedCount').text,
+            total_count=int(polling_root.find('./Response/TotalCount').text),
+            processed_count=int(polling_root.find('./Response/ProcessedCount').text),
             status=polling_root.find('./Response/Status').text)
 
     def _download_results(self, job_id):

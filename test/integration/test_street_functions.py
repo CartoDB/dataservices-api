@@ -259,7 +259,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         """
         Useful just to test a good batch size
         """
-        n = 50
+        n = 110
+        batch_size = 'NULL'  # NULL for optimal
         streets = []
         for i in range(0, n):
             streets.append('{{"cartodb_id": {}, "address": "{} Yonge Street, ' \
@@ -270,7 +271,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "'select * from jsonb_to_recordset(''[" \
                 "{}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
-                "'address', null, null, null, {})".format(','.join(streets), n)
+                "'address', null, null, null, {})".format(','.join(streets), batch_size)
         response = self._run_authenticated(query)
         assert_equal(n - 1, len(response['rows']))
 
@@ -306,6 +307,20 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
 
         assert_close_enough(self._x_y_by_cartodb_id(response)[1],
                             self.fixture_points['Plaza España 1, Barcelona'])
+
+    def _test_known_table(self):
+        subquery = 'select * from known_table where cartodb_id < 1100'
+        subquery_count = 'select count(1) from ({}) _x'.format(subquery)
+        count = self._run_authenticated(subquery_count)['rows'][0]['count']
+
+        query = "select cartodb_id, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
+                "'{}' " \
+                ", 'street', 'city', NULL, 'country')".format(subquery)
+        response = self._run_authenticated(query)
+        assert_equal(len(response['rows']), count)
+        assert_not_equal(response['rows'][0]['st_x'], None)
+
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,

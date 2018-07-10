@@ -39,5 +39,6 @@ CREATE TYPE cdb_dataservices_client.service_quota_info AS (
     monthly_quota NUMERIC,
     used_quota NUMERIC,
     soft_limit BOOLEAN,
-    provider TEXT
+    provider TEXT,
+    max_batch_size NUMERIC
 );
