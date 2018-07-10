@@ -8,6 +8,67 @@ from ..helpers.integration_test_helper import IntegrationTestHelper
 from ..helpers.integration_test_helper import assert_close_enough
 
 class TestStreetFunctionsSetUp(TestCase):
+    provider = None
+    fixture_points = None
+
+    GOOGLE_POINTS = {
+        'Plaza Mayor, Valladolid': [-4.728252, 41.6517025],
+        'Paseo Zorrilla, Valladolid': [-4.7404453, 41.6314339],
+        '1900 amphitheatre parkway': [-122.0875324, 37.4227968],
+        '1901 amphitheatre parkway': [-122.0885504, 37.4238657],
+        '1902 amphitheatre parkway': [-122.0876674, 37.4235729],
+        'Valladolid': [-4.7245321, 41.652251],
+        'Valladolid, Spain': [-4.7245321, 41.652251],
+        'Valladolid, Mexico': [-88.2022488, 20.68964],
+        'Madrid': [-3.7037902, 40.4167754],
+        'Logroño, Spain': [-2.4449852, 42.4627195],
+        'Logroño, Argentina': [-61.6961807, -29.5031057],
+        'Plaza España 1, Barcelona': [2.1482563, 41.375485]
+    }
+
+    HERE_POINTS = {
+        'Plaza Mayor, Valladolid': [-4.72979, 41.65258],
+        'Paseo Zorrilla, Valladolid': [-4.73869, 41.63817],
+        '1900 amphitheatre parkway': [-122.0879468, 37.4234763],
+        '1901 amphitheatre parkway': [-122.0879253, 37.4238725],
+        '1902 amphitheatre parkway': [-122.0879531, 37.4234775],
+        'Valladolid': [-4.73214, 41.6542],
+        'Valladolid, Spain': [-4.73214, 41.6542],
+        'Valladolid, Mexico': [-88.20117, 20.69021],
+        'Madrid': [-3.70578, 40.42028],
+        'Logroño, Spain': [-2.45194, 42.46592],
+        'Logroño, Argentina': [-61.69604, -29.50425],
+        'Plaza España 1, Barcelona': [2.1735699, 41.3823]  # TODO: not ideal
+    }
+
+    TOMTOM_POINTS = HERE_POINTS.copy()
+    TOMTOM_POINTS.update({
+        'Plaza Mayor, Valladolid': [-4.72183, 41.5826],
+        'Paseo Zorrilla, Valladolid': [-4.74031, 41.63181],
+        'Valladolid': [-4.72838, 41.6542],
+        'Valladolid, Spain': [-4.72838, 41.6542],
+        'Madrid': [-3.70035, 40.42028],
+        'Logroño, Spain': [-2.44998, 42.46592],
+        'Plaza España 1, Barcelona': [2.07479, 41.36818]  # TODO: not ideal
+    })
+
+    MAPBOX_POINTS = GOOGLE_POINTS.copy()
+    MAPBOX_POINTS.update({
+        'Logroño, Spain': [-2.44556, 42.47],
+        'Logroño, Argentina': [-70.687195, -33.470901],  # TODO: huge mismatch
+        'Valladolid': [-4.72856, 41.652251],
+        'Valladolid, Spain': [-4.72856, 41.652251],
+        '1902 amphitheatre parkway': [-118.03, 34.06],  # TODO: huge mismatch
+        'Madrid': [-3.69194, 40.4167754],
+        'Plaza España 1, Barcelona': [2.245969, 41.452483]  # TODO: not ideal
+    })
+
+    FIXTURE_POINTS = {
+        'google': GOOGLE_POINTS,
+        'heremaps': HERE_POINTS,
+        'tomtom': TOMTOM_POINTS,
+        'mapbox': MAPBOX_POINTS
+    }
 
     def setUp(self):
         self.env_variables = IntegrationTestHelper.get_environment_variables()
@@ -17,6 +78,15 @@ class TestStreetFunctionsSetUp(TestCase):
             self.env_variables['host'],
             self.env_variables['api_key']
         )
+
+        if not self.fixture_points:
+            query = "select provider from " \
+                    "cdb_dataservices_client.cdb_service_quota_info() " \
+                    "where service = 'hires_geocoder'"
+            response = self._run_authenticated(query)
+            provider = response['rows'][0]['provider']
+            self.fixture_points = self.FIXTURE_POINTS[provider]
+
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
@@ -54,77 +124,9 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
         row = response['rows'][0]
         x_y = [row['st_x'], row['st_y']]
         # Wrong coordinates (Plaza España, Madrid): [-3.7138975, 40.4256762]
-        assert_close_enough(x_y, [2.1482563, 41.375485])
+        assert_close_enough(x_y, self.fixture_points['Plaza España 1, Barcelona'])
 
 class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
-    provider = None
-    fixture_points = None
-
-    GOOGLE_POINTS = {
-        'Plaza Mayor, Valladolid': [-4.728252, 41.6517025],
-        'Paseo Zorrilla, Valladolid': [-4.7404453, 41.6314339],
-        '1900 amphitheatre parkway': [-122.0875324, 37.4227968],
-        '1901 amphitheatre parkway': [-122.0885504, 37.4238657],
-        '1902 amphitheatre parkway': [-122.0876674, 37.4235729],
-        'Valladolid': [-4.7245321, 41.652251],
-        'Valladolid, Spain': [-4.7245321, 41.652251],
-        'Valladolid, Mexico': [-88.2022488, 20.68964],
-        'Madrid': [-3.7037902, 40.4167754],
-        'Logroño, Spain': [-2.4449852, 42.4627195],
-        'Logroño, Argentina': [-61.6961807, -29.5031057]
-    }
-
-    HERE_POINTS = {
-        'Plaza Mayor, Valladolid': [-4.72979, 41.65258],
-        'Paseo Zorrilla, Valladolid': [-4.73869, 41.63817],
-        '1900 amphitheatre parkway': [-122.0879468, 37.4234763],
-        '1901 amphitheatre parkway': [-122.0879253, 37.4238725],
-        '1902 amphitheatre parkway': [-122.0879531, 37.4234775],
-        'Valladolid': [-4.73214, 41.6542],
-        'Valladolid, Spain': [-4.73214, 41.6542],
-        'Valladolid, Mexico': [-88.20117, 20.69021],
-        'Madrid': [-3.70578, 40.42028],
-        'Logroño, Spain': [-2.45194, 42.46592],
-        'Logroño, Argentina': [-61.69604, -29.50425]
-    }
-
-    TOMTOM_POINTS = HERE_POINTS.copy()
-    TOMTOM_POINTS.update({
-        'Plaza Mayor, Valladolid': [-4.72183, 41.5826],
-        'Paseo Zorrilla, Valladolid': [-4.74031, 41.63181],
-        'Valladolid': [-4.72838, 41.6542],
-        'Valladolid, Spain': [-4.72838, 41.6542],
-        'Madrid': [-3.70035, 40.42028],
-        'Logroño, Spain': [-2.44998, 42.46592],
-    })
-
-    MAPBOX_POINTS = GOOGLE_POINTS.copy()
-    MAPBOX_POINTS.update({
-        'Logroño, Spain': [-2.44556, 42.47],
-        'Logroño, Argentina': [-70.687195, -33.470901],  # TODO: huge mismatch
-        'Valladolid': [-4.72856, 41.652251],
-        'Valladolid, Spain': [-4.72856, 41.652251],
-        '1902 amphitheatre parkway': [-118.03, 34.06],  # TODO: huge mismatch
-        'Madrid': [-3.69194, 40.4167754],
-    })
-
-    FIXTURE_POINTS = {
-        'google': GOOGLE_POINTS,
-        'heremaps': HERE_POINTS,
-        'tomtom': TOMTOM_POINTS,
-        'mapbox': MAPBOX_POINTS
-    }
-
-    def setUp(self):
-        TestStreetFunctionsSetUp.setUp(self)
-
-        if not self.fixture_points:
-            query = "select provider from " \
-                    "cdb_dataservices_client.cdb_service_quota_info() " \
-                    "where service = 'hires_geocoder'"
-            response = self._run_authenticated(query)
-            provider = response['rows'][0]['provider']
-            self.fixture_points = self.FIXTURE_POINTS[provider]
 
     def test_full_spec(self):
         query = "select cartodb_id, st_x(the_geom), st_y(the_geom) " \
@@ -257,7 +259,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         """
         Useful just to test a good batch size
         """
-        n = 10
+        n = 50
         streets = []
         for i in range(0, n):
             streets.append('{{"cartodb_id": {}, "address": "{} Yonge Street, ' \
@@ -291,6 +293,19 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
 
         x_y_by_cartodb_id = self._x_y_by_cartodb_id(response)
         assert_equal(x_y_by_cartodb_id[1], x_y_by_cartodb_id[2])
+
+        # "'Plaza España 1', 'Barcelona', null, 'Spain') as the_geom) _x"
+    def test_component_aggregation(self):
+        query = "select cartodb_id, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
+                "'select 1 as cartodb_id, ''Spain'' as country, " \
+                "''Barcelona'' as city, " \
+                "''Plaza España 1'' as street' " \
+                ", 'street', 'city', NULL, 'country')"
+        response = self._run_authenticated(query)
+
+        assert_close_enough(self._x_y_by_cartodb_id(response)[1],
+                            self.fixture_points['Plaza España 1, Barcelona'])
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,

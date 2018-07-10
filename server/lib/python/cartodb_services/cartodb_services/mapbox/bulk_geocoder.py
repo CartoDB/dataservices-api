@@ -21,16 +21,6 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
         self.session = requests.Session()
 
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
-
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH
 

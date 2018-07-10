@@ -19,16 +19,6 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
     def __init__(self, client_id, client_secret, logger):
         GoogleMapsGeocoder.__init__(self, client_id, client_secret, logger)
 
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
-
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH
 

@@ -15,13 +15,13 @@ from cartodb_services.tools.exceptions import ServiceException
 HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status')
 
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
-    BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     MAX_BATCH_SIZE = 1000000  # From the docs
+    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
+    BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     # https://developer.here.com/documentation/batch-geocoder/topics/read-batch-request-output.html
     META_COLS = ['relevance', 'matchType', 'matchCode', 'matchLevel', 'matchQualityStreet']
     MAX_STALLED_RETRIES = 100
     BATCH_RETRY_SLEEP_S = 5
-    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
     JOB_FINAL_STATES = ['completed', 'cancelled', 'deleted', 'failed']
 
     def __init__(self, app_id, app_code, logger, service_params=None, maxresults=HereMapsGeocoder.DEFAULT_MAXRESULTS):
@@ -33,16 +33,6 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
             'app_id': self.app_id,
             'app_code': self.app_code,
         }
-
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
 
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH

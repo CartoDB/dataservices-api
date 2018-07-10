@@ -51,7 +51,12 @@ StreetGeocoderSearch = namedtuple('StreetGeocoderSearch', 'id address city state
 class StreetPointBulkGeocoder:
     """
     Classes extending StreetPointBulkGeocoder should implement:
-        * _bulk_geocode(street_geocoder_searches)
+        * _batch_geocode(street_geocoder_searches)
+        * MAX_BATCH_SIZE
+
+    If they want to provide an alternative serial (for small batches):
+        * _should_use_batch(street_geocoder_searches)
+        * _serial_geocode(street_geocoder_searches)
     """
 
     SEARCH_KEYS = ['id', 'address', 'city', 'state', 'country']
@@ -77,10 +82,22 @@ class StreetPointBulkGeocoder:
             street_geocoder_searches.append(
                 StreetGeocoderSearch(search_id, address, city, state, country))
 
-        return self._bulk_geocode(street_geocoder_searches)
+        if len(street_geocoder_searches) > self.MAX_BATCH_SIZE:
+            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
+        if self._should_use_batch(street_geocoder_searches):
+            self._logger.debug('--> Batch geocode')
+            return self._batch_geocode(street_geocoder_searches)
+        else:
+            self._logger.debug('--> Serial geocode')
+            return self._serial_geocode(street_geocoder_searches)
 
-    def _bulk_geocode(self, street_geocoder_searches):
-        """
-        Subclasses must implement _bulk_geocode
-        """
-        raise NotImplementedError('Subclasses must implement _bulk_geocode')
+    def _batch_geocode(self, street_geocoder_searches):
+        raise NotImplementedError('Subclasses must implement _batch_geocode')
+
+    def _serial_geocode(self, street_geocoder_searches):
+        raise NotImplementedError('Subclasses must implement _serial_geocode')
+
+    def _should_use_batch(self, street_geocoder_searches):
+        return True
+
+

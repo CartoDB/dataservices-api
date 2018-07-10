@@ -6,12 +6,12 @@ from cartodb_services.tools.exceptions import ServiceException
 
 
 class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
+    MAX_BATCH_SIZE = 1000000  # From the docs
+    MIN_BATCHED_SEARCH = 10  # Batch API is really fast
     BASE_URL = 'https://api.tomtom.com'
     BATCH_URL = BASE_URL + '/search/2/batch.json'
-    MAX_BATCH_SIZE = 1000000  # From the docs
     MAX_STALLED_RETRIES = 100
     BATCH_RETRY_SLEEP_S = 5
-    MIN_BATCHED_SEARCH = 10  # Batch API is really fast
     READ_TIMEOUT = 60
     CONNECT_TIMEOUT = 10
     MAX_RETRIES = 1
@@ -25,16 +25,6 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         self.session.headers.update({'Content-Type': 'application/json'})
         self.session.mount(self.BATCH_URL,
                            HTTPAdapter(max_retries=self.max_retries))
-
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
 
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH
