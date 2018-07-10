@@ -38,18 +38,18 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
             state = state.encode('utf-8') if state else None
             country = country.encode('utf-8') if country else None
             self._logger.debug('--> Sending serial search: {}'.format(search))
-            coordinates = self.geocode(searchtext=address, city=city,
+            result = self.geocode_meta(searchtext=address, city=city,
                                        state_province=state, country=country)
             self._logger.debug('--> result sent')
-            results.append((search_id, coordinates, []))
+            results.append((search_id, result[0], result[1]))
         return results
 
     def _batch_geocode(self, searches):
         location = self._send_batch(searches)
-        xy_results = self._download_results(location)
+        full_results = self._download_results(location)
         results = []
-        for s, r in zip(searches, xy_results):
-            results.append((s[0], r, []))
+        for s, r in zip(searches, full_results):
+            results.append((s[0], r[0], r[1]))
         self._logger.debug('--> results: {}'.format(results))
         return results
 

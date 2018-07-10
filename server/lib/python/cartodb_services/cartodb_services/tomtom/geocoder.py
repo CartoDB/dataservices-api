@@ -18,6 +18,7 @@ ENTRY_RESULTS = 'results'
 ENTRY_POSITION = 'position'
 ENTRY_LON = 'lon'
 ENTRY_LAT = 'lat'
+EMPTY_RESPONSE = [[], {}]
 
 
 class TomTomGeocoder(Traceable):
@@ -62,6 +63,11 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
+        return self.geocode_meta(searchtext, city, state_province, country)[0]
+
+    @qps_retry(qps=5)
+    def geocode_meta(self, searchtext, city=None, state_province=None,
+                country=None):
         if searchtext:
             searchtext = searchtext.decode('utf-8')
         if city:
@@ -72,7 +78,7 @@ class TomTomGeocoder(Traceable):
             country = country.decode('utf-8')
 
         if not self._validate_input(searchtext, city, state_province, country):
-            return []
+            return EMPTY_RESPONSE
 
         address = []
         if searchtext and searchtext.strip():
@@ -98,15 +104,15 @@ class TomTomGeocoder(Traceable):
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to TomTom geocoding server',
                                exception=ce)
-            return []
+            return EMPTY_RESPONSE
 
     def _parse_response(self, status_code, text):
         if status_code == requests.codes.ok:
             return self._parse_geocoder_response(text)
         elif status_code == requests.codes.bad_request:
-            return []
+            return EMPTY_RESPONSE
         elif status_code == requests.codes.unprocessable_entity:
-            return []
+            return EMPTY_RESPONSE
         else:
             msg = 'Unknown response {}: {}'.format(str(status_code), text)
             raise ServiceException(msg, None)
@@ -117,7 +123,14 @@ class TomTomGeocoder(Traceable):
 
         if json_response and json_response[ENTRY_RESULTS]:
             result = json_response[ENTRY_RESULTS][0]
-            return self._extract_lng_lat_from_feature(result)
+            return [
+                self._extract_lng_lat_from_feature(result),
+                self._extract_metadata_from_result(result)
+            ]
         else:
-            return []
+            return EMPTY_RESPONSE
 
+    def _extract_metadata_from_result(self, result):
+        return {
+            'relevance': result['score']  # TODO: normalize
+        }
