@@ -81,10 +81,21 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         'Logroño, Spain': [-2.44998, 42.46592],
     })
 
+    MAPBOX_POINTS = GOOGLE_POINTS.copy()
+    MAPBOX_POINTS.update({
+        'Logroño, Spain': [-2.44556, 42.47],
+        'Logroño, Argentina': [-70.687195, -33.470901],  # TODO: huge mismatch
+        'Valladolid': [-4.72856, 41.652251],
+        'Valladolid, Spain': [-4.72856, 41.652251],
+        '1902 amphitheatre parkway': [-118.03, 34.06],  # TODO: huge mismatch
+        'Madrid': [-3.69194, 40.4167754],
+    })
+
     FIXTURE_POINTS = {
         'google': GOOGLE_POINTS,
         'heremaps': HERE_POINTS,
-        'tomtom': TOMTOM_POINTS
+        'tomtom': TOMTOM_POINTS,
+        'mapbox': MAPBOX_POINTS
     }
 
     def setUp(self):
@@ -250,6 +261,19 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 ")"
         response = self._run_authenticated(query)
         assert_equal(1, len(response['rows']))
+
+    def test_semicolon(self):
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{\"cartodb_id\": 1, \"address\": \"1900 amphitheatre parkway; mountain view; ca; us\"}," \
+                "{\"cartodb_id\": 2, \"address\": \"1900 amphitheatre parkway, mountain view, ca, us\"}" \
+                "]''::jsonb) as (cartodb_id integer, address text)', " \
+                "'address', null, null, null)"
+        response = self._run_authenticated(query)
+
+        x_y_by_cartodb_id = self._x_y_by_cartodb_id(response)
+        assert_equal(x_y_by_cartodb_id[1], x_y_by_cartodb_id[2])
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,

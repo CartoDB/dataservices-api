@@ -39,17 +39,20 @@ class MapboxGeocoder(Traceable):
 
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
+        self._logger.debug('--> json response: {}'.format(json_response))
 
-        # If Mapbox returns more that one result, take the first one
         if json_response:
-            if type(json_response) == list:
-                json_response = json_response[0]
+            if type(json_response) != list:
+                json_response = [json_response]
 
-            if json_response[ENTRY_FEATURES]:
-                feature = json_response[ENTRY_FEATURES][0]
-                return self._extract_lng_lat_from_feature(feature)
-            else:
-                return []
+            result = []
+            for a_json_response in json_response:
+                if a_json_response[ENTRY_FEATURES]:
+                    feature = a_json_response[ENTRY_FEATURES][0]
+                    result.append(self._extract_lng_lat_from_feature(feature))
+                else:
+                    result.append([])
+            return result
         else:
             return []
 
@@ -78,6 +81,13 @@ class MapboxGeocoder(Traceable):
     @qps_retry(qps=10)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
+        """
+        :param searchtext:
+        :param city:
+        :param state_province:
+        :param country: Country ISO 3166 code
+        :return: [x, y] on success, [] on error
+        """
         if not self._validate_input(searchtext, city, state_province, country):
             return []
 
@@ -91,8 +101,21 @@ class MapboxGeocoder(Traceable):
 
         country = [country] if country else None
 
+        free_search = ', '.join(address)
+
+        return self.geocode_free_text([free_search], country)[0]
+
+    @qps_retry(qps=10)
+    def geocode_free_text(self, free_searches, country=None):
+        """
+        :param free_searches: Free text searches
+        :param country: Country ISO 3166 code
+        :return: list of [x, y] on success, [] on error
+        """
         try:
-            response = self._geocoder.forward(address=', '.join(address).decode('utf-8'),
+            free_search = ';'.join([self._escape(fs) for fs in free_searches])
+            self._logger.debug('--> free search: {}'.format(free_search))
+            response = self._geocoder.forward(address=free_search.decode('utf-8'),
                                               country=country,
                                               limit=1)
 
@@ -110,9 +133,16 @@ class MapboxGeocoder(Traceable):
             self._logger.error('Timeout connecting to Mapbox geocoding server',
                                te)
             raise ServiceException('Error geocoding {0} using Mapbox'.format(
-                searchtext), None)
+                free_search), None)
         except requests.ConnectionError as ce:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to Mapbox geocoding server',
                                exception=ce)
             return []
+
+    def _escape(self, free_search):
+        # Semicolon is used to separate batch geocoding; there's no documented
+        # way to pass actual semicolons, and %3B or &#59; won't work (check
+        # TestBulkStreetFunctions.test_semicolon and the docs,
+        # https://www.mapbox.com/api-documentation/#batch-requests)
+        return free_search.replace(';', ',')
