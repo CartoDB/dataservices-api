@@ -38,7 +38,7 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
 
     def test_if_select_with_street_without_api_key_raise_error(self):
         table = self.env_variables['table_name']
-        query = "SELECT cdb_geocode_street_point(street) " \
+        query = "SELECT cdb_dataservices_client.cdb_geocode_street_point(street) " \
                 "as geometry FROM {0} LIMIT 1".format(table)
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)

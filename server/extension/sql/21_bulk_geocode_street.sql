@@ -44,10 +44,10 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_stre
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services import run_street_point_geocoder
   from cartodb_services.tools import LegacyServiceManager
-  from cartodb_services.google import GoogleMapsGeocoder
+  from cartodb_services.google import GoogleMapsBulkGeocoder
 
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
+  geocoder = GoogleMapsBulkGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
