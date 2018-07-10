@@ -24,7 +24,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
     MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
     JOB_FINAL_STATES = ['completed', 'cancelled', 'deleted', 'failed']
 
-    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=MAX_BATCH_SIZE):
+    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=HereMapsGeocoder.DEFAULT_MAXRESULTS):
         HereMapsGeocoder.__init__(self, app_id, app_code, logger, service_params, maxresults)
         self.session = requests.Session()
         self.session.mount(self.BATCH_URL,
