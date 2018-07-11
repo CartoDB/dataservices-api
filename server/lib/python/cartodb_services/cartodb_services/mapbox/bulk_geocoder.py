@@ -29,15 +29,10 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
         for search in searches:
             elements = self._encoded_elements(search)
             self._logger.debug('--> Sending serial search: {}'.format(search))
-            coordinates = self._geocode_search(*elements)
-            results.append((search[0], coordinates, []))
-        return results
+            result = self.geocode_meta(*elements)
 
-    def _geocode_search(self, address, city, state, country):
-        coordinates = self.geocode(searchtext=address, city=city,
-                                   state_province=state, country=country)
-        self._logger.debug('--> result sent')
-        return coordinates
+            results.append((search[0], result[0], result[1]))
+        return results
 
     def _encoded_elements(self, search):
         (search_id, address, city, state, country) = search
@@ -58,11 +53,11 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
                 frees.append(free)
 
             self._logger.debug('--> sending free search: {}'.format(frees))
-            xy_results = self.geocode_free_text(frees)
+            full_results = self.geocode_free_text_meta(frees)
             results = []
-            self._logger.debug('--> searches: {}; xy: {}'.format(searches, xy_results))
-            for s, r in zip(searches, xy_results):
-                results.append((s[0], r, []))
+            self._logger.debug('--> searches: {}; xy: {}'.format(searches, full_results))
+            for s, r in zip(searches, full_results):
+                results.append((s[0], r[0], r[1]))
             self._logger.debug('--> results: {}'.format(results))
             return results
 
