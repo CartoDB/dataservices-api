@@ -69,30 +69,38 @@ class TestStreetFunctionsSetUp(TestCase):
         'mapbox': MAPBOX_POINTS
     }
 
-    HERE_RELEVANCES = {
-        'Plaza España, Barcelona': 1
+    GOOGLE_METADATAS = {
+        'Plaza España, Barcelona': {
+            'relevance': 0.9, 'precision': 'precise'
+        },
+        'Santiago Rusiñol 123, Valladolid': {
+            'relevance': 0.8, 'precision': 'interpolated'
+        }
     }
 
-    MAPBOX_RELEVANCES = HERE_RELEVANCES.copy()
-    MAPBOX_RELEVANCES.update({
-        'Plaza España, Barcelona': 0.75
-    })
+    HERE_METADATAS = {
+        'Plaza España, Barcelona': {
+            'relevance': 1
+        }
+    }
 
-    TOMTOM_RELEVANCES = MAPBOX_RELEVANCES.copy()
-    TOMTOM_RELEVANCES.update({
-        'Plaza España, Barcelona': 0.85
-    })
+    TOMTOM_METADATAS = {
+        'Plaza España, Barcelona': {
+            'relevance': 0.85
+        }
+    }
 
-    GOOGLE_RELEVANCES = HERE_RELEVANCES.copy()
-    GOOGLE_RELEVANCES.update({
-        'Plaza España, Barcelona': 0.9
-    })
+    MAPBOX_METADATAS = {
+        'Plaza España, Barcelona': {
+            'relevance': 0.75
+        }
+    }
 
-    RELEVANCES = {
-        'google': GOOGLE_RELEVANCES,
-        'here': HERE_RELEVANCES,
-        'tomtom': TOMTOM_RELEVANCES,
-        'mapbox': MAPBOX_RELEVANCES
+    METADATAS = {
+        'google': GOOGLE_METADATAS,
+        'here': HERE_METADATAS,
+        'tomtom': TOMTOM_METADATAS,
+        'mapbox': MAPBOX_METADATAS
     }
 
     def setUp(self):
@@ -112,7 +120,7 @@ class TestStreetFunctionsSetUp(TestCase):
             provider = response['rows'][0]['provider']
             self.fixture_points = self.FIXTURE_POINTS[provider]
 
-            self.relevances = self.RELEVANCES[provider]
+            self.metadata = self.METADATAS[provider]
 
 
     def _run_authenticated(self, query):
@@ -353,19 +361,25 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         assert_equal(len(response['rows']), count)
         assert_not_equal(response['rows'][0]['st_x'], None)
 
-    def test_relevance(self):
+    def test_metadata(self):
         query = "select metadata " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
                 "'select 1 as cartodb_id, ''Spain'' as country, " \
                 "''Barcelona'' as city, " \
-                "''Plaza España'' as street' " \
+                "''Plaza España'' as street " \
+                "UNION " \
+                "select 2 as cartodb_id, ''Spain'' as country, " \
+                "''Valladolid'' as city, " \
+                "''Calle Santiago Rusiñol 123'' as street' " \
                 ", 'street', 'city', NULL, 'country')"
         response = self._run_authenticated(query)
 
-        relevance = response['rows'][0]['metadata']['relevance']
-        expected_relevance = self.relevances['Plaza España, Barcelona']
-        assert_true(isclose(relevance, expected_relevance, 0.05),
-                    '{} not close to {}'.format(relevance, expected_relevance))
+        expected = [
+            self.metadata['Plaza España, Barcelona'],
+            self.metadata['Santiago Rusiñol 123, Valladolid']
+        ]
+        for r, e in zip(response['rows'], expected):
+            self.assert_metadata(r['metadata'], e)
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
@@ -384,3 +398,12 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         assert_equal(len(points_a_by_cartodb_id), len(points_b_by_cartodb_id))
         for cartodb_id, point in points_a_by_cartodb_id.iteritems():
             assert_close_enough(point, points_b_by_cartodb_id[cartodb_id])
+
+    @staticmethod
+    def assert_metadata(metadata, expected):
+        relevance = metadata['relevance']
+        expected_relevance = expected['relevance']
+        assert_true(isclose(relevance, expected_relevance, 0.05),
+                    '{} not close to {}'.format(relevance, expected_relevance))
+
+        assert_equal(metadata['precision'], expected['precision'])

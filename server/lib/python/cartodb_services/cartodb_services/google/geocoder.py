@@ -4,6 +4,7 @@
 from urlparse import parse_qs
 
 from exceptions import MalformedResult
+from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.geocoder import compose_address
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
@@ -15,6 +16,12 @@ RELEVANCE_BY_LOCATION_TYPE = {
     'GEOMETRIC_CENTER': 0.9,
     'RANGE_INTERPOLATED': 0.8,
     'APPROXIMATE': 0.7
+}
+PRECISION_BY_LOCATION_TYPE = {
+    'ROOFTOP': PRECISION_PRECISE,
+    'GEOMETRIC_CENTER': PRECISION_PRECISE,
+    'RANGE_INTERPOLATED': PRECISION_INTERPOLATED,
+    'APPROXIMATE': PRECISION_INTERPOLATED
 }
 
 
@@ -64,7 +71,8 @@ class GoogleMapsGeocoder():
         partial_match = result.get('partial_match', False)
         partial_factor = PARTIAL_FACTOR if partial_match else 1
         return {
-            'relevance': base_relevance * partial_factor
+            'relevance': base_relevance * partial_factor,
+            'precision': PRECISION_BY_LOCATION_TYPE[location_type]
         }
 
 
