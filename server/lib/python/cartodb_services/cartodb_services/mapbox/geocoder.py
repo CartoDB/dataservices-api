@@ -5,6 +5,7 @@ Python client for the Mapbox Geocoder service.
 import json
 import requests
 from mapbox import Geocoder
+from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -74,8 +75,14 @@ class MapboxGeocoder(Traceable):
         return [longitude, latitude]
 
     def _extract_metadata_from_result(self, result):
+        if result[ENTRY_GEOMETRY].get('interpolated', False):
+            precision = PRECISION_INTERPOLATED
+        else:
+            precision = PRECISION_PRECISE
+
         return {
-            'relevance': self._normalize_relevance(float(result['relevance']))
+            'relevance': self._normalize_relevance(float(result['relevance'])),
+            'precision': precision
         }
 
     def _normalize_relevance(self, relevance):

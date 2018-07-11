@@ -91,9 +91,10 @@ class TestStreetFunctionsSetUp(TestCase):
     }
 
     MAPBOX_METADATAS = {
-        'Plaza España, Barcelona': {
-            'relevance': 0.75
-        }
+        'Plaza España, Barcelona':
+            {'relevance': 0.666, 'precision': 'precise'},
+        'Santiago Rusiñol 123, Valladolid':
+            {'relevance': 0.666, 'precision': 'precise'} # TODO: wrong
     }
 
     METADATAS = {
