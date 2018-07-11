@@ -73,15 +73,21 @@ class TestStreetFunctionsSetUp(TestCase):
         'Plaza España, Barcelona': 1
     }
 
-    MAPBOX_RELEVANCES = {
+    MAPBOX_RELEVANCES = HERE_RELEVANCES.copy()
+    MAPBOX_RELEVANCES.update({
         'Plaza España, Barcelona': 0.75
-    }
+    })
+
+    TOMTOM_RELEVANCES = MAPBOX_RELEVANCES.copy()
+    TOMTOM_RELEVANCES.update({
+        'Plaza España, Barcelona': 0.85
+    })
 
     RELEVANCES = {
+        'google': HERE_RELEVANCES,
         'here': HERE_RELEVANCES,
-        'tomtom': HERE_RELEVANCES,
-        'mapbox': MAPBOX_RELEVANCES,
-        'google': HERE_RELEVANCES
+        'tomtom': TOMTOM_RELEVANCES,
+        'mapbox': MAPBOX_RELEVANCES
     }
 
     def setUp(self):
@@ -346,8 +352,10 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 ", 'street', 'city', NULL, 'country')"
         response = self._run_authenticated(query)
 
-        assert_true(isclose(response['rows'][0]['metadata']['relevance'],
-                            self.relevances['Plaza España, Barcelona']))
+        relevance = response['rows'][0]['metadata']['relevance']
+        expected_relevance = self.relevances['Plaza España, Barcelona']
+        assert_true(isclose(relevance, expected_relevance, 0.05),
+                    '{} not close to {}'.format(relevance, expected_relevance))
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,

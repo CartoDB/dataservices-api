@@ -4,6 +4,7 @@
 import json
 import requests
 from uritemplate import URITemplate
+from math import tanh
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -20,6 +21,7 @@ ENTRY_LON = 'lon'
 ENTRY_LAT = 'lat'
 EMPTY_RESPONSE = [[], {}]
 
+SCORE_NORMALIZATION_FACTOR = 0.15
 
 class TomTomGeocoder(Traceable):
     '''
@@ -132,5 +134,8 @@ class TomTomGeocoder(Traceable):
 
     def _extract_metadata_from_result(self, result):
         return {
-            'relevance': result['score']  # TODO: normalize
+            'relevance': self._normalize_score(result['score'])
         }
+
+    def _normalize_score(self, score):
+        return tanh(score * SCORE_NORMALIZATION_FACTOR)
