@@ -6,7 +6,13 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from exceptions import *
+from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
+
+PRECISION_BY_MATCH_TYPE = {
+    'pointAddress': PRECISION_PRECISE,
+    'interpolated': PRECISION_INTERPOLATED
+}
 
 
 class HereMapsGeocoder(Traceable):
@@ -82,11 +88,13 @@ class HereMapsGeocoder(Traceable):
         try:
             response = self._perform_request(params)
             result = response['Response']['View'][0]['Result'][0]
+            self._logger.debug('--> Result: {}'.format(result))
             return [self._extract_lng_lat_from_result(result),
                     self._extract_metadata_from_result(result)]
         except IndexError:
             return [[], {}]
-        except KeyError:
+        except KeyError as e:
+            self._logger.error('params: {}'.format(params), e)
             raise MalformedResult()
 
     def _perform_request(self, params):
@@ -124,6 +132,10 @@ class HereMapsGeocoder(Traceable):
         return [longitude, latitude]
 
     def _extract_metadata_from_result(self, result):
+        # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
+        precision = PRECISION_BY_MATCH_TYPE[
+            result.get('MatchType', 'pointAddress')]
         return {
-            'relevance': result['Relevance']
+            'relevance': result['Relevance'],
+            'precision': precision
         }

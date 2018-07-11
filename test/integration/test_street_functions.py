@@ -70,18 +70,17 @@ class TestStreetFunctionsSetUp(TestCase):
     }
 
     GOOGLE_METADATAS = {
-        'Plaza España, Barcelona': {
-            'relevance': 0.9, 'precision': 'precise'
-        },
-        'Santiago Rusiñol 123, Valladolid': {
-            'relevance': 0.8, 'precision': 'interpolated'
-        }
+        'Plaza España, Barcelona':
+            {'relevance': 0.9, 'precision': 'precise'},
+        'Santiago Rusiñol 123, Valladolid':
+            {'relevance': 0.8, 'precision': 'interpolated'}
     }
 
     HERE_METADATAS = {
-        'Plaza España, Barcelona': {
-            'relevance': 1
-        }
+        'Plaza España, Barcelona':
+            {'relevance': 1, 'precision': 'precise'},
+        'Santiago Rusiñol 123, Valladolid':
+            {'relevance': 0.89, 'precision': 'precise'}  # Wrong. See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
     }
 
     TOMTOM_METADATAS = {
@@ -98,7 +97,7 @@ class TestStreetFunctionsSetUp(TestCase):
 
     METADATAS = {
         'google': GOOGLE_METADATAS,
-        'here': HERE_METADATAS,
+        'heremaps': HERE_METADATAS,
         'tomtom': TOMTOM_METADATAS,
         'mapbox': MAPBOX_METADATAS
     }
