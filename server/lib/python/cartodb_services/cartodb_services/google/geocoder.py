@@ -8,6 +8,15 @@ from cartodb_services.geocoder import compose_address
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
+EMPTY_RESPONSE = [[], {}]
+PARTIAL_FACTOR = 0.8
+RELEVANCE_BY_LOCATION_TYPE = {
+    'ROOFTOP': 1,
+    'GEOMETRIC_CENTER': 0.9,
+    'RANGE_INTERPOLATED': 0.8,
+    'APPROXIMATE': 0.7
+}
+
 
 class GoogleMapsGeocoder():
 
@@ -19,25 +28,48 @@ class GoogleMapsGeocoder():
         self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret, self.channel)
         self._logger = logger
 
-    def geocode(self, searchtext, city=None, state=None,
-                country=None):
+    def geocode(self, searchtext, city=None, state=None, country=None):
+        return self.geocode_meta(searchtext, city, state, country)[0]
+
+    def geocode_meta(self, searchtext, city=None, state=None, country=None):
         try:
             address = compose_address(searchtext, city, state, country)
             opt_params = self._build_optional_parameters(city, state, country)
             results = self.geocoder.geocode(address=address,
                                             components=opt_params)
-            if results:
-                return self._extract_lng_lat_from_result(results[0])
-            else:
-                return []
-        except KeyError:
+            return self._process_results(results)
+        except KeyError as e:
+            self._logger.error('params: {}, {}, {}, {}'.format(
+                searchtext.encode('utf-8'), city.encode('utf-8'),
+                state.encode('utf-8'), country.encode('utf-8')
+            ), e)
             raise MalformedResult()
+
+    def _process_results(self, results):
+        if results:
+            self._logger.debug('--> results: {}'.format(results[0]))
+            return [
+                self._extract_lng_lat_from_result(results[0]),
+                self._extract_metadata_from_result(results[0])
+            ]
+        else:
+            return EMPTY_RESPONSE
 
     def _extract_lng_lat_from_result(self, result):
         location = result['geometry']['location']
         longitude = location['lng']
         latitude = location['lat']
         return [longitude, latitude]
+
+    def _extract_metadata_from_result(self, result):
+        location_type = result['geometry']['location_type']
+        base_relevance = RELEVANCE_BY_LOCATION_TYPE[location_type]
+        partial_match = result.get('partial_match', False)
+        partial_factor = PARTIAL_FACTOR if partial_match else 1
+        return {
+            'relevance': base_relevance * partial_factor
+        }
+
 
     def _build_optional_parameters(self, city=None, state=None,
                                    country=None):

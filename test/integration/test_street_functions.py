@@ -83,8 +83,13 @@ class TestStreetFunctionsSetUp(TestCase):
         'Plaza España, Barcelona': 0.85
     })
 
+    GOOGLE_RELEVANCES = HERE_RELEVANCES.copy()
+    GOOGLE_RELEVANCES.update({
+        'Plaza España, Barcelona': 0.9
+    })
+
     RELEVANCES = {
-        'google': HERE_RELEVANCES,
+        'google': GOOGLE_RELEVANCES,
         'here': HERE_RELEVANCES,
         'tomtom': TOMTOM_RELEVANCES,
         'mapbox': MAPBOX_RELEVANCES
@@ -331,7 +336,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                             self.fixture_points['Plaza España, Barcelona'])
 
     def _test_known_table(self):
-        subquery = 'select * from known_table where cartodb_id < 1100'
+        subquery = 'select * from unknown_table where cartodb_id < 1100'
         subquery_count = 'select count(1) from ({}) _x'.format(subquery)
         count = self._run_authenticated(subquery_count)['rows'][0]['count']
 

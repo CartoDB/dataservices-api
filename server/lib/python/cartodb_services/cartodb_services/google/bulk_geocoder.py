@@ -6,8 +6,7 @@ from cartodb_services.google import GoogleMapsGeocoder
 
 
 def async_geocoder(geocoder, address, components):
-    results = geocoder.geocode(address=address, components=components)
-    return results if results else []
+    return geocoder.geocode(address=address, components=components)
 
 
 class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
@@ -26,12 +25,9 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (cartodb_id, street, city, state, country) = search
-            address = compose_address(street, city, state, country)
-            components = self._build_optional_parameters(city, state, country)
-            result = self.geocoder.geocode(address=address, components=components)
-            lng_lat = self._extract_lng_lat_from_result(result[0]) if result else []
-            self._logger.debug('--> lng_lat: {}'.format(lng_lat))
-            results.append((cartodb_id, lng_lat, []))
+            lng_lat, metadata = self.geocode_meta(street, city, state, country)
+            self._logger.debug('--> lng_lat: {}. metadata: {}'.format(lng_lat, metadata))
+            results.append((cartodb_id, lng_lat, metadata))
         return results
 
     def _batch_geocode(self, searches):
@@ -39,16 +35,13 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         pool = Pool(processes=self.PARALLEL_PROCESSES)
         for search in searches:
             (cartodb_id, street, city, state, country) = search
-            components = self._build_optional_parameters(city, state, country)
-            # Geocoding works better if components are also inside the address
+            self._logger.debug('async geocoding --> {}'.format(search))
             address = compose_address(street, city, state, country)
             if address:
-                self._logger.debug('async geocoding --> {} {}'.format(address.encode('utf-8'), components))
+                components = self._build_optional_parameters(city, state, country)
                 result = pool.apply_async(async_geocoder,
                                           (self.geocoder, address, components))
-            else:
-                result = []
-            bulk_results[cartodb_id] = result
+                bulk_results[cartodb_id] = result
         pool.close()
         pool.join()
 
@@ -56,13 +49,12 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
             results = []
             for cartodb_id, bulk_result in bulk_results.items():
                 try:
-                    result = bulk_result.get()
+                    lng_lat, metadata = self._process_results(bulk_result.get())
                 except Exception as e:
                     self._logger.error('Error at Google async_geocoder', e)
-                    result = []
+                    lng_lat, metadata = [[], {}]
 
-                lng_lat = self._extract_lng_lat_from_result(result[0]) if result else []
-                results.append((cartodb_id, lng_lat, []))
+                results.append((cartodb_id, lng_lat, metadata))
             return results
         except KeyError as e:
             self._logger.error('KeyError error', exception=e)
@@ -70,4 +62,3 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         except Exception as e:
             self._logger.error('General error', exception=e)
             raise e
-
