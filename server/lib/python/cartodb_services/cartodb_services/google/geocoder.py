@@ -32,17 +32,14 @@ class GoogleMapsGeocoder():
         return self.geocode_meta(searchtext, city, state, country)[0]
 
     def geocode_meta(self, searchtext, city=None, state=None, country=None):
+        address = compose_address(searchtext, city, state, country)
         try:
-            address = compose_address(searchtext, city, state, country)
             opt_params = self._build_optional_parameters(city, state, country)
             results = self.geocoder.geocode(address=address,
                                             components=opt_params)
             return self._process_results(results)
         except KeyError as e:
-            self._logger.error('params: {}, {}, {}, {}'.format(
-                searchtext.encode('utf-8'), city.encode('utf-8'),
-                state.encode('utf-8'), country.encode('utf-8')
-            ), e)
+            self._logger.error('address: {}'.format(address), e)
             raise MalformedResult()
 
     def _process_results(self, results):
