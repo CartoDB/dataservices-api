@@ -287,11 +287,14 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         Useful just to test a good batch size
         """
         n = 110
+        first_cartodb_id = -1
+        first_street_number = 1
         batch_size = 'NULL'  # NULL for optimal
         streets = []
         for i in range(0, n):
             streets.append('{{"cartodb_id": {}, "address": "{} Yonge Street, ' \
-                           'Toronto, Canada"}}'.format(i, i))
+                           'Toronto, Canada"}}'.format(first_cartodb_id + i,
+                                                       first_street_number + i))
 
         query = "select *, st_x(the_geom), st_y(the_geom) " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
@@ -300,7 +303,9 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
                 "'address', null, null, null, {})".format(','.join(streets), batch_size)
         response = self._run_authenticated(query)
-        assert_equal(n - 1, len(response['rows']))
+        assert_equal(n, len(response['rows']))
+        for row in response['rows']:
+            assert_not_equal(row['st_x'], None)
 
     def test_missing_components_on_private_function(self):
         query = "SELECT _cdb_bulk_geocode_street_point(" \
