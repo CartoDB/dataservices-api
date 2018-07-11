@@ -73,7 +73,7 @@ class TestStreetFunctionsSetUp(TestCase):
         'Plaza España, Barcelona':
             {'relevance': 0.9, 'precision': 'precise'},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.8, 'precision': 'interpolated'}
+            {'relevance': 0.56, 'precision': 'interpolated'}
     }
 
     HERE_METADATAS = {
@@ -84,9 +84,10 @@ class TestStreetFunctionsSetUp(TestCase):
     }
 
     TOMTOM_METADATAS = {
-        'Plaza España, Barcelona': {
-            'relevance': 0.85
-        }
+        'Plaza España, Barcelona':
+            {'relevance': 0.85, 'precision': 'precise'},
+        'Santiago Rusiñol 123, Valladolid':
+            {'relevance': 0.448283494533, 'precision': 'interpolated'}
     }
 
     MAPBOX_METADATAS = {
@@ -369,7 +370,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "UNION " \
                 "select 2 as cartodb_id, ''Spain'' as country, " \
                 "''Valladolid'' as city, " \
-                "''Calle Santiago Rusiñol 123'' as street' " \
+                "''Santiago Rusiñol 123'' as street' " \
                 ", 'street', 'city', NULL, 'country')"
         response = self._run_authenticated(query)
 

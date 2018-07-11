@@ -5,6 +5,7 @@ import json
 import requests
 from uritemplate import URITemplate
 from math import tanh
+from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -22,6 +23,7 @@ ENTRY_LAT = 'lat'
 EMPTY_RESPONSE = [[], {}]
 
 SCORE_NORMALIZATION_FACTOR = 0.15
+PRECISION_SCORE_THRESHOLD = 0.5
 
 class TomTomGeocoder(Traceable):
     '''
@@ -133,9 +135,15 @@ class TomTomGeocoder(Traceable):
             return EMPTY_RESPONSE
 
     def _extract_metadata_from_result(self, result):
+        score = self._normalize_score(result['score'])
         return {
-            'relevance': self._normalize_score(result['score'])
+            'relevance': score,
+            'precision': self._precision_from_score(score)
         }
 
     def _normalize_score(self, score):
         return tanh(score * SCORE_NORMALIZATION_FACTOR)
+
+    def _precision_from_score(self, score):
+        return PRECISION_PRECISE \
+            if score > PRECISION_SCORE_THRESHOLD else PRECISION_INTERPOLATED
