@@ -25,6 +25,17 @@ TYPE_POINT = 'Point'
 
 EMPTY_RESPONSE = [[], {}]
 
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'poi': 'point_of_interest',
+    'poi.landmark': 'point_of_interest',
+    'place': 'point_of_interest',
+    'country': 'country',
+    'region': 'state',
+    'locality': 'locality',
+    'district': 'district',
+    'address': 'street'
+}
+
 
 class MapboxGeocoder(Traceable):
     '''
@@ -80,9 +91,12 @@ class MapboxGeocoder(Traceable):
         else:
             precision = PRECISION_PRECISE
 
+        match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
+                       for match_level in result['place_type']]
         return {
             'relevance': self._normalize_relevance(float(result['relevance'])),
-            'precision': precision
+            'precision': precision,
+            'match_types': filter(None, match_types)
         }
 
     def _normalize_relevance(self, relevance):
