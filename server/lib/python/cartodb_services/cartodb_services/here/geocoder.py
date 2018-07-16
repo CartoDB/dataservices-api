@@ -13,6 +13,18 @@ PRECISION_BY_MATCH_TYPE = {
     'pointAddress': PRECISION_PRECISE,
     'interpolated': PRECISION_INTERPOLATED
 }
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'landmark': 'point_of_interest',
+    'country': 'country',
+    'state': 'state',
+    'county': 'county',
+    'city': 'locality',
+    'district': 'district',
+    'street': 'street',
+    'intersection': 'intersection',
+    'houseNumber': 'street_number',
+    'postalCode': 'postal_code'
+}
 
 
 class HereMapsGeocoder(Traceable):
@@ -135,7 +147,9 @@ class HereMapsGeocoder(Traceable):
         # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
         precision = PRECISION_BY_MATCH_TYPE[
             result.get('MatchType', 'pointAddress')]
+        match_type = MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
         return {
             'relevance': result['Relevance'],
-            'precision': precision
+            'precision': precision,
+            'match_types': [match_type] if match_type else []
         }

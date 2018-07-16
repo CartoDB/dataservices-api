@@ -78,9 +78,9 @@ class TestStreetFunctionsSetUp(TestCase):
 
     HERE_METADATAS = {
         'Plaza España, Barcelona':
-            {'relevance': 1, 'precision': 'precise'},
+            {'relevance': 1, 'precision': 'precise', 'match_types': ['street']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.89, 'precision': 'precise'}  # Wrong. See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
+            {'relevance': 0.89, 'precision': 'precise', 'match_types': ['street']}  # Wrong. See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
     }
 
     TOMTOM_METADATAS = {
