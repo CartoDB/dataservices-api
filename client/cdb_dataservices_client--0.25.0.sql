@@ -18,7 +18,12 @@ BEGIN
 
     RETURN ROWS;
 END
-$func$ LANGUAGE plpgsql;--
+$func$ LANGUAGE plpgsql;
+
+-- Taken from https://stackoverflow.com/a/48013356/351721
+CREATE OR REPLACE FUNCTION jsonb_array_casttext(jsonb) RETURNS text[] AS $f$
+    SELECT array_agg(x) || ARRAY[]::text[] FROM jsonb_array_elements_text($1) t(x);
+$f$ LANGUAGE sql IMMUTABLE;--
 -- Geocoder server connection config
 --
 -- The purpose of this function is provide to the PL/Proxy functions
