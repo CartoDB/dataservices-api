@@ -9,24 +9,6 @@ from exceptions import *
 from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 
-PRECISION_BY_MATCH_TYPE = {
-    'pointAddress': PRECISION_PRECISE,
-    'interpolated': PRECISION_INTERPOLATED
-}
-MATCH_TYPE_BY_MATCH_LEVEL = {
-    'landmark': 'point_of_interest',
-    'country': 'country',
-    'state': 'state',
-    'county': 'county',
-    'city': 'locality',
-    'district': 'district',
-    'street': 'street',
-    'intersection': 'intersection',
-    'houseNumber': 'street_number',
-    'postalCode': 'postal_code'
-}
-
-
 class HereMapsGeocoder(Traceable):
     'A Here Maps Geocoder wrapper for python'
 
@@ -69,6 +51,23 @@ class HereMapsGeocoder(Traceable):
         'prox',
         'strictlanguagemode'
         ] + ADDRESS_PARAMS
+
+    PRECISION_BY_MATCH_TYPE = {
+        'pointAddress': PRECISION_PRECISE,
+        'interpolated': PRECISION_INTERPOLATED
+    }
+    MATCH_TYPE_BY_MATCH_LEVEL = {
+        'landmark': 'point_of_interest',
+        'country': 'country',
+        'state': 'state',
+        'county': 'county',
+        'city': 'locality',
+        'district': 'district',
+        'street': 'street',
+        'intersection': 'intersection',
+        'houseNumber': 'street_number',
+        'postalCode': 'postal_code'
+    }
 
     def __init__(self, app_id, app_code, logger, service_params=None, maxresults=DEFAULT_MAXRESULTS):
         service_params = service_params or {}
@@ -145,9 +144,9 @@ class HereMapsGeocoder(Traceable):
 
     def _extract_metadata_from_result(self, result):
         # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
-        precision = PRECISION_BY_MATCH_TYPE[
+        precision = self.PRECISION_BY_MATCH_TYPE[
             result.get('MatchType', 'pointAddress')]
-        match_type = MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
+        match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
         return {
             'relevance': result['Relevance'],
             'precision': precision,

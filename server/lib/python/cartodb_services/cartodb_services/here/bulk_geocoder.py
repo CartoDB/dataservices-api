@@ -140,10 +140,15 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                 reader = csv.DictReader(root_zip.open(name), delimiter='|')
                 for row in reader:
                     if row['SeqNumber'] == '1':  # First per requested data
+                        precision = self.PRECISION_BY_MATCH_TYPE[
+                            row.get('matchType', 'pointAddress')]
+                        match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(row['matchLevel'], None)
                         results.append((row['recId'],
                                         [row['displayLongitude'], row['displayLatitude']],
                                         {
-                                            'relevance': float(row['relevance'])
+                                            'relevance': float(row['relevance']),
+                                            'precision': precision,
+                                            'match_types': [match_type] if match_type else []
                                         }))
 
         return results

@@ -315,6 +315,11 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         assert_equal(n, len(response['rows']))
         for row in response['rows']:
             assert_not_equal(row['st_x'], None)
+            assert_not_equal(row['metadata'], {})
+            metadata = row['metadata']
+            assert_not_equal(metadata['relevance'], None)
+            assert_not_equal(metadata['precision'], None)
+            assert_not_equal(metadata['match_types'], None)
 
     def test_missing_components_on_private_function(self):
         query = "SELECT _cdb_bulk_geocode_street_point(" \
