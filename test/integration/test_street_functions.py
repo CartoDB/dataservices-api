@@ -85,9 +85,9 @@ class TestStreetFunctionsSetUp(TestCase):
 
     TOMTOM_METADATAS = {
         'Plaza España, Barcelona':
-            {'relevance': 0.85, 'precision': 'precise'},
+            {'relevance': 0.85, 'precision': 'precise', 'match_types': ['street']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.448283494533, 'precision': 'interpolated'}
+            {'relevance': 0.448283494533, 'precision': 'interpolated', 'match_types': ['street']}
     }
 
     MAPBOX_METADATAS = {

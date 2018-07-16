@@ -24,6 +24,13 @@ EMPTY_RESPONSE = [[], {}]
 
 SCORE_NORMALIZATION_FACTOR = 0.15
 PRECISION_SCORE_THRESHOLD = 0.5
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'POI': 'point_of_interest',
+    'Street': 'street',
+    'Address Range': 'street',
+    'Cross Street': 'intersection',
+    'Point Address': 'street_number'
+}
 
 class TomTomGeocoder(Traceable):
     '''
@@ -136,9 +143,11 @@ class TomTomGeocoder(Traceable):
 
     def _extract_metadata_from_result(self, result):
         score = self._normalize_score(result['score'])
+        match_type = MATCH_TYPE_BY_MATCH_LEVEL.get(result['type'], None)
         return {
             'relevance': score,
-            'precision': self._precision_from_score(score)
+            'precision': self._precision_from_score(score),
+            'match_types': [match_type] if match_type else []
         }
 
     def _normalize_score(self, score):
