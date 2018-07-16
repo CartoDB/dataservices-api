@@ -71,9 +71,9 @@ class TestStreetFunctionsSetUp(TestCase):
 
     GOOGLE_METADATAS = {
         'Plaza España, Barcelona':
-            {'relevance': 0.9, 'precision': 'precise'},
+            {'relevance': 0.9, 'precision': 'precise', 'match_types': ['point_of_interest']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.56, 'precision': 'interpolated'}
+            {'relevance': 0.56, 'precision': 'interpolated', 'match_types': ['locality']}
     }
 
     HERE_METADATAS = {
@@ -408,3 +408,5 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                     '{} not close to {}'.format(relevance, expected_relevance))
 
         assert_equal(metadata['precision'], expected['precision'])
+
+        assert_equal(metadata['match_types'], expected['match_types'])

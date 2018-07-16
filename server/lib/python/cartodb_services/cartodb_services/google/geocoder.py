@@ -23,6 +23,18 @@ PRECISION_BY_LOCATION_TYPE = {
     'RANGE_INTERPOLATED': PRECISION_INTERPOLATED,
     'APPROXIMATE': PRECISION_INTERPOLATED
 }
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'point_of_interest': 'point_of_interest',
+    'country': 'country',
+    'administrative_area_level_1': 'state',
+    'administrative_area_level_2': 'county',
+    'locality': 'locality',
+    'sublocality': 'district',
+    'street_address': 'street',
+    'intersection': 'intersection',
+    'street_number': 'street_number',
+    'postal_code': 'postal_code'
+}
 
 
 class GoogleMapsGeocoder():
@@ -70,9 +82,12 @@ class GoogleMapsGeocoder():
         base_relevance = RELEVANCE_BY_LOCATION_TYPE[location_type]
         partial_match = result.get('partial_match', False)
         partial_factor = PARTIAL_FACTOR if partial_match else 1
+        match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
+                       for match_level in result['types']]
         return {
             'relevance': base_relevance * partial_factor,
-            'precision': PRECISION_BY_LOCATION_TYPE[location_type]
+            'precision': PRECISION_BY_LOCATION_TYPE[location_type],
+            'match_types': filter(None, match_types)
         }
 
 
