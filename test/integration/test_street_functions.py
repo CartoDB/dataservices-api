@@ -131,6 +131,11 @@ class TestStreetFunctionsSetUp(TestCase):
         return IntegrationTestHelper.execute_query_raw(self.sql_api_url,
                                                        authenticated_query)
 
+    def _used_quota(self):
+        query = "select used_quota " \
+                "from cdb_dataservices_client.cdb_service_quota_info() " \
+                "where service = 'hires_geocoder'"
+        return self._run_authenticated(query)['rows'][0]['used_quota']
 
 class TestStreetFunctions(TestStreetFunctionsSetUp):
 
@@ -305,6 +310,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                            'Toronto, Canada"}}'.format(first_cartodb_id + i,
                                                        first_street_number + i))
 
+        used_quota = self._used_quota()
+
         query = "select *, st_x(the_geom), st_y(the_geom) " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
                 "'select * from jsonb_to_recordset(''[" \
@@ -320,6 +327,8 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             assert_not_equal(metadata['relevance'], None)
             assert_not_equal(metadata['precision'], None)
             assert_not_equal(metadata['match_types'], None)
+
+        assert_equal(self._used_quota(), used_quota + n)
 
     def test_missing_components_on_private_function(self):
         query = "SELECT _cdb_bulk_geocode_street_point(" \

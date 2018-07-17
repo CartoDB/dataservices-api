@@ -17,6 +17,7 @@ def geocoder_metadata(relevance, precision, match_types):
         'match_types': match_types
     }
 
+
 def compose_address(street, city=None, state=None, country=None):
     return ', '.join(filter(None, [street, city, state, country]))
 
