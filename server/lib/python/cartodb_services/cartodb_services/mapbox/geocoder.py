@@ -99,7 +99,7 @@ class MapboxGeocoder(Traceable):
         }
 
     def _normalize_relevance(self, relevance):
-        return 1 if relevance == 0.99 else relevance
+        return 1 if relevance >= 0.99 else relevance
 
     def _validate_input(self, searchtext, city=None, state_province=None,
                         country=None):
