@@ -2000,8 +2000,6 @@ DECLARE
   enough_quota boolean;
   remaining_quota integer;
   max_batch_size integer;
-  max_cartodb_id integer;
-  min_cartodb_id integer;
 
   cartodb_id_batch integer;
   batches_n integer;
@@ -2027,8 +2025,8 @@ BEGIN
     batch_size := MAX_SAFE_BATCH_SIZE;
   END IF;
 
-  EXECUTE format('SELECT count(1), max(cartodb_id), min(cartodb_id), ceil((max(cartodb_id) + 1 - min(cartodb_id))::float/%s) FROM (%s) _x', batch_size, query)
-  INTO query_row_count, max_cartodb_id, min_cartodb_id, batches_n;
+  EXECUTE format('SELECT count(1), ceil(count(1)::float/%s) FROM (%s) _x', batch_size, query)
+  INTO query_row_count, batches_n;
 
   RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; country: %; state: %; city: %; street: %',
       query_row_count, query, country_column, state_column, city_column, street_column;
@@ -2058,13 +2056,13 @@ BEGIN
         'WITH geocoding_data as (' ||
         '   SELECT ' ||
         '      json_build_object(''id'', cartodb_id, ''address'', %s, ''city'', %s, ''state'', %s, ''country'', %s) as data , ' ||
-        '      floor((cartodb_id - $1)::float/$2) as batch' ||
+        '      floor((row_number() over ())::float/$1) as batch' ||
         '   FROM (%s) _x' ||
         ') ' ||
         'INSERT INTO %s SELECT (cdb_dataservices_client._cdb_bulk_geocode_street_point(jsonb_agg(data))).* ' ||
         'FROM geocoding_data ' ||
-        'WHERE batch = $3', street_column, city_column, state_column, country_column, query, temp_table_name)
-      USING min_cartodb_id, batch_size, cartodb_id_batch;
+        'WHERE batch = $2', street_column, city_column, state_column, country_column, query, temp_table_name)
+      USING batch_size, cartodb_id_batch;
 
       GET DIAGNOSTICS current_row_count = ROW_COUNT;
       RAISE DEBUG 'Batch % --> %', cartodb_id_batch, current_row_count;
