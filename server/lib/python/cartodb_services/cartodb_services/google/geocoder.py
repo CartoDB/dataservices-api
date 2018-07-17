@@ -4,7 +4,7 @@
 from urlparse import parse_qs
 
 from exceptions import MalformedResult
-from cartodb_services.geocoder import compose_address, METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES, PRECISION_PRECISE, PRECISION_INTERPOLATED
+from cartodb_services.geocoder import compose_address, geocoder_metadata, PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
@@ -82,11 +82,11 @@ class GoogleMapsGeocoder():
         partial_factor = PARTIAL_FACTOR if partial_match else 1
         match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
                        for match_level in result['types']]
-        return {
-            METADATA_RELEVANCE: base_relevance * partial_factor,
-            METADATA_PRECISION: PRECISION_BY_LOCATION_TYPE[location_type],
-            METADATA_MATCH_TYPES: filter(None, match_types)
-        }
+        return geocoder_metadata(
+            base_relevance * partial_factor,
+            PRECISION_BY_LOCATION_TYPE[location_type],
+            filter(None, match_types)
+        )
 
 
     def _build_optional_parameters(self, city=None, state=None,

@@ -5,7 +5,7 @@ import json
 import requests
 from uritemplate import URITemplate
 from math import tanh
-from cartodb_services.geocoder import METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES, PRECISION_PRECISE, PRECISION_INTERPOLATED
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -144,11 +144,11 @@ class TomTomGeocoder(Traceable):
     def _extract_metadata_from_result(self, result):
         score = self._normalize_score(result['score'])
         match_type = MATCH_TYPE_BY_MATCH_LEVEL.get(result['type'], None)
-        return {
-            METADATA_RELEVANCE: score,
-            METADATA_PRECISION: self._precision_from_score(score),
-            METADATA_MATCH_TYPES: [match_type] if match_type else []
-        }
+        return geocoder_metadata(
+            score,
+            self._precision_from_score(score),
+            [match_type] if match_type else []
+        )
 
     def _normalize_score(self, score):
         return tanh(score * SCORE_NORMALIZATION_FACTOR)

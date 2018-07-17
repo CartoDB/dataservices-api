@@ -87,14 +87,14 @@ class TestStreetFunctionsSetUp(TestCase):
         'Plaza España, Barcelona':
             {'relevance': 0.85, 'precision': 'precise', 'match_types': ['street']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.448283494533, 'precision': 'interpolated', 'match_types': ['street']}
+            {'relevance': 0.45, 'precision': 'interpolated', 'match_types': ['street']}
     }
 
     MAPBOX_METADATAS = {
         'Plaza España, Barcelona':
-            {'relevance': 0.666, 'precision': 'precise', 'match_types': ['point_of_interest']},
+            {'relevance': 0.67, 'precision': 'precise', 'match_types': ['point_of_interest']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.666, 'precision': 'precise', 'match_types': ['point_of_interest']} # TODO: wrong
+            {'relevance': 0.67, 'precision': 'precise', 'match_types': ['point_of_interest']} # TODO: wrong
     }
 
     METADATAS = {
@@ -410,7 +410,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
     def assert_metadata(metadata, expected):
         relevance = metadata['relevance']
         expected_relevance = expected['relevance']
-        assert_true(isclose(relevance, expected_relevance, 0.05),
+        assert_true(isclose(relevance, expected_relevance, 0.02),
                     '{} not close to {}'.format(relevance, expected_relevance))
 
         assert_equal(metadata['precision'], expected['precision'])

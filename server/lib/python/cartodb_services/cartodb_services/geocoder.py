@@ -6,12 +6,16 @@ from collections import namedtuple
 import json
 
 
-METADATA_RELEVANCE = 'relevance'
-METADATA_PRECISION = 'precision'
-METADATA_MATCH_TYPES = 'match_types'
-
 PRECISION_PRECISE = 'precise'
 PRECISION_INTERPOLATED = 'interpolated'
+
+
+def geocoder_metadata(relevance, precision, match_types):
+    return {
+        'relevance': round(relevance, 2),
+        'precision': precision,
+        'match_types': match_types
+    }
 
 def compose_address(street, city=None, state=None, country=None):
     return ', '.join(filter(None, [street, city, state, country]))
