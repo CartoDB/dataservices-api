@@ -37,7 +37,7 @@ class TestStreetFunctionsSetUp(TestCase):
         'Madrid': [-3.70578, 40.42028],
         'Logroño, Spain': [-2.45194, 42.46592],
         'Logroño, Argentina': [-61.69604, -29.50425],
-        'Plaza España, Barcelona': [2.1735699, 41.3823]  # TODO: not ideal
+        'Plaza España, Barcelona': [2.14834, 41.37494]
     }
 
     TOMTOM_POINTS = HERE_POINTS.copy()
@@ -48,7 +48,7 @@ class TestStreetFunctionsSetUp(TestCase):
         'Valladolid, Spain': [-4.72838, 41.6542],
         'Madrid': [-3.70035, 40.42028],
         'Logroño, Spain': [-2.44998, 42.46592],
-        'Plaza España, Barcelona': [2.07479, 41.36818]  # TODO: not ideal
+        'Plaza España, Barcelona': [2.1497, 41.37516]
     })
 
     MAPBOX_POINTS = GOOGLE_POINTS.copy()
@@ -59,7 +59,7 @@ class TestStreetFunctionsSetUp(TestCase):
         'Valladolid, Spain': [-4.72856, 41.652251],
         '1902 amphitheatre parkway': [-118.03, 34.06],  # TODO: huge mismatch
         'Madrid': [-3.69194, 40.4167754],
-        'Plaza España, Barcelona': [2.245969, 41.452483]  # TODO: not ideal
+        'Plaza España, Barcelona': [2.342231, 41.50677]  # TODO: not ideal
     })
 
     FIXTURE_POINTS = {
@@ -341,7 +341,6 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         x_y_by_cartodb_id = self._x_y_by_cartodb_id(response)
         assert_equal(x_y_by_cartodb_id[1], x_y_by_cartodb_id[2])
 
-        # "'Plaza España', 'Barcelona', null, 'Spain') as the_geom) _x"
     def test_component_aggregation(self):
         query = "select cartodb_id, st_x(the_geom), st_y(the_geom) " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
