@@ -22,7 +22,8 @@ BEGIN
       monthly_quota NUMERIC,
       used_quota NUMERIC,
       soft_limit BOOLEAN,
-      provider TEXT
+      provider TEXT,
+      max_batch_size NUMERIC
     );
   END IF;
 END $$;
@@ -33,6 +34,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(
 RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   from cartodb_services.metrics.user import UserMetricsService
   from datetime import date
+  from cartodb_services.bulk_geocoders import BATCH_GEOCODER_CLASS_BY_PROVIDER
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -50,7 +52,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   used_quota = user_service.used_quota(user_isolines_config.service_type, today)
   soft_limit = user_isolines_config.soft_isolines_limit
   provider = user_isolines_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider, 1]]
 
   #-- Hires Geocoder
   service = 'hires_geocoder'
@@ -62,7 +64,12 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   used_quota = user_service.used_quota(user_geocoder_config.service_type, today)
   soft_limit = user_geocoder_config.soft_geocoding_limit
   provider = user_geocoder_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+  batch_geocoder_class = BATCH_GEOCODER_CLASS_BY_PROVIDER.get(provider, None)
+  if batch_geocoder_class and hasattr(batch_geocoder_class, 'MAX_BATCH_SIZE'):
+      max_batch_size = batch_geocoder_class.MAX_BATCH_SIZE
+  else:
+      max_batch_size = 1
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider, max_batch_size]]
 
   #-- Routing
   service = 'routing'
@@ -74,7 +81,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   used_quota = user_service.used_quota(user_routing_config.service_type, today)
   soft_limit = user_routing_config.soft_limit
   provider = user_routing_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider, 1]]
 
   #-- Observatory
   service = 'observatory'
@@ -86,7 +93,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   used_quota = user_service.used_quota(user_obs_config.service_type, today)
   soft_limit = user_obs_config.soft_limit
   provider = user_obs_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider, 1]]
 
   return ret
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

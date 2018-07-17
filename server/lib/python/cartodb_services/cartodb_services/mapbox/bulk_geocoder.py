@@ -21,16 +21,6 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
         self.session = requests.Session()
 
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
-
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH
 
@@ -38,16 +28,10 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             elements = self._encoded_elements(search)
-            self._logger.debug('--> Sending serial search: {}'.format(search))
-            coordinates = self._geocode_search(*elements)
-            results.append((search[0], coordinates, []))
-        return results
+            result = self.geocode_meta(*elements)
 
-    def _geocode_search(self, address, city, state, country):
-        coordinates = self.geocode(searchtext=address, city=city,
-                                   state_province=state, country=country)
-        self._logger.debug('--> result sent')
-        return coordinates
+            results.append((search[0], result[0], result[1]))
+        return results
 
     def _encoded_elements(self, search):
         (search_id, address, city, state, country) = search
@@ -67,13 +51,10 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
                 free = ', '.join([elem for elem in elements if elem])
                 frees.append(free)
 
-            self._logger.debug('--> sending free search: {}'.format(frees))
-            xy_results = self.geocode_free_text(frees)
+            full_results = self.geocode_free_text_meta(frees)
             results = []
-            self._logger.debug('--> searches: {}; xy: {}'.format(searches, xy_results))
-            for s, r in zip(searches, xy_results):
-                results.append((s[0], r, []))
-            self._logger.debug('--> results: {}'.format(results))
+            for s, r in zip(searches, full_results):
+                results.append((s[0], r[0], r[1]))
             return results
 
     def _country_code(self, country):

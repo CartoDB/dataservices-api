@@ -8,6 +8,7 @@ from collections import namedtuple
 from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.here import HereMapsGeocoder
+from cartodb_services.geocoder import geocoder_metadata
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 
@@ -15,16 +16,16 @@ from cartodb_services.tools.exceptions import ServiceException
 HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status')
 
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
-    BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     MAX_BATCH_SIZE = 1000000  # From the docs
+    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
+    BATCH_URL = 'https://batch.geocoder.cit.api.here.com/6.2/jobs'
     # https://developer.here.com/documentation/batch-geocoder/topics/read-batch-request-output.html
     META_COLS = ['relevance', 'matchType', 'matchCode', 'matchLevel', 'matchQualityStreet']
     MAX_STALLED_RETRIES = 100
     BATCH_RETRY_SLEEP_S = 5
-    MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
     JOB_FINAL_STATES = ['completed', 'cancelled', 'deleted', 'failed']
 
-    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=MAX_BATCH_SIZE):
+    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=HereMapsGeocoder.DEFAULT_MAXRESULTS):
         HereMapsGeocoder.__init__(self, app_id, app_code, logger, service_params, maxresults)
         self.session = requests.Session()
         self.session.mount(self.BATCH_URL,
@@ -34,16 +35,6 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
             'app_code': self.app_code,
         }
 
-    def _bulk_geocode(self, searches):
-        if len(searches) > self.MAX_BATCH_SIZE:
-            raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(searches):
-            self._logger.debug('--> Batch geocode')
-            return self._batch_geocode(searches)
-        else:
-            self._logger.debug('--> Serial geocode')
-            return self._serial_geocode(searches)
-
     def _should_use_batch(self, searches):
         return len(searches) >= self.MIN_BATCHED_SEARCH
 
@@ -51,13 +42,12 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (search_id, address, city, state, country) = search
-            coordinates = self.geocode(searchtext=address, city=city, state=state, country=country)
-            results.append((search_id, coordinates, []))
+            result = self.geocode_meta(searchtext=address, city=city, state=state, country=country)
+            results.append((search_id, result[0], result[1]))
         return results
 
     def _batch_geocode(self, searches):
         request_id = self._send_batch(self._searches_to_csv(searches))
-        self._logger.debug('--> Sent batch {}'.format(request_id))
 
         last_processed = 0
         stalled_retries = 0
@@ -72,16 +62,12 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                 stalled_retries = 0
                 last_processed = job_info.processed_count
 
-            self._logger.debug('--> Job poll check: {}'.format(job_info))
             if job_info.status in self.JOB_FINAL_STATES:
                 break
             else:
                 time.sleep(self.BATCH_RETRY_SLEEP_S)
 
-        self._logger.debug('--> Job complete: {}'.format(job_info))
-
         results = self._download_results(request_id)
-        self._logger.debug('--> Results: {} rows; {}'.format(len(results), results))
 
         return results
 
@@ -105,7 +91,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         request_params.update({
             'gen': 8,
             'action': 'run',
-            #'mailto': 'juanignaciosl@carto.com',
+            # 'mailto': 'juanignaciosl@carto.com',
             'header': 'true',
             'inDelim': '|',
             'outDelim': '|',
@@ -131,8 +117,8 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                                 timeout=(self.connect_timeout, self.read_timeout))
         polling_root = ET.fromstring(polling_r.text)
         return HereJobStatus(
-            total_count=polling_root.find('./Response/TotalCount').text,
-            processed_count=polling_root.find('./Response/ProcessedCount').text,
+            total_count=int(polling_root.find('./Response/TotalCount').text),
+            processed_count=int(polling_root.find('./Response/ProcessedCount').text),
             status=polling_root.find('./Response/Status').text)
 
     def _download_results(self, job_id):
@@ -147,7 +133,16 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                 reader = csv.DictReader(root_zip.open(name), delimiter='|')
                 for row in reader:
                     if row['SeqNumber'] == '1':  # First per requested data
-                        results.append((row['recId'], [row['displayLongitude'], row['displayLatitude']]))
+                        precision = self.PRECISION_BY_MATCH_TYPE[
+                            row.get('matchType', 'pointAddress')]
+                        match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(row['matchLevel'], None)
+                        results.append((row['recId'],
+                                        [row['displayLongitude'], row['displayLatitude']],
+                                        geocoder_metadata(
+                                            float(row['relevance']),
+                                            precision,
+                                            [match_type] if match_type else []
+                                        )))
 
         return results
 
