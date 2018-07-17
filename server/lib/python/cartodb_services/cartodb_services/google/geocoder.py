@@ -4,8 +4,7 @@
 from urlparse import parse_qs
 
 from exceptions import MalformedResult
-from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
-from cartodb_services.geocoder import compose_address
+from cartodb_services.geocoder import compose_address, METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES, PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
@@ -84,9 +83,9 @@ class GoogleMapsGeocoder():
         match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
                        for match_level in result['types']]
         return {
-            'relevance': base_relevance * partial_factor,
-            'precision': PRECISION_BY_LOCATION_TYPE[location_type],
-            'match_types': filter(None, match_types)
+            METADATA_RELEVANCE: base_relevance * partial_factor,
+            METADATA_PRECISION: PRECISION_BY_LOCATION_TYPE[location_type],
+            METADATA_MATCH_TYPES: filter(None, match_types)
         }
 
 

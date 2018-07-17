@@ -5,7 +5,7 @@ Python client for the Mapbox Geocoder service.
 import json
 import requests
 from mapbox import Geocoder
-from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
+from cartodb_services.geocoder import METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES, PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -93,9 +93,9 @@ class MapboxGeocoder(Traceable):
         match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
                        for match_level in result['place_type']]
         return {
-            'relevance': self._normalize_relevance(float(result['relevance'])),
-            'precision': precision,
-            'match_types': filter(None, match_types)
+            METADATA_RELEVANCE: self._normalize_relevance(float(result['relevance'])),
+            METADATA_PRECISION: precision,
+            METADATA_MATCH_TYPES: filter(None, match_types)
         }
 
     def _normalize_relevance(self, relevance):

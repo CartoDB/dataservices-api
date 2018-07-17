@@ -384,6 +384,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
             self.metadata['Plaza España, Barcelona'],
             self.metadata['Santiago Rusiñol 123, Valladolid']
         ]
+        assert_equal(len(response['rows']), len(expected))
         for r, e in zip(response['rows'], expected):
             self.assert_metadata(r['metadata'], e)
 

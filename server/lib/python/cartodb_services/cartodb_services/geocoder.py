@@ -6,6 +6,13 @@ from collections import namedtuple
 import json
 
 
+METADATA_RELEVANCE = 'relevance'
+METADATA_PRECISION = 'precision'
+METADATA_MATCH_TYPES = 'match_types'
+
+PRECISION_PRECISE = 'precise'
+PRECISION_INTERPOLATED = 'interpolated'
+
 def compose_address(street, city=None, state=None, country=None):
     return ', '.join(filter(None, [street, city, state, country]))
 

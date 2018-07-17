@@ -8,6 +8,7 @@ from collections import namedtuple
 from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.here import HereMapsGeocoder
+from cartodb_services.geocoder import METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 
@@ -138,9 +139,9 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                         results.append((row['recId'],
                                         [row['displayLongitude'], row['displayLatitude']],
                                         {
-                                            'relevance': float(row['relevance']),
-                                            'precision': precision,
-                                            'match_types': [match_type] if match_type else []
+                                            METADATA_RELEVANCE: float(row['relevance']),
+                                            METADATA_PRECISION: precision,
+                                            METADATA_MATCH_TYPES: [match_type] if match_type else []
                                         }))
 
         return results

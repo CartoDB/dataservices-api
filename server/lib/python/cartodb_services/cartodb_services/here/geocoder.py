@@ -6,7 +6,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from exceptions import *
-from cartodb_services import PRECISION_PRECISE, PRECISION_INTERPOLATED
+from cartodb_services.geocoder import METADATA_RELEVANCE, METADATA_PRECISION, METADATA_MATCH_TYPES, PRECISION_PRECISE, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 
 class HereMapsGeocoder(Traceable):
@@ -147,7 +147,7 @@ class HereMapsGeocoder(Traceable):
             result.get('MatchType', 'pointAddress')]
         match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
         return {
-            'relevance': result['Relevance'],
-            'precision': precision,
-            'match_types': [match_type] if match_type else []
+            METADATA_RELEVANCE: result['Relevance'],
+            METADATA_PRECISION: precision,
+            METADATA_MATCH_TYPES: [match_type] if match_type else []
         }

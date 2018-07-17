@@ -35,6 +35,3 @@ def _reset():
     GD = None
 
 from geocoder import run_street_point_geocoder, StreetPointBulkGeocoder
-
-PRECISION_PRECISE = 'precise'
-PRECISION_INTERPOLATED = 'interpolated'
