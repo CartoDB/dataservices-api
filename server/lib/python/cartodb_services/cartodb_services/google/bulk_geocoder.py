@@ -26,7 +26,6 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         for search in searches:
             (cartodb_id, street, city, state, country) = search
             lng_lat, metadata = self.geocode_meta(street, city, state, country)
-            self._logger.debug('--> lng_lat: {}. metadata: {}'.format(lng_lat, metadata))
             results.append((cartodb_id, lng_lat, metadata))
         return results
 
@@ -35,7 +34,6 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         pool = Pool(processes=self.PARALLEL_PROCESSES)
         for search in searches:
             (cartodb_id, street, city, state, country) = search
-            self._logger.debug('async geocoding --> {}'.format(search))
             address = compose_address(street, city, state, country)
             if address:
                 components = self._build_optional_parameters(city, state, country)

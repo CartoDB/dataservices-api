@@ -47,7 +47,6 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
 
     def _batch_geocode(self, searches):
         request_id = self._send_batch(self._searches_to_csv(searches))
-        self._logger.debug('--> Sent batch {}'.format(request_id))
 
         last_processed = 0
         stalled_retries = 0
@@ -55,26 +54,19 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         while True:
             job_info = self._job_status(request_id)
             if job_info.processed_count == last_processed:
-                self._logger.debug('--> no progress ({})'.format(last_processed))
                 stalled_retries += 1
                 if stalled_retries > self.MAX_STALLED_RETRIES:
                     raise Exception('Too many retries for job {}'.format(request_id))
             else:
-                self._logger.debug('--> progress ({} != {})'.format(job_info.processed_count, last_processed))
                 stalled_retries = 0
                 last_processed = job_info.processed_count
 
-            self._logger.debug('--> Job poll check ({}): {}'.format(
-                stalled_retries, job_info))
             if job_info.status in self.JOB_FINAL_STATES:
                 break
             else:
                 time.sleep(self.BATCH_RETRY_SLEEP_S)
 
-        self._logger.debug('--> Job complete: {}'.format(job_info))
-
         results = self._download_results(request_id)
-        self._logger.debug('--> Results: {} rows; {}'.format(len(results), results))
 
         return results
 

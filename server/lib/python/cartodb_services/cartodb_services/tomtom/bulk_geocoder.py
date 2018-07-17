@@ -37,10 +37,8 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
             city = city.encode('utf-8') if city else None
             state = state.encode('utf-8') if state else None
             country = country.encode('utf-8') if country else None
-            self._logger.debug('--> Sending serial search: {}'.format(search))
             result = self.geocode_meta(searchtext=address, city=city,
                                        state_province=state, country=country)
-            self._logger.debug('--> result sent')
             results.append((search_id, result[0], result[1]))
         return results
 
@@ -50,12 +48,10 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         results = []
         for s, r in zip(searches, full_results):
             results.append((s[0], r[0], r[1]))
-        self._logger.debug('--> results: {}'.format(results))
         return results
 
     def _send_batch(self, searches):
         body = {'batchItems': [{'query': self._query(s)} for s in searches]}
-        self._logger.debug('--> {}; Body: {}'.format(self.BATCH_URL, body))
         request_params = {
             'key': self._apikey
         }
@@ -63,9 +59,7 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
                                      allow_redirects=False,
                                      params=request_params,
                                      timeout=(self.connect_timeout, self.read_timeout))
-        self._logger.debug('--> response: {}'.format(response.status_code))
         if response.status_code == 303:
-            self._logger.debug(response.headers)
             return response.headers['Location']
         else:
             msg = "Error sending batch: {}; Headers: {}".format(
@@ -78,14 +72,12 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         while True:
             response = self.session.get(self.BASE_URL + location)
             if response.status_code == 200:
-                self._logger.debug('--> Results ready {}'.format(location))
                 return self._parse_results(response.json())
             elif response.status_code == 202:
                 stalled_retries += 1
                 if stalled_retries > self.MAX_STALLED_RETRIES:
                     raise Exception('Too many retries for job {}'.format(location))
                 location = response.headers['Location']
-                self._logger.debug('--> Waiting for {}'.format(location))
                 time.sleep(self.BATCH_RETRY_SLEEP_S)
             else:
                 msg = "Error downloading batch: {}; Headers: {}".format(

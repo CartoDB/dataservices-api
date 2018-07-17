@@ -53,7 +53,6 @@ class MapboxGeocoder(Traceable):
 
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
-        self._logger.debug('--> json response: {}'.format(json_response))
 
         if json_response:
             if type(json_response) != list:
@@ -154,7 +153,6 @@ class MapboxGeocoder(Traceable):
 
         try:
             free_search = ';'.join([self._escape(fs) for fs in free_searches])
-            self._logger.debug('--> free search: {}, country: {}'.format(free_search, country))
             response = self._geocoder.forward(address=free_search.decode('utf-8'),
                                               country=country)
 

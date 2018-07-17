@@ -28,7 +28,6 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             elements = self._encoded_elements(search)
-            self._logger.debug('--> Sending serial search: {}'.format(search))
             result = self.geocode_meta(*elements)
 
             results.append((search[0], result[0], result[1]))
@@ -52,13 +51,10 @@ class MapboxBulkGeocoder(MapboxGeocoder, StreetPointBulkGeocoder):
                 free = ', '.join([elem for elem in elements if elem])
                 frees.append(free)
 
-            self._logger.debug('--> sending free search: {}'.format(frees))
             full_results = self.geocode_free_text_meta(frees)
             results = []
-            self._logger.debug('--> searches: {}; xy: {}'.format(searches, full_results))
             for s, r in zip(searches, full_results):
                 results.append((s[0], r[0], r[1]))
-            self._logger.debug('--> results: {}'.format(results))
             return results
 
     def _country_code(self, country):

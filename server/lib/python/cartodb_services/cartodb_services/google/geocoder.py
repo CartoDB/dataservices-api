@@ -63,7 +63,6 @@ class GoogleMapsGeocoder():
 
     def _process_results(self, results):
         if results:
-            self._logger.debug('--> results: {}'.format(results[0]))
             return [
                 self._extract_lng_lat_from_result(results[0]),
                 self._extract_metadata_from_result(results[0])

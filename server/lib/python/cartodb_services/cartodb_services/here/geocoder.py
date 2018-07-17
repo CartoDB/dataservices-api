@@ -99,7 +99,6 @@ class HereMapsGeocoder(Traceable):
         try:
             response = self._perform_request(params)
             result = response['Response']['View'][0]['Result'][0]
-            self._logger.debug('--> Result: {}'.format(result))
             return [self._extract_lng_lat_from_result(result),
                     self._extract_metadata_from_result(result)]
         except IndexError:

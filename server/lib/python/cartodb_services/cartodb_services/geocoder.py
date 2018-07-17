@@ -91,10 +91,8 @@ class StreetPointBulkGeocoder:
         if len(street_geocoder_searches) > self.MAX_BATCH_SIZE:
             raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
         if self._should_use_batch(street_geocoder_searches):
-            self._logger.debug('--> Batch geocode')
             return self._batch_geocode(street_geocoder_searches)
         else:
-            self._logger.debug('--> Serial geocode')
             return self._serial_geocode(street_geocoder_searches)
 
     def _batch_geocode(self, street_geocoder_searches):
