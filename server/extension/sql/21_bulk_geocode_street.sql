@@ -35,8 +35,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
       raise Exception('Requested geocoder is not available')
 
     plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
-    result = plpy.execute(plan, [username, orgname, searches])
-    return result
+    return plpy.execute(plan, [username, orgname, searches])
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 

@@ -94,7 +94,11 @@ class Logger:
         else:
             exception_message = ''
 
+        # Adding trace breaks tests
+        # trace = traceback.format_exc(15)
+        # message = '{}{}. Trace: {}'.format(text, exception_message, trace)
         message = '{}{}'.format(text, exception_message)
+
         if self._check_plpy():
             if level == 'debug':
                 plpy.debug(message)

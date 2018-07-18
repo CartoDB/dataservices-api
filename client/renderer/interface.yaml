@@ -517,6 +517,13 @@
   params:
     - {}
 
+- name: cdb_service_quota_info_batch
+  return_type: SETOF service_quota_info_batch
+  multi_row: true
+  multi_field: true
+  params:
+    - {}
+
 - name: cdb_enough_quota
   return_type: BOOLEAN
   params:

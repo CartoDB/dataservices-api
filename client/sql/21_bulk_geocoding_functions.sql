@@ -11,13 +11,12 @@ DECLARE
   batches_n integer;
   DEFAULT_BATCH_SIZE CONSTANT numeric := 100;
   MAX_SAFE_BATCH_SIZE CONSTANT numeric := 5000;
-  current_row_count integer ;
 
   temp_table_name text;
 BEGIN
   SELECT csqi.monthly_quota - csqi.used_quota AS remaining_quota, csqi.max_batch_size
   INTO remaining_quota, max_batch_size
-  FROM cdb_dataservices_client.cdb_service_quota_info() csqi
+  FROM cdb_dataservices_client.cdb_service_quota_info_batch() csqi
   WHERE service = 'hires_geocoder';
   RAISE DEBUG 'remaining_quota: %; max_batch_size: %', remaining_quota, max_batch_size;
 
@@ -57,21 +56,17 @@ BEGIN
   IF batches_n > 0 THEN
     FOR cartodb_id_batch in 0..(batches_n - 1)
     LOOP
-
       EXECUTE format(
         'WITH geocoding_data as (' ||
         '   SELECT ' ||
         '      json_build_object(''id'', cartodb_id, ''address'', %s, ''city'', %s, ''state'', %s, ''country'', %s) as data , ' ||
-        '      floor((row_number() over ())::float/$1) as batch' ||
+        '      floor((row_number() over () - 1)::float/$1) as batch' ||
         '   FROM (%s) _x' ||
         ') ' ||
         'INSERT INTO %s SELECT (cdb_dataservices_client._cdb_bulk_geocode_street_point(jsonb_agg(data))).* ' ||
         'FROM geocoding_data ' ||
         'WHERE batch = $2', street_column, city_column, state_column, country_column, query, temp_table_name)
       USING batch_size, cartodb_id_batch;
-
-      GET DIAGNOSTICS current_row_count = ROW_COUNT;
-      RAISE DEBUG 'Batch % --> %', cartodb_id_batch, current_row_count;
 
     END LOOP;
   END IF;

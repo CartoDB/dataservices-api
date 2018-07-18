@@ -230,6 +230,24 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         }
         self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
+    def test_batch_size_1(self):
+        query = "select *, st_x(the_geom), st_y(the_geom) " \
+                "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
+                "'select * from jsonb_to_recordset(''[" \
+                "{\"cartodb_id\": 1, \"address\": \"1900 amphitheatre parkway, mountain view, ca, us\"}," \
+                "{\"cartodb_id\": 2, \"address\": \"1901 amphitheatre parkway, mountain view, ca, us\"}," \
+                "{\"cartodb_id\": 3, \"address\": \"1902 amphitheatre parkway, mountain view, ca, us\"}" \
+                "]''::jsonb) as (cartodb_id integer, address text)', " \
+                "'address', null, null, null, 1)"
+        response = self._run_authenticated(query)
+
+        points_by_cartodb_id = {
+            1: self.fixture_points['1900 amphitheatre parkway'],
+            2: self.fixture_points['1901 amphitheatre parkway'],
+            3: self.fixture_points['1902 amphitheatre parkway'],
+        }
+        self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
+
     def test_city_column_geocoding(self):
         query = "select *, st_x(the_geom), st_y(the_geom) " \
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point( " \
