@@ -4,20 +4,33 @@
 import json
 import requests
 from uritemplate import URITemplate
+from math import tanh
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools.normalize import normalize
 
-BASEURI = ('https://api.tomtom.com/search/2/geocode/'
-           '{searchtext}.JSON'
-           '?key={apiKey}'
-           '&limit=1')
+HOST = 'https://api.tomtom.com'
+API_BASEURI = '/search/2'
+REQUEST_BASEURI = ('/geocode/'
+               '{searchtext}.json'
+               '?limit=1')
 ENTRY_RESULTS = 'results'
 ENTRY_POSITION = 'position'
 ENTRY_LON = 'lon'
 ENTRY_LAT = 'lat'
+EMPTY_RESPONSE = [[], {}]
 
+SCORE_NORMALIZATION_FACTOR = 0.15
+PRECISION_SCORE_THRESHOLD = 0.5
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'POI': 'point_of_interest',
+    'Street': 'street',
+    'Address Range': 'street',
+    'Cross Street': 'intersection',
+    'Point Address': 'street_number'
+}
 
 class TomTomGeocoder(Traceable):
     '''
@@ -29,21 +42,17 @@ class TomTomGeocoder(Traceable):
         self._apikey = apikey
         self._logger = logger
 
-    def _uri(self, searchtext, countries=None):
-        baseuri = BASEURI + '&countrySet={}'.format(countries) \
-                  if countries else BASEURI
-        uri = URITemplate(baseuri).expand(apiKey=self._apikey,
-                                          searchtext=searchtext.encode('utf-8'))
-        return uri
+    def _uri(self, searchtext, country=None):
+        return HOST + API_BASEURI + \
+               self._request_uri(searchtext, country, self._apikey)
 
-    def _parse_geocoder_response(self, response):
-        json_response = json.loads(response)
-
-        if json_response and json_response[ENTRY_RESULTS]:
-            result = json_response[ENTRY_RESULTS][0]
-            return self._extract_lng_lat_from_feature(result)
-        else:
-            return []
+    def _request_uri(self, searchtext, country=None, apiKey=None):
+        baseuri = REQUEST_BASEURI
+        if country:
+            baseuri += '&countrySet={}'.format(country)
+        baseuri = baseuri + '&key={apiKey}' if apiKey else baseuri
+        return URITemplate(baseuri).expand(apiKey=apiKey,
+                                           searchtext=searchtext.encode('utf-8'))
 
     def _extract_lng_lat_from_feature(self, result):
         position = result[ENTRY_POSITION]
@@ -65,6 +74,11 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
+        return self.geocode_meta(searchtext, city, state_province, country)[0]
+
+    @qps_retry(qps=5)
+    def geocode_meta(self, searchtext, city=None, state_province=None,
+                country=None):
         if searchtext:
             searchtext = searchtext.decode('utf-8')
         if city:
@@ -75,7 +89,7 @@ class TomTomGeocoder(Traceable):
             country = country.decode('utf-8')
 
         if not self._validate_input(searchtext, city, state_province, country):
-            return []
+            return EMPTY_RESPONSE
 
         address = []
         if searchtext and searchtext.strip():
@@ -85,19 +99,11 @@ class TomTomGeocoder(Traceable):
         if state_province:
             address.append(normalize(state_province))
 
-        uri = self._uri(searchtext=', '.join(address), countries=country)
+        uri = self._uri(searchtext=', '.join(address), country=country)
 
         try:
             response = requests.get(uri)
-
-            if response.status_code == requests.codes.ok:
-                return self._parse_geocoder_response(response.text)
-            elif response.status_code == requests.codes.bad_request:
-                return []
-            elif response.status_code == requests.codes.unprocessable_entity:
-                return []
-            else:
-                raise ServiceException(response.status_code, response)
+            return self._parse_response(response.status_code, response.text)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
@@ -109,4 +115,44 @@ class TomTomGeocoder(Traceable):
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to TomTom geocoding server',
                                exception=ce)
-            return []
+            return EMPTY_RESPONSE
+
+    def _parse_response(self, status_code, text):
+        if status_code == requests.codes.ok:
+            return self._parse_geocoder_response(text)
+        elif status_code == requests.codes.bad_request:
+            return EMPTY_RESPONSE
+        elif status_code == requests.codes.unprocessable_entity:
+            return EMPTY_RESPONSE
+        else:
+            msg = 'Unknown response {}: {}'.format(str(status_code), text)
+            raise ServiceException(msg, None)
+
+    def _parse_geocoder_response(self, response):
+        json_response = json.loads(response) \
+            if type(response) != dict else response
+
+        if json_response and json_response[ENTRY_RESULTS]:
+            result = json_response[ENTRY_RESULTS][0]
+            return [
+                self._extract_lng_lat_from_feature(result),
+                self._extract_metadata_from_result(result)
+            ]
+        else:
+            return EMPTY_RESPONSE
+
+    def _extract_metadata_from_result(self, result):
+        score = self._normalize_score(result['score'])
+        match_type = MATCH_TYPE_BY_MATCH_LEVEL.get(result['type'], None)
+        return geocoder_metadata(
+            score,
+            self._precision_from_score(score),
+            [match_type] if match_type else []
+        )
+
+    def _normalize_score(self, score):
+        return tanh(score * SCORE_NORMALIZATION_FACTOR)
+
+    def _precision_from_score(self, score):
+        return PRECISION_PRECISE \
+            if score > PRECISION_SCORE_THRESHOLD else PRECISION_INTERPOLATED

@@ -70,6 +70,13 @@
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: _cdb_bulk_geocode_street_point
+  return_type: SETOF cdb_dataservices_client.geocoding
+  multi_row: true
+  multi_field: true
+  params:
+    - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
+
 - name: cdb_here_geocode_street_point
   return_type: Geometry
   params:
@@ -505,6 +512,13 @@
 
 - name: cdb_service_quota_info
   return_type: SETOF service_quota_info
+  multi_row: true
+  multi_field: true
+  params:
+    - {}
+
+- name: cdb_service_quota_info_batch
+  return_type: SETOF service_quota_info_batch
   multi_row: true
   multi_field: true
   params:
