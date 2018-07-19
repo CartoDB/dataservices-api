@@ -62,7 +62,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         service_manager.logger.error('Error trying to bulk geocode street point', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to bulk geocode street')
     finally:
-        service_manager.quota_service.increment_total_service_use()
+        service_manager.quota_service.increment_total_service_use(len(searches))
 
 
 StreetGeocoderSearch = namedtuple('StreetGeocoderSearch', 'id address city state country')

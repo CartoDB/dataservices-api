@@ -26,4 +26,4 @@ class TestRunStreetPointGeocoder(TestCase):
                                       None, None, searches)
 
         quota_service_mock.increment_total_service_use. \
-            assert_called_once_with()
+            assert_called_once_with(len(searches))
