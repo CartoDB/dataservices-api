@@ -7,7 +7,7 @@ SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
 -- HERE goes your code to upgrade/downgrade
 -- Taken from https://wiki.postgresql.org/wiki/Count_estimate
-CREATE FUNCTION cdb_dataservices_client.cdb_count_estimate(query text) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_count_estimate(query text) RETURNS INTEGER AS
 $func$
 DECLARE
     rec   record;
@@ -273,3 +273,4 @@ GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point(
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_count_estimate(query text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_jsonb_array_casttext(jsonb) TO publicuser;
+GRANT EXECUTE ON FUNCTION cdb_dataservices_client.__cdb_bulk_geocode_street_point (username text, orgname text, searches jsonb) TO publicuser;
