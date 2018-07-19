@@ -54,11 +54,13 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
             service_manager.quota_service.increment_empty_service_use(len(searches))
             return []
     except QuotaExceededException as qe:
+        logger.debug('QuotaExceededException at run_street_point_geocoder', qe,
+                     data={"username": username, "orgname": orgname})
         service_manager.quota_service.increment_failed_service_use(len(searches))
         return []
     except BaseException as e:
         import sys
-        service_manager.quota_service.increment_failed_service_use()
+        service_manager.quota_service.increment_failed_service_use(len(searches))
         service_manager.logger.error('Error trying to bulk geocode street point', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to bulk geocode street')
     finally:
