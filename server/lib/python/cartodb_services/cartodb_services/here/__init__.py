@@ -1,2 +1,3 @@
 from geocoder import HereMapsGeocoder
+from bulk_geocoder import HereMapsBulkGeocoder
 from routing import HereMapsRoutingIsoline
