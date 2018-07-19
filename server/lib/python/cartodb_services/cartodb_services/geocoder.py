@@ -9,6 +9,8 @@ import json
 PRECISION_PRECISE = 'precise'
 PRECISION_INTERPOLATED = 'interpolated'
 
+EMPTY_RESPONSE = [[], {}]
+
 
 def geocoder_metadata(relevance, precision, match_types):
     return {

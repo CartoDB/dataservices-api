@@ -5,7 +5,7 @@ Python client for the Mapbox Geocoder service.
 import json
 import requests
 from mapbox import Geocoder
-from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -22,8 +22,6 @@ ENTRY_GEOMETRY = 'geometry'
 ENTRY_COORDINATES = 'coordinates'
 ENTRY_TYPE = 'type'
 TYPE_POINT = 'Point'
-
-EMPTY_RESPONSE = [[], {}]
 
 MATCH_TYPE_BY_MATCH_LEVEL = {
     'poi': 'point_of_interest',
@@ -154,6 +152,7 @@ class MapboxGeocoder(Traceable):
         try:
             free_search = ';'.join([self._escape(fs) for fs in free_searches])
             response = self._geocoder.forward(address=free_search.decode('utf-8'),
+                                              limit=1,
                                               country=country)
 
             if response.status_code == requests.codes.ok:

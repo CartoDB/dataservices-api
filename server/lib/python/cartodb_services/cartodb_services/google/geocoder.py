@@ -4,11 +4,10 @@
 from urlparse import parse_qs
 
 from exceptions import MalformedResult
-from cartodb_services.geocoder import compose_address, geocoder_metadata, PRECISION_PRECISE, PRECISION_INTERPOLATED
+from cartodb_services.geocoder import compose_address, geocoder_metadata, PRECISION_PRECISE, PRECISION_INTERPOLATED, EMPTY_RESPONSE
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory
 
-EMPTY_RESPONSE = [[], {}]
 PARTIAL_FACTOR = 0.8
 RELEVANCE_BY_LOCATION_TYPE = {
     'ROOFTOP': 1,

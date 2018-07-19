@@ -5,7 +5,7 @@ import json
 import requests
 from uritemplate import URITemplate
 from math import tanh
-from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -20,7 +20,6 @@ ENTRY_RESULTS = 'results'
 ENTRY_POSITION = 'position'
 ENTRY_LON = 'lon'
 ENTRY_LAT = 'lat'
-EMPTY_RESPONSE = [[], {}]
 
 SCORE_NORMALIZATION_FACTOR = 0.15
 PRECISION_SCORE_THRESHOLD = 0.5
