@@ -1,6 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
+import json
 from unittest import TestCase
 from mock import Mock, MagicMock
 from nose.tools import assert_not_equal, assert_equal, assert_true
@@ -53,6 +54,17 @@ EXPECTED_RESULTS_FIXTURES = {
 
 
 class TestRunStreetPointGeocoder(TestCase):
+    def _run_geocoder(self, plpy=None, gd=None, geocoder=None,
+                      service_manager=None, username=None, orgname=None,
+                      searches=None):
+        return run_street_point_geocoder(
+            plpy if plpy else self.plpy_mock,
+            gd if gd else self.gd_mock,
+            geocoder if geocoder else self.geocoder_mock,
+            service_manager if service_manager else self.service_manager_mock,
+            username if username else 'any_username',
+            orgname if orgname else None,
+            json.dumps(searches) if searches else '[]')
 
     def setUp(self):
         point = [0,0]
@@ -79,10 +91,8 @@ class TestRunStreetPointGeocoder(TestCase):
         searches = []
 
         with(self.assertRaises(BaseException)):
-            run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                      self.geocoder_mock,
-                                      self.service_manager_mock,
-                                      'any_username', None, searches)
+            self._run_geocoder(service_manager=self.service_manager_mock,
+                               searches=searches)
 
         self.quota_service_mock.increment_total_service_use. \
             assert_called_once_with(len(searches))
@@ -96,10 +106,8 @@ class TestRunStreetPointGeocoder(TestCase):
 
         searches = SEARCH_FIXTURES['two']
 
-        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                           self.geocoder_mock,
-                                           self.service_manager_mock,
-                                           'any_username', None, searches)
+        result = self._run_geocoder(service_manager=self.service_manager_mock,
+                                    searches=searches)
         assert_equal(result, [])
 
         self.quota_service_mock.increment_failed_service_use. \
@@ -116,10 +124,8 @@ class TestRunStreetPointGeocoder(TestCase):
             [2, [0, 0], '{}'],
         ]
         self.geocoder_mock.bulk_geocode = MagicMock(return_value=results)
-        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                           self.geocoder_mock,
-                                           self.service_manager_mock,
-                                           'any_username', None, searches)
+        result = self._run_geocoder(geocoder=self.geocoder_mock,
+                                    searches=searches)
         assert_equal(result, expected_results)
 
         self.quota_service_mock.increment_success_service_use. \
@@ -129,10 +135,8 @@ class TestRunStreetPointGeocoder(TestCase):
         searches = SEARCH_FIXTURES['two']
         results = []
         self.geocoder_mock.bulk_geocode = MagicMock(return_value=results)
-        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                           self.geocoder_mock,
-                                           self.service_manager_mock,
-                                           'any_username', None, searches)
+        result = self._run_geocoder(geocoder=self.geocoder_mock,
+                                    searches=searches)
 
         assert_equal(result, results)
 
@@ -143,10 +147,8 @@ class TestRunStreetPointGeocoder(TestCase):
         searches = SEARCH_FIXTURES['two'] + SEARCH_FIXTURES['wrong']
         bulk_results = BULK_RESULTS_FIXTURES['two'] + BULK_RESULTS_FIXTURES['wrong']
         self.geocoder_mock.bulk_geocode = MagicMock(return_value=bulk_results)
-        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                           self.geocoder_mock,
-                                           self.service_manager_mock,
-                                           'any_username', None, searches)
+        result = self._run_geocoder(geocoder=self.geocoder_mock,
+                                    searches=searches)
 
         assert_equal(result, EXPECTED_RESULTS_FIXTURES['two'] + EXPECTED_RESULTS_FIXTURES['wrong'])
 
@@ -159,10 +161,8 @@ class TestRunStreetPointGeocoder(TestCase):
         searches = SEARCH_FIXTURES['two'] + SEARCH_FIXTURES['error']
         bulk_results = BULK_RESULTS_FIXTURES['two'] + BULK_RESULTS_FIXTURES['error']
         self.geocoder_mock.bulk_geocode = MagicMock(return_value=bulk_results)
-        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
-                                           self.geocoder_mock,
-                                           self.service_manager_mock,
-                                           'any_username', None, searches)
+        result = self._run_geocoder(geocoder=self.geocoder_mock,
+                                    searches=searches)
 
         assert_equal(result, EXPECTED_RESULTS_FIXTURES['two'] + EXPECTED_RESULTS_FIXTURES['error'])
 
