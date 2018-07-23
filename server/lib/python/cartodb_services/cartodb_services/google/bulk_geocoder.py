@@ -27,11 +27,10 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
             (cartodb_id, street, city, state, country) = search
             try:
                 lng_lat, metadata = self.geocode_meta(street, city, state, country)
-                result = (cartodb_id, lng_lat, metadata)
             except Exception as e:
                 self._logger.error("Error geocoding", e)
-                result = geocoder_error_response("Error geocoding")
-            results.append(result)
+                lng_lat, metadata = geocoder_error_response("Error geocoding")
+            results.append((cartodb_id, lng_lat, metadata))
         return results
 
     def _batch_geocode(self, searches):
