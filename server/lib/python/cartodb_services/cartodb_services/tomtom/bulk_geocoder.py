@@ -1,6 +1,7 @@
 import json, requests, time
 from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
+from cartodb_services.geocoder import geocoder_error_response
 from cartodb_services.tomtom import TomTomGeocoder
 from cartodb_services.tools.exceptions import ServiceException
 
@@ -43,12 +44,20 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         return results
 
     def _batch_geocode(self, searches):
-        location = self._send_batch(searches)
-        full_results = self._download_results(location)
+        full_results = self._geocode_searches(searches)
         results = []
         for s, r in zip(searches, full_results):
             results.append((s[0], r[0], r[1]))
         return results
+
+    def _geocode_searches(self, searches):
+        try:
+            location = self._send_batch(searches)
+            return self._download_results(location)
+        except Exception as e:
+            msg = "Error running TomTom batch geocode: {}".format(e)
+            self._logger.error(msg, e)
+            return [geocoder_error_response(msg)] * len(searches)
 
     def _send_batch(self, searches):
         body = {'batchItems': [{'query': self._query(s)} for s in searches]}
