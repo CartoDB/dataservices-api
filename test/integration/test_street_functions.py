@@ -26,7 +26,7 @@ class TestStreetFunctionsSetUp(TestCase):
     }
 
     HERE_POINTS = {
-        'Plaza Mayor 1, Valladolid': [-4.72979, 41.65258],
+        'Plaza Mayor 1, Valladolid': [-4.729, 41.65258],
         'Paseo Zorrilla, Valladolid': [-4.73869, 41.63817],
         '1900 amphitheatre parkway': [-122.0879468, 37.4234763],
         '1901 amphitheatre parkway': [-122.0879253, 37.4238725],
