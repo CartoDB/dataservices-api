@@ -6,7 +6,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from exceptions import *
-from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE
 from cartodb_services.metrics import Traceable
 
 class HereMapsGeocoder(Traceable):
@@ -90,7 +90,7 @@ class HereMapsGeocoder(Traceable):
             if value and value.strip():
                 params[key] = value
         if not params:
-            return [[], {}]
+            return EMPTY_RESPONSE
         return self._execute_geocode(params)
 
     def _execute_geocode(self, params):
@@ -102,7 +102,7 @@ class HereMapsGeocoder(Traceable):
             return [self._extract_lng_lat_from_result(result),
                     self._extract_metadata_from_result(result)]
         except IndexError:
-            return [[], {}]
+            return EMPTY_RESPONSE
         except KeyError as e:
             self._logger.error('params: {}'.format(params), e)
             raise MalformedResult()
@@ -127,7 +127,7 @@ class HereMapsGeocoder(Traceable):
             self._logger.warning('Error 4xx trying to geocode street using HERE',
                                data={"response": response.json(), "params":
                                      params})
-            return []
+            return EMPTY_RESPONSE
         else:
             self._logger.error('Error trying to geocode street using HERE',
                                data={"response": response.json(), "params":
