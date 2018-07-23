@@ -51,6 +51,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         service_manager.assert_within_limits(quota=False)
         geocode_results = geocoder.bulk_geocode(searches)
         results = []
+        a_failed_one = None
         if not geocode_results == EMPTY_BATCH_RESPONSE:
             for result in geocode_results:
                 if len(result) > 2:
@@ -64,6 +65,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
                     logger.warning('Geocoding error',
                                    data={"username": username, "orgname": orgname, "error": metadata['error']})
                     results.append([result[0], None, json.dumps(metadata)])
+                    a_failed_one = result
                     failed_count += 1
                 elif result[1] and len(result[1]) == 2:
                     plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
@@ -75,6 +77,13 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
 
         empty_count = len(searches) - success_count - failed_count
         logger.debug("--> Success: {}; empty: {}; failed: {}".format(success_count, empty_count, failed_count))
+        if a_failed_one:
+            logger.warning("failed geocoding",
+                           data={
+                               "username": username,
+                               "orgname": orgname,
+                               "failed": str(a_failed_one)
+                           })
         service_manager.quota_service.increment_success_service_use(success_count)
         service_manager.quota_service.increment_empty_service_use(empty_count)
         service_manager.quota_service.increment_failed_service_use(failed_count)
