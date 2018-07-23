@@ -24,7 +24,7 @@ def compose_address(street, city=None, state=None, country=None):
     return ', '.join(filter(None, [street, city, state, country]))
 
 
-def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches):
+def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches_string):
     plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
     logger_config = GD["logger_config"]
 
@@ -33,8 +33,14 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
     success_count, failed_count = 0, 0
 
     try:
+        searches = json.loads(searches_string)
+    except Exception as e:
+        logger.error('Parsing searches', exception=e, data={'searches': searches_string})
+        raise e
+
+    try:
         service_manager.assert_within_limits(quota=False)
-        geocode_results = geocoder.bulk_geocode(searches=searches)
+        geocode_results = geocoder.bulk_geocode(searches)
         results = []
         if geocode_results:
             for result in geocode_results:
@@ -94,20 +100,14 @@ class StreetPointBulkGeocoder:
 
     SEARCH_KEYS = ['id', 'address', 'city', 'state', 'country']
 
-    def bulk_geocode(self, searches):
+    def bulk_geocode(self, decoded_searches):
         """
-        :param searches: array of StreetGeocoderSearch
+        :param decoded_searches: array of StreetGeocoderSearch
         :return: array of tuples with three elements:
             * id
             * latitude and longitude (array of two elements)
             * empty array (future use: metadata)
         """
-        try:
-            decoded_searches = json.loads(searches)
-        except Exception as e:
-            self._logger.error('General error', exception=e)
-            raise e
-
         street_geocoder_searches = []
         for search in decoded_searches:
             search_id, address, city, state, country = \
