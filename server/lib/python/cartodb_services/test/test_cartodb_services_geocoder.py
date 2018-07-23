@@ -18,6 +18,10 @@ SEARCH_FIXTURES = {
     'wrong': [
         StreetGeocoderSearch(id=100, address='deowpfjoepwjfopejwpofjewpojgf',
                              city=None, state=None, country=None),
+    ],
+    'error': [
+        StreetGeocoderSearch(id=200, address=None, city=None, state=None,
+                             country=None),
     ]
 }
 
@@ -28,6 +32,9 @@ BULK_RESULTS_FIXTURES = {
     ],
     'wrong': [
         (100, [], {})
+    ],
+    'error': [
+        (200, [], {'error': 'Something wrong happened'})
     ]
 }
 
@@ -38,6 +45,9 @@ EXPECTED_RESULTS_FIXTURES = {
     ],
     'wrong': [
         [100, None, '{}']
+    ],
+    'error': [
+        [200, None, '{"error": "Something wrong happened"}']
     ]
 }
 
@@ -50,7 +60,8 @@ class TestRunStreetPointGeocoder(TestCase):
         self.plpy_mock.execute = MagicMock(return_value=[{'the_geom': point}])
 
         self.logger_config_mock = MagicMock(min_log_level='debug',
-                                            log_file_path='/tmp/ptest.log')
+                                            log_file_path='/tmp/ptest.log',
+                                            rollbar_api_key=None)
         self.gd_mock = {'logger_config': self.logger_config_mock}
 
         self.geocoder_mock = Mock()
@@ -143,5 +154,21 @@ class TestRunStreetPointGeocoder(TestCase):
             assert_called_once_with(len(SEARCH_FIXTURES['two']))
         self.quota_service_mock.increment_empty_service_use. \
             assert_called_once_with(len(SEARCH_FIXTURES['wrong']))
+
+    def test_increment_mixed_error_service_use_on_complete_response(self):
+        searches = SEARCH_FIXTURES['two'] + SEARCH_FIXTURES['error']
+        bulk_results = BULK_RESULTS_FIXTURES['two'] + BULK_RESULTS_FIXTURES['error']
+        self.geocoder_mock.bulk_geocode = MagicMock(return_value=bulk_results)
+        result = run_street_point_geocoder(self.plpy_mock, self.gd_mock,
+                                           self.geocoder_mock,
+                                           self.service_manager_mock,
+                                           'any_username', None, searches)
+
+        assert_equal(result, EXPECTED_RESULTS_FIXTURES['two'] + EXPECTED_RESULTS_FIXTURES['error'])
+
+        self.quota_service_mock.increment_success_service_use. \
+            assert_called_once_with(len(SEARCH_FIXTURES['two']))
+        self.quota_service_mock.increment_failed_service_use. \
+            assert_called_once_with(len(SEARCH_FIXTURES['error']))
 
 

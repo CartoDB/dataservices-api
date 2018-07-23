@@ -39,18 +39,24 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         if geocode_results:
             for result in geocode_results:
                 if len(result) > 2:
-                    metadata = json.dumps(result[2])
+                    metadata = result[2]
                 else:
-                    logger.warning('Geocoding for {} without metadata'.format(username))
-                    metadata = '{}'
+                    logger.warning('Geocoding without metadata',
+                                   data={"username": username, "orgname": orgname})
+                    metadata = {}
 
-                if result[1] and len(result[1]) == 2:
+                if metadata.get('error', None):
+                    logger.warning('Geocoding error',
+                                   data={"username": username, "orgname": orgname, "error": metadata['error']})
+                    results.append([result[0], None, json.dumps(metadata)])
+                    failed_count += 1
+                elif result[1] and len(result[1]) == 2:
                     plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
                     point = plpy.execute(plan, result[1], 1)[0]
-                    results.append([result[0], point['the_geom'], metadata])
+                    results.append([result[0], point['the_geom'], json.dumps(metadata)])
                     success_count += 1
                 else:
-                    results.append([result[0], None, metadata])
+                    results.append([result[0], None, json.dumps(metadata)])
 
         empty_count = len(searches) - success_count - failed_count
         service_manager.quota_service.increment_success_service_use(success_count)
