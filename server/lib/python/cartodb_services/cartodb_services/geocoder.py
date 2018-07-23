@@ -121,7 +121,7 @@ class StreetPointBulkGeocoder:
 
     def bulk_geocode(self, decoded_searches):
         """
-        :param decoded_searches: array of StreetGeocoderSearch
+        :param decoded_searches: JSON array
         :return: array of tuples with three elements:
             * id
             * latitude and longitude (array of two elements)
@@ -136,10 +136,19 @@ class StreetPointBulkGeocoder:
 
         if len(street_geocoder_searches) > self.MAX_BATCH_SIZE:
             raise Exception("Batch size can't be larger than {}".format(self.MAX_BATCH_SIZE))
-        if self._should_use_batch(street_geocoder_searches):
-            return self._batch_geocode(street_geocoder_searches)
-        else:
-            return self._serial_geocode(street_geocoder_searches)
+        try:
+            if self._should_use_batch(street_geocoder_searches):
+                return self._batch_geocode(street_geocoder_searches)
+            else:
+                return self._serial_geocode(street_geocoder_searches)
+        except Exception as e:
+            msg = "Error running geocode: {}".format(e)
+            self._logger.error(msg, e)
+            errors = [geocoder_error_response(msg)] * len(decoded_searches)
+            results = []
+            for s, r in zip(decoded_searches, errors):
+                results.append((s['id'], r[0], r[1]))
+            return results
 
     def _batch_geocode(self, street_geocoder_searches):
         raise NotImplementedError('Subclasses must implement _batch_geocode')
