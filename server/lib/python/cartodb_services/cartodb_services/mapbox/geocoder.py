@@ -163,7 +163,6 @@ class MapboxGeocoder(Traceable):
             response = self._geocoder.forward(address=free_search.decode('utf-8'),
                                               limit=1,
                                               country=country)
-
             if response.status_code == requests.codes.ok:
                 return self._parse_geocoder_response(response.text)
             elif response.status_code == requests.codes.too_many_requests:
@@ -174,6 +173,7 @@ class MapboxGeocoder(Traceable):
                 return EMPTY_BATCH_RESPONSE
             else:
                 msg = "Unkown status: {}".format(response.status_code)
+                self._logger.warning(msg, data={"searches": free_searches})
                 return [geocoder_error_response(msg)] * len(free_searches)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
