@@ -1,7 +1,7 @@
 from multiprocessing import Pool
 from exceptions import MalformedResult
 from cartodb_services import StreetPointBulkGeocoder
-from cartodb_services.geocoder import compose_address
+from cartodb_services.geocoder import compose_address, geocoder_error_response
 from cartodb_services.google import GoogleMapsGeocoder
 
 
@@ -25,8 +25,13 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (cartodb_id, street, city, state, country) = search
-            lng_lat, metadata = self.geocode_meta(street, city, state, country)
-            results.append((cartodb_id, lng_lat, metadata))
+            try:
+                lng_lat, metadata = self.geocode_meta(street, city, state, country)
+                result = (cartodb_id, lng_lat, metadata)
+            except Exception as e:
+                self._logger.error("Error geocoding", e)
+                result = geocoder_error_response("Error geocoding")
+            results.append(result)
         return results
 
     def _batch_geocode(self, searches):
@@ -49,14 +54,12 @@ class GoogleMapsBulkGeocoder(GoogleMapsGeocoder, StreetPointBulkGeocoder):
                 try:
                     lng_lat, metadata = self._process_results(bulk_result.get())
                 except Exception as e:
-                    self._logger.error('Error at Google async_geocoder', e)
-                    lng_lat, metadata = [[], {}]
+                    msg = 'Error at Google async_geocoder'
+                    self._logger.error(msg, e)
+                    lng_lat, metadata = geocoder_error_response(msg)
 
                 results.append((cartodb_id, lng_lat, metadata))
             return results
-        except KeyError as e:
-            self._logger.error('KeyError error', exception=e)
-            raise MalformedResult()
         except Exception as e:
             self._logger.error('General error', exception=e)
             raise e
