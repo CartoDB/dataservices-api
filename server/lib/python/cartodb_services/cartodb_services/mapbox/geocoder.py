@@ -5,7 +5,7 @@ Python client for the Mapbox Geocoder service.
 import json
 import requests
 from mapbox import Geocoder
-from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE, EMPTY_BATCH_RESPONSE, TOO_MANY_REQUESTS_ERROR_RESPONSE, geocoder_error_response
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -69,7 +69,7 @@ class MapboxGeocoder(Traceable):
                     result.append(EMPTY_RESPONSE)
             return result
         else:
-            return EMPTY_RESPONSE
+            return EMPTY_BATCH_RESPONSE
 
     def _extract_lng_lat_from_feature(self, feature):
         geometry = feature[ENTRY_GEOMETRY]
@@ -118,9 +118,17 @@ class MapboxGeocoder(Traceable):
         :param city:
         :param state_province:
         :param country: Country ISO 3166 code
-        :return: [x, y] on success, [] on error
+        :return: [x, y] on success, raises ServiceException on error
         """
-        return self.geocode_meta(searchtext, city, state_province, country)[0]
+        response = self.geocode_meta(searchtext, city, state_province, country)
+        if response:
+            error_message = response[1].get('error', None)
+            if error_message:
+                raise ServiceException(error_message, None)
+            else:
+                return response[0]
+        else:
+            return EMPTY_RESPONSE
 
     @qps_retry(qps=10)
     def geocode_meta(self, searchtext, city=None, state_province=None,
@@ -138,7 +146,8 @@ class MapboxGeocoder(Traceable):
 
         free_search = ', '.join(address)
 
-        return self.geocode_free_text_meta([free_search], country)[0]
+        response = self.geocode_free_text_meta([free_search], country)
+        return response[0] if response else EMPTY_RESPONSE
 
     @qps_retry(qps=10)
     def geocode_free_text_meta(self, free_searches, country=None):
@@ -157,24 +166,26 @@ class MapboxGeocoder(Traceable):
 
             if response.status_code == requests.codes.ok:
                 return self._parse_geocoder_response(response.text)
+            elif response.status_code == requests.codes.too_many_requests:
+                return [TOO_MANY_REQUESTS_ERROR_RESPONSE] * len(free_searches)
             elif response.status_code == requests.codes.bad_request:
-                return EMPTY_RESPONSE
+                return EMPTY_BATCH_RESPONSE
             elif response.status_code == requests.codes.unprocessable_entity:
-                return EMPTY_RESPONSE
+                return EMPTY_BATCH_RESPONSE
             else:
-                raise ServiceException(response.status_code, response)
+                msg = "Unkown status: {}".format(response.status_code)
+                return [geocoder_error_response(msg)] * len(free_searches)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
-            self._logger.error('Timeout connecting to Mapbox geocoding server',
-                               te)
-            raise ServiceException('Error geocoding {0} using Mapbox'.format(
-                free_search), None)
+            msg = 'Timeout connecting to Mapbox geocoding server'
+            self._logger.error(msg, te)
+            return [geocoder_error_response(msg)] * len(free_searches)
         except requests.ConnectionError as ce:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to Mapbox geocoding server',
                                exception=ce)
-            return EMPTY_RESPONSE
+            return EMPTY_BATCH_RESPONSE
 
     def _escape(self, free_search):
         # Semicolon is used to separate batch geocoding; there's no documented

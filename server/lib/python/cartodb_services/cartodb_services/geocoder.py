@@ -9,15 +9,24 @@ import json
 PRECISION_PRECISE = 'precise'
 PRECISION_INTERPOLATED = 'interpolated'
 
-EMPTY_RESPONSE = [[], {}]
-
-
 def geocoder_metadata(relevance, precision, match_types):
     return {
         'relevance': round(relevance, 2),
         'precision': precision,
         'match_types': match_types
     }
+
+
+def geocoder_error_response(message):
+    return [[], {'error': message}]
+
+
+# Single empty result
+EMPTY_RESPONSE = [[], {}]
+# HTTP 429 and related
+TOO_MANY_REQUESTS_ERROR_RESPONSE = geocoder_error_response('Rate limit exceeded')
+# Full empty _batch_geocode response
+EMPTY_BATCH_RESPONSE = []
 
 
 def compose_address(street, city=None, state=None, country=None):
@@ -42,7 +51,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         service_manager.assert_within_limits(quota=False)
         geocode_results = geocoder.bulk_geocode(searches)
         results = []
-        if geocode_results:
+        if not geocode_results == EMPTY_BATCH_RESPONSE:
             for result in geocode_results:
                 if len(result) > 2:
                     metadata = result[2]
@@ -65,6 +74,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
                     results.append([result[0], None, json.dumps(metadata)])
 
         empty_count = len(searches) - success_count - failed_count
+        logger.debug("--> Success: {}; empty: {}; failed: {}".format(success_count, empty_count, failed_count))
         service_manager.quota_service.increment_success_service_use(success_count)
         service_manager.quota_service.increment_empty_service_use(empty_count)
         service_manager.quota_service.increment_failed_service_use(failed_count)

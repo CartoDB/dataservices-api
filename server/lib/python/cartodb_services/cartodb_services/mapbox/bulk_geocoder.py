@@ -1,8 +1,6 @@
-import json, requests, time
-from requests.adapters import HTTPAdapter
+import requests
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.mapbox import MapboxGeocoder
-from cartodb_services.tools.exceptions import ServiceException
 from iso3166 import countries
 from cartodb_services.tools.country import country_to_iso3
 
