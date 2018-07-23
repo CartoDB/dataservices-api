@@ -39,7 +39,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
 
     logger = Logger(logger_config)
 
-    success_count, failed_count = 0, 0
+    success_count, failed_count, empty_count = 0, 0, 0
 
     try:
         searches = json.loads(searches_string)
@@ -54,16 +54,9 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         a_failed_one = None
         if not geocode_results == EMPTY_BATCH_RESPONSE:
             for result in geocode_results:
-                if len(result) > 2:
-                    metadata = result[2]
-                else:
-                    logger.warning('Geocoding without metadata',
-                                   data={"username": username, "orgname": orgname})
-                    metadata = {}
+                metadata = result[2] if len(result) > 2 else {}
 
                 if metadata.get('error', None):
-                    logger.warning('Geocoding error',
-                                   data={"username": username, "orgname": orgname, "error": metadata['error']})
                     results.append([result[0], None, json.dumps(metadata)])
                     a_failed_one = result
                     failed_count += 1
@@ -74,18 +67,25 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
                     success_count += 1
                 else:
                     results.append([result[0], None, json.dumps(metadata)])
+                    empty_count += 1
 
-        empty_count = len(searches) - success_count - failed_count
-        logger.debug("--> Success: {}; empty: {}; failed: {}".format(success_count, empty_count, failed_count))
+        missing_count = len(searches) - success_count - failed_count - empty_count
+
+        logger.debug("--> Success: {}; empty: {}; missing: {}, failed: {}".
+                     format(success_count, empty_count, missing_count, failed_count))
         if a_failed_one:
             logger.warning("failed geocoding",
                            data={
                                "username": username,
                                "orgname": orgname,
-                               "failed": str(a_failed_one)
+                               "failed": str(a_failed_one),
+                               "success_count": success_count,
+                               "empty_count": empty_count,
+                               "missing_count": missing_count,
+                               "failed_count": failed_count
                            })
         service_manager.quota_service.increment_success_service_use(success_count)
-        service_manager.quota_service.increment_empty_service_use(empty_count)
+        service_manager.quota_service.increment_empty_service_use(empty_count + missing_count)
         service_manager.quota_service.increment_failed_service_use(failed_count)
 
         return results
