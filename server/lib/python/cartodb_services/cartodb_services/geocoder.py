@@ -30,11 +30,13 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
 
     logger = Logger(logger_config)
 
+    success_count, failed_count = 0, 0
+
     try:
         service_manager.assert_within_limits(quota=False)
         geocode_results = geocoder.bulk_geocode(searches=searches)
+        results = []
         if geocode_results:
-            results = []
             for result in geocode_results:
                 if len(result) > 2:
                     metadata = json.dumps(result[2])
@@ -46,13 +48,16 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
                     plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
                     point = plpy.execute(plan, result[1], 1)[0]
                     results.append([result[0], point['the_geom'], metadata])
+                    success_count += 1
                 else:
                     results.append([result[0], None, metadata])
-            service_manager.quota_service.increment_success_service_use(len(results))
-            return results
-        else:
-            service_manager.quota_service.increment_empty_service_use(len(searches))
-            return []
+
+        empty_count = len(searches) - success_count - failed_count
+        service_manager.quota_service.increment_success_service_use(success_count)
+        service_manager.quota_service.increment_empty_service_use(empty_count)
+        service_manager.quota_service.increment_failed_service_use(failed_count)
+
+        return results
     except QuotaExceededException as qe:
         logger.debug('QuotaExceededException at run_street_point_geocoder', qe,
                      data={"username": username, "orgname": orgname})
