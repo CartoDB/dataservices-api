@@ -55,19 +55,25 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
         if not geocode_results == EMPTY_BATCH_RESPONSE:
             for result in geocode_results:
                 metadata = result[2] if len(result) > 2 else {}
-
-                if metadata.get('error', None):
+                try:
+                    if metadata.get('error', None):
+                        results.append([result[0], None, json.dumps(metadata)])
+                        a_failed_one = result
+                        failed_count += 1
+                    elif result[1] and len(result[1]) == 2:
+                        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
+                        point = plpy.execute(plan, result[1], 1)[0]
+                        results.append([result[0], point['the_geom'], json.dumps(metadata)])
+                        success_count += 1
+                    else:
+                        results.append([result[0], None, json.dumps(metadata)])
+                        empty_count += 1
+                except Exception as e:
+                    import sys
+                    logger.error("Error processing geocode", sys.exc_info(), data={"username": username, "orgname": orgname})
+                    metadata['processing_error'] = 'Error: {}'.format(e.message)
                     results.append([result[0], None, json.dumps(metadata)])
-                    a_failed_one = result
                     failed_count += 1
-                elif result[1] and len(result[1]) == 2:
-                    plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as the_geom; ", ["double precision", "double precision"])
-                    point = plpy.execute(plan, result[1], 1)[0]
-                    results.append([result[0], point['the_geom'], json.dumps(metadata)])
-                    success_count += 1
-                else:
-                    results.append([result[0], None, json.dumps(metadata)])
-                    empty_count += 1
 
         missing_count = len(searches) - success_count - failed_count - empty_count
 
