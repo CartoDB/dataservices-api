@@ -77,14 +77,22 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
 
         missing_count = len(searches) - success_count - failed_count - empty_count
 
-        logger.debug("--> Success: {}; empty: {}; missing: {}, failed: {}".
-                     format(success_count, empty_count, missing_count, failed_count))
         if a_failed_one:
             logger.warning("failed geocoding",
                            data={
                                "username": username,
                                "orgname": orgname,
                                "failed": str(a_failed_one),
+                               "success_count": success_count,
+                               "empty_count": empty_count,
+                               "missing_count": missing_count,
+                               "failed_count": failed_count
+                           })
+        else:
+            logger.debug("finished geocoding",
+                           data={
+                               "username": username,
+                               "orgname": orgname,
                                "success_count": success_count,
                                "empty_count": empty_count,
                                "missing_count": missing_count,
