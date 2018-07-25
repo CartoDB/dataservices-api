@@ -5,7 +5,7 @@ import json
 import requests
 from uritemplate import URITemplate
 from math import tanh
-from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE, geocoder_error_response
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -20,7 +20,6 @@ ENTRY_RESULTS = 'results'
 ENTRY_POSITION = 'position'
 ENTRY_LON = 'lon'
 ENTRY_LAT = 'lat'
-EMPTY_RESPONSE = [[], {}]
 
 SCORE_NORMALIZATION_FACTOR = 0.15
 PRECISION_SCORE_THRESHOLD = 0.5
@@ -74,7 +73,12 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        return self.geocode_meta(searchtext, city, state_province, country)[0]
+        response = self.geocode_meta(searchtext, city, state_province, country)
+        error_message = response[1].get('error', None)
+        if error_message:
+            raise ServiceException(error_message, None)
+        else:
+            return response[0]
 
     @qps_retry(qps=5)
     def geocode_meta(self, searchtext, city=None, state_province=None,
@@ -107,10 +111,9 @@ class TomTomGeocoder(Traceable):
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
-            self._logger.error('Timeout connecting to TomTom geocoding server',
-                               te)
-            raise ServiceException('Error geocoding {0} using TomTom'.format(
-                searchtext), None)
+            msg = 'Timeout connecting to TomTom geocoding server'
+            self._logger.error(msg, te)
+            return geocoder_error_response(msg)
         except requests.ConnectionError as ce:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to TomTom geocoding server',
@@ -126,7 +129,9 @@ class TomTomGeocoder(Traceable):
             return EMPTY_RESPONSE
         else:
             msg = 'Unknown response {}: {}'.format(str(status_code), text)
-            raise ServiceException(msg, None)
+            self._logger.warning('Error parsing TomTom geocoding response',
+                                 data={'msg': msg})
+            return geocoder_error_response(msg)
 
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response) \

@@ -11,7 +11,7 @@ class TestStreetFunctionsSetUp(TestCase):
     fixture_points = None
 
     GOOGLE_POINTS = {
-        'Plaza Mayor, Valladolid': [-4.728252, 41.6517025],
+        'Plaza Mayor 1, Valladolid': [-4.728252, 41.6517025],
         'Paseo Zorrilla, Valladolid': [-4.7404453, 41.6314339],
         '1900 amphitheatre parkway': [-122.0875324, 37.4227968],
         '1901 amphitheatre parkway': [-122.0885504, 37.4238657],
@@ -26,7 +26,7 @@ class TestStreetFunctionsSetUp(TestCase):
     }
 
     HERE_POINTS = {
-        'Plaza Mayor, Valladolid': [-4.72979, 41.65258],
+        'Plaza Mayor 1, Valladolid': [-4.729, 41.65258],
         'Paseo Zorrilla, Valladolid': [-4.73869, 41.63817],
         '1900 amphitheatre parkway': [-122.0879468, 37.4234763],
         '1901 amphitheatre parkway': [-122.0879253, 37.4238725],
@@ -42,13 +42,13 @@ class TestStreetFunctionsSetUp(TestCase):
 
     TOMTOM_POINTS = HERE_POINTS.copy()
     TOMTOM_POINTS.update({
-        'Plaza Mayor, Valladolid': [-4.72183, 41.5826],
+        'Plaza Mayor 1, Valladolid': [-4.7286, 41.6523],
         'Paseo Zorrilla, Valladolid': [-4.74031, 41.63181],
         'Valladolid': [-4.72838, 41.6542],
         'Valladolid, Spain': [-4.72838, 41.6542],
         'Madrid': [-3.70035, 40.42028],
         'Logroño, Spain': [-2.44998, 42.46592],
-        'Plaza España, Barcelona': [2.1497, 41.37516]
+        'Plaza España, Barcelona': [2.14856, 41.37516]
     })
 
     MAPBOX_POINTS = GOOGLE_POINTS.copy()
@@ -174,7 +174,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "FROM cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
                 "'select 1 as cartodb_id, ''Spain'' as country, " \
                 "''Castilla y León'' as state, ''Valladolid'' as city, " \
-                "''Plaza Mayor'' as street  " \
+                "''Plaza Mayor 1'' as street  " \
                 "UNION " \
                 "select 2 as cartodb_id, ''Spain'' as country, " \
                 "''Castilla y León'' as state, ''Valladolid'' as city, " \
@@ -183,7 +183,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         response = self._run_authenticated(query)
 
         points_by_cartodb_id = {
-            1: self.fixture_points['Plaza Mayor, Valladolid'],
+            1: self.fixture_points['Plaza Mayor 1, Valladolid'],
             2: self.fixture_points['Paseo Zorrilla, Valladolid']
         }
         self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)

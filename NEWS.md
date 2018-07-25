@@ -1,6 +1,6 @@
 Jul 19th, 2018
 ==============
-* Version `0.25.0` of the client, `0.32.0` of the server, and `0.19.0` of the Python library.
+* Version `0.25.0` of the client, `0.32.0` of the server, and `0.19.1` of the Python library.
     * Support for batch street-level geocoding.
 
 May 7th, 2018
