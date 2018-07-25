@@ -8,7 +8,7 @@ from collections import namedtuple
 from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.here import HereMapsGeocoder
-from cartodb_services.geocoder import geocoder_metadata
+from cartodb_services.geocoder import geocoder_metadata, geocoder_error_response
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 
@@ -42,7 +42,11 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (search_id, address, city, state, country) = search
-            result = self.geocode_meta(searchtext=address, city=city, state=state, country=country)
+            try:
+                result = self.geocode_meta(searchtext=address, city=city, state=state, country=country)
+            except Exception as e:
+                self._logger.error("Error geocoding", e)
+                result = geocoder_error_response("Error geocoding")
             results.append((search_id, result[0], result[1]))
         return results
 
