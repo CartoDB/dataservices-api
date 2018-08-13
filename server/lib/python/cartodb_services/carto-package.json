@@ -1,11 +1,8 @@
 {
   "name": "dataservices-api-server-python-lib",
-  "versions": {
-    "0.19.0": {
-      "tag": "python-0.19.0",
-      "requires": {
-        "python": "2.7"
-      }
+  "current_version": {
+    "requires": {
+      "python": "2.7"
     }
   }
 }

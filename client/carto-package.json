@@ -1,17 +1,13 @@
 {
   "name": "dataservices-api-client-extension",
-  "versions": {
-    "0.25.0": {
-      "tag": "0.25.0-client",
-      "works_with": {
-        "dataservices-api-server-extension": "^0.32.0"
-      },
-      "requires": {
-        "postgresql": "^10.0.0",
-        "postgis": "^2.4",
-        "cartodb-postgresql": "^0.23.0"
-      }
+  "current_version": {
+    "requires": {
+      "postgresql": "^10.0.0",
+      "postgis": "^2.4",
+      "cartodb-extension": "^0.23.0"
+    },
+    "works_with": {
+      "dataservices-api-server-extension": "^0.32.0"
     }
   }
 }
-

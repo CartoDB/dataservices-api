@@ -1,30 +1,14 @@
 {
   "name": "dataservices-api-server-extension",
-  "versions": {
-    "0.32.0": {
-      "tag": "0.32.0-server",
-      "works_with": {
-        "dataservices-api-server-python-lib": "^0.19.0"
-      },
-      "requires": {
-        "postgresql": "^10.0.0",
-        "postgis": "^2.4",
-        "cartodb-postgresql": "^0.23.0"
-      }
+  "current_version": {
+    "requires": {
+      "postgresql": "^10.0.0",
+      "postgis": "^2.4",
+      "cartodb-postgresql": "^0.23.0"
     },
-    "0.32.0-customer": {
-      "tag": "0.32.0-server-customer",
-      "works_with": {
-        "dataservices-api-server-python-lib": {
-          "git-repository": "https://github.com/CUSTOMER/dataservices-api",
-          "manifest": "/server/extension/carto-package.json",
-          "version": "0.19.0-experimental"
-        }
-      },
-      "requires": {
-        "postgresql": "^10.0.0",
-        "postgis": "^2.4",
-        "cartodb-postgresql": "^0.23.0"
+    "works_with": {
+      "dataservices-api-server-python-lib": "^0.19.1",
+      "observatory-server-extension": "^1.9.0"
     }
   }
 }
