@@ -3,15 +3,13 @@ from mock import Mock
 from cartodb_services.mapbox.isolines import MapboxIsolines
 from cartodb_services.mapbox.matrix_client import DEFAULT_PROFILE
 from cartodb_services.mapbox.matrix_client import MapboxMatrixClient
-from cartodb_services.mapbox.routing import MapboxRouting
 from cartodb_services.tools import Coordinate
-from cartodb_services.tools.coordinates import (validate_coordinates,
-                                                marshall_coordinates)
 from credentials import mapbox_api_key
 
 VALID_ORIGIN = Coordinate(-73.989, 40.733)
 
 
+@unittest.skip("Stop using Matrix API. CartoDB/cartodb-management/issues/5199")
 class MapboxIsolinesTestCase(unittest.TestCase):
 
     def setUp(self):
