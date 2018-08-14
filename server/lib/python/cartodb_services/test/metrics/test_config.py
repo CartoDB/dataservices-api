@@ -173,7 +173,8 @@ class TestGeocoderOrgConfig(TestCase):
 
 
 class TestIsolinesUserConfig(TestCase):
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom']
+    # Don't test mapbox. See CartoDB/cartodb-management/issues/5199"
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -233,8 +234,8 @@ class TestIsolinesUserConfig(TestCase):
 
 
 class TestIsolinesOrgConfig(TestCase):
-
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom']
+    # Don't test mapbox. See CartoDB/cartodb-management/issues/5199"
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
