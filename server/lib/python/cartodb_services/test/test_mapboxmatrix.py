@@ -20,6 +20,7 @@ VALID_PROFILE = DEFAULT_PROFILE
 INVALID_PROFILE = 'invalid_profile'
 
 
+@unittest.skip("Stop using Matrix API. CartoDB/cartodb-management/issues/5199")
 class MapboxMatrixTestCase(unittest.TestCase):
     def setUp(self):
         self.matrix_client = MapboxMatrixClient(token=mapbox_api_key(),
