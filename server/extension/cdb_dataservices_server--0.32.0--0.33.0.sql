@@ -3,3 +3,4 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.33.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
+DROP FUNCTION IF EXISTS cdb_dataservices_server._get_obs_snapshot_config;
