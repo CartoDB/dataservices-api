@@ -28,9 +28,7 @@ def build_redis_user_config(redis_conn, username, service, quota=100,
         redis_conn.hset(user_redis_name, 'mapzen_routing_quota', str(quota))
         redis_conn.hset(user_redis_name, 'soft_mapzen_routing_limit', str(soft_limit).lower())
     elif service is 'data_observatory':
-        redis_conn.hset(user_redis_name, 'obs_snapshot_quota', str(quota))
         redis_conn.hset(user_redis_name, 'obs_general_quota', str(quota))
-        redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit', str(soft_limit).lower())
         redis_conn.hset(user_redis_name, 'soft_obs_general_limit', str(soft_limit).lower())
 
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
@@ -57,7 +55,6 @@ def build_redis_org_config(redis_conn, orgname, service, quota=100,
             redis_conn.hset(org_redis_name, 'mapzen_routing_quota', str(quota))
     elif service is 'data_observatory':
         if quota is not None:
-            redis_conn.hset(org_redis_name, 'obs_snapshot_quota', str(quota))
             redis_conn.hset(org_redis_name, 'obs_general_quota', str(quota))
 
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')

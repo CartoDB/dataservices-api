@@ -86,28 +86,6 @@ class DataObservatoryConfig(ServiceConfig):
         return 'data observatory'
 
 
-class ObservatorySnapshotConfig(DataObservatoryConfig):
-
-    SOFT_LIMIT_KEY = 'soft_obs_snapshot_limit'
-    QUOTA_KEY = 'obs_snapshot_quota'
-    PERIOD_END_DATE = 'period_end_date'
-
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(ObservatorySnapshotConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
-        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
-            self._soft_limit = True
-        else:
-            self._soft_limit = False
-        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
-        self._connection_str = self._db_config.data_observatory_connection_str
-
-    @property
-    def service_type(self):
-        return 'obs_snapshot'
-
-
 class ObservatoryConfig(DataObservatoryConfig):
 
     SOFT_LIMIT_KEY = 'soft_obs_general_limit'
@@ -890,7 +868,6 @@ class ServicesRedisConfig:
     QUOTA_KEY = 'geocoding_quota'
     ISOLINES_QUOTA_KEY = 'here_isolines_quota'
     ROUTING_QUOTA_KEY = 'mapzen_routing_quota'
-    OBS_SNAPSHOT_QUOTA_KEY = 'obs_snapshot_quota'
     OBS_GENERAL_QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
@@ -934,8 +911,6 @@ class ServicesRedisConfig:
                 user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
             if self.ROUTING_QUOTA_KEY in org_config:
                 user_config[self.ROUTING_QUOTA_KEY] = org_config[self.ROUTING_QUOTA_KEY]
-            if self.OBS_SNAPSHOT_QUOTA_KEY in org_config:
-                user_config[self.OBS_SNAPSHOT_QUOTA_KEY] = org_config[self.OBS_SNAPSHOT_QUOTA_KEY]
             if self.OBS_GENERAL_QUOTA_KEY in org_config:
                 user_config[self.OBS_GENERAL_QUOTA_KEY] = org_config[self.OBS_GENERAL_QUOTA_KEY]
             if self.PERIOD_END_DATE in org_config:
