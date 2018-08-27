@@ -1,5 +1,5 @@
 
-Aug ?th, 2018
+Aug 27th, 2018
 ==============
 * Version `0.33.0` of the server, and `0.20.0` of the Python library.
     * Remove the obs_snapshot quota and now the snapshot functions uses obs_general quota
