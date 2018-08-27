@@ -344,41 +344,7 @@ class TestDataObservatoryUserConfig(TestCase):
         self.redis_conn = MockRedis()
         plpy_mock_config()
 
-    def test_should_return_config_for_obs_snapshot(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=100, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                          'test_user')
-        assert do_config.monthly_quota == 100
-        assert do_config.soft_limit is False
-        assert do_config.period_end_date.date() == yesterday.date()
-
-    def test_should_return_true_if_soft_limit_is_true_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=0, soft_limit=True, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                          'test_user')
-        assert do_config.soft_limit is True
-
-    def test_should_return_0_if_quota_is_0_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=0, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                              'test_user')
-        assert do_config.monthly_quota == 0
-
-    def test_should_return_0_if_quota_is_empty_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota='', end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                              'test_user')
-        assert do_config.monthly_quota == 0
-
-    def test_should_return_config_for_obs_snapshot(self):
+    def test_should_return_config_for_obs_config(self):
         yesterday = datetime.today() - timedelta(days=1)
         build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
                                 quota=100, end_date=yesterday)
