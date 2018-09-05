@@ -1,33 +1,51 @@
 ---
 - name: cdb_geocode_admin0_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: country_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: admin1_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: admin1_name,  type: text }
     - { name: country_name, type: text }
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: city_name, type: text}
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: city_name,    type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: city_name,    type: text}
     - { name: admin1_name,  type: text}
@@ -35,35 +53,53 @@
 
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_ipaddress_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: ip_address,  type: text}
 
 - name: cdb_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -74,11 +110,17 @@
   return_type: SETOF cdb_dataservices_client.geocoding
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
 
 - name: cdb_here_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -87,6 +129,9 @@
 
 - name: cdb_google_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -95,6 +140,9 @@
 
 - name: cdb_mapbox_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -103,6 +151,9 @@
 
 - name: cdb_tomtom_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -111,6 +162,9 @@
 
 - name: cdb_mapzen_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding is not allowed
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -121,6 +175,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -131,6 +188,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -141,6 +201,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -151,6 +214,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -161,6 +227,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -171,6 +240,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -181,6 +253,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -191,6 +266,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines are not allowed
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -200,6 +278,9 @@
 - name: cdb_route_point_to_point
   return_type: cdb_dataservices_client.simple_route
   multi_field: true
+  requires_permission: true
+  permission_name: routing
+  permission_error: Routing is not allowed
   params:
     - { name: origin,  type: "geometry(Point, 4326)" }
     - { name: destination,  type: "geometry(Point, 4326)" }
@@ -210,6 +291,9 @@
 - name: cdb_route_with_waypoints
   return_type: cdb_dataservices_client.simple_route
   multi_field: true
+  requires_permission: true
+  permission_name: routing
+  permission_error: Routing is not allowed
   params:
     - { name: waypoints,  type: "geometry(Point, 4326)[]" }
     - { name: mode, type: text }

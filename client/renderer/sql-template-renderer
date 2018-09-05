@@ -28,6 +28,18 @@ class SqlTemplateRenderer
     @function_signature['return_type']
   end
 
+  def requires_permission
+    @function_signature['requires_permission']
+  end
+
+  def permission_name
+    @function_signature['permission_name']
+  end
+
+  def permission_error
+    @function_signature['permission_error']
+  end
+
   def multi_field
     @function_signature['multi_field']
   end
