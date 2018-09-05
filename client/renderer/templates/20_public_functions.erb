@@ -9,13 +9,17 @@ RETURNS <%= return_type %> AS $$
 DECLARE
   <%= return_declaration if not multi_row %>
   <%= user_org_declaration %>
+  <% unless superuser_function? -%>
+  appname TEXT;
+  apikey_permissions JSON;
+  <% end %>
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
   <% unless superuser_function? -%>
-  <% if requires_permission %>
   SELECT u, o, a, p INTO username, orgname, appname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, a text, p json);
+  <% if requires_permission %>
   IF NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
     RAISE EXCEPTION '<%= permission_error %>';
   END IF;
