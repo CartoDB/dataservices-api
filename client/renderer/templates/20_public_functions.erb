@@ -19,7 +19,7 @@ BEGIN
   <% if requires_permission %>IF NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
     RAISE EXCEPTION '<%= permission_error %>';
   END IF;
-  <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text);<% end %><% end %>
+  <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text, a text, p json);<% end %><% end %>
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';
