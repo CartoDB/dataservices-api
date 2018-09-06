@@ -10,6 +10,8 @@ DECLARE
   _returned_sqlstate TEXT;
   _message_text TEXT;
   _pg_exception_context TEXT;
+  <% unless superuser_function? -%>appname text;
+  apikey_permissions json;<% end %>
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
