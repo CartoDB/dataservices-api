@@ -61,6 +61,9 @@ class SqlTemplateRenderer
     if with_user_org
       parameters << { 'name' => 'username', 'type' => 'text' }
       parameters << { 'name' => 'orgname',  'type' => 'text' }
+      if requires_permission
+        parameters << { 'name' => 'appname', 'type' => 'text' }
+      end
     end
     parameters + @function_signature['params'].reject(&:empty?)
   end
