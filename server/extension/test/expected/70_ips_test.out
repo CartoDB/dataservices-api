@@ -1,6 +1,6 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point('test_user', 'test_orgname', '0.0.0.0');
+SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point('test_user', 'test_orgname', 'test_appname', '0.0.0.0');
  cdb_geocode_ipaddress_point 
 -----------------------------
  
@@ -9,7 +9,7 @@ SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point('test_user', 'test_or
 -- Insert dummy data into ip_address_locations
 INSERT INTO ip_address_locations VALUES ('::ffff:0.0.0.0'::inet, (ST_SetSRID(ST_MakePoint('40.40', '3.71'), 4326)));
 -- This should return the polygon inserted above
-SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point('test_user', 'test_orgname', '0.0.0.0');
+SELECT cdb_dataservices_server.cdb_geocode_ipaddress_point('test_user', 'test_orgname', 'test_appname', '0.0.0.0');
             cdb_geocode_ipaddress_point             
 ----------------------------------------------------
  0101000020E61000003333333333334440AE47E17A14AE0D40
@@ -21,7 +21,7 @@ SELECT exists(SELECT *
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'cdb_geocode_ipaddress_point'
-              AND oidvectortypes(p.proargtypes)  = 'text, text, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
  exists 
 --------
  t
