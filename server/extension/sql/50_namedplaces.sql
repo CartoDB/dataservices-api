@@ -9,8 +9,8 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
 
   try:
-    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3) as point;", ["text", "text", "text"])
-    return plpy.execute(street_point, [username, orgname, city_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, $4) as point;", ["text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, appname, city_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
     import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})

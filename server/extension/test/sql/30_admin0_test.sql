@@ -1,6 +1,6 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_dataservices_server.cdb_geocode_admin0_polygon('test_user', 'test_orgname', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_admin0_polygon('test_user', 'test_orgname', 'test_appname', 'Spain');
 
 -- Insert some dummy synonym
 INSERT INTO admin0_synonyms (name, adm0_a3) VALUES ('Spain', 'ESP');
@@ -14,7 +14,7 @@ INSERT INTO ne_admin0_v3 (adm0_a3, the_geom) VALUES('ESP', ST_GeomFromText(
 );
 
 -- This should return the polygon inserted above
-SELECT cdb_dataservices_server.cdb_geocode_admin0_polygon('test_user', 'test_orgname', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_admin0_polygon('test_user', 'test_orgname', 'test_appname', 'Spain');
 
 -- Check for admin0 signatures
 SELECT exists(SELECT *
@@ -22,7 +22,7 @@ SELECT exists(SELECT *
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'cdb_geocode_admin0_polygon'
-              AND oidvectortypes(p.proargtypes)  = 'text, text, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
 
 SELECT exists(SELECT *
               FROM pg_proc p
