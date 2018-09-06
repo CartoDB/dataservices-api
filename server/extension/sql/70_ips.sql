@@ -14,6 +14,9 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
+
+  params = {'username': username, 'orgname': orgname, 'appname': appname, 'ip': ip}
+
   with metrics('cdb_geocode_ipaddress_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])

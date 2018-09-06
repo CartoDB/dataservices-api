@@ -14,8 +14,8 @@ RETURNS Geometry AS $$
   except spiexceptions.ExternalRoutineException as e:
     import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4) as point;", ["text", "text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, appname, city_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
@@ -29,13 +29,13 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
 
   try:
-    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, NULL, $4) as point;", ["text", "text", "text", "text"])
-    return plpy.execute(street_point, [username, orgname, city_name, country_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, $4, NULL, NULL, $5) as point;", ["text", "text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, appname, city_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
     import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, NULL, $5) as point;", ["text", "text", "text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, appname, city_name, country_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
@@ -49,16 +49,16 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
 
   try:
-    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, $4, $5) as point;", ["text", "text", "text", "text", "text"])
-    return plpy.execute(street_point, [username, orgname, city_name, admin1_name, country_name])[0]['point']
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, $4, NULL, $5, $6) as point;", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, appname, city_name, admin1_name, country_name])[0]['point']
   except spiexceptions.ExternalRoutineException as e:
     import sys
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5, $6) as point;", ["text", "text", "text", "text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, appname, city_name, admin1_name, country_name])[0]['point']
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_internal_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_internal_geocode_namedplace(username text, orgname text, appname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig, metrics
@@ -74,7 +74,9 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
+  params = {'username': username, 'orgname': orgname, 'appname': appname, 'city_name': city_name, 'admin1_name': admin1_name, 'country_name': country_name}
+
+  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger, params):
     try:
       if admin1_name and country_name:
         plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
