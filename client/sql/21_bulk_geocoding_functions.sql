@@ -22,7 +22,7 @@ BEGIN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
   SELECT u, o, a, p INTO username, orgname, appname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, a text, p json);
-  IF NOT apikey_permissions::jsonb ? 'geocoding' THEN
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'geocoding' THEN
     RAISE EXCEPTION 'Geocoding is not allowed';
   END IF;
 

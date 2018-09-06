@@ -17,7 +17,7 @@ BEGIN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
   <% unless superuser_function? -%>SELECT u, o, a, p INTO username, orgname, appname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, a text, p json);
-  <% if requires_permission %>IF NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
+  <% if requires_permission %>IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
     RAISE EXCEPTION '<%= permission_error %>';
   END IF;
   <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text, a text, p json);<% end %><% end %>
