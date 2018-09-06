@@ -19,6 +19,21 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+
+-- No permissions granted
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

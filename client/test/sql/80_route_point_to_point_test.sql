@@ -28,12 +28,33 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
--- Exercise the public and the proxied functions
+-- -- Exercise the public and the proxied function
+
+-- No permissions granted
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
-
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
 
+-- Grant other permissions but routing
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding", "isolines"]}');
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
+
+-- Grant routing permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing"]}');
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
+SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

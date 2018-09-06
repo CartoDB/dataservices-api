@@ -9,12 +9,46 @@ CREATE FUNCTION cdb_dataservices_client.cdb_enough_quota (service TEXT ,input_si
 RETURNS BOOLEAN as $$
   SELECT FALSE;
 $$ LANGUAGE SQL;
+-- No permissions granted
+-- Test bulk size not mandatory (it will get the optimal)
+SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
+ERROR:  Geocoding is not allowed
+-- Test quota check by mocking quota 0
+SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
+ERROR:  Geocoding is not allowed
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+-- Test bulk size not mandatory (it will get the optimal)
+SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
+ERROR:  Geocoding is not allowed
+-- Test quota check by mocking quota 0
+SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
+ERROR:  Geocoding is not allowed
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 -- Test bulk size not mandatory (it will get the optimal)
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
 ERROR:  Remaining quota: 0. Estimated cost: 1
 -- Test quota check by mocking quota 0
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
 ERROR:  Remaining quota: 0. Estimated cost: 1
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
+ 
+(1 row)
+
 DROP FUNCTION cdb_dataservices_client.cdb_service_quota_info_batch;
 DROP FUNCTION cdb_dataservices_client.cdb_enough_quota;
 ALTER FUNCTION cdb_dataservices_client.cdb_enough_quota_mocked (service TEXT ,input_size NUMERIC) RENAME TO cdb_enough_quota;

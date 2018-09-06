@@ -12,7 +12,9 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+
+-- No permissions granted
 SELECT cdb_geocode_street_point('One street, 1');
 SELECT cdb_geocode_street_point('One street', 'city');
 SELECT cdb_geocode_street_point('One street', 'city', 'state');
@@ -23,3 +25,32 @@ SELECT cdb_geocode_street_point('One street', 'city');
 SELECT cdb_geocode_street_point('One street', 'city', 'state');
 SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
 SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
+
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT cdb_geocode_street_point('One street, 1');
+SELECT cdb_geocode_street_point('One street', 'city');
+SELECT cdb_geocode_street_point('One street', 'city', 'state');
+SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
+SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
+SELECT cdb_geocode_street_point('One street, 1');
+SELECT cdb_geocode_street_point('One street', 'city');
+SELECT cdb_geocode_street_point('One street', 'city', 'state');
+SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
+SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
+
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT cdb_geocode_street_point('One street, 1');
+SELECT cdb_geocode_street_point('One street', 'city');
+SELECT cdb_geocode_street_point('One street', 'city', 'state');
+SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
+SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
+SELECT cdb_geocode_street_point('One street, 1');
+SELECT cdb_geocode_street_point('One street', 'city');
+SELECT cdb_geocode_street_point('One street', 'city', 'state');
+SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
+SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

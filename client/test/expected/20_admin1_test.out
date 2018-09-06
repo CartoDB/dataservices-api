@@ -16,18 +16,48 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+-- No permissions granted
 SELECT cdb_geocode_admin1_polygon('California');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, <NULL>, California)
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California', 'United States');
+ERROR:  Geocoding is not allowed
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_admin1_polygon('California');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California', 'United States');
+ERROR:  Geocoding is not allowed
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_admin1_polygon('California');
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California)
  cdb_geocode_admin1_polygon 
 ----------------------------
  
 (1 row)
 
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, <NULL>, California, United States)
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California, United States)
  cdb_geocode_admin1_polygon 
 ----------------------------
+ 
+(1 row)
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
  
 (1 row)
 

@@ -3,85 +3,6 @@
 SET ROLE test_regular_user;
 -- Add to the search path the schema
 SET search_path TO public,cartodb,cdb_dataservices_client;
--- Exercise the public function
--- it is public, it shall work
-SELECT cdb_geocode_admin0_polygon('Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin0_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin0_polygon invoked with params (test_user, <NULL>, <NULL>, Spain)
- cdb_geocode_admin0_polygon 
-----------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_admin1_polygon('California');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, <NULL>, California)
- cdb_geocode_admin1_polygon 
-----------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_admin1_polygon('California', 'United States');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, <NULL>, California, United States)
- cdb_geocode_admin1_polygon 
-----------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_namedplace_point('Elx');
-NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, <NULL>, Elx)
- cdb_geocode_namedplace_point 
-------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
-NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, <NULL>, Elx, Valencia)
- cdb_geocode_namedplace_point 
-------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, <NULL>, Elx, Valencia, Spain)
- cdb_geocode_namedplace_point 
-------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, <NULL>, 03204, Spain)
- cdb_geocode_postalcode_polygon 
---------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_postalcode_point('03204', 'Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, <NULL>, 03204, Spain)
- cdb_geocode_postalcode_point 
-------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_ipaddress_point('8.8.8.8');
-NOTICE:  cdb_dataservices_client._cdb_geocode_ipaddress_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_ipaddress_point invoked with params (test_user, <NULL>, <NULL>, 8.8.8.8)
- cdb_geocode_ipaddress_point 
------------------------------
- 
-(1 row)
-
-SELECT cdb_geocode_street_point('one street, 1');
-NOTICE:  cdb_dataservices_client._cdb_geocode_street_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_geocoder_street_point invoked with params (test_user, <NULL>, <NULL>, one street, 1, <NULL>, <NULL>, <NULL>)
- cdb_geocode_street_point 
---------------------------
- 
-(1 row)
-
-SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(8): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, <NULL>, 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, kilometers)
- cdb_route_point_to_point 
---------------------------
- (,5.33,100)
-(1 row)
-
 -- Check the regular user has no permissions on private functions
 SELECT _cdb_geocode_admin0_polygon('evil_user', 'evil_orgname', 'evil_appname', 'Hell');
 ERROR:  permission denied for function _cdb_geocode_admin0_polygon
@@ -105,3 +26,153 @@ SELECT _cdb_geocode_street_point('evil_user', 'evil_orgname', 'evil_appname', 'o
 ERROR:  permission denied for function _cdb_geocode_street_point
 SELECT _cdb_route_point_to_point('evil_user', 'evil_orgname', 'evil_appname', 'POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
 ERROR:  permission denied for function _cdb_route_point_to_point
+-- -- Exercise the public function
+-- -- it is public, it shall work
+-- No permissions granted
+SELECT cdb_geocode_admin0_polygon('Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California', 'United States');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_street_point('one street, 1');
+ERROR:  Geocoding is not allowed
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
+ERROR:  Routing is not allowed
+-- Grant other permissions but geocoding and routing
+SET ROLE postgres;
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["isolines"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SET ROLE test_regular_user; -- Use regular user role
+SELECT cdb_geocode_admin0_polygon('Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_admin1_polygon('California', 'United States');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+ERROR:  Geocoding is not allowed
+SELECT cdb_geocode_street_point('one street, 1');
+ERROR:  Geocoding is not allowed
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
+ERROR:  Routing is not allowed
+-- Grant geocoding permissions
+SET ROLE postgres;
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding", "routing"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SET ROLE test_regular_user; -- Use regular user role
+SELECT cdb_geocode_admin0_polygon('Spain');
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin0_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin0_polygon invoked with params (test_user, <NULL>, "testing_app", Spain)
+ cdb_geocode_admin0_polygon 
+----------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_admin1_polygon('California');
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California)
+ cdb_geocode_admin1_polygon 
+----------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_admin1_polygon('California', 'United States');
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California, United States)
+ cdb_geocode_admin1_polygon 
+----------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_namedplace_point('Elx');
+NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, "testing_app", Elx)
+ cdb_geocode_namedplace_point 
+------------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
+NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, "testing_app", Elx, Valencia)
+ cdb_geocode_namedplace_point 
+------------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
+NOTICE:  cdb_dataservices_client._cdb_geocode_namedplace_point(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_namedplace_point invoked with params (test_user, <NULL>, "testing_app", Elx, Valencia, Spain)
+ cdb_geocode_namedplace_point 
+------------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, "testing_app", 03204, Spain)
+ cdb_geocode_postalcode_polygon 
+--------------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, "testing_app", 03204, Spain)
+ cdb_geocode_postalcode_point 
+------------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+NOTICE:  cdb_dataservices_client._cdb_geocode_ipaddress_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_ipaddress_point invoked with params (test_user, <NULL>, "testing_app", 8.8.8.8)
+ cdb_geocode_ipaddress_point 
+-----------------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_street_point('one street, 1');
+NOTICE:  cdb_dataservices_client._cdb_geocode_street_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_geocoder_street_point invoked with params (test_user, <NULL>, "testing_app", one street, 1, <NULL>, <NULL>, <NULL>)
+ cdb_geocode_street_point 
+--------------------------
+ 
+(1 row)
+
+SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
+NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(8): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, "testing_app", 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, kilometers)
+ cdb_route_point_to_point 
+--------------------------
+ (,5.33,100)
+(1 row)
+
+-- Remove permissions
+SET ROLE postgres;
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
+ 
+(1 row)
+

@@ -12,5 +12,18 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+
+-- No permissions granted
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT cdb_geocode_ipaddress_point('8.8.8.8');
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
