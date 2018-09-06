@@ -1,5 +1,5 @@
 ---- cdb_geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, appname TEXT, admin1_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -37,7 +37,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, appname TEXT, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     from cartodb_services.metrics import metrics
     from cartodb_services.metrics import QuotaService

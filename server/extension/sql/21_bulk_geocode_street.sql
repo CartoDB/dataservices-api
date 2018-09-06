@@ -5,7 +5,7 @@ CREATE TYPE cdb_dataservices_server.geocoding AS (
     metadata jsonb
 );
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger

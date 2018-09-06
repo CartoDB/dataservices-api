@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, appname TEXT, country_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig

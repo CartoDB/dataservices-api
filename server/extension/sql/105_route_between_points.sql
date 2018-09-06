@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
   orgname TEXT,
+  appname TEXT,
   origin geometry(Point, 4326),
   destination geometry(Point, 4326),
   mode TEXT,
@@ -43,6 +44,7 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
   username TEXT,
   orgname TEXT,
+  appname TEXT,
   waypoints geometry(Point, 4326)[],
   mode TEXT,
   options text[] DEFAULT ARRAY[]::text[],

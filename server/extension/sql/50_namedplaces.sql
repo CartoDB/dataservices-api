@@ -1,5 +1,5 @@
 ---- cdb_geocode_namedplace_point(city_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, appname TEXT, city_name text)
 RETURNS Geometry AS $$
   import spiexceptions
   from cartodb_services.tools import Logger,LoggerConfig
@@ -19,7 +19,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, appname TEXT, city_name text, country_name text)
 RETURNS Geometry AS $$
   import spiexceptions
   from cartodb_services.tools import Logger,LoggerConfig
@@ -39,7 +39,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, appname TEXT, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
   import spiexceptions
   from cartodb_services.tools import Logger,LoggerConfig

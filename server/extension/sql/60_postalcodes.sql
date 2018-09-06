@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, appname TEXT, code text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -34,13 +34,13 @@ RETURNS Geometry AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, appname TEXT, code double precision)
 RETURNS Geometry AS $$
-  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text);
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, appname, code::text);
 $$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, appname TEXT, code text, country text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -76,13 +76,13 @@ RETURNS Geometry AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, appname TEXT, code double precision, country text)
 RETURNS Geometry AS $$
-  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text, country);
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, appname, code::text, country);
 $$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, appname TEXT, code text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -118,14 +118,14 @@ RETURNS Geometry AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, appname TEXT, code double precision)
 RETURNS Geometry AS $$
-  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text)
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, appname, code::text)
 $$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, appname TEXT, code text, country text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -161,9 +161,9 @@ RETURNS Geometry AS $$
       quota_service.increment_total_service_use()
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision, country text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, appname TEXT, code double precision, country text)
 RETURNS Geometry AS $$
-  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country);
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, appname, code::text, country);
 $$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
