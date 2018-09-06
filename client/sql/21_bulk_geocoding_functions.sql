@@ -13,7 +13,24 @@ DECLARE
   MAX_SAFE_BATCH_SIZE CONSTANT numeric := 5000;
 
   temp_table_name text;
+  username text;
+  orgname text;
+  appname text;
+  apikey_permissions json;
 BEGIN
+  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
+    RAISE EXCEPTION 'The api_key must be provided';
+  END IF;
+  SELECT u, o, a, p INTO username, orgname, appname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, a text, p json);
+  IF NOT apikey_permissions::jsonb ? 'geocoding' THEN
+    RAISE EXCEPTION 'Geocoding is not allowed';
+  END IF;
+
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
+
   SELECT csqi.monthly_quota - csqi.used_quota AS remaining_quota, csqi.max_batch_size
   INTO remaining_quota, max_batch_size
   FROM cdb_dataservices_client.cdb_service_quota_info_batch() csqi
