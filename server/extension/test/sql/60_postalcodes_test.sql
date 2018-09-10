@@ -7,7 +7,7 @@ DELETE FROM admin0_synonyms;
 
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', 'test_app', '03204');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', '03204');
 
 -- Insert dummy data into ip_address_locations
 INSERT INTO global_postal_code_points (the_geom, iso3, postal_code, postal_code_num) VALUES (

@@ -6,7 +6,7 @@ DELETE FROM available_services;
 DELETE FROM admin0_synonyms;
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', 'test_app', '03204');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', '03204');
  cdb_geocode_postalcode_point 
 ------------------------------
  
