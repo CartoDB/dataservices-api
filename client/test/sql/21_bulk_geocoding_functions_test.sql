@@ -19,14 +19,14 @@ SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartod
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
 
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
 -- Test bulk size not mandatory (it will get the optimal)
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
 -- Test quota check by mocking quota 0
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
 
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
 -- Test bulk size not mandatory (it will get the optimal)
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
 -- Test quota check by mocking quota 0
