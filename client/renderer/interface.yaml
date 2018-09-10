@@ -177,7 +177,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -190,7 +190,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -203,7 +203,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -216,7 +216,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -229,7 +229,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -242,7 +242,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -255,7 +255,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -268,7 +268,7 @@
   multi_field: true
   requires_permission: true
   permission_name: isolines
-  permission_error: Isolines are not allowed
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
