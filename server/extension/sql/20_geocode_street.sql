@@ -1,6 +1,6 @@
 -- Geocodes a street address given a searchtext and a state and/or country
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger,LoggerConfig
@@ -12,7 +12,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
+  params = {'username': username, 'orgname': orgname, 'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
 
   with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.heremaps_geocoder:
@@ -36,7 +36,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -51,7 +51,7 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_google_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -66,7 +66,7 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   # The configuration is retrieved but no checks are performed on it
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -79,7 +79,7 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   # The configuration is retrieved but no checks are performed on it
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
@@ -92,7 +92,7 @@ RETURNS Geometry AS $$
 
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   # The configuration is retrieved but no checks are performed on it
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))

@@ -1,7 +1,6 @@
 CREATE TYPE cdb_dataservices_client._entity_config AS (
     username text,
     organization_name text,
-    application_name text,
     apikey_permissions json
 );
 
@@ -37,7 +36,6 @@ BEGIN
     END IF;
     result.username = username;
     result.organization_name = organization_name;
-    result.application_name = apikey_config->'application';
     result.apikey_permissions = apikey_config->'permissions';
     RETURN result;
 END;

@@ -1,20 +1,20 @@
 -- Check that the public function is callable, even with no data
 -- It should return NULL
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
  cdb_geocode_namedplace_point 
 ------------------------------
  
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
  cdb_geocode_namedplace_point 
 ------------------------------
  
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx', 'Valencia', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx', 'Valencia', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
  cdb_geocode_namedplace_point 
 ------------------------------
@@ -34,42 +34,42 @@ INSERT INTO country_decoder (synonyms, iso2) VALUES (Array['spain', 'Spain'], 'E
 -- Insert dummy data into admin1 decoder table
 INSERT INTO admin1_decoder (admin1, synonyms, iso2) VALUES ('Valencia', Array['valencia', 'Valencia'], 'ES');
 -- This should return the point inserted above
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------
  0101000020E6100000637FD93D7958E63F2ECA6C9049A24340
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elche');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elche');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------
  0101000020E6100000637FD93D7958E63F2ECA6C9049A24340
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------
  0101000020E6100000637FD93D7958E63F2ECA6C9049A24340
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elche', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elche', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------
  0101000020E6100000637FD93D7958E63F2ECA6C9049A24340
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elx', 'Valencia', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elx', 'Valencia', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------
  0101000020E6100000637FD93D7958E63F2ECA6C9049A24340
 (1 row)
 
-SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'test_appname', 'Elche', 'valencia', 'Spain');
+SELECT cdb_dataservices_server.cdb_geocode_namedplace_point('test_user', 'test_orgname', 'Elche', 'valencia', 'Spain');
 WARNING:  Error geocoding namedplace using geocode street point, falling back to internal geocoder. Exception: spiexceptions.ExternalRoutineException: cartodb_services.metrics.config.ConfigException: There is no user config available. Please check your configuration.'
             cdb_geocode_namedplace_point            
 ----------------------------------------------------

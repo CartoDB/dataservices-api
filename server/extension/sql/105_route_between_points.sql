@@ -1,7 +1,6 @@
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
   orgname TEXT,
-  appname TEXT,
   origin geometry(Point, 4326),
   destination geometry(Point, 4326),
   mode TEXT,
@@ -19,7 +18,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
+  params = {'username': username, 'orgname': orgname, 'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
 
   with metrics('cdb_route_with_point', user_routing_config, logger, params):
     waypoints = [origin, destination]
@@ -44,7 +43,6 @@ $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
   username TEXT,
   orgname TEXT,
-  appname TEXT,
   waypoints geometry(Point, 4326)[],
   mode TEXT,
   options text[] DEFAULT ARRAY[]::text[],
@@ -61,7 +59,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
+  params = {'username': username, 'orgname': orgname, 'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
 
   with metrics('cdb_route_with_waypoints', user_routing_config, logger, params):
     if user_routing_config.mapzen_provider:

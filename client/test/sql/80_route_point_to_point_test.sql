@@ -4,24 +4,24 @@ SET search_path TO public,cartodb,cdb_dataservices_client;
 
 -- Mock the server functions
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point (username text, orgname text, appname text, origin geometry(Point, 4326), destination geometry(Point, 4326), mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point (username text, orgname text, origin geometry(Point, 4326), destination geometry(Point, 4326), mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
 RETURNS cdb_dataservices_client.simple_route AS $$
 DECLARE 
   ret cdb_dataservices_client.simple_route;
 BEGIN
-  RAISE NOTICE 'cdb_dataservices_server.cdb_route_point_to_point invoked with params (%, %, %, %, %, %, %, %)', username, orgname, appname, origin, destination, mode, options, units;
+  RAISE NOTICE 'cdb_dataservices_server.cdb_route_point_to_point invoked with params (%, %, %, %, %, %, %)', username, orgname, origin, destination, mode, options, units;
   SELECT NULL, 5.33, 100 INTO ret;
   RETURN ret;
 END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(username text, orgname text, appname text, waypoints geometry(Point, 4326)[], mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(username text, orgname text, waypoints geometry(Point, 4326)[], mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
 RETURNS cdb_dataservices_client.simple_route AS $$
 DECLARE 
   ret cdb_dataservices_client.simple_route;
 BEGIN
-  RAISE NOTICE 'cdb_dataservices_server.cdb_route_with_waypoints invoked with params (%, %, %, %, %, %, %)', username, orgname, appname, waypoints, mode, options, units;
+  RAISE NOTICE 'cdb_dataservices_server.cdb_route_with_waypoints invoked with params (%, %, %, %, %, %)', username, orgname, waypoints, mode, options, units;
   SELECT NULL, 2.22, 500 INTO ret;
   RETURN ret;
 END;

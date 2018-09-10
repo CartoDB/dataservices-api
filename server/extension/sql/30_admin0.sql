@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, appname TEXT, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
   from cartodb_services.metrics import InternalGeocoderConfig
@@ -15,7 +15,7 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'country_name': country_name}
+  params = {'username': username, 'orgname': orgname, 'country_name': country_name}
 
   with metrics('cdb_geocode_admin0_polygon', user_geocoder_config, logger, params):
     try:

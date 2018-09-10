@@ -1,5 +1,5 @@
 ---- cdb_geocode_admin1_polygon(admin1_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, appname TEXT, admin1_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -16,7 +16,7 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'admin1_name': admin1_name}
+  params = {'username': username, 'orgname': orgname, 'admin1_name': admin1_name}
 
   with metrics('cdb_geocode_admin1_polygon', user_geocoder_config, logger, params):
     try:
@@ -39,7 +39,7 @@ RETURNS Geometry AS $$
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, appname TEXT, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
     from cartodb_services.metrics import metrics
     from cartodb_services.metrics import QuotaService

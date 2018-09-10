@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, appname TEXT, ip text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.metrics import QuotaService
@@ -15,7 +15,7 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'ip': ip}
+  params = {'username': username, 'orgname': orgname, 'ip': ip}
 
   with metrics('cdb_geocode_ipaddress_point', user_geocoder_config, logger):
     try:

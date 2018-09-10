@@ -9,17 +9,16 @@ RETURNS <%= return_type %> AS $$
 DECLARE
   <%= return_declaration if not multi_row %>
   <%= user_org_declaration %>
-  <% unless superuser_function? -%>appname text;
-  apikey_permissions json;<% end %>
+  <% unless superuser_function? -%>apikey_permissions json;<% end %>
 BEGIN
   IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
   END IF;
-  <% unless superuser_function? -%>SELECT u, o, a, p INTO username, orgname, appname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, a text, p json);
+  <% unless superuser_function? -%>SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   <% if requires_permission %>IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
     RAISE EXCEPTION '<%= permission_error %>';
   END IF;
-  <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text, a text, p json);<% end %><% end %>
+  <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text, p json);<% end %><% end %>
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
     RAISE EXCEPTION 'Username is a mandatory argument, check it out';

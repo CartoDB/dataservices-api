@@ -5,7 +5,7 @@ CREATE TYPE cdb_dataservices_server.geocoding AS (
     metadata jsonb
 );
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, appname TEXT, searches jsonb)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger
@@ -20,7 +20,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'username': username, 'orgname': orgname, 'appname': appname, 'searches': searches}
+  params = {'username': username, 'orgname': orgname, 'searches': searches}
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:

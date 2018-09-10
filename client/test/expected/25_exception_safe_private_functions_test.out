@@ -2,20 +2,20 @@
 SET client_min_messages TO warning;
 SET search_path TO public,cartodb,cdb_dataservices_client;
 -- Mock the server functions to raise exceptions
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point (username text, orgname text, appname text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point (username text, orgname text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
 RETURNS Geometry AS $$
 BEGIN
   RAISE EXCEPTION 'Not enough quota or any other exception whatsoever.';
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username text, orgname text, appname text, source geometry, mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username text, orgname text, source geometry, mode text, range integer[], options text[] DEFAULT ARRAY[]::text[])
 RETURNS SETOF isoline AS $$
 BEGIN
   RAISE EXCEPTION 'Not enough quota or any other exception whatsoever.';
 END;
 $$ LANGUAGE 'plpgsql';
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point (username text, orgname text, appname text, origin geometry(Point, 4326), destination geometry(Point, 4326), mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point (username text, orgname text, origin geometry(Point, 4326), destination geometry(Point, 4326), mode TEXT, options text[] DEFAULT ARRAY[]::text[], units text DEFAULT 'kilometers')
 RETURNS cdb_dataservices_client.simple_route AS $$
 DECLARE 
   ret cdb_dataservices_client.simple_route;
