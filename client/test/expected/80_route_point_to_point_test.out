@@ -37,7 +37,7 @@ ERROR:  Routing is not allowed
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
 ERROR:  Routing is not allowed
 -- Grant other permissions but routing
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "isolines"]}');
  cdb_conf_setconf 
 ------------------
  
@@ -56,49 +56,49 @@ ERROR:  Routing is not allowed
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
 ERROR:  Routing is not allowed
 -- Grant routing permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing"]}');
  cdb_conf_setconf 
 ------------------
  
 (1 row)
 
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(8): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, "testing_app", 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, kilometers)
+NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, kilometers)
  cdb_route_point_to_point 
 --------------------------
  (,5.33,100)
 (1 row)
 
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
-NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(8): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, "testing_app", 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {mode_type=shortest}, kilometers)
+NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {mode_type=shortest}, kilometers)
  cdb_route_point_to_point 
 --------------------------
  (,5.33,100)
 (1 row)
 
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
-NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(8): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, "testing_app", 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, miles)
+NOTICE:  cdb_dataservices_client._cdb_route_point_to_point(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_point_to_point invoked with params (test_user, <NULL>, 0101000000D53E1D8F19F455C0185B087250F24440, 0101000000465F419AB1F255C0D8B628B341EE4440, car, {}, miles)
  cdb_route_point_to_point 
 --------------------------
  (,5.33,100)
 (1 row)
 
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
-NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, "testing_app", {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {}, kilometers)
+NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {}, kilometers)
  cdb_route_with_waypoints 
 --------------------------
  (,2.22,500)
 (1 row)
 
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
-NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, "testing_app", {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {mode_type=shortest}, kilometers)
+NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {mode_type=shortest}, kilometers)
  cdb_route_with_waypoints 
 --------------------------
  (,2.22,500)
 (1 row)
 
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
-NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(7): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, "testing_app", {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {}, miles)
+NOTICE:  cdb_dataservices_client._cdb_route_with_waypoints(6): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_route_with_waypoints invoked with params (test_user, <NULL>, {0101000000D53E1D8F19F455C0185B087250F24440:0101000000650113B875F355C05665DF15C1EF4440:0101000000465F419AB1F255C0D8B628B341EE4440}, car, {}, miles)
  cdb_route_with_waypoints 
 --------------------------
  (,2.22,500)

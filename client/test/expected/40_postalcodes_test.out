@@ -23,7 +23,7 @@ ERROR:  Geocoding is not allowed
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
 ERROR:  Geocoding is not allowed
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
  cdb_conf_setconf 
 ------------------
  
@@ -34,21 +34,21 @@ ERROR:  Geocoding is not allowed
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
 ERROR:  Geocoding is not allowed
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
  cdb_conf_setconf 
 ------------------
  
 (1 row)
 
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, "testing_app", 03204, Spain)
+NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, 03204, Spain)
  cdb_geocode_postalcode_polygon 
 --------------------------------
  
 (1 row)
 
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
-NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, "testing_app", 03204, Spain)
+NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, 03204, Spain)
  cdb_geocode_postalcode_point 
 ------------------------------
  

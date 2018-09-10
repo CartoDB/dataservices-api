@@ -38,7 +38,7 @@ SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.417
 ERROR:  Routing is not allowed
 -- No permissions granted but conf created
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": []}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": []}');
  cdb_conf_setconf 
 ------------------
  
@@ -53,7 +53,7 @@ SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.417
 ERROR:  Routing is not allowed
 -- Grant geocoding permissions
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding", "routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "routing", "isolines"]}');
  cdb_conf_setconf 
 ------------------
  

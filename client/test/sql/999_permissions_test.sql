@@ -35,7 +35,7 @@ SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87
 
 -- Grant other permissions but geocoding and routing
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["isolines"]}');
 SET ROLE test_regular_user; -- Use regular user role
 SELECT cdb_geocode_admin0_polygon('Spain');
 SELECT cdb_geocode_admin1_polygon('California');
@@ -51,7 +51,7 @@ SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87
 
 -- Grant geocoding permissions
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding", "routing"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "routing"]}');
 SET ROLE test_regular_user; -- Use regular user role
 SELECT cdb_geocode_admin0_polygon('Spain');
 SELECT cdb_geocode_admin1_polygon('California');

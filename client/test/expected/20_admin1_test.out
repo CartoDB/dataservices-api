@@ -23,7 +23,7 @@ ERROR:  Geocoding is not allowed
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
 ERROR:  Geocoding is not allowed
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
  cdb_conf_setconf 
 ------------------
  
@@ -34,21 +34,21 @@ ERROR:  Geocoding is not allowed
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
 ERROR:  Geocoding is not allowed
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"application": "testing_app", "permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
  cdb_conf_setconf 
 ------------------
  
 (1 row)
 
 SELECT cdb_geocode_admin1_polygon('California');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California)
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, California)
  cdb_geocode_admin1_polygon 
 ----------------------------
  
 (1 row)
 
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
-NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, "testing_app", California, United States)
+NOTICE:  cdb_dataservices_client._cdb_geocode_admin1_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin1_polygon invoked with params (test_user, <NULL>, California, United States)
  cdb_geocode_admin1_polygon 
 ----------------------------
  
