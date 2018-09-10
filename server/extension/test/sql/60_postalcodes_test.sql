@@ -44,13 +44,13 @@ INSERT INTO admin0_synonyms (adm0_a3, name, name_, rank) VALUES (
 );
 
 -- This should return the polygon inserted above
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', 'test_app', '03204');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', '03204');
 
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', 'test_app', '03204', 'spain');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_point('test_user', 'test_org', '03204', 'spain');
 
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon('test_user', 'test_org', 'test_app', '03204');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon('test_user', 'test_org', '03204');
 
-SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon('test_user', 'test_org', 'test_app', '03204', 'spain');
+SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon('test_user', 'test_org', '03204', 'spain');
 
 -- Clean dbs
 DELETE FROM global_postal_code_points;
@@ -65,20 +65,13 @@ SELECT exists(SELECT *
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'cdb_geocode_postalcode_point'
-              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text');
 
 SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'cdb_geocode_postalcode_point'
-              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text, text');
-
-SELECT exists(SELECT *
-              FROM pg_proc p
-              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
-              WHERE ns.nspname = 'cdb_dataservices_server'
-              AND proname = 'cdb_geocode_postalcode_polygon'
               AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
 
 SELECT exists(SELECT *
@@ -86,7 +79,14 @@ SELECT exists(SELECT *
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
               WHERE ns.nspname = 'cdb_dataservices_server'
               AND proname = 'cdb_geocode_postalcode_polygon'
-              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text, text');
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text');
+
+SELECT exists(SELECT *
+              FROM pg_proc p
+              INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
+              WHERE ns.nspname = 'cdb_dataservices_server'
+              AND proname = 'cdb_geocode_postalcode_polygon'
+              AND oidvectortypes(p.proargtypes)  = 'text, text, text, text');
 
 SELECT exists(SELECT *
               FROM pg_proc p
