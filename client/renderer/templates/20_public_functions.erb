@@ -16,7 +16,7 @@ BEGIN
   END IF;
   <% unless superuser_function? -%>SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   <% if requires_permission %>IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
-    RAISE EXCEPTION '<%= permission_error %>' USING ERRCODE = 'CDB403';
+    RAISE EXCEPTION '<%= permission_error %>' USING ERRCODE = '01007';
   END IF;<% end %>
   <% else %>SELECT u, o INTO username, orgname FROM <%= DATASERVICES_CLIENT_SCHEMA %>._cdb_entity_config() AS (u text, o text, p json);<% end %>
   -- JSON value stored "" is taken as literal
