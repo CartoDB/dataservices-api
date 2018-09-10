@@ -25,17 +25,17 @@ $$ LANGUAGE 'plpgsql';
 -- -- Exercise the public and the proxied function
 -- No permissions granted
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 -- Grant other permissions but routing
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "isolines"]}');
  cdb_conf_setconf 
@@ -44,17 +44,17 @@ SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "iso
 (1 row)
 
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY['mode_type=shortest']::text[]);
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car', ARRAY[]::text[], 'miles');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY['mode_type=shortest']::text[]);
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 -- Grant routing permissions
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing"]}');
  cdb_conf_setconf 

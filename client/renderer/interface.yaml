@@ -3,7 +3,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: country_name, type: text }
 
@@ -11,7 +11,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: admin1_name, type: text }
 
@@ -19,7 +19,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: admin1_name,  type: text }
     - { name: country_name, type: text }
@@ -28,7 +28,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name, type: text}
 
@@ -36,7 +36,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name,    type: text}
     - { name: country_name, type: text}
@@ -45,7 +45,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name,    type: text}
     - { name: admin1_name,  type: text}
@@ -55,7 +55,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
@@ -64,7 +64,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
@@ -73,7 +73,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
@@ -82,7 +82,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
@@ -91,7 +91,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: ip_address,  type: text}
 
@@ -99,7 +99,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -112,7 +112,7 @@
   multi_field: true
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
 
@@ -120,7 +120,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -131,7 +131,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -142,7 +142,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -153,7 +153,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -164,7 +164,7 @@
   return_type: Geometry
   requires_permission: true
   permission_name: geocoding
-  permission_error: Geocoding is not allowed
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -280,7 +280,7 @@
   multi_field: true
   requires_permission: true
   permission_name: routing
-  permission_error: Routing is not allowed
+  permission_error: Routing permission denied
   params:
     - { name: origin,  type: "geometry(Point, 4326)" }
     - { name: destination,  type: "geometry(Point, 4326)" }
@@ -293,7 +293,7 @@
   multi_field: true
   requires_permission: true
   permission_name: routing
-  permission_error: Routing is not allowed
+  permission_error: Routing permission denied
   params:
     - { name: waypoints,  type: "geometry(Point, 4326)[]" }
     - { name: mode, type: text }

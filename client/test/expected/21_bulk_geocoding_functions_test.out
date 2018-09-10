@@ -12,10 +12,10 @@ $$ LANGUAGE SQL;
 -- No permissions granted
 -- Test bulk size not mandatory (it will get the optimal)
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 -- Test quota check by mocking quota 0
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 -- Grant other permissions but geocoding
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
  cdb_conf_setconf 
@@ -25,10 +25,10 @@ SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isoli
 
 -- Test bulk size not mandatory (it will get the optimal)
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''', null, null, null, null);
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 -- Test quota check by mocking quota 0
 SELECT cdb_dataservices_client.cdb_bulk_geocode_street_point('select 1 as cartodb_id', '''Valladolid, Spain''');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 -- Grant geocoding permissions
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
  cdb_conf_setconf 

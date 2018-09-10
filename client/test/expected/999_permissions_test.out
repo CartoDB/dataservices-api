@@ -30,27 +30,27 @@ ERROR:  permission denied for function _cdb_route_point_to_point
 -- -- it is public, it shall work
 -- No permissions granted
 SELECT cdb_geocode_admin0_polygon('Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_admin1_polygon('California');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_street_point('one street, 1');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 -- Grant other permissions but geocoding and routing
 SET ROLE postgres;
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["isolines"]}');
@@ -61,27 +61,27 @@ SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["isolines"]}');
 
 SET ROLE test_regular_user; -- Use regular user role
 SELECT cdb_geocode_admin0_polygon('Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_admin1_polygon('California');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_admin1_polygon('California', 'United States');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_postalcode_point('03204', 'Spain');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_geocode_street_point('one street, 1');
-ERROR:  Geocoding is not allowed
+ERROR:  Geocoding permission denied
 SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87.79209 41.86138)'::geometry, 'car');
-ERROR:  Routing is not allowed
+ERROR:  Routing permission denied
 -- Grant geocoding permissions
 SET ROLE postgres;
 SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "routing"]}');
