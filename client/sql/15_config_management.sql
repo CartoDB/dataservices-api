@@ -17,7 +17,7 @@ DECLARE
     apikey_config json;
     is_organization boolean;
     username text;
-    organization_name text;
+    organization_name text DEFAULT NULL;
 BEGIN
     SELECT cartodb.cdb_conf_getconf('api_keys_'||session_user) INTO apikey_config;
 
@@ -26,8 +26,6 @@ BEGIN
         RAISE EXCEPTION 'User must have user configuration in the config table';
     ELSIF is_organization = TRUE THEN
         SELECT cartodb.cdb_conf_getconf('user_config')->>'entity_name' INTO organization_name;
-    ELSE
-        organization_name = NULL;
     END IF;
     result.username = apikey_config->'username';
     result.organization_name = organization_name;
