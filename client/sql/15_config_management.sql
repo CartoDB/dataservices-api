@@ -27,7 +27,7 @@ BEGIN
     ELSIF is_organization = TRUE THEN
         SELECT cartodb.cdb_conf_getconf('user_config')->>'entity_name' INTO organization_name;
     END IF;
-    result.username = apikey_config->'username';
+    result.username = apikey_config->>'username';
     result.organization_name = organization_name;
     result.apikey_permissions = apikey_config->'permissions';
     RETURN result;
