@@ -42,7 +42,7 @@ SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.417
 
 -- No permissions granted but conf created
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": []}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": []}');
 SET ROLE test_regular_user; -- Use regular user role
 SELECT _cdb_geocode_street_point_exception_safe('One street, 1');
 SELECT * FROM _cdb_isodistance_exception_safe('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);
@@ -50,7 +50,7 @@ SELECT * FROM _cdb_route_point_to_point_exception_safe('POINT(-3.70237112 40.417
 
 -- Grant geocoding permissions
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding", "routing", "isolines"]}');
 SET ROLE test_regular_user; -- Use regular user role
 SELECT _cdb_geocode_street_point_exception_safe('One street, 1');
 SELECT * FROM _cdb_isodistance_exception_safe('POINT(-3.70568 40.42028)'::geometry, 'walk', ARRAY[300]::integer[]);

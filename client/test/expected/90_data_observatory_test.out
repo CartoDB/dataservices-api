@@ -202,6 +202,12 @@ BEGIN
   RETURN QUERY SELECT true AS valid, ARRAY[]::TEXT[] AS errors;
 END;
 $$ LANGUAGE 'plpgsql';
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": [""]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 -- Exercise the public and the proxied function
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 NOTICE:  cdb_dataservices_client._obs_get_demographic_snapshot(5): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.obs_get_demographic_snapshot invoked with params (test_user, <NULL>, 0101000020E6100000548B8862F27B52C0DDD1FF722D5A4440, 2009 - 2013, "us.census.tiger".block_group)
@@ -364,5 +370,11 @@ NOTICE:  cdb_dataservices_client._obs_metadatavalidation(6): [contrib_regression
  obs_metadatavalidation 
 ------------------------
  (t,{})
+(1 row)
+
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
+ 
 (1 row)
 

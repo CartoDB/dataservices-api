@@ -27,7 +27,7 @@ SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
 SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
 
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
 SELECT cdb_geocode_street_point('One street, 1');
 SELECT cdb_geocode_street_point('One street', 'city');
 SELECT cdb_geocode_street_point('One street', 'city', 'state');
@@ -40,7 +40,7 @@ SELECT cdb_geocode_street_point('One street', 'city', 'state', 'country');
 SELECT cdb_geocode_street_point('One street', 'city', NULL, 'country');
 
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
 SELECT cdb_geocode_street_point('One street, 1');
 SELECT cdb_geocode_street_point('One street', 'city');
 SELECT cdb_geocode_street_point('One street', 'city', 'state');

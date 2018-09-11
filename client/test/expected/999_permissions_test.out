@@ -53,7 +53,7 @@ SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87
 ERROR:  Routing permission denied
 -- Grant other permissions but geocoding and routing
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["isolines"]}');
  cdb_conf_setconf 
 ------------------
  
@@ -84,7 +84,7 @@ SELECT cdb_route_point_to_point('POINT(-87.81406 41.89308)'::geometry,'POINT(-87
 ERROR:  Routing permission denied
 -- Grant geocoding permissions
 SET ROLE postgres;
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "routing"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding", "routing"]}');
  cdb_conf_setconf 
 ------------------
  

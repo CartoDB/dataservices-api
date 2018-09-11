@@ -18,11 +18,11 @@ $$ LANGUAGE 'plpgsql';
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
 
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
 
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
 SELECT cdb_geocode_ipaddress_point('8.8.8.8');
 
 -- Remove permissions

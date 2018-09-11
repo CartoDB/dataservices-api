@@ -34,6 +34,8 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": [""]}');
+
 -- Create a sample user table
 CREATE TABLE user_table (cartodb_id int, the_geom geometry);
 INSERT INTO user_table(cartodb_id, the_geom) VALUES (1, '0101000020E6100000F74FC902E07D52C05FE24CC7654B4440');
@@ -54,3 +56,5 @@ SELECT * FROM my_table_dst;
 
 -- Clean tables
 DROP TABLE my_table_dst;
+
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

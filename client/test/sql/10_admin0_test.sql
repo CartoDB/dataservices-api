@@ -17,11 +17,11 @@ $$ LANGUAGE 'plpgsql';
 SELECT cdb_geocode_admin0_polygon('Spain');
 
 -- Grant other permissions but geocoding
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
 SELECT cdb_geocode_admin0_polygon('Spain');
 
 -- Grant geocoding permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
 SELECT cdb_geocode_admin0_polygon('Spain');
 
 -- Remove permissions

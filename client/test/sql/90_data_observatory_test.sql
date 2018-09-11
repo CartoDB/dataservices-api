@@ -227,6 +227,8 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": [""]}');
+
 -- Exercise the public and the proxied function
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 SELECT obs_get_segment_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
@@ -252,3 +254,4 @@ SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7),
 SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
 SELECT obs_metadatavalidation(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 'ST_Polygon', '[{"numer_id": "us.census.acs.B01003001"}]', 1000);
 
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

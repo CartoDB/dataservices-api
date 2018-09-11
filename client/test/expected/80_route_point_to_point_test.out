@@ -37,7 +37,7 @@ ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
 ERROR:  Routing permission denied
 -- Grant other permissions but routing
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["geocoding", "isolines"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding", "isolines"]}');
  cdb_conf_setconf 
 ------------------
  
@@ -56,7 +56,7 @@ ERROR:  Routing permission denied
 SELECT cdb_route_with_waypoints(Array['POINT(-87.81406 41.89308)'::geometry,'POINT(-87.80406 41.87308)'::geometry,'POINT(-87.79209 41.86138)'::geometry], 'car', ARRAY[]::text[], 'miles');
 ERROR:  Routing permission denied
 -- Grant routing permissions
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"permissions": ["routing"]}');
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing"]}');
  cdb_conf_setconf 
 ------------------
  
