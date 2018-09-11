@@ -302,6 +302,9 @@
 
 - name: obs_get_demographic_snapshot
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
@@ -309,6 +312,9 @@
 
 - name: obs_get_segment_snapshot
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
@@ -316,6 +322,9 @@
 - name: obs_getdemographicsnapshot
   return_type: SETOF JSON
   multi_row: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: 'NULL' }
@@ -324,12 +333,18 @@
 - name: obs_getsegmentsnapshot
   return_type: SETOF JSON
   multi_row: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getboundary
   return_type: Geometry
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
@@ -337,6 +352,9 @@
 
 - name: obs_getboundaryid
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
@@ -344,6 +362,9 @@
 
 - name: obs_getboundarybyid
   return_type: Geometry
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geometry_id,  type: text }
     - { name: boundary_id, type: text }
@@ -353,6 +374,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -366,6 +390,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -380,6 +407,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -393,6 +423,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -405,6 +438,9 @@
 
 - name: obs_getmeasure
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: measure_id, type: text }
@@ -414,6 +450,9 @@
 
 - name: obs_getmeasurebyid
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_ref,  type: text }
     - { name: measure_id, type: text }
@@ -424,6 +463,9 @@
   return_type: TABLE(id int, data json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: integer }
     - { name: data, type: json }
@@ -436,6 +478,9 @@
   return_type: TABLE(id text, data json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: text }
     - { name: data, type: json }
@@ -445,6 +490,9 @@
 
 - name: obs_getmeta
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_ref,  type: "Geometry(Geometry, 4326)" }
     - { name: params, type: json }
@@ -456,6 +504,9 @@
   return_type: TABLE(valid boolean, errors text[])
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_extent,  type: "Geometry(Geometry, 4326)" }
     - { name: geom_type,  type: text }
@@ -464,6 +515,9 @@
 
 - name: obs_getcategory
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: category_id, type: text }
@@ -472,6 +526,9 @@
 
 - name: obs_getuscensusmeasure
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: name, type: text }
@@ -481,6 +538,9 @@
 
 - name: obs_getuscensuscategory
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: name, type: text }
@@ -489,6 +549,9 @@
 
 - name: obs_getpopulation
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: normalize, type: text, default: 'NULL'}
@@ -499,6 +562,9 @@
   return_type: TABLE(id text, description text, name text, aggregate text, source text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: text }
     - { name: description, type: text }
@@ -513,6 +579,9 @@
   return_type: TABLE(boundary_id text, description text, time_span text, tablename text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: boundary_id, type: text }
     - { name: description, type: text }
@@ -524,6 +593,9 @@
 
 - name: obs_dumpversion
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - {}
 
@@ -531,6 +603,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_numerator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -542,6 +617,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_numerator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: section_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
@@ -557,6 +635,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_denominator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -568,6 +649,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_geometry
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -580,6 +664,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_timespan
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -591,6 +678,9 @@
   return_type: TABLE(name text, subsection json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: aggregate_type, type: text, default: 'NULL' }
 

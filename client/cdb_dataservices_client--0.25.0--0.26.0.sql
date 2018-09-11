@@ -1021,11 +1021,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1049,11 +1049,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1077,11 +1077,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1105,11 +1105,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1133,11 +1133,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1161,11 +1161,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1189,11 +1189,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1217,11 +1217,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1245,11 +1245,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1273,11 +1273,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1301,11 +1301,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1329,11 +1329,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1357,11 +1357,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1385,11 +1385,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1413,11 +1413,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1441,11 +1441,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1469,11 +1469,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1497,11 +1497,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1525,11 +1525,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1553,11 +1553,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1581,11 +1581,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1609,11 +1609,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1637,11 +1637,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1665,11 +1665,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1693,11 +1693,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1721,11 +1721,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1749,11 +1749,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1777,11 +1777,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1805,11 +1805,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -1833,11 +1833,11 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied' USING ERRCODE = '01007';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3142,11 +3142,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3181,11 +3181,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3220,11 +3220,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3259,11 +3259,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3298,11 +3298,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3337,11 +3337,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3376,11 +3376,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3415,11 +3415,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3454,11 +3454,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3493,11 +3493,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3532,11 +3532,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3571,11 +3571,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3610,11 +3610,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3649,11 +3649,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3688,11 +3688,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3727,11 +3727,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3766,11 +3766,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3805,11 +3805,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3844,11 +3844,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3883,11 +3883,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3922,11 +3922,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -3961,11 +3961,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4000,11 +4000,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4039,11 +4039,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4078,11 +4078,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4117,11 +4117,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4156,11 +4156,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4195,11 +4195,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4234,11 +4234,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN
@@ -4273,11 +4273,11 @@ DECLARE
   _pg_exception_context TEXT;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
-  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'observatory' THEN
+    RAISE EXCEPTION 'Data Observatory permission denied';
+  END IF;
   
   -- JSON value stored "" is taken as literal
   IF username IS NULL OR username = '' OR username = '""' THEN

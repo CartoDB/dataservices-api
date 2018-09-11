@@ -227,9 +227,61 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": [""]}');
+-- -- Exercise the public and the proxied function
 
--- Exercise the public and the proxied function
+-- No permissions granted
+SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
+SELECT obs_get_segment_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
+SELECT obs_getdemographicsnapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013', '"us.census.tiger".block_group'::text);
+SELECT obs_getsegmentsnapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
+SELECT obs_getboundary(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundaryid(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundarybyid('36047'::text, 'us.census.tiger.county'::text);
+SELECT obs_getboundariesbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundariesbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500, 'us.census.tiger.census_tract'::text);
+SELECT obs_getpointsbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getpointsbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500::numeric, 'us.census.tiger.census_tract'::text);
+SELECT obs_getmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.acs.B01001001'::text);
+SELECT obs_getmeasurebyid('36047'::text, 'us.census.acs.B01001001'::text, 'us.census.tiger.county'::text);
+SELECT obs_getcategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.spielman_singleton_segments.X10'::text);
+SELECT obs_getuscensusmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'male population'::text);
+SELECT obs_getuscensuscategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'Spielman-Singleton Segments: 10 Clusters'::text);
+SELECT obs_getpopulation(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
+SELECT obs_search('total_pop'::text);
+SELECT obs_getavailableboundaries(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
+SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]', 1, 1, 1000);
+SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}]', 1, 1, 1000));
+SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
+SELECT obs_metadatavalidation(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 'ST_Polygon', '[{"numer_id": "us.census.acs.B01003001"}]', 1000);
+
+-- Grant other permissions but DO
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
+SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
+SELECT obs_get_segment_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
+SELECT obs_getdemographicsnapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013', '"us.census.tiger".block_group'::text);
+SELECT obs_getsegmentsnapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
+SELECT obs_getboundary(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundaryid(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundarybyid('36047'::text, 'us.census.tiger.county'::text);
+SELECT obs_getboundariesbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getboundariesbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500, 'us.census.tiger.census_tract'::text);
+SELECT obs_getpointsbygeometry(ST_MakeEnvelope(-73.9452409744, 40.6988851644, -73.9280319214, 40.7101254524, 4326), 'us.census.tiger.census_tract'::text);
+SELECT obs_getpointsbypointandradius(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 500::numeric, 'us.census.tiger.census_tract'::text);
+SELECT obs_getmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.acs.B01001001'::text);
+SELECT obs_getmeasurebyid('36047'::text, 'us.census.acs.B01001001'::text, 'us.census.tiger.county'::text);
+SELECT obs_getcategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'us.census.spielman_singleton_segments.X10'::text);
+SELECT obs_getuscensusmeasure(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'male population'::text);
+SELECT obs_getuscensuscategory(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), 'Spielman-Singleton Segments: 10 Clusters'::text);
+SELECT obs_getpopulation(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
+SELECT obs_search('total_pop'::text);
+SELECT obs_getavailableboundaries(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326));
+SELECT obs_getmeta(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]', 1, 1, 1000);
+SELECT obs_getdata(ARRAY['36047'], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001", "geom_id": "us.census.tiger.county"}]', 1, 1, 1000));
+SELECT obs_getdata(ARRAY[(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 1)::geomval], obs_getmeta(st_setsrid(st_point(-73.9, 40.7), 4326), '[{"numer_id": "us.census.acs.B01003001"}]'));
+SELECT obs_metadatavalidation(ST_SetSRID(ST_Point(-73.9, 40.7), 4326), 'ST_Polygon', '[{"numer_id": "us.census.acs.B01003001"}]', 1000);
+
+-- Grant DO permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["observatory"]}');
 SELECT obs_get_demographic_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013'::text, '"us.census.tiger".block_group'::text);
 SELECT obs_get_segment_snapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '"us.census.tiger".block_group'::text);
 SELECT obs_getdemographicsnapshot(ST_SetSRID(ST_Point(-73.936669 , 40.704512), 4326), '2009 - 2013', '"us.census.tiger".block_group'::text);
