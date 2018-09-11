@@ -17,9 +17,6 @@ DECLARE
   orgname text;
   apikey_permissions json;
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
-    RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
   SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'geocoding' THEN
     RAISE EXCEPTION 'Geocoding permission denied' USING ERRCODE = '01007';

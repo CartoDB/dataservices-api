@@ -12,9 +12,9 @@ DECLARE
   _pg_exception_context TEXT;
   <% unless superuser_function? -%>apikey_permissions json;<% end %>
 BEGIN
-  IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
+  <% unless requires_permission %>IF session_user = 'publicuser' OR session_user ~ 'cartodb_publicuser_*' THEN
     RAISE EXCEPTION 'The api_key must be provided';
-  END IF;
+  END IF;<% end %>
   <% unless superuser_function? -%>SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
   <% if requires_permission %>IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? '<%= permission_name %>' THEN
     RAISE EXCEPTION '<%= permission_error %>';
