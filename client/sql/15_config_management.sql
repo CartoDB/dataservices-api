@@ -16,7 +16,6 @@ DECLARE
     result cdb_dataservices_client._entity_config;
     apikey_config json;
     is_organization boolean;
-    username text;
     organization_name text DEFAULT NULL;
 BEGIN
     SELECT cartodb.cdb_conf_getconf('api_keys_'||session_user) INTO apikey_config;
