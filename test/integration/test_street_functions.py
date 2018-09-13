@@ -110,7 +110,6 @@ class TestStreetFunctionsSetUp(TestCase):
             self.env_variables['schema'],
             self.env_variables['username'],
             self.env_variables['host'],
-            self.env_variables['api_key']
         )
 
         if not self.fixture_points:
@@ -122,7 +121,6 @@ class TestStreetFunctionsSetUp(TestCase):
             self.fixture_points = self.FIXTURE_POINTS[provider]
 
             self.metadata = self.METADATAS[provider]
-
 
     def _run_authenticated(self, query):
         authenticated_query = "{}&api_key={}".format(query,
@@ -136,6 +134,7 @@ class TestStreetFunctionsSetUp(TestCase):
                 "from cdb_dataservices_client.cdb_service_quota_info() " \
                 "where service = 'hires_geocoder'"
         return self._run_authenticated(query)['rows'][0]['used_quota']
+
 
 class TestStreetFunctions(TestStreetFunctionsSetUp):
 

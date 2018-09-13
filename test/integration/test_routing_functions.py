@@ -1,6 +1,6 @@
 from unittest import TestCase
 from nose.tools import assert_raises
-from nose.tools import assert_not_equal, assert_equal
+from nose.tools import assert_not_equal, assert_true
 from ..helpers.integration_test_helper import IntegrationTestHelper
 
 
@@ -12,7 +12,6 @@ class TestRoutingFunctions(TestCase):
             self.env_variables['schema'],
             self.env_variables['username'],
             self.env_variables['host'],
-            self.env_variables['api_key']
         )
 
     def test_if_select_with_routing_point_to_point_is_ok(self):
@@ -32,7 +31,7 @@ class TestRoutingFunctions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
+            assert_true(e.message[0] in ["Routing permission denied", "function cdb_route_point_to_point(geometry, geometry, unknown, text[]) does not exist"])
 
     def test_if_select_with_routing_with_waypoints_is_ok(self):
         query = "SELECT duration, length, shape as the_geom " \
@@ -46,11 +45,12 @@ class TestRoutingFunctions(TestCase):
 
     def test_if_select_with_routing_with_waypoints_without_api_key_raise_error(self):
         query = "SELECT duration, length, shape as the_geom " \
-                "FROM cdb_route_with_waypoints(Array['POINT(-3.7109 40.4234)'::GEOMETRY, "\
+                "FROM cdb_route_with_waypoints(Array['POINT(-3.7109 40.4234)'::geometry, "\
                 "'POINT(-3.7059 40.4203)'::geometry, 'POINT(-3.7046 40.4180)'::geometry]" \
                 "::geometry[], 'car', " \
-                "ARRAY['mode_type=shortest']::text[])&api_key={0}"
+                "ARRAY['mode_type=shortest']::text[])&api_key={0}".format(
+                    self.env_variables['api_key'])
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
+            assert_true(e.message[0] in ["Routing permission denied", "function cdb_route_with_waypoints(geometry, geometry, text, text[]) does not exist"])

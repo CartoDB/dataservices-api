@@ -1,6 +1,6 @@
 from unittest import TestCase
 from nose.tools import assert_raises
-from nose.tools import assert_not_equal, assert_equal
+from nose.tools import assert_not_equal, assert_true
 from ..helpers.integration_test_helper import IntegrationTestHelper
 
 
@@ -12,7 +12,6 @@ class TestIsolinesFunctions(TestCase):
             self.env_variables['schema'],
             self.env_variables['username'],
             self.env_variables['host'],
-            self.env_variables['api_key']
         )
 
     def test_if_select_with_isochrones_is_ok(self):
@@ -28,7 +27,7 @@ class TestIsolinesFunctions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
+            assert_true(e.message[0] in ["Isolines permission denied", "function cdb_isochrone(geometry, unknown, integer[]) does not exist"])
 
     def test_if_select_with_isodistance_is_ok(self):
         query = "SELECT * FROM cdb_isodistance('POINT(-3.70568 40.42028)'::geometry, " \
@@ -43,4 +42,4 @@ class TestIsolinesFunctions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_equal(e.message[0], "The api_key must be provided")
+            assert_true(e.message[0] in ["Isolines permission denied", "function cdb_isodistance(geometry, unknown, integer[]) does not exist"])
