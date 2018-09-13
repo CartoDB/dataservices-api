@@ -9,11 +9,37 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+-- No permissions granted
+SELECT cdb_geocode_admin0_polygon('Spain');
+ERROR:  Geocoding permission denied
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_admin0_polygon('Spain');
+ERROR:  Geocoding permission denied
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 SELECT cdb_geocode_admin0_polygon('Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_admin0_polygon(3): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_admin0_polygon invoked with params (test_user, <NULL>, Spain)
  cdb_geocode_admin0_polygon 
 ----------------------------
+ 
+(1 row)
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
  
 (1 row)
 

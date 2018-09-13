@@ -16,7 +16,30 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE 'plpgsql';
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+-- No permissions granted
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+ERROR:  Geocoding permission denied
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+ERROR:  Geocoding permission denied
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
+ERROR:  Geocoding permission denied
+SELECT cdb_geocode_postalcode_point('03204', 'Spain');
+ERROR:  Geocoding permission denied
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 SELECT cdb_geocode_postalcode_polygon('03204', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_polygon(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_polygon invoked with params (test_user, <NULL>, 03204, Spain)
  cdb_geocode_postalcode_polygon 
@@ -28,6 +51,13 @@ SELECT cdb_geocode_postalcode_point('03204', 'Spain');
 NOTICE:  cdb_dataservices_client._cdb_geocode_postalcode_point(4): [contrib_regression] REMOTE NOTICE: cdb_dataservices_server.cdb_geocode_postalcode_point invoked with params (test_user, <NULL>, 03204, Spain)
  cdb_geocode_postalcode_point 
 ------------------------------
+ 
+(1 row)
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');
+ cdb_conf_removeconf 
+---------------------
  
 (1 row)
 

@@ -20,7 +20,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'searches': searches}
+  params = {'username': username, 'orgname': orgname, 'searches': searches}
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:

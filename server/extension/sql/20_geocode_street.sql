@@ -12,7 +12,7 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
+  params = {'username': username, 'orgname': orgname, 'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
 
   with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.heremaps_geocoder:

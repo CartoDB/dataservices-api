@@ -74,7 +74,9 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
+  params = {'username': username, 'orgname': orgname, 'city_name': city_name, 'admin1_name': admin1_name, 'country_name': country_name}
+
+  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger, params):
     try:
       if admin1_name and country_name:
         plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
