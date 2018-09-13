@@ -18,7 +18,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
+  params = {'username': username, 'orgname': orgname, 'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
 
   with metrics('cdb_route_with_point', user_routing_config, logger, params):
     waypoints = [origin, destination]
@@ -59,7 +59,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
+  params = {'username': username, 'orgname': orgname, 'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
 
   with metrics('cdb_route_with_waypoints', user_routing_config, logger, params):
     if user_routing_config.mapzen_provider:
