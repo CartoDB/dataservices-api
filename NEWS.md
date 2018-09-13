@@ -1,3 +1,7 @@
+Sep 13th, 2018
+==============
+* Version `0.34.0` of the server, and `0.26.0` of the client.
+    * Use dataservices with non-master keys
 
 Aug 27th, 2018
 ==============
