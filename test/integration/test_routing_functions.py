@@ -1,6 +1,6 @@
 from unittest import TestCase
 from nose.tools import assert_raises
-from nose.tools import assert_not_equal, assert_true
+from nose.tools import assert_not_equal, assert_in
 from ..helpers.integration_test_helper import IntegrationTestHelper
 
 
@@ -31,7 +31,7 @@ class TestRoutingFunctions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_true(e.message[0] in ["Routing permission denied", "function cdb_route_point_to_point(geometry, geometry, unknown, text[]) does not exist"])
+            assert_in(e.message[0], ["Routing permission denied", "function cdb_route_point_to_point(geometry, geometry, unknown, text[]) does not exist"])
 
     def test_if_select_with_routing_with_waypoints_is_ok(self):
         query = "SELECT duration, length, shape as the_geom " \
@@ -53,4 +53,4 @@ class TestRoutingFunctions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_true(e.message[0] in ["Routing permission denied", "function cdb_route_with_waypoints(geometry, geometry, text, text[]) does not exist"])
+            assert_in(e.message[0], ["Routing permission denied", "function cdb_route_with_waypoints(geometry, geometry, text, text[]) does not exist"])

@@ -1,6 +1,6 @@
 from unittest import TestCase
 from nose.tools import assert_raises
-from nose.tools import assert_not_equal, assert_true
+from nose.tools import assert_not_equal, assert_in
 from ..helpers.integration_test_helper import IntegrationTestHelper
 
 
@@ -37,4 +37,4 @@ class TestAdmin1Functions(TestCase):
         try:
             IntegrationTestHelper.execute_query(self.sql_api_url, query)
         except Exception as e:
-            assert_true(e.message[0] in ["Geocoding permission denied", "function cdb_geocode_admin1_polygon(text) does not exist"])
+            assert_in(e.message[0], ["Geocoding permission denied", "function cdb_geocode_admin1_polygon(text) does not exist"])
