@@ -49,6 +49,8 @@ class QPSService:
                         self.retry(start_time, attempt_number)
                     elif response.status_code == 429:
                         self.retry(start_time, attempt_number)
+                    else:
+                        raise e
                 else:
                     raise e
             attempt_number += 1
