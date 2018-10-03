@@ -18,15 +18,10 @@ def qps_retry(original_function=None, **options):
     """
     if original_function is not None:
         def wrapped_function(*args, **kwargs):
-            if 'timeout' in options:
-                timeout = options['timeout']
-            else:
-                timeout = DEFAULT_RETRY_TIMEOUT
-            if 'qps' in options:
-                qps = options['qps']
-            else:
-                qps = DEFAULT_QUERIES_PER_SECOND
-            return QPSService(retry_timeout=timeout, queries_per_second=qps).call(original_function, *args, **kwargs)
+            timeout = options.get('timeout', DEFAULT_RETRY_TIMEOUT)
+            qps = options.get('qps', DEFAULT_QUERIES_PER_SECOND)
+            provider = options.get('provider', None)
+            return QPSService(retry_timeout=timeout, queries_per_second=qps, provider=provider).call(original_function, *args, **kwargs)
         return wrapped_function
     else:
         def partial_wrapper(func):
@@ -36,9 +31,10 @@ def qps_retry(original_function=None, **options):
 
 class QPSService:
 
-    def __init__(self, queries_per_second, retry_timeout):
+    def __init__(self, queries_per_second, retry_timeout, provider):
         self._queries_per_second = queries_per_second
         self._retry_timeout = retry_timeout
+        self._provider = provider
 
     def call(self, fn, *args, **kwargs):
         start_time = datetime.now()
@@ -48,8 +44,13 @@ class QPSService:
                 return fn(*args, **kwargs)
             except Exception as e:
                 response = getattr(e, 'response', None)
-                if response is not None and (response.status_code == 429):
-                    self.retry(start_time, attempt_number)
+                if response is not None:
+                    if self._provider is not None and self._provider == 'tomtom' and (response.status_code == 403):
+                        self.retry(start_time, attempt_number)
+                    elif response.status_code == 429:
+                        self.retry(start_time, attempt_number)
+                    else:
+                        raise e
                 else:
                     raise e
             attempt_number += 1

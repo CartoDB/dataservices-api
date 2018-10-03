@@ -64,7 +64,7 @@ class TomTomIsolines():
 
             return self._parse_coordinates(reachable_range[ENTRY_BOUNDARY])
 
-    @qps_retry(qps=5)
+    @qps_retry(qps=5, provider='tomtom')
     def _calculate_isoline(self, origin, time_range,
                            profile=DEFAULT_PROFILE,
                            date_time=DEFAULT_DEPARTAT):
