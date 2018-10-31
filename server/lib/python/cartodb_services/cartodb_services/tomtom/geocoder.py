@@ -70,7 +70,7 @@ class TomTomGeocoder(Traceable):
 
         return False
 
-    @qps_retry(qps=5)
+    @qps_retry(qps=5, provider='tomtom')
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
         response = self.geocode_meta(searchtext, city, state_province, country)
@@ -80,7 +80,7 @@ class TomTomGeocoder(Traceable):
         else:
             return response[0]
 
-    @qps_retry(qps=5)
+    @qps_retry(qps=5, provider='tomtom')
     def geocode_meta(self, searchtext, city=None, state_province=None,
                 country=None):
         if searchtext:
