@@ -1,3 +1,15 @@
+
+Oct 31th, 2018
+==============
+* Version `0.20.2` of the python library
+    * Added missing provider property to the QPS decorator in other TomTom services
+    * Now we only retry with the properly header coming from TomTom
+
+Oct 3rd, 2018
+==============
+* Version `0.20.1` of the python library
+    * Fix QPS manager to retry with 403 status codes coming from TomTom
+
 Sep 13th, 2018
 ==============
 * Version `0.34.0` of the server, and `0.26.0` of the client.
