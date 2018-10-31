@@ -89,7 +89,7 @@ class TomTomRouting(Traceable):
                                  point[ENTRY_LONGITUDE]))
         return geometry
 
-    @qps_retry(qps=5)
+    @qps_retry(qps=5, provider='tomtom')
     def directions(self, waypoints, profile=DEFAULT_PROFILE,
                    date_time=DEFAULT_DEPARTAT):
         self._validate_profile(profile)

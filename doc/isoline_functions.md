@@ -16,6 +16,8 @@ The following functions provide an isoline generator service, based on time or d
 
 Displays a contoured line on a map, connecting geometries to a defined area, measured by an equal range of distance (in meters).
 
+Note that not all the providers, for example TomTom, provide us a way to define the isoline limit in distance so we need to make some estimations. Due that estimations the produced isolines could not be 100% precise.
+
 #### Arguments
 
 Name | Type | Description | Accepted values
