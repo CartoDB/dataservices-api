@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_poin
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger
+  import json
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
@@ -20,7 +21,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  params = {'username': username, 'orgname': orgname, 'searches': searches}
+  params = {'username': username, 'orgname': orgname, 'searches': json.loads(searches)}
 
   with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.google_geocoder:
