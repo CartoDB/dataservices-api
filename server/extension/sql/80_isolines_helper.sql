@@ -295,10 +295,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       for isochrone in resp:
         result_polygon = coordinates_to_polygon(isochrone.coordinates)
         if result_polygon:
-          quota_service.increment_success_service_use()
           result.append([source, isochrone.duration, result_polygon])
         else:
-          quota_service.increment_empty_service_use()
           result.append([source, isochrone.duration, None])
       quota_service.increment_success_service_use()
       quota_service.increment_isolines_service_use(len(result))
@@ -356,10 +354,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       for isochrone in resp:
         result_polygon = coordinates_to_polygon(isochrone.coordinates)
         if result_polygon:
-          service_manager.quota_service.increment_success_service_use()
           result.append([source, isochrone.duration, result_polygon])
         else:
-          service_manager.quota_service.increment_empty_service_use()
           result.append([source, isochrone.duration, None])
       service_manager.quota_service.increment_success_service_use()
       service_manager.quota_service.increment_isolines_service_use(len(result))
@@ -416,10 +412,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       for isochrone in resp:
         result_polygon = coordinates_to_polygon(isochrone.coordinates)
         if result_polygon:
-          service_manager.quota_service.increment_success_service_use()
           result.append([source, isochrone.duration, result_polygon])
         else:
-          service_manager.quota_service.increment_empty_service_use()
           result.append([source, isochrone.duration, None])
       service_manager.quota_service.increment_success_service_use()
       service_manager.quota_service.increment_isolines_service_use(len(result))
