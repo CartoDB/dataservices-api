@@ -1,3 +1,7 @@
+Nov 22th, 2018
+==============
+* Version `0.34.1` of the server extension
+    * Fixed isochrones metrics that increase `success_rows` field for every isochrone generated (#533)
 
 Oct 31th, 2018
 ==============
