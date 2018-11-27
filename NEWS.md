@@ -1,3 +1,9 @@
+
+Nov 27th, 2018
+==============
+* Version `0.34.2` of the server extension
+    * Fixed bulk geocoding log metrics in order to fix problems in ELK due to the JSON not being standard (#530)
+
 Nov 22th, 2018
 ==============
 * Version `0.34.1` of the server extension
