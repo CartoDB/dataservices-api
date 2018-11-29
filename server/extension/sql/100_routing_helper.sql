@@ -8,7 +8,9 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoi
   username TEXT,
   orgname TEXT,
   waypoints geometry(Point, 4326)[],
-  mode TEXT)
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
 RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.tools import ServiceManager
   from cartodb_services.mapbox import MapboxRouting
@@ -69,11 +71,13 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_route_with_waypoi
   username TEXT,
   orgname TEXT,
   waypoints geometry(Point, 4326)[],
-  mode TEXT)
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
 RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.tools import ServiceManager
   from cartodb_services.tomtom import TomTomRouting
-  from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM
+  from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM, DEFAULT_ROUTE_TYPE, MODE_TYPE_TO_TOMTOM
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.polyline import polyline_to_linestring
   from cartodb_services.refactor.service.tomtom_routing_config import TomTomRoutingConfigBuilder
@@ -104,8 +108,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       waypoint_coords.append(Coordinate(lon,lat))
 
     profile = TRANSPORT_MODE_TO_TOMTOM.get(mode)
+    route_type = DEFAULT_ROUTE_TYPE
+    if 'mode_type' in options:
+      route_type = MODE_TYPE_TO_TOMTOM.get(options['mode_type'])
 
-    resp = client.directions(waypoint_coords, profile)
+    resp = client.directions(waypoint_coords, profile=profile, route_type=route_type)
     if resp and resp.shape:
       shape_linestring = polyline_to_linestring(resp.shape)
       if shape_linestring:
