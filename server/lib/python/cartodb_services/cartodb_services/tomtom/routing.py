@@ -11,7 +11,7 @@ from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
-from types import (DEFAULT_PROFILE, DEFAULT_ROUTE_TYPE, VALID_PROFILES, DEFAULT_DEPARTAT)
+from types import (DEFAULT_PROFILE, DEFAULT_ROUTE_TYPE, VALID_PROFILES, VALID_ROUTE_TYPE, DEFAULT_DEPARTAT)
 
 BASEURI = ('https://api.tomtom.com/routing/1/calculateRoute/'
            '{coordinates}'
@@ -62,6 +62,14 @@ class TomTomRouting(Traceable):
                                  valid_profiles=', '.join(
                                      [x for x in VALID_PROFILES])))
 
+    def _validate_route_type(self, route_type):
+        if route_type not in VALID_ROUTE_TYPE:
+            raise ValueError('{route_type} is not a valid route type. '
+                             'Valid route types are: {valid_route_types}'.format(
+                                 route_type=route_type,
+                                 valid_route_types=', '.join(
+                                     [x for x in VALID_ROUTE_TYPE])))
+
     def _marshall_coordinates(self, coordinates):
         return ':'.join(['{lat},{lon}'.format(lat=coordinate.latitude,
                                               lon=coordinate.longitude)
@@ -95,6 +103,7 @@ class TomTomRouting(Traceable):
     def directions(self, waypoints, profile=DEFAULT_PROFILE,
                    date_time=DEFAULT_DEPARTAT, route_type=DEFAULT_ROUTE_TYPE):
         self._validate_profile(profile)
+        self._validate_route_type(route_type)
         validate_coordinates(waypoints, NUM_WAYPOINTS_MIN, NUM_WAYPOINTS_MAX)
 
         coordinates = self._marshall_coordinates(waypoints)

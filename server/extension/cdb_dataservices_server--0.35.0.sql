@@ -20,6 +20,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.tools.normalize import options_to_dict
   from cartodb_services.refactor.service.mapbox_routing_config import MapboxRoutingConfigBuilder
 
   import cartodb_services
@@ -48,6 +49,9 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       waypoint_coords.append(Coordinate(lon,lat))
 
     profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
+    options_dict = options_to_dict(options)
+    if 'mode_type' in options_dict:
+      plpy.warning('Mapbox provider doesnt support route type parameter')
 
     resp = client.directions(waypoint_coords, profile)
     if resp and resp.shape:
@@ -83,6 +87,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM, DEFAULT_ROUTE_TYPE, MODE_TYPE_TO_TOMTOM
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.tools.normalize import options_to_dict
   from cartodb_services.refactor.service.tomtom_routing_config import TomTomRoutingConfigBuilder
 
   import cartodb_services
@@ -112,8 +117,9 @@ RETURNS cdb_dataservices_server.simple_route AS $$
 
     profile = TRANSPORT_MODE_TO_TOMTOM.get(mode)
     route_type = DEFAULT_ROUTE_TYPE
-    if 'mode_type' in options:
-      route_type = MODE_TYPE_TO_TOMTOM.get(options['mode_type'])
+    options_dict = options_to_dict(options)
+    if 'mode_type' in options_dict:
+      route_type = MODE_TYPE_TO_TOMTOM.get(options_dict['mode_type'])
 
     resp = client.directions(waypoint_coords, profile=profile, route_type=route_type)
     if resp and resp.shape:
