@@ -24,3 +24,9 @@ TRANSPORT_MODE_TO_TOMTOM = {
     'walk': 'pedestrian',
     'bicycle': 'bicycle',
 }
+
+DEFAULT_ROUTE_TYPE = 'shortest'
+MODE_TYPE_TO_TOMTOM = {
+    'shortest': 'shortest',
+    'fastest': 'fastest'
+}

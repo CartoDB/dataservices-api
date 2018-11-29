@@ -11,13 +11,14 @@ from cartodb_services.tools.coordinates import (validate_coordinates,
                                                 marshall_coordinates)
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
-from types import (DEFAULT_PROFILE, VALID_PROFILES, DEFAULT_DEPARTAT)
+from types import (DEFAULT_PROFILE, DEFAULT_ROUTE_TYPE, VALID_PROFILES, DEFAULT_DEPARTAT)
 
 BASEURI = ('https://api.tomtom.com/routing/1/calculateRoute/'
            '{coordinates}'
            '/json'
            '?key={apikey}'
            '&travelMode={travelmode}'
+           '&routeType={route_type}'
            '&departAt={departat}'
            '&computeBestOrder=true')
 
@@ -45,10 +46,11 @@ class TomTomRouting(Traceable):
         self._logger = logger
 
     def _uri(self, coordinates, profile=DEFAULT_PROFILE,
-             date_time=DEFAULT_DEPARTAT):
+             date_time=DEFAULT_DEPARTAT, route_type=DEFAULT_ROUTE_TYPE):
         uri = URITemplate(BASEURI).expand(apikey=self._apikey,
                                           coordinates=coordinates,
                                           travelmode=profile,
+                                          route_type=route_type,
                                           departat=date_time)
         return uri
 
@@ -91,13 +93,13 @@ class TomTomRouting(Traceable):
 
     @qps_retry(qps=5, provider='tomtom')
     def directions(self, waypoints, profile=DEFAULT_PROFILE,
-                   date_time=DEFAULT_DEPARTAT):
+                   date_time=DEFAULT_DEPARTAT, route_type=DEFAULT_ROUTE_TYPE):
         self._validate_profile(profile)
         validate_coordinates(waypoints, NUM_WAYPOINTS_MIN, NUM_WAYPOINTS_MAX)
 
         coordinates = self._marshall_coordinates(waypoints)
 
-        uri = self._uri(coordinates, profile, date_time)
+        uri = self._uri(coordinates, profile, date_time, route_type)
 
         try:
             response = requests.get(uri)
