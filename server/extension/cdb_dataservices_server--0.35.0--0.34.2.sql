@@ -3,6 +3,8 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.34.2'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
+DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_mapbox_route_with_waypoints(text, text, geometry(Point, 4326)[], text, text[], text);
+DROP FUNCTION IF EXISTS cdb_dataservices_server._cdb_tomtom_route_with_waypoints(text, text, geometry(Point, 4326)[], text, text[], text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoints(
   username TEXT,
   orgname TEXT,
