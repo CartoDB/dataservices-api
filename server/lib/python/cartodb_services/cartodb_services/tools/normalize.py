@@ -5,5 +5,4 @@ def normalize(str_input):
                     .replace(';', ',')
 
 def options_to_dict(options):
-    options_list = list(chain(*[option.split('=') for option in options]))
-    return dict(zip(options_list[::2],options_list[1::2]))
+    return dict(option.split("=") for option in options)
