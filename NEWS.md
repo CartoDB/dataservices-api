@@ -1,3 +1,7 @@
+Nov 30th, 2018
+==============
+* Version `0.35.0` of the server extension
+    * Now the `mode_type` is working the providers that support it (#536)
 
 Nov 27th, 2018
 ==============

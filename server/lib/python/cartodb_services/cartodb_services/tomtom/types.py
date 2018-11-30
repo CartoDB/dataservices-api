@@ -6,12 +6,16 @@ PROFILE_DRIVING = 'car'
 PROFILE_CYCLING = 'bicycle'
 PROFILE_WALKING = 'pedestrian'
 DEFAULT_PROFILE = PROFILE_DRIVING
+ROUTE_TYPE_FAST = 'fastest'
+ROUTE_TYPE_SHORT = 'shortest'
 
 DEFAULT_DEPARTAT = 'now'
 
 VALID_PROFILES = [PROFILE_DRIVING,
                   PROFILE_CYCLING,
                   PROFILE_WALKING]
+VALID_ROUTE_TYPE = [ROUTE_TYPE_SHORT,
+                    ROUTE_TYPE_FAST]
 
 MAX_SPEEDS = {
     PROFILE_WALKING: 3.3333333,  # In m/s, assuming 12km/h walking speed
@@ -20,7 +24,13 @@ MAX_SPEEDS = {
 }
 
 TRANSPORT_MODE_TO_TOMTOM = {
-    'car': 'car',
-    'walk': 'pedestrian',
-    'bicycle': 'bicycle',
+    'car': PROFILE_DRIVING,
+    'walk': PROFILE_WALKING,
+    'bicycle': PROFILE_CYCLING,
+}
+
+DEFAULT_ROUTE_TYPE = ROUTE_TYPE_SHORT
+MODE_TYPE_TO_TOMTOM = {
+    'shortest': ROUTE_TYPE_SHORT,
+    'fastest': ROUTE_TYPE_FAST
 }
