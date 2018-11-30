@@ -15,7 +15,9 @@ INVALID_WAYPOINTS_MIN = [Coordinate(13.42936, 52.50931)]
 INVALID_WAYPOINTS_MAX = [Coordinate(13.42936, 52.50931)
                          for x in range(0, NUM_WAYPOINTS_MAX + 2)]
 VALID_PROFILE = DEFAULT_PROFILE
+VALID_ROUTE_TYPE = 'fastest'
 INVALID_PROFILE = 'invalid_profile'
+INVALID_ROUTE_TYPE = 'invalid_route_type'
 
 
 class TomTomRoutingTestCase(unittest.TestCase):
@@ -43,9 +45,18 @@ class TomTomRoutingTestCase(unittest.TestCase):
         with self.assertRaises(ServiceException):
             invalid_routing.directions(VALID_WAYPOINTS,
                                        VALID_PROFILE)
+    def test_invalid_route_type(self):
+        with self.assertRaises(ValueError):
+            self.routing.directions(VALID_WAYPOINTS, VALID_PROFILE, route_type=INVALID_ROUTE_TYPE)
 
     def test_valid_request(self):
         route = self.routing.directions(VALID_WAYPOINTS, VALID_PROFILE)
+
+        assert route.shape
+        assert route.length
+        assert route.duration
+
+        route = self.routing.directions(VALID_WAYPOINTS, VALID_PROFILE, route_type=VALID_ROUTE_TYPE)
 
         assert route.shape
         assert route.length
