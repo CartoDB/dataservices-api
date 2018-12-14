@@ -59,9 +59,9 @@ Result:
 ```sql
     service     | monthly_quota | used_quota | soft_limit |     provider
 ----------------+---------------+------------+------------+------------------
- isolines       |           100 |          0 | f          | mapbox
- hires_geocoder |           100 |          0 | f          | mapbox
- routing        |            50 |          0 | f          | mapbox
+ isolines       |           100 |          0 | f          | tomtom
+ hires_geocoder |           100 |          0 | f          | tomtom
+ routing        |            50 |          0 | f          | tomtom
  observatory    |             0 |          0 | f          | data observatory
 (4 rows)
 
