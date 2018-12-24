@@ -6,4 +6,4 @@
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
 -- HERE goes your code to upgrade/downgrade
-ALTER TYPE cdb_dataservices_client.geocoding ALTER ATTRIBUTE the_geom SET TYPE geometry(MultiPolygon,4326);
+ALTER TYPE cdb_dataservices_client.geocoding ALTER ATTRIBUTE the_geom TYPE geometry(MultiPolygon,4326);

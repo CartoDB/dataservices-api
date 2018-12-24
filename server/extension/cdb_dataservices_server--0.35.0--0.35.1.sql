@@ -3,4 +3,4 @@
 \echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.35.1'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
-ALTER TYPE cdb_dataservices_server.geocoding ALTER ATTRIBUTE the_geom SET TYPE geometry(Point,4326);
+ALTER TYPE cdb_dataservices_server.geocoding ALTER ATTRIBUTE the_geom TYPE geometry(Point,4326);
