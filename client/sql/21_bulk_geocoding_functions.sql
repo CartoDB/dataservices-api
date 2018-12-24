@@ -58,7 +58,7 @@ BEGIN
   temp_table_name := 'bulk_geocode_street_' || md5(random()::text);
 
   EXECUTE format('CREATE TEMPORARY TABLE %s ' ||
-   '(cartodb_id integer, the_geom geometry(Multipolygon,4326), metadata jsonb)',
+   '(cartodb_id integer, the_geom geometry(Point,4326), metadata jsonb)',
    temp_table_name);
 
   select
