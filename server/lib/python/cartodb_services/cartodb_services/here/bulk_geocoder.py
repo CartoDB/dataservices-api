@@ -8,7 +8,7 @@ from collections import namedtuple
 from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.here import HereMapsGeocoder
-from cartodb_services.geocoder import geocoder_metadata, geocoder_error_response
+from cartodb_services.geocoder import geocoder_metadata, geocoder_error_response, PRECISION_INTERPOLATED
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 
@@ -137,8 +137,8 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                 reader = csv.DictReader(root_zip.open(name), delimiter='|')
                 for row in reader:
                     if row['SeqNumber'] == '1':  # First per requested data
-                        precision = self.PRECISION_BY_MATCH_TYPE[
-                            row.get('matchType', 'pointAddress')]
+                        precision = self.PRECISION_BY_MATCH_TYPE.get(
+                            row.get('matchType'), PRECISION_INTERPOLATED)
                         match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(row['matchLevel'], None)
                         results.append((row['recId'],
                                         [row['displayLongitude'], row['displayLatitude']],
