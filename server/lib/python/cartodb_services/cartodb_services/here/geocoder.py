@@ -143,8 +143,8 @@ class HereMapsGeocoder(Traceable):
 
     def _extract_metadata_from_result(self, result):
         # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
-        precision = self.PRECISION_BY_MATCH_TYPE[
-            result.get('MatchType', 'pointAddress')]
+        precision = self.PRECISION_BY_MATCH_TYPE.get(
+            result.get('MatchType'), PRECISION_INTERPOLATED)
         match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
         return geocoder_metadata(
             result['Relevance'],
