@@ -1,4 +1,4 @@
-Dec 27th, 2018
+Dec 31st, 2018
 ==============
 * Version `0.35.1` of the server extension and `0.26.1` of the client
     * Now the bulk geocoder returns `Point` geometries instead of MultiPolygons (#538)
