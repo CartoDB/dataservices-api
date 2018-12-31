@@ -6,7 +6,7 @@ CREATE TYPE cdb_dataservices_client.isoline AS (
 
 CREATE TYPE cdb_dataservices_client.geocoding AS (
     cartodb_id integer,
-    the_geom geometry(Multipolygon,4326),
+    the_geom geometry(Point,4326),
     metadata jsonb
 );
 

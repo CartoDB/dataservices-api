@@ -1,7 +1,7 @@
 -- TODO: could cartodb_id be replaced by rowid, maybe needing extra care for offset?
 CREATE TYPE cdb_dataservices_server.geocoding AS (
     cartodb_id integer,
-    the_geom geometry(Multipolygon,4326),
+    the_geom geometry(Point,4326),
     metadata jsonb
 );
 
