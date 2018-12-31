@@ -1,3 +1,13 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_client UPDATE TO '0.26.0'" to load this file. \quit
+
+-- Make sure we have a sane search path to create/update the extension
+SET search_path = "$user",cartodb,public,cdb_dataservices_client;
+
+-- HERE goes your code to upgrade/downgrade
+ALTER TYPE cdb_dataservices_client.geocoding ALTER ATTRIBUTE the_geom TYPE geometry(MultiPolygon,4326);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text,
     street_column text, city_column text default null, state_column text default null, country_column text default null, batch_size integer DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
@@ -58,7 +68,7 @@ BEGIN
   temp_table_name := 'bulk_geocode_street_' || md5(random()::text);
 
   EXECUTE format('CREATE TEMPORARY TABLE %s ' ||
-   '(cartodb_id integer, the_geom geometry(Point,4326), metadata jsonb)',
+   '(cartodb_id integer, the_geom geometry(Multipolygon,4326), metadata jsonb)',
    temp_table_name);
 
   select
