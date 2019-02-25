@@ -1,3 +1,8 @@
+Feb 25th, 2019
+==============
+* Version `0.26.2` of the client extension
+    * Fixed bulk geocoding soft limit (#543)
+
 Dec 31st, 2018
 ==============
 * Version `0.35.1` of the server extension and `0.26.1` of the client
