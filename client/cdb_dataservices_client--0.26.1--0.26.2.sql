@@ -1,3 +1,10 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_client UPDATE TO '0.26.2'" to load this file. \quit
+
+-- Make sure we have a sane search path to create/update the extension
+SET search_path = "$user",cartodb,public,cdb_dataservices_client;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text,
     street_column text, city_column text default null, state_column text default null, country_column text default null, batch_size integer DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$

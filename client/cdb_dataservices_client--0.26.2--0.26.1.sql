@@ -1,3 +1,10 @@
+--DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
+-- Complain if script is sourced in psql, rather than via CREATE EXTENSION
+\echo Use "ALTER EXTENSION cdb_dataservices_client UPDATE TO '0.26.1'" to load this file. \quit
+
+-- Make sure we have a sane search path to create/update the extension
+SET search_path = "$user",cartodb,public,cdb_dataservices_client;
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_bulk_geocode_street_point (query text,
     street_column text, city_column text default null, state_column text default null, country_column text default null, batch_size integer DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.geocoding AS $$
@@ -49,7 +56,7 @@ BEGIN
   RAISE DEBUG 'cdb_bulk_geocode_street_point --> query_row_count: %; query: %; country: %; state: %; city: %; street: %',
       query_row_count, query, country_column, state_column, city_column, street_column;
   SELECT cdb_dataservices_client.cdb_enough_quota('hires_geocoder', query_row_count) INTO enough_quota;
-  IF enough_quota IS NULL OR NOT enough_quota THEN
+  IF remaining_quota < query_row_count THEN
     RAISE EXCEPTION 'Remaining quota: %. Estimated cost: %', remaining_quota, query_row_count;
   END IF;
 
