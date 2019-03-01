@@ -5,6 +5,7 @@ Python client for the Mapbox Geocoder service.
 import json
 import requests
 from mapbox import Geocoder
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE, EMPTY_BATCH_RESPONSE, TOO_MANY_REQUESTS_ERROR_RESPONSE, geocoder_error_response
 from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
@@ -21,6 +22,17 @@ ENTRY_GEOMETRY = 'geometry'
 ENTRY_COORDINATES = 'coordinates'
 ENTRY_TYPE = 'type'
 TYPE_POINT = 'Point'
+
+MATCH_TYPE_BY_MATCH_LEVEL = {
+    'poi': 'point_of_interest',
+    'poi.landmark': 'point_of_interest',
+    'place': 'point_of_interest',
+    'country': 'country',
+    'region': 'state',
+    'locality': 'locality',
+    'district': 'district',
+    'address': 'street'
+}
 
 
 class MapboxGeocoder(Traceable):
@@ -40,18 +52,24 @@ class MapboxGeocoder(Traceable):
     def _parse_geocoder_response(self, response):
         json_response = json.loads(response)
 
-        # If Mapbox returns more that one result, take the first one
         if json_response:
-            if type(json_response) == list:
-                json_response = json_response[0]
+            if type(json_response) != list:
+                json_response = [json_response]
 
-            if json_response[ENTRY_FEATURES]:
-                feature = json_response[ENTRY_FEATURES][0]
-                return self._extract_lng_lat_from_feature(feature)
-            else:
-                return []
+            result = []
+            for a_json_response in json_response:
+                if a_json_response[ENTRY_FEATURES]:
+                    feature = a_json_response[ENTRY_FEATURES][0]
+                    result.append([
+                        self._extract_lng_lat_from_feature(feature),
+                        self._extract_metadata_from_result(feature)
+                        ]
+                    )
+                else:
+                    result.append(EMPTY_RESPONSE)
+            return result
         else:
-            return []
+            return EMPTY_BATCH_RESPONSE
 
     def _extract_lng_lat_from_feature(self, feature):
         geometry = feature[ENTRY_GEOMETRY]
@@ -64,42 +82,114 @@ class MapboxGeocoder(Traceable):
         latitude = location[1]
         return [longitude, latitude]
 
+    def _extract_metadata_from_result(self, result):
+        if result[ENTRY_GEOMETRY].get('interpolated', False):
+            precision = PRECISION_INTERPOLATED
+        else:
+            precision = PRECISION_PRECISE
+
+        match_types = [MATCH_TYPE_BY_MATCH_LEVEL.get(match_level, None)
+                       for match_level in result['place_type']]
+        return geocoder_metadata(
+            self._normalize_relevance(float(result['relevance'])),
+            precision,
+            filter(None, match_types)
+        )
+
+    def _normalize_relevance(self, relevance):
+        return 1 if relevance >= 0.99 else relevance
+
+    def _validate_input(self, searchtext, city=None, state_province=None,
+                        country=None):
+        if searchtext and searchtext.strip():
+            return True
+        elif city:
+            return True
+        elif state_province:
+            return True
+
+        return False
+
     @qps_retry(qps=10)
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        if searchtext and searchtext.strip():
-            address = [normalize(searchtext)]
-            if city:
-                address.append(normalize(city))
-            if state_province:
-                address.append(normalize(state_province))
+        """
+        :param searchtext:
+        :param city:
+        :param state_province:
+        :param country: Country ISO 3166 code
+        :return: [x, y] on success, raises ServiceException on error
+        """
+        response = self.geocode_meta(searchtext, city, state_province, country)
+        if response:
+            error_message = response[1].get('error', None)
+            if error_message:
+                raise ServiceException(error_message, None)
+            else:
+                return response[0]
         else:
-            return []
+            return EMPTY_RESPONSE
 
+    @qps_retry(qps=10)
+    def geocode_meta(self, searchtext, city=None, state_province=None,
+                country=None):
+        if not self._validate_input(searchtext, city, state_province, country):
+            return EMPTY_RESPONSE
+
+        address = []
+        if searchtext and searchtext.strip():
+            address.append(normalize(searchtext))
+        if city:
+            address.append(normalize(city))
+        if state_province:
+            address.append(normalize(state_province))
+
+        free_search = ', '.join(address)
+
+        response = self.geocode_free_text_meta([free_search], country)
+        return response[0] if response else EMPTY_RESPONSE
+
+    @qps_retry(qps=10)
+    def geocode_free_text_meta(self, free_searches, country=None):
+        """
+        :param free_searches: Free text searches
+        :param country: Country ISO 3166 code
+        :return: list of [x, y] on success, [] on error
+        """
         country = [country] if country else None
 
         try:
-            response = self._geocoder.forward(address=', '.join(address).decode('utf-8'),
-                                              country=country,
-                                              limit=1)
-
+            free_search = ';'.join([self._escape(fs) for fs in free_searches])
+            response = self._geocoder.forward(address=free_search.decode('utf-8'),
+                                              limit=1,
+                                              country=country)
             if response.status_code == requests.codes.ok:
                 return self._parse_geocoder_response(response.text)
+            elif response.status_code == requests.codes.too_many_requests:
+                return [TOO_MANY_REQUESTS_ERROR_RESPONSE] * len(free_searches)
             elif response.status_code == requests.codes.bad_request:
-                return []
+                return EMPTY_BATCH_RESPONSE
             elif response.status_code == requests.codes.unprocessable_entity:
-                return []
+                return EMPTY_BATCH_RESPONSE
             else:
-                raise ServiceException(response.status_code, response)
+                msg = "Unkown status: {}".format(response.status_code)
+                self._logger.warning(msg, data={"searches": free_searches})
+                return [geocoder_error_response(msg)] * len(free_searches)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
-            self._logger.error('Timeout connecting to Mapbox geocoding server',
-                               te)
-            raise ServiceException('Error geocoding {0} using Mapbox'.format(
-                searchtext), None)
+            msg = 'Timeout connecting to Mapbox geocoding server'
+            self._logger.error(msg, te)
+            return [geocoder_error_response(msg)] * len(free_searches)
         except requests.ConnectionError as ce:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to Mapbox geocoding server',
                                exception=ce)
-            return []
+            return EMPTY_BATCH_RESPONSE
+
+    def _escape(self, free_search):
+        # Semicolon is used to separate batch geocoding; there's no documented
+        # way to pass actual semicolons, and %3B or &#59; won't work (check
+        # TestBulkStreetFunctions.test_semicolon and the docs,
+        # https://www.mapbox.com/api-documentation/#batch-requests)
+        return free_search.replace(';', ',')

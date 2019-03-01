@@ -6,8 +6,8 @@ import requests
 
 from requests.adapters import HTTPAdapter
 from exceptions import *
+from cartodb_services.geocoder import PRECISION_PRECISE, PRECISION_INTERPOLATED, geocoder_metadata, EMPTY_RESPONSE
 from cartodb_services.metrics import Traceable
-
 
 class HereMapsGeocoder(Traceable):
     'A Here Maps Geocoder wrapper for python'
@@ -52,6 +52,23 @@ class HereMapsGeocoder(Traceable):
         'strictlanguagemode'
         ] + ADDRESS_PARAMS
 
+    PRECISION_BY_MATCH_TYPE = {
+        'pointAddress': PRECISION_PRECISE,
+        'interpolated': PRECISION_INTERPOLATED
+    }
+    MATCH_TYPE_BY_MATCH_LEVEL = {
+        'landmark': 'point_of_interest',
+        'country': 'country',
+        'state': 'state',
+        'county': 'county',
+        'city': 'locality',
+        'district': 'district',
+        'street': 'street',
+        'intersection': 'intersection',
+        'houseNumber': 'street_number',
+        'postalCode': 'postal_code'
+    }
+
     def __init__(self, app_id, app_code, logger, service_params=None, maxresults=DEFAULT_MAXRESULTS):
         service_params = service_params or {}
         self.app_id = app_id
@@ -65,12 +82,15 @@ class HereMapsGeocoder(Traceable):
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
 
     def geocode(self, **kwargs):
+        return self.geocode_meta(**kwargs)[0]
+
+    def geocode_meta(self, **kwargs):
         params = {}
         for key, value in kwargs.iteritems():
             if value and value.strip():
                 params[key] = value
         if not params:
-            return []
+            return EMPTY_RESPONSE
         return self._execute_geocode(params)
 
     def _execute_geocode(self, params):
@@ -78,11 +98,13 @@ class HereMapsGeocoder(Traceable):
             raise BadGeocodingParams(params)
         try:
             response = self._perform_request(params)
-            results = response['Response']['View'][0]['Result'][0]
-            return self._extract_lng_lat_from_result(results)
+            result = response['Response']['View'][0]['Result'][0]
+            return [self._extract_lng_lat_from_result(result),
+                    self._extract_metadata_from_result(result)]
         except IndexError:
-            return []
-        except KeyError:
+            return EMPTY_RESPONSE
+        except KeyError as e:
+            self._logger.error('params: {}'.format(params), e)
             raise MalformedResult()
 
     def _perform_request(self, params):
@@ -105,7 +127,7 @@ class HereMapsGeocoder(Traceable):
             self._logger.warning('Error 4xx trying to geocode street using HERE',
                                data={"response": response.json(), "params":
                                      params})
-            return []
+            return EMPTY_RESPONSE
         else:
             self._logger.error('Error trying to geocode street using HERE',
                                data={"response": response.json(), "params":
@@ -118,3 +140,14 @@ class HereMapsGeocoder(Traceable):
         latitude = location['DisplayPosition']['Latitude']
 
         return [longitude, latitude]
+
+    def _extract_metadata_from_result(self, result):
+        # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
+        precision = self.PRECISION_BY_MATCH_TYPE.get(
+            result.get('MatchType'), PRECISION_INTERPOLATED)
+        match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(result['MatchLevel'], None)
+        return geocoder_metadata(
+            result['Relevance'],
+            precision,
+            [match_type] if match_type else []
+        )

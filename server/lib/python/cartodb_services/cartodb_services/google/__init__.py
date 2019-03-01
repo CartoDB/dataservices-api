@@ -1,1 +1,2 @@
 from geocoder import GoogleMapsGeocoder
+from bulk_geocoder import GoogleMapsBulkGeocoder

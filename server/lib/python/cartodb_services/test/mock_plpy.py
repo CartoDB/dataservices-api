@@ -52,11 +52,14 @@ class MockPlPy:
         self._logged_queries = []
         self._log_executed_queries = True
 
+    def warning(self, msg):
+        self.warnings.append(msg)
+
     def notice(self, msg):
         self.notices.append(msg)
 
     def debug(self, msg):
-        self.notices.append(msg)
+        self.debugs.append(msg)
 
     def info(self, msg):
         self.infos.append(msg)

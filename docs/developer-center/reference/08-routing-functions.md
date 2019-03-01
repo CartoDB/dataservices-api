@@ -81,4 +81,4 @@ The optional value parameters must be passed using the format: `option=value`. N
 
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
-`mode_type` | `text` | Type of route calculation | `shortest` (this option only applies to the car transport mode)
+`mode_type` | `text` | Type of route calculation | `shortest` or `fastest` (this option only applies to the car transport mode)

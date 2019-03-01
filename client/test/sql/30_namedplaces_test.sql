@@ -27,8 +27,24 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
--- Exercise the public and the proxied function
+-- -- Exercise the public and the proxied function
+
+-- No permissions granted
 SELECT cdb_geocode_namedplace_point('Elx');
 SELECT cdb_geocode_namedplace_point('Elx', 'Spain');
 SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
 
+-- Grant other permissions but geocoding
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["routing", "isolines"]}');
+SELECT cdb_geocode_namedplace_point('Elx');
+SELECT cdb_geocode_namedplace_point('Elx', 'Spain');
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
+
+-- Grant geocoding permissions
+SELECT CDB_Conf_SetConf('api_keys_postgres', '{"username": "test_user", "permissions": ["geocoding"]}');
+SELECT cdb_geocode_namedplace_point('Elx');
+SELECT cdb_geocode_namedplace_point('Elx', 'Spain');
+SELECT cdb_geocode_namedplace_point('Elx', 'Valencia', 'Spain');
+
+-- Remove permissions
+SELECT CDB_Conf_RemoveConf('api_keys_postgres');

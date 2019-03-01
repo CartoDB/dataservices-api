@@ -1,3 +1,98 @@
+Feb 25th, 2019
+==============
+* Version `0.26.2` of the client extension
+    * Fixed bulk geocoding soft limit (#543)
+
+Dec 31st, 2018
+==============
+* Version `0.35.1` of the server extension and `0.26.1` of the client
+    * Now the bulk geocoder returns `Point` geometries instead of MultiPolygons (#538)
+
+Nov 30th, 2018
+==============
+* Version `0.35.0` of the server extension
+    * Now the `mode_type` is working the providers that support it (#536)
+
+Nov 27th, 2018
+==============
+* Version `0.34.2` of the server extension
+    * Fixed bulk geocoding log metrics in order to fix problems in ELK due to the JSON not being standard (#530)
+
+Nov 22th, 2018
+==============
+* Version `0.34.1` of the server extension
+    * Fixed isochrones metrics that increase `success_rows` field for every isochrone generated (#533)
+
+Oct 31th, 2018
+==============
+* Version `0.20.2` of the python library
+    * Added missing provider property to the QPS decorator in other TomTom services
+    * Now we only retry with the properly header coming from TomTom
+
+Oct 3rd, 2018
+==============
+* Version `0.20.1` of the python library
+    * Fix QPS manager to retry with 403 status codes coming from TomTom
+
+Sep 13th, 2018
+==============
+* Version `0.34.0` of the server, and `0.26.0` of the client.
+    * Use dataservices with non-master keys
+
+Aug 27th, 2018
+==============
+* Version `0.33.0` of the server, and `0.20.0` of the Python library.
+    * Remove the obs_snapshot quota and now the snapshot functions uses obs_general quota
+
+Jul 19th, 2018
+==============
+* Version `0.25.0` of the client, `0.32.0` of the server, and `0.19.1` of the Python library.
+    * Support for batch street-level geocoding.
+
+May 7th, 2018
+=============
+* Version `0.24.0` of the client, `0.31.0` of the server, and `0.18.0` of the python library.
+    * Support for TomTom routing, geocoding and isolines.
+
+March 28th, 2018
+================
+* Version `0.30.5` of server side and `0.17.6` of the python library
+    * All the returned polygons are now always MULTIPOLYGON #488
+
+March 27th, 2018
+================
+* Version `0.17.5` of python library
+    * Avoid reaching provider for empty geocodings (but still incrementing empty service use) #476
+
+March 16th, 2018
+================
+* Version `0.30.3` of server side
+    * Fix problem with invalid Mapbox isolines #483
+* Version `0.30.4` of server side
+    * Added ST_CollectionExtract to ST_MakeValid for Mapbox isolines to avoid non-polygonal geometries #486
+
+March 14th, 2018
+================
+* Version `0.17.4` of the python library
+    * Fix bug with previous version when checking quotas #480
+* Version `0.17.3` of the python library
+    * Fix bug with Mapbox routing not using the proper quota value #477
+
+February 22th, 2018
+==================
+* Version `0.17.2` of the python library
+    * Fix bug with Mapbox isolines not stopping at the seacoast #471
+
+February 27th, 2018
+==================
+* Version `0.17.1` of the python library
+    * Fix bug when the mapzen credentials are not in the db config and we keep getting them
+
+February 22th, 2018
+==================
+* Version `0.17.0` of the python library
+    * Change default provider to Mapbox
+    * Remove the obligatory nature of the Mapzen configuration due to its deprecation as provider
 
 February 13th, 2018
 ==================

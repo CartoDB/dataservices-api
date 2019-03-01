@@ -30,6 +30,8 @@ VALID_PROFILES = [PROFILE_DRIVING_TRAFFIC,
                   PROFILE_WALKING]
 
 ENTRY_DURATIONS = 'durations'
+ENTRY_DESTINATIONS = 'destinations'
+ENTRY_LOCATION = 'location'
 
 
 def validate_profile(profile):

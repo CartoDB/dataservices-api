@@ -1,33 +1,51 @@
 ---
 - name: cdb_geocode_admin0_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: country_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: admin1_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: admin1_name,  type: text }
     - { name: country_name, type: text }
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name, type: text}
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name,    type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_namedplace_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: city_name,    type: text}
     - { name: admin1_name,  type: text}
@@ -35,43 +53,74 @@
 
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_polygon
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: text}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: postal_code,  type: double precision}
     - { name: country_name, type: text}
 
 - name: cdb_geocode_ipaddress_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: ip_address,  type: text}
 
 - name: cdb_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: _cdb_bulk_geocode_street_point
+  return_type: SETOF cdb_dataservices_client.geocoding
+  multi_row: true
+  multi_field: true
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
+  params:
+    - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
+
 - name: cdb_here_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -80,6 +129,9 @@
 
 - name: cdb_google_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -88,6 +140,20 @@
 
 - name: cdb_mapbox_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
+- name: cdb_tomtom_geocode_street_point
+  return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -96,6 +162,9 @@
 
 - name: cdb_mapzen_geocode_street_point
   return_type: Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
   params:
     - { name: searchtext,  type: text}
     - { name: city,  type: text, default: 'NULL'}
@@ -106,6 +175,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -116,6 +188,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -126,6 +201,22 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
+- name: cdb_tomtom_isochrone
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -136,6 +227,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -146,6 +240,22 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
+  params:
+    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: mode, type: text }
+    - { name: range, type: "integer[]" }
+    - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
+
+- name: cdb_tomtom_isodistance
+  return_type: SETOF cdb_dataservices_client.isoline
+  multi_row: true
+  multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -156,6 +266,9 @@
   return_type: SETOF cdb_dataservices_client.isoline
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: isolines
+  permission_error: Isolines permission denied
   params:
     - { name: source,  type: "geometry(Geometry, 4326)" }
     - { name: mode, type: text }
@@ -165,6 +278,9 @@
 - name: cdb_route_point_to_point
   return_type: cdb_dataservices_client.simple_route
   multi_field: true
+  requires_permission: true
+  permission_name: routing
+  permission_error: Routing permission denied
   params:
     - { name: origin,  type: "geometry(Point, 4326)" }
     - { name: destination,  type: "geometry(Point, 4326)" }
@@ -175,6 +291,9 @@
 - name: cdb_route_with_waypoints
   return_type: cdb_dataservices_client.simple_route
   multi_field: true
+  requires_permission: true
+  permission_name: routing
+  permission_error: Routing permission denied
   params:
     - { name: waypoints,  type: "geometry(Point, 4326)[]" }
     - { name: mode, type: text }
@@ -183,6 +302,9 @@
 
 - name: obs_get_demographic_snapshot
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
@@ -190,6 +312,9 @@
 
 - name: obs_get_segment_snapshot
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
@@ -197,6 +322,9 @@
 - name: obs_getdemographicsnapshot
   return_type: SETOF JSON
   multi_row: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: 'NULL' }
@@ -205,12 +333,18 @@
 - name: obs_getsegmentsnapshot
   return_type: SETOF JSON
   multi_row: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getboundary
   return_type: Geometry
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
@@ -218,6 +352,9 @@
 
 - name: obs_getboundaryid
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: "geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
@@ -225,6 +362,9 @@
 
 - name: obs_getboundarybyid
   return_type: Geometry
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geometry_id,  type: text }
     - { name: boundary_id, type: text }
@@ -234,6 +374,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -247,6 +390,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -261,6 +407,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -274,6 +423,9 @@
   return_type: TABLE(the_geom geometry, geom_refs text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
@@ -286,6 +438,9 @@
 
 - name: obs_getmeasure
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: measure_id, type: text }
@@ -295,6 +450,9 @@
 
 - name: obs_getmeasurebyid
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_ref,  type: text }
     - { name: measure_id, type: text }
@@ -305,6 +463,9 @@
   return_type: TABLE(id int, data json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: integer }
     - { name: data, type: json }
@@ -317,6 +478,9 @@
   return_type: TABLE(id text, data json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: text }
     - { name: data, type: json }
@@ -326,6 +490,9 @@
 
 - name: obs_getmeta
   return_type: json
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_ref,  type: "Geometry(Geometry, 4326)" }
     - { name: params, type: json }
@@ -337,6 +504,9 @@
   return_type: TABLE(valid boolean, errors text[])
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom_extent,  type: "Geometry(Geometry, 4326)" }
     - { name: geom_type,  type: text }
@@ -345,6 +515,9 @@
 
 - name: obs_getcategory
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: category_id, type: text }
@@ -353,6 +526,9 @@
 
 - name: obs_getuscensusmeasure
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: name, type: text }
@@ -362,6 +538,9 @@
 
 - name: obs_getuscensuscategory
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: name, type: text }
@@ -370,6 +549,9 @@
 
 - name: obs_getpopulation
   return_type: numeric
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: geom,  type: Geometry }
     - { name: normalize, type: text, default: 'NULL'}
@@ -380,6 +562,9 @@
   return_type: TABLE(id text, description text, name text, aggregate text, source text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: id, type: text }
     - { name: description, type: text }
@@ -394,6 +579,9 @@
   return_type: TABLE(boundary_id text, description text, time_span text, tablename text)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   table_fields:
     - { name: boundary_id, type: text }
     - { name: description, type: text }
@@ -405,6 +593,9 @@
 
 - name: obs_dumpversion
   return_type: text
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - {}
 
@@ -412,6 +603,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_numerator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -423,6 +617,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_numerator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: section_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
@@ -438,6 +635,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_denominator
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -449,6 +649,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_geometry
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -461,6 +664,9 @@
   return_type: SETOF cdb_dataservices_client.obs_meta_timespan
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
@@ -472,11 +678,21 @@
   return_type: TABLE(name text, subsection json)
   multi_row: true
   multi_field: true
+  requires_permission: true
+  permission_name: observatory
+  permission_error: Data Observatory permission denied
   params:
     - { name: aggregate_type, type: text, default: 'NULL' }
 
 - name: cdb_service_quota_info
   return_type: SETOF service_quota_info
+  multi_row: true
+  multi_field: true
+  params:
+    - {}
+
+- name: cdb_service_quota_info_batch
+  return_type: SETOF service_quota_info_batch
   multi_row: true
   multi_field: true
   params:

@@ -28,9 +28,7 @@ def build_redis_user_config(redis_conn, username, service, quota=100,
         redis_conn.hset(user_redis_name, 'mapzen_routing_quota', str(quota))
         redis_conn.hset(user_redis_name, 'soft_mapzen_routing_limit', str(soft_limit).lower())
     elif service is 'data_observatory':
-        redis_conn.hset(user_redis_name, 'obs_snapshot_quota', str(quota))
         redis_conn.hset(user_redis_name, 'obs_general_quota', str(quota))
-        redis_conn.hset(user_redis_name, 'soft_obs_snapshot_limit', str(soft_limit).lower())
         redis_conn.hset(user_redis_name, 'soft_obs_general_limit', str(soft_limit).lower())
 
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
@@ -57,7 +55,6 @@ def build_redis_org_config(redis_conn, orgname, service, quota=100,
             redis_conn.hset(org_redis_name, 'mapzen_routing_quota', str(quota))
     elif service is 'data_observatory':
         if quota is not None:
-            redis_conn.hset(org_redis_name, 'obs_snapshot_quota', str(quota))
             redis_conn.hset(org_redis_name, 'obs_general_quota', str(quota))
 
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')
@@ -80,6 +77,7 @@ def plpy_mock_config():
     plpy_mock._define_result("CDB_Conf_GetConf\('heremaps_conf'\)", [{'conf': '{"geocoder": {"app_id": "app_id", "app_code": "code", "geocoder_cost_per_hit": 1}, "isolines": {"app_id": "app_id", "app_code": "code"}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('mapzen_conf'\)", [{'conf': '{"routing": {"api_key": "api_key_rou", "monthly_quota": 1500000}, "geocoder": {"api_key": "api_key_geo", "monthly_quota": 1500000}, "matrix": {"api_key": "api_key_mat", "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('mapbox_conf'\)", [{'conf': '{"routing": {"api_keys": ["api_key_rou"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}, "matrix": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('tomtom_conf'\)", [{'conf': '{"routing": {"api_keys": ["api_key_rou"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}, "isolines": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('logger_conf'\)", [{'conf': '{"geocoder_log_path": "/dev/null"}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('data_observatory_conf'\)", [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('server_conf'\)", [{'conf': '{"environment": "testing"}'}])

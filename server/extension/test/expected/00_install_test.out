@@ -1,3 +1,5 @@
+-- Only show warning or error messages in the tests output
+SET client_min_messages TO WARNING;
 -- Install dependencies
 CREATE EXTENSION postgis;
 CREATE EXTENSION plpythonu;
@@ -32,6 +34,12 @@ SELECT cartodb.cdb_conf_setconf('mapzen_conf', '{"routing": {"api_key": "routing
 (1 row)
 
 SELECT cartodb.cdb_conf_setconf('mapbox_conf', '{"routing": {"api_keys": ["routing_dummy_api_key"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["geocoder_dummy_api_key"], "monthly_quota": 1500000}, "matrix": {"api_keys": ["matrix_dummy_api_key"], "monthly_quota": 1500000}}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
+SELECT cartodb.cdb_conf_setconf('tomtom_conf', '{"routing": {"api_keys": ["routing_dummy_api_key"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["geocoder_dummy_api_key"], "monthly_quota": 1500000}, "isolines": {"api_keys": ["matrix_dummy_api_key"], "monthly_quota": 1500000}}');
  cdb_conf_setconf 
 ------------------
  

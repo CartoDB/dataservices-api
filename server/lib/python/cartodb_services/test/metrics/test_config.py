@@ -7,7 +7,7 @@ from cartodb_services.metrics.config import *
 
 class TestGeocoderUserConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -27,6 +27,9 @@ class TestGeocoderUserConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'mapbox':
                 assert geocoder_config.mapbox_geocoder is True
+                assert geocoder_config.geocoding_quota == 100
+            elif geocoder_provider == 'tomtom':
+                assert geocoder_config.tomtom_geocoder is True
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
@@ -81,7 +84,7 @@ class TestGeocoderUserConfig(TestCase):
 
 class TestGeocoderOrgConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -106,6 +109,9 @@ class TestGeocoderOrgConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'mapbox':
                 assert geocoder_config.mapbox_geocoder is True
+                assert geocoder_config.geocoding_quota == 200
+            elif geocoder_provider == 'tomtom':
+                assert geocoder_config.tomtom_geocoder is True
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
@@ -167,7 +173,8 @@ class TestGeocoderOrgConfig(TestCase):
 
 
 class TestIsolinesUserConfig(TestCase):
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox']
+    # Don't test mapbox. See CartoDB/cartodb-management/issues/5199"
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -183,6 +190,8 @@ class TestIsolinesUserConfig(TestCase):
                 assert isolines_config.service_type is 'mapzen_isolines'
             elif isolines_provider is 'mapbox':
                 assert isolines_config.service_type is 'mapbox_isolines'
+            elif isolines_provider is 'tomtom':
+                assert isolines_config.service_type is 'tomtom_isolines'
             else:
                 assert isolines_config.service_type is 'here_isolines'
             assert isolines_config.isolines_quota == 100
@@ -225,8 +234,8 @@ class TestIsolinesUserConfig(TestCase):
 
 
 class TestIsolinesOrgConfig(TestCase):
-
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'mapbox']
+    # Don't test mapbox. See CartoDB/cartodb-management/issues/5199"
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -301,7 +310,7 @@ class TestRoutingConfig(TestCase):
         self._redis_conn.hset(self._user_key, 'mapzen_routing_quota', 1000)
         orgname = None
         config = RoutingConfig(self._redis_conn, self._db_conn, self._username, orgname)
-        assert config.monthly_quota == 1000
+        assert config.routing_quota == 1000
 
     def test_org_quota_overrides_user_quota(self):
         self._redis_conn.hset(self._user_key, 'mapzen_routing_quota', 1000)
@@ -315,7 +324,7 @@ class TestRoutingConfig(TestCase):
         self._redis_conn.hset(orgname_key, 'here_isolines_quota', 0)
 
         config = RoutingConfig(self._redis_conn, self._db_conn, self._username, orgname)
-        assert config.monthly_quota == 5000
+        assert config.routing_quota == 5000
 
     def test_should_have_soft_limit_false_by_default(self):
         orgname = None
@@ -335,41 +344,7 @@ class TestDataObservatoryUserConfig(TestCase):
         self.redis_conn = MockRedis()
         plpy_mock_config()
 
-    def test_should_return_config_for_obs_snapshot(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=100, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                          'test_user')
-        assert do_config.monthly_quota == 100
-        assert do_config.soft_limit is False
-        assert do_config.period_end_date.date() == yesterday.date()
-
-    def test_should_return_true_if_soft_limit_is_true_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=0, soft_limit=True, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                          'test_user')
-        assert do_config.soft_limit is True
-
-    def test_should_return_0_if_quota_is_0_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota=0, end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                              'test_user')
-        assert do_config.monthly_quota == 0
-
-    def test_should_return_0_if_quota_is_empty_in_redis(self):
-        yesterday = datetime.today() - timedelta(days=1)
-        build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
-                                quota='', end_date=yesterday)
-        do_config = ObservatorySnapshotConfig(self.redis_conn, plpy_mock,
-                                              'test_user')
-        assert do_config.monthly_quota == 0
-
-    def test_should_return_config_for_obs_snapshot(self):
+    def test_should_return_config_for_obs_config(self):
         yesterday = datetime.today() - timedelta(days=1)
         build_redis_user_config(self.redis_conn, 'test_user', 'data_observatory',
                                 quota=100, end_date=yesterday)
