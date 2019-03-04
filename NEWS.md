@@ -1,3 +1,8 @@
+Mar 4th, 2019
+==============
+* Version `0.21.2` of the python library
+    * Fixed TomTom Qps respondes (#546)
+
 Feb 25th, 2019
 ==============
 * Version `0.26.2` of the client extension
