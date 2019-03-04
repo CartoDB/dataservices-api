@@ -2,13 +2,17 @@ import time
 import random
 from datetime import datetime
 from exceptions import TimeoutException
+import re
 
 DEFAULT_RETRY_TIMEOUT = 60
 DEFAULT_QUERIES_PER_SECOND = 10
 
-TOMTOM_403_RATE_LIMIT_HEADER = 'Account Over Queries Per Second Limit'
+TOMTOM_403_RATE_LIMIT_HEADERS = [
+    'Account Over Queries Per Second Limit',
+    'Developer Over Qps'
+]
 TOMTOM_DETAIL_HEADER = 'X-Error-Detail-Header'
-
+TOMTOM_403_RATE_LIMIT_HEADER_PATTERN = re.compile('|'.join(TOMTOM_403_RATE_LIMIT_HEADERS), re.IGNORECASE)
 
 def qps_retry(original_function=None, **options):
     """ Query Per Second retry decorator
@@ -49,9 +53,11 @@ class QPSService:
                 response = getattr(e, 'response', None)
                 if response is not None:
                     if self._provider is not None and self._provider == 'tomtom' and (response.status_code == 403):
-                        if response.headers.get(TOMTOM_DETAIL_HEADER) != TOMTOM_403_RATE_LIMIT_HEADER:
+                        detail_header = response.headers.get(TOMTOM_DETAIL_HEADER)
+                        if detail_header and TOMTOM_403_RATE_LIMIT_HEADER_PATTERN.search(detail_header):
+                            self.retry(start_time, attempt_number)
+                        else:
                             raise e
-                        self.retry(start_time, attempt_number)
                     elif response.status_code == 429:
                         self.retry(start_time, attempt_number)
                     else:
