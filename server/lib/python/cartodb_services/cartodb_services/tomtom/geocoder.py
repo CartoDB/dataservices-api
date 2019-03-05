@@ -73,12 +73,12 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5, provider='tomtom')
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        response = self.geocode_meta(searchtext, city, state_province, country)
-        error_message = response[1].get('error', None)
+        geocoder_response, http_response = self.geocode_meta(searchtext, city, state_province, country)
+        error_message = geocoder_response[1].get('error', None)
         if error_message:
-            raise ServiceException(error_message, None)
+            raise ServiceException(error_message, http_response)
         else:
-            return response[0]
+            return geocoder_response[0]
 
     @qps_retry(qps=5, provider='tomtom')
     def geocode_meta(self, searchtext, city=None, state_province=None,
@@ -93,7 +93,7 @@ class TomTomGeocoder(Traceable):
             country = country.decode('utf-8')
 
         if not self._validate_input(searchtext, city, state_province, country):
-            return EMPTY_RESPONSE
+            return (EMPTY_RESPONSE, None)
 
         address = []
         if searchtext and searchtext.strip():
@@ -107,18 +107,18 @@ class TomTomGeocoder(Traceable):
 
         try:
             response = requests.get(uri)
-            return self._parse_response(response.status_code, response.text)
+            return (self._parse_response(response.status_code, response.text), response)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
             msg = 'Timeout connecting to TomTom geocoding server'
             self._logger.error(msg, te)
-            return geocoder_error_response(msg)
+            return (geocoder_error_response(msg), None)
         except requests.ConnectionError as ce:
             # Don't raise the exception to continue with the geocoding job
             self._logger.error('Error connecting to TomTom geocoding server',
                                exception=ce)
-            return EMPTY_RESPONSE
+            return (EMPTY_RESPONSE, None)
 
     def _parse_response(self, status_code, text):
         if status_code == requests.codes.ok:
