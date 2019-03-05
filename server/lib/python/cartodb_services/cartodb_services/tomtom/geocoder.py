@@ -76,7 +76,7 @@ class TomTomGeocoder(Traceable):
         response = self.geocode_meta(searchtext, city, state_province, country)
         error_message = response[1].get('error', None)
         if error_message:
-            raise ServiceException(error_message, None)
+            raise ServiceException(error_message, response)
         else:
             return response[0]
 
