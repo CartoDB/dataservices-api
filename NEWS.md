@@ -1,7 +1,12 @@
+Mar 5th, 2019
+==============
+* Version `0.21.3` of the python library
+    * Fixed TomTom Qps respondes part 2 (#546)
+
 Mar 4th, 2019
 ==============
 * Version `0.21.2` of the python library
-    * Fixed TomTom Qps respondes (#546)
+    * Fixed TomTom Qps responses (#546)
 
 Feb 25th, 2019
 ==============
