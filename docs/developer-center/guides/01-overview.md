@@ -14,13 +14,13 @@ The Data Services API also exposes its services directly through CARTO Builder. 
 
 The geometries provided by this API are projected in the projection [WGS 84 SRID 4326](http://spatialreference.org/ref/epsg/wgs-84/).
 
-**Note:** The Data Services API [geocoding functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The CARTO Engine does not support multi-geometry layers or datasets, therefore you must confirm that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
+**Note:** The Data Services API [geocoding functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) return different types of geometries (points or polygons) as result of different geocoding processes. The CARTO Engine does not support multi-geometry layers or datasets, therefore you must verify that you are using consistent geometry types inside a table, to avoid future conflicts in your map visualization.
 
 #### Best Practices
 
 _Be mindful of the following usage notes when using the Data Services functions with the SQL API:_
 
-It is discouraged to use the SELECT operation with the Data Services API functions in your map layers, as these type of queries consume quota when rendering tiles for your live map views. It may also result in sync performance issues, due to executing multiple requests to the API each time your map is viewed. See details about [Quota Consumption]({{site.dataservicesapi_docs}}/support/quota-information/).
+It is discouraged to use the SELECT operation with the Data Services API functions in your map layers, as these type of queries consume quota when rendering tiles for your live map views. It may also result in sync performance issues, due to executing multiple requests to the API each time your map is viewed. See details about [Quota Consumption]({{site.dataservicesapi_docs}}/support/quota-information/#quota-consumption).
 
 The Data Services API is **recommended** to be used with INSERT or UPDATE operations, for applying location data to your tables. While SELECT (retrieve) is standard for SQL API requests, be mindful of quota consumption and use INSERT (to insert a new record) or UPDATE (to update an existing record), for best practices.
 

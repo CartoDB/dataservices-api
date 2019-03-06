@@ -36,10 +36,10 @@ Name            | Type      | Description
 
 Service Types:
 
-* `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service](https://carto.com/docs/carto-engine/dataservices-api/isoline_functions/)
-* `'hires_geocoder'` [Street level geocoding](https://carto.com/docs/carto-engine/dataservices-api/geocoding-functions#street-level-geocoder)
-* `'routing'` [Routing functions](https://carto.com/docs/carto-engine/dataservices-api/routing_functions/)
-* `'observatory'` Data Observatory services ([demographic](https://carto.com/docs/carto-engine/dataservices-api/demographic_functions/) and [segmentation](https://carto.com/docs/carto-engine/dataservices-api/segmentation_functions/) functions)
+* `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service]({{site.dataservicesapi_docs}}/reference/#isoline_functions/)
+* `'hires_geocoder'` [Street level geocoding]({{site.dataservicesapi_docs}}/reference/#street-level-geocoder)
+* `'routing'` [Routing functions]({{site.dataservicesapi_docs}}/reference/#routing_functions/)
+* `'observatory'` Data Observatory services ([demographic]({{site.dataservicesapi_docs}}/reference/#demographic_functions/) and [segmentation]({{site.dataservicesapi_docs}}/reference/#segmentation_functions/) functions)
 
 **Notes**
 
