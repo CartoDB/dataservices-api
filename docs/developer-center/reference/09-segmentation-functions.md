@@ -1,18 +1,18 @@
-# Segmentation Functions
+## Segmentation Functions
 
-The Segmentation Snapshot functions enable you to determine the pre-calculated population segment for a location. Segmentation is a method that divides a populations into subclassifications based on common traits. For example, you can take the a store location and determine what classification of population exists around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions](https://carto.com/docs/carto-engine/dataservices-api/geocoding-functions/) documentation.
+The Segmentation Snapshot functions enable you to determine the pre-calculated population segment for a location. Segmentation is a method that divides a populations into subclassifications based on common traits. For example, you can take the a store location and determine what classification of population exists around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) documentation.
 
 _**Note:** The Segmentation Snapshot functions are only available for the United States. Our first release (May 18, 2016) is derived from Census 2010 variables. Our next release will be based on Census 2014 data. For the latest information, see the [Open Segments](https://github.com/CartoDB/open-segments) project repository._
 
-## OBS_GetSegmentSnapshot( Point Geometry )
+### OBS_GetSegmentSnapshot( Point Geometry )
 
-### Arguments
+#### Arguments
 
 Name | Description | Example Values
 --- |  --- | ---
 point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
-### Returns
+#### Returns
 
 The segmentation function returns two segment levels for the point you requests, the x10\_segment and x55\_segment. These segmentation levels contain different classifications of population within with each segment. The function also returns the quantile of a number of census variables. For example, if total_poulation is at 90% quantile level then this tract has a higher total population than 90% of the other tracts. 
 
@@ -155,14 +155,14 @@ The possible segments are:
 </table>
 
 
-### Examples
+#### Examples
 
 ```bash
 https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetSegmentSnapshot({{point geometry}})
 ```
 
-##### Get the Geographic Snapshot of a Segmentation
+###### Get the Geographic Snapshot of a Segmentation
 
 __Get the Segmentation Snapshot around the MGM Grand__
 

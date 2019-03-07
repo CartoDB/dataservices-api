@@ -1,8 +1,8 @@
-# Quota Information
+## Quota Information
 
 **Based on your account plan, some of the Data Services API functions are subject to quota limitations and extra fees may apply.** View our [terms and conditions](https://carto.com/terms/), or [contact us](mailto:sales@carto.com) for details about which functions require service credits to your account.
 
-## Quota Consumption
+### Quota Consumption
 
 Quota consumption is calculated based on the number of request made for each function. Be mindful of the following usage recommendations when using the Data Services API functions:
 
@@ -14,15 +14,15 @@ Quota consumption is calculated based on the number of request made for each fun
 * It is advised to store results of these queries into your datasets, and refresh them as needed. This ensure more control of quota credits for your account
 
 
-## Quota Information Functions
+### Quota Information Functions
 
 There are several SQL functions that you can run to obtain quota information about your services. 
 
-## cdb_service_quota_info()
+### cdb_service_quota_info()
 
 Returns information about per-service quotas (available and used) for the account.
 
-#### Returns
+##### Returns
 
 This function returns a set of service quota information records, one per service.
 
@@ -36,10 +36,10 @@ Name            | Type      | Description
 
 Service Types:
 
-* `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service](https://carto.com/docs/carto-engine/dataservices-api/isoline_functions/)
-* `'hires_geocoder'` [Street level geocoding](https://carto.com/docs/carto-engine/dataservices-api/geocoding-functions#street-level-geocoder)
-* `'routing'` [Routing functions](https://carto.com/docs/carto-engine/dataservices-api/routing_functions/)
-* `'observatory'` Data Observatory services ([demographic](https://carto.com/docs/carto-engine/dataservices-api/demographic_functions/) and [segmentation](https://carto.com/docs/carto-engine/dataservices-api/segmentation_functions/) functions)
+* `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service]({{site.dataservicesapi_docs}}/reference/#isoline_functions/)
+* `'hires_geocoder'` [Street level geocoding]({{site.dataservicesapi_docs}}/reference/#street-level-geocoder)
+* `'routing'` [Routing functions]({{site.dataservicesapi_docs}}/reference/#routing_functions/)
+* `'observatory'` Data Observatory services ([demographic]({{site.dataservicesapi_docs}}/reference/#demographic_functions/) and [segmentation]({{site.dataservicesapi_docs}}/reference/#segmentation_functions/) functions)
 
 **Notes**
 
@@ -48,7 +48,7 @@ expenses when the regular quota is exceeded.
 
 A zero value of `monthly_quota` indicates that the service has not been activated for the user.
 
-#### Example
+##### Example
 
 ```sql
 SELECT * FROM cdb_service_quota_info();
@@ -59,9 +59,9 @@ Result:
 ```sql
     service     | monthly_quota | used_quota | soft_limit |     provider
 ----------------+---------------+------------+------------+------------------
- isolines       |           100 |          0 | f          | mapbox
- hires_geocoder |           100 |          0 | f          | mapbox
- routing        |            50 |          0 | f          | mapbox
+ isolines       |           100 |          0 | f          | tomtom
+ hires_geocoder |           100 |          0 | f          | tomtom
+ routing        |            50 |          0 | f          | tomtom
  observatory    |             0 |          0 | f          | data observatory
 (4 rows)
 
@@ -69,7 +69,7 @@ Result:
 
 In this case, notice that the user has no access to the observatory services. All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
 
-## cdb_enough_quota(service text ,input_size numeric)
+### cdb_enough_quota(service text ,input_size numeric)
 
 This function is useful to check if enough quota is available for completing a job.
 
@@ -79,20 +79,20 @@ This is specifically relevant if a number of service calls are to be performed i
 
 Note that some services consume more than one credit per row/call. For example, isolines (with more than one range/track) consume (N rows x M ranges) credits; indicating that the input size should be N x M.
 
-#### Arguments
+##### Arguments
 
 Name         | Type      | Description
 ------------ | --------- | -----------
 `service`    | `text`    | Service to check; see the list of valid services above.
 `input_size` | `numeric` | Number of service calls required, i.e. size of the input to be processed.
 
-#### Returns
+##### Returns
 
 The result is a *boolean* value. A *true* value (`'t'`) indicates that the available quota
 for the service is enough for the input size requested. A *false* value (`'f'`) indicates
 insufficient quota.
 
-#### Example
+##### Example
 
 Suppose you want to geocode a whole table. In order to check that you have enough quota, and avoid a "quota exhausted" exception, first find out how many records you need to geocode:
 
