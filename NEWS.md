@@ -1,3 +1,8 @@
+Mar 13rd, 2019
+==============
+* Version `0.21.4` of the python library
+    * Fix TomTom bulk geocoder bug (#551)
+
 Mar 5th, 2019
 ==============
 * Version `0.21.3` of the python library
