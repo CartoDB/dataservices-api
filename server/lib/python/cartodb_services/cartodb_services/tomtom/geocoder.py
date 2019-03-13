@@ -73,15 +73,19 @@ class TomTomGeocoder(Traceable):
     @qps_retry(qps=5, provider='tomtom')
     def geocode(self, searchtext, city=None, state_province=None,
                 country=None):
-        geocoder_response, http_response = self.geocode_meta(searchtext, city, state_province, country)
+        geocoder_response, http_response = self._geocode_meta(searchtext, city, state_province, country)
         error_message = geocoder_response[1].get('error', None)
         if error_message:
             raise ServiceException(error_message, http_response)
         else:
             return geocoder_response[0]
 
-    @qps_retry(qps=5, provider='tomtom')
     def geocode_meta(self, searchtext, city=None, state_province=None,
+                country=None):
+        return self._geocode_meta(searchtext, city, state_province, country)[0]
+
+    @qps_retry(qps=5, provider='tomtom')
+    def _geocode_meta(self, searchtext, city=None, state_province=None,
                 country=None):
         if searchtext:
             searchtext = searchtext.decode('utf-8')
