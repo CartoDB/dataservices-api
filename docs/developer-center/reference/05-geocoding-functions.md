@@ -185,7 +185,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_namedplace_point('Barcelon
 
 #### cdb_geocode_namedplace_point(_city_name text, admin1_name text, country_name text_)
 
-Geocodes your data into a named place point geometry, containing the text name of a city, for a specified province/state and country. This is recommended for the most accurate geocoding of city data. 
+Geocodes your data into a named place point geometry, containing the text name of a city, for a specified province/state and country. This is recommended for the most accurate geocoding of city data.
 ##### Arguments
 
 Name | Type | Description
@@ -311,7 +311,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34
 
 ### Street-Level Geocoder
 
-This function geocodes your data into a point geometry for a street address. CARTO platform uses [Mapbox geocoding services](https://www.mapbox.com/) by default as the service provider for street-level geocoding. [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account.
+These functions geocode your data into a point geometry for a street address. CARTO platform uses [Mapbox geocoding services](https://www.mapbox.com/) by default as the service provider for street-level geocoding. [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information]({{site.dataservicesapi_docs}}/support/quota-information/) for details and recommendations about quota consumption.
 
@@ -344,4 +344,46 @@ UPDATE {tablename} SET the_geom = cdb_geocode_street_point({street_name_column})
 
 ```bash
 INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_street_point('651 Lombard Street', 'San Francisco', 'California', 'United States')
+```
+
+#### cdb_bulk_geocode_street_point (_query text, street_column text, [city_column text], [state_column text], [country_column text], [batch_size integer]_)
+
+Geocodes complete street addresses into point data. Similar to `cdb_geocode_street_point`, but using batch services and therefore allowing for several addresses to be geocoded in a single API call.
+
+##### Arguments
+
+Name | Type | Description
+--- | --- | --- | ---
+`query` | `text` | SQL query that returns the addresses to be geocoded. It must include a `cartodb_id` column and another column to get the free-form addresses from. Optionally, it may include other columns to fine-tune the geocoding, such as a city column, a state column and a country column.
+`street_column` | `text` | Name of the free-form address column, must be present in the SQL query.
+`city_column` | `text` | (Optional) Name of the city column, if present in the SQL query.
+`state_column` | `text` | (Optional) Name of the state column, if present in the SQL query.
+`country_column` | `text` | (Optional) Name of the country column, if present in the SQL query.
+`batch_size` | `integer` | (Optional) Geocoding queries are sent in batches. Batch size can be configured, from 1 geocoding query per batch to a maximum value, limited by user quota or other limits. If not specified, it defaults to the maximum size available to the user, which is typically the best option, performance-wise.
+
+##### Returns
+
+Geocoding results are returned in an array. Each array element contains:
+
+Name | Type | Description
+--- | --- | --- | ---
+`cartodb_id` | `integer` | `cartodb_id` from the original query.
+`the_geom` | `Geometry (point, EPSG 4326)` | Point that corresponds to the most accurate match found for this particular address, or `null` if no match was found.
+`metadata` | `JSON` | Information about the geocoding result, empty if no match was found.
+
+The `metadata` JSON type includes the following attributes when geocoding was successful:
+
+Name | Type | Description
+--- | --- | --- | ---
+`precision` | `text` | One of `precise` or `interpolated`.
+`relevance` | `number` | Relevance factor, from 0 to 1, higher being more relevant.
+`match_type` | `text` | Array with one of `point_of_interest`, `country`, `state`, `county`, `locality`, `district`, `street`, `intersection`, `street_number`, `postal_code`. Empty array if match type is unknown.
+
+
+##### Example
+
+###### Update the geometries of an entire table by geocoding all the rows based on a street address
+
+```bash
+WITH geocoding_results AS (SELECT cartodb_id, the_geom FROM cdb_bulk_geocode_street_point('SELECT cartodb_id, {address_column} from {tablename}', '{address_column}')) UPDATE {tablename} tn SET the_geom = geocoding_results.the_geom FROM geocoding_results WHERE tn.cartodb_id = geocoding_results.cartodb_id
 ```
