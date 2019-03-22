@@ -311,7 +311,7 @@ INSERT INTO {tablename} (the_geom) SELECT cdb_geocode_ipaddress_point('102.23.34
 
 ### Street-Level Geocoder
 
-These functions geocode your data into a point geometry for a street address. CARTO platform uses [Mapbox geocoding services](https://www.mapbox.com/) by default as the service provider for street-level geocoding. [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account.
+These functions geocode your data into a point geometry for a street address. CARTO platform uses [TomTom geocoding services](https://www.tomtom.com/) by default as the service provider for street-level geocoding. [Contact us](mailto:sales@carto.com) if you have any specific questions or requirements about the location data service provider being used with your account.
 
 **This service is subject to quota limitations, and extra fees may apply**. View the [Quota information]({{site.dataservicesapi_docs}}/support/quota-information/) for details and recommendations about quota consumption.
 
