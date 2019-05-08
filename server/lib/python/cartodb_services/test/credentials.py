@@ -9,3 +9,8 @@ def mapbox_api_key():
 def tomtom_api_key():
     """Returns TomTom API key. Requires setting TOMTOM_API_KEY environment variable."""
     return os.environ['TOMTOM_API_KEY']
+
+
+def google_api_key():
+    """Returns Google API key. Requires setting GOOGLE_API_KEY environment variable."""
+    return os.environ['GOOGLE_API_KEY']

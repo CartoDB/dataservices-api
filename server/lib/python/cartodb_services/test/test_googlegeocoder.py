@@ -5,14 +5,14 @@ import unittest
 import requests_mock
 from mock import Mock
 
+from credentials import google_api_key
 from cartodb_services.google import GoogleMapsGeocoder
 from cartodb_services.google.exceptions import MalformedResult
 
 requests_mock.Mocker.TEST_PREFIX = 'test_'
 
 
-@requests_mock.Mocker()
-class GoogleGeocoderTestCase(unittest.TestCase):
+class GoogleGeocoderTestCase():
     GOOGLE_MAPS_GEOCODER_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
 
     EMPTY_RESPONSE = """{
@@ -87,12 +87,6 @@ class GoogleGeocoderTestCase(unittest.TestCase):
 
     MALFORMED_RESPONSE = """{"manolo": "escobar"}"""
 
-    def setUp(self):
-        logger = Mock()
-        self.geocoder = GoogleMapsGeocoder('dummy_client_id',
-                                           'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E',
-                                           logger)
-
     def test_geocode_address_with_valid_params(self, req_mock):
         req_mock.register_uri('GET', self.GOOGLE_MAPS_GEOCODER_URL,
                        text=self.GOOD_RESPONSE)
@@ -119,6 +113,15 @@ class GoogleGeocoderTestCase(unittest.TestCase):
                 city='Madrid',
                 country='España')
 
+
+@requests_mock.Mocker()
+class GoogleGeocoderClientSecretTestCase(unittest.TestCase, GoogleGeocoderTestCase):
+    def setUp(self):
+        logger = Mock()
+        self.geocoder = GoogleMapsGeocoder('dummy_client_id',
+                                           'MgxyOFxjZXIyOGO52jJlMzEzY1Oqy4hsO49E',
+                                           logger)
+
     def test_client_data_extraction(self, req_mock):
         client_id, channel = self.geocoder.parse_client_id('dummy_client_id')
         self.assertEqual(client_id, 'dummy_client_id')
@@ -133,3 +136,21 @@ class GoogleGeocoderTestCase(unittest.TestCase):
         client_id, channel = self.geocoder.parse_client_id('client=gme-test&channel=testchannel')
         self.assertEqual(client_id, 'gme-test')
         self.assertEqual(channel, 'testchannel')
+
+
+@requests_mock.Mocker()
+class GoogleGeocoderApiKeyTestCase(unittest.TestCase, GoogleGeocoderTestCase):
+    def setUp(self):
+        logger = Mock()
+        self.geocoder = GoogleMapsGeocoder(None,
+                                           google_api_key(),
+                                           logger)
+
+
+@requests_mock.Mocker()
+class GoogleGeocoderClientApiKeyTestCase(unittest.TestCase, GoogleGeocoderTestCase):
+    def setUp(self):
+        logger = Mock()
+        self.geocoder = GoogleMapsGeocoder('fake_client_id',
+                                           google_api_key(),
+                                           logger)

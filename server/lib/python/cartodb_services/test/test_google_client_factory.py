@@ -48,9 +48,17 @@ class GoogleMapsClientFactoryTestCase(unittest.TestCase):
         client2 = GoogleMapsClientFactory.get(id2, key)
         self.assertNotEqual(client1, client2)
 
-    def test_invalid_credentials(self):
+    def test_invalid_credentials_client_secret(self):
         with self.assertRaises(InvalidGoogleCredentials):
             GoogleMapsClientFactory.get('dummy_client_id', 'lalala')
+
+    def test_invalid_credentials_api_key_client(self):
+        with self.assertRaises(ValueError):
+            GoogleMapsClientFactory.get('fake_client', 'key=fake_apikey')
+
+    def test_invalid_credentials_api_key_noclient(self):
+        with self.assertRaises(ValueError):
+            GoogleMapsClientFactory.get(None, 'key=fake_apikey')
 
     def test_credentials_with_dashes_can_be_valid(self):
         client = GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola-k-ase---')
@@ -59,10 +67,6 @@ class GoogleMapsClientFactoryTestCase(unittest.TestCase):
     def test_credentials_with_underscores_can_be_valid(self):
         client = GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola_k_ase___')
         self.assertIsInstance(client, googlemaps.Client)
-
-    def test_invalid_credentials(self):
-        with self.assertRaises(InvalidGoogleCredentials):
-            GoogleMapsClientFactory.get('dummy_client_id', 'lalala')
 
     def test_credentials_with_channel(self):
         client = GoogleMapsClientFactory.get('yet_another_dummy_client_id', 'Ola_k_ase___', 'channel')

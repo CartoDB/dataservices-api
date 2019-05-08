@@ -5,23 +5,25 @@ import googlemaps
 import base64
 from exceptions import InvalidGoogleCredentials
 
+CLIENT_SECRET_APIKEY = 'key='
+
 
 class GoogleMapsClientFactory():
     clients = {}
 
     @classmethod
-    def get(cls, client_id, client_secret, channel=None):
+    def get(cls, client_id=None, client_secret=None, channel=None):
         cache_key = "{}:{}:{}".format(client_id, client_secret, channel)
         client = cls.clients.get(cache_key)
         if not client:
-            if client_id:
+            if client_secret.startswith(CLIENT_SECRET_APIKEY):
+                client = googlemaps.Client(key=client_secret.replace(CLIENT_SECRET_APIKEY, ''))
+            else:
                 cls.assert_valid_crendentials(client_secret)
                 client = googlemaps.Client(
                     client_id=client_id,
                     client_secret=client_secret,
                     channel=channel)
-            else:
-                client = googlemaps.Client(key=client_secret)
             cls.clients[cache_key] = client
         return client
 
