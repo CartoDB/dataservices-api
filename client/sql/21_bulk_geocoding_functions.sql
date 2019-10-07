@@ -86,4 +86,5 @@ BEGIN
 
   RETURN QUERY EXECUTE 'SELECT * FROM ' || quote_ident(temp_table_name);
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;

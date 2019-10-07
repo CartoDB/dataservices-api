@@ -37,4 +37,5 @@ BEGIN
         <%= return_statement %>
   END;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
+    SET search_path = pg_temp;

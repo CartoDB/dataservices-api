@@ -41,7 +41,9 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(
     table_name text,
@@ -89,7 +91,9 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;
+
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeasure(

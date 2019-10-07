@@ -18,7 +18,7 @@ RETURNS SETOF cdb_dataservices_client.geocoding AS $$
 BEGIN
   RAISE NOTICE 'called with this searches: %', searches;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE SET search_path = pg_temp;
 
 -- No permissions granted
 -- Test bulk size not mandatory (it will get the optimal)

@@ -26,4 +26,5 @@ BEGIN
 
   <% return_statement do %><%= DATASERVICES_CLIENT_SCHEMA %>._<%= name %>(<%= params(_with_user_org=true).join(', ') %>)<% end %>
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
+    SET search_path = pg_temp;
