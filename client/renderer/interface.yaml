@@ -1,6 +1,6 @@
 ---
 - name: cdb_geocode_admin0_polygon
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -8,7 +8,7 @@
     - { name: country_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -16,7 +16,7 @@
     - { name: admin1_name, type: text }
 
 - name: cdb_geocode_admin1_polygon
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -25,7 +25,7 @@
     - { name: country_name, type: text }
 
 - name: cdb_geocode_namedplace_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -33,7 +33,7 @@
     - { name: city_name, type: text}
 
 - name: cdb_geocode_namedplace_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -42,7 +42,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_namedplace_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -52,7 +52,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_polygon
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -61,7 +61,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_polygon
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -70,7 +70,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -79,7 +79,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_postalcode_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -88,7 +88,7 @@
     - { name: country_name, type: text}
 
 - name: cdb_geocode_ipaddress_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -96,7 +96,7 @@
     - { name: ip_address,  type: text}
 
 - name: cdb_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -117,7 +117,7 @@
     - { name: searches,  type: jsonb } # Array of JSON objects with id, address, city, state and country fields
 
 - name: cdb_here_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -128,7 +128,7 @@
     - { name: country,  type: text, default: 'NULL'}
 
 - name: cdb_google_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -139,7 +139,7 @@
     - { name: country,  type: text, default: 'NULL'}
 
 - name: cdb_mapbox_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -150,7 +150,7 @@
     - { name: country,  type: text, default: 'NULL'}
 
 - name: cdb_tomtom_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -161,7 +161,7 @@
     - { name: country,  type: text, default: 'NULL'}
 
 - name: cdb_mapzen_geocode_street_point
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: geocoding
   permission_error: Geocoding permission denied
@@ -179,7 +179,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -192,7 +192,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -205,7 +205,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -218,7 +218,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -231,7 +231,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -244,7 +244,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -257,7 +257,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -270,7 +270,7 @@
   permission_name: isolines
   permission_error: Isolines permission denied
   params:
-    - { name: source,  type: "geometry(Geometry, 4326)" }
+    - { name: source,  type: "public.geometry(Geometry, 4326)" }
     - { name: mode, type: text }
     - { name: range, type: "integer[]" }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
@@ -282,8 +282,8 @@
   permission_name: routing
   permission_error: Routing permission denied
   params:
-    - { name: origin,  type: "geometry(Point, 4326)" }
-    - { name: destination,  type: "geometry(Point, 4326)" }
+    - { name: origin,  type: "public.geometry(Point, 4326)" }
+    - { name: destination,  type: "public.geometry(Point, 4326)" }
     - { name: mode, type: text }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
     - { name: units, type: "text", default: "'kilometers'"}
@@ -295,7 +295,7 @@
   permission_name: routing
   permission_error: Routing permission denied
   params:
-    - { name: waypoints,  type: "geometry(Point, 4326)[]" }
+    - { name: waypoints,  type: "public.geometry(Point, 4326)[]" }
     - { name: mode, type: text }
     - { name: options, type: "text[]", default: 'ARRAY[]::text[]' }
     - { name: units, type: "text", default: "'kilometers'"}
@@ -306,7 +306,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: "'2009 - 2013'::text" }
     - { name: geometry_level, type: text, default: 'NULL' }
 
@@ -316,7 +316,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getdemographicsnapshot
@@ -326,7 +326,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: time_span,  type: "text", default: 'NULL' }
     - { name: geometry_level, type: text, default: 'NULL' }
 
@@ -337,16 +337,16 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: geometry_level, type: text, default: 'NULL' }
 
 - name: obs_getboundary
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
 
@@ -356,12 +356,12 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
 
 - name: obs_getboundarybyid
-  return_type: Geometry
+  return_type: public.Geometry
   requires_permission: true
   permission_name: observatory
   permission_error: Data Observatory permission denied
@@ -381,7 +381,7 @@
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
     - { name: overlap_type, type: text, default: 'NULL'}
@@ -397,7 +397,7 @@
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: radius, type: numeric }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
@@ -414,7 +414,7 @@
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
     - { name: overlap_type, type: text, default: 'NULL'}
@@ -430,7 +430,7 @@
     - { name: the_geom, type: geometry }
     - { name: geom_refs, type: text }
   params:
-    - { name: geom,  type: "geometry(Geometry, 4326)" }
+    - { name: geom,  type: "public.geometry(Geometry, 4326)" }
     - { name: radius, type: numeric }
     - { name: boundary_id, type: text }
     - { name: time_span, type: text, default: 'NULL'}
@@ -442,7 +442,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: measure_id, type: text }
     - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
@@ -494,7 +494,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom_ref,  type: "Geometry(Geometry, 4326)" }
+    - { name: geom_ref,  type: "public.Geometry(Geometry, 4326)" }
     - { name: params, type: json }
     - { name: max_timespan_rank, type: integer, default: 'NULL' }
     - { name: max_score_rank, type: integer, default: 'NULL' }
@@ -508,7 +508,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom_extent,  type: "Geometry(Geometry, 4326)" }
+    - { name: geom_extent,  type: "public.Geometry(Geometry, 4326)" }
     - { name: geom_type,  type: text }
     - { name: params, type: json }
     - { name: target_geoms, type: integer, default: 'NULL' }
@@ -519,7 +519,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: category_id, type: text }
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
@@ -530,7 +530,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: name, type: text }
     - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
@@ -542,7 +542,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: name, type: text }
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
@@ -553,7 +553,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: normalize, type: text, default: 'NULL'}
     - { name: boundary_id, type: text, default: 'NULL' }
     - { name: time_span, type: text, default: 'NULL'}
@@ -588,7 +588,7 @@
     - { name: time_span, type: text }
     - { name: tablename, type: text }
   params:
-    - { name: geom,  type: Geometry }
+    - { name: geom,  type: public.Geometry }
     - { name: timespan, type: text, default: 'NULL'}
 
 - name: obs_dumpversion
@@ -607,7 +607,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: bounds, type: "public.geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
     - { name: denom_id, type: text, default: 'NULL' }
     - { name: geom_id, type: text, default: 'NULL' }
@@ -621,7 +621,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: bounds, type: "public.geometry(Geometry, 4326)", default: 'NULL' }
     - { name: section_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
     - { name: subsection_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
     - { name: other_tags, type: "text[]", default: 'ARRAY[]::TEXT[]' }
@@ -639,7 +639,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: bounds, type: "public.geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
     - { name: numer_id, type: text, default: 'NULL' }
     - { name: geom_id, type: text, default: 'NULL' }
@@ -653,7 +653,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: bounds, type: "public.geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
     - { name: numer_id, type: text, default: 'NULL' }
     - { name: denom_id, type: text, default: 'NULL' }
@@ -668,7 +668,7 @@
   permission_name: observatory
   permission_error: Data Observatory permission denied
   params:
-    - { name: bounds, type: "geometry(Geometry, 4326)", default: 'NULL' }
+    - { name: bounds, type: "public.geometry(Geometry, 4326)", default: 'NULL' }
     - { name: filter_tags, type: "text[]", default: 'NULL' }
     - { name: numer_id, type: text, default: 'NULL' }
     - { name: denom_id, type: text, default: 'NULL' }

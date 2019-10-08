@@ -31,4 +31,6 @@ BEGIN
     result.apikey_permissions = apikey_config->'permissions';
     RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL SAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL SAFE
+    SET search_path = pg_temp;
+
