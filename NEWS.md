@@ -1,3 +1,8 @@
+Oct 9th, 2019
+==============
+* Version `0.27.0` of the client extension
+    * Changes in search_path
+
 Mar 13rd, 2019
 ==============
 * Version `0.21.4` of the python library
