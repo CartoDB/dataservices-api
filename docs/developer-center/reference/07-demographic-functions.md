@@ -1,20 +1,20 @@
-# Demographic Functions
+### Demographic Functions
 
-The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CARTO's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions](https://carto.com/docs/carto-engine/dataservices-api/geocoding-functions/) documentation.
+The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CARTO's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) documentation.
 
 _**Note:** The Demographic Snapshot functions are only available for the United States._
 
-## OBS_GetDemographicSnapshot( point geometry )
+#### OBS_GetDemographicSnapshot( point geometry )
 
 Fields returned include information about income, education, transportation, race, and more. Not all fields will have information for every coordinate queried.
 
-### Arguments
+##### Arguments
 
 Name | Description | Example Values
 --- | --- | ---
 point geometry | A point geometry. You can use the helper function, `CDB_LatLng` to quickly generate one from latitude and longitude | `CDB_LatLng(40.760410,-73.964242)`
 
-### Returns
+##### Returns
 
 The Demographic Snapshot contains a broad subset of demographic measures in the Data Observatory. Over 80 measurements are returned by a single API request. For each demographic measure, the API returns the following values.
 
@@ -37,14 +37,14 @@ obs_getdemographicsnapshot: {
 
 **For details, see the [Glossary of Demographic Measures](#glossary-of-demographic-measures).**
 
-### Examples
+##### Examples
 
 ```bash
 https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot({{point geometry}})
 ```
 
-##### Get the Geographic Snapshot of a Demographic
+####### Get the Geographic Snapshot of a Demographic
 
 __Get the Demographic Snapshot at Camp David__
 
@@ -60,7 +60,7 @@ https://{username}.carto.com/api/v2/sql?q=SELECT * FROM
 OBS_GetDemographicSnapshot(CDB_LatLng(40.80, -73.960))
 ```
 
-## Glossary of Demographic Measures
+#### Glossary of Demographic Measures
 
 This list contains the demographic measures and response names for results from the ```OBS_GetDemographicSnapshot``` function.
 

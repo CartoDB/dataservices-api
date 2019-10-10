@@ -58,7 +58,7 @@ BEGIN
   temp_table_name := 'bulk_geocode_street_' || md5(random()::text);
 
   EXECUTE format('CREATE TEMPORARY TABLE %s ' ||
-   '(cartodb_id integer, the_geom geometry(Point,4326), metadata jsonb)',
+   '(cartodb_id integer, the_geom public.geometry(Point,4326), metadata jsonb)',
    temp_table_name);
 
   select
@@ -86,4 +86,5 @@ BEGIN
 
   RETURN QUERY EXECUTE 'SELECT * FROM ' || quote_ident(temp_table_name);
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;

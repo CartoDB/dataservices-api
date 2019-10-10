@@ -1,5 +1,5 @@
 comment = 'CartoDB dataservices client API extension'
-default_version = '0.26.2'
+default_version = '0.27.0'
 requires = 'plproxy, cartodb'
 superuser = true
 schema = cdb_dataservices_client

@@ -41,7 +41,9 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(
     table_name text,
@@ -89,7 +91,9 @@ BEGIN
 
   RETURN result;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER VOLATILE PARALLEL UNSAFE
+    SET search_path = pg_temp;
+
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeasure(
@@ -124,7 +128,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PrepareTableOBS_GetMeas
 
     # Create a new table with the required columns
     plpy.execute('CREATE TABLE "{schema}".{table_name} ( '
-        'cartodb_id int, the_geom geometry, {columns_with_types} '
+        'cartodb_id int, the_geom public.geometry, {columns_with_types} '
         ');'
         .format(schema=user_schema, table_name=output_table_name, columns_with_types=columns_with_types)
         )
@@ -200,7 +204,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_client.__DST_PopulateTableOBS_GetMea
         'INSERT INTO "{schema}".{analysis_table_name} '
         'SELECT ut.cartodb_id, ut.the_geom, {colname_list} '
         'FROM "{schema}".{table_name} ut '
-        'LEFT JOIN _DST_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, '
+        'LEFT JOIN cdb_dataservices_client._DST_FetchJoinFdwTableData({username}::text, {orgname}::text, {server_schema}::text, {server_table_name}::text, '
         '{function_name}::text, {params}::json) '
         'AS result ({columns_with_types}, cartodb_id int)  '
         'ON result.cartodb_id = ut.cartodb_id;' .format(
