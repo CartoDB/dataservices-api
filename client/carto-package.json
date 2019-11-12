@@ -7,7 +7,6 @@
       "carto_postgresql_ext": "^0.32.0"
     },
     "works_with": {
-      "dataservices-api-server-extension": "^0.35.1"
     }
   }
 }
