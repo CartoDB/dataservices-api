@@ -2,9 +2,9 @@
   "name": "dataservices-api-client-extension",
   "current_version": {
     "requires": {
-      "postgresql": "^10.0.0",
-      "postgis": "^2.4.0.0",
-      "carto_postgresql_ext": "^0.23.0"
+      "postgresql": "^11.0.0",
+      "postgis": "^2.5.0.0",
+      "carto_postgresql_ext": "^0.32.0"
     },
     "works_with": {
       "dataservices-api-server-extension": "^0.35.1"
