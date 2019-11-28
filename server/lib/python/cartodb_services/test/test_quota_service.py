@@ -114,6 +114,23 @@ class TestQuotaService(TestCase):
         qs.increment_success_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
+    def test_should_check_user_google_geocoder_quota_correctly(self):
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 provider='google')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is True  # We don't check quota for google geocoder
+
+    def test_should_check_org_google_geocoder_quota_correctly(self):
+        qs = self.__build_geocoder_quota_service('test_user',
+                                                 orgname='testorg',
+                                                 provider='google')
+        qs.increment_success_service_use()
+        assert qs.check_user_quota() is True
+        qs.increment_success_service_use(amount=1500000)
+        assert qs.check_user_quota() is True  # We don't check quota for google geocoder
+
     def test_should_check_user_mapzen_routing_quota_correctly(self):
         qs = self.__build_routing_quota_service('test_user', provider='mapzen')
         qs.increment_success_service_use()

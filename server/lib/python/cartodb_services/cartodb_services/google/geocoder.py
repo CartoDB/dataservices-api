@@ -38,12 +38,12 @@ MATCH_TYPE_BY_MATCH_LEVEL = {
 class GoogleMapsGeocoder():
 
     def __init__(self, client_id, client_secret, logger):
-        if client_id is None:
+        self._logger = logger
+        if client_id is None and client_secret is None:
             raise InvalidGoogleCredentials
         self.client_id, self.channel = self.parse_client_id(client_id)
         self.client_secret = client_secret
         self.geocoder = GoogleMapsClientFactory.get(self.client_id, self.client_secret, self.channel)
-        self._logger = logger
 
     def geocode(self, searchtext, city=None, state=None, country=None):
         return self.geocode_meta(searchtext, city, state, country)[0]
@@ -100,6 +100,9 @@ class GoogleMapsGeocoder():
         return optional_params
 
     def parse_client_id(self, client_id):
+        if not client_id:
+            return None, None
+
         arguments = parse_qs(client_id)
         client = arguments['client'][0] if arguments.has_key('client') else client_id
         channel = arguments['channel'][0] if arguments.has_key('channel') else None
