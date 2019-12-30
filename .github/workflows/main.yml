@@ -18,12 +18,14 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - run: cd server
     - run: pip install -r ./lib/python/cartodb_services/requirements.txt --upgrade
+      working-directory: ./server
       timeout-minutes: 30
     - run: pip install ./lib/python/cartodb_services --upgrade
+      working-directory: ./server
       timeout-minutes: 30
     - run: nosetests lib/python/cartodb_services/test
+      working-directory: ./server
       env:
          MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
          TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
