@@ -1,0 +1,30 @@
+name: dataservies-api PR testing
+on: pull_request
+jobs:
+  platform-tools:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '2.7', '3.5' ]
+    steps:
+#    - run: sudo apt install virtualenv
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - run: cd server
+    - run: pip install -r ./lib/python/cartodb_services/requirements.txt --upgrade
+      timeout-minutes: 30
+    - run: pip install ./lib/python/cartodb_services --upgrade
+      timeout-minutes: 30
+    - run: nosetests lib/python/cartodb_services/test
+      env:
+         MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
+         TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
+      timeout-minutes: 30
