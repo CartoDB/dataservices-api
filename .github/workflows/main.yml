@@ -5,9 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '2.7', '3.5' ]
+        python-version: [ '2.7' ]
     steps:
-#    - run: sudo apt install virtualenv
     - uses: actions/checkout@v1
     - uses: actions/setup-python@v1
       with:
@@ -30,3 +29,16 @@ jobs:
          MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
          TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
       timeout-minutes: 30
+
+    - run: make clean all install installcheck
+      working-directory: ./server/extension
+      env:
+          PGUSER: postgres
+      timeout-minutes: 30
+
+    - run: make clean all install installcheck
+      working-directory: ./client
+      env:
+          PGUSER: postgres
+      timeout-minutes: 30
+
