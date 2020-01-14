@@ -45,6 +45,12 @@ SELECT cartodb.cdb_conf_setconf('tomtom_conf', '{"routing": {"api_keys": ["routi
  
 (1 row)
 
+SELECT cartodb.cdb_conf_setconf('geocodio_conf', '{"geocoder": {"api_keys": ["geocoder_dummy_api_key"], "monthly_quota": 1500000}}');
+ cdb_conf_setconf 
+------------------
+ 
+(1 row)
+
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
  cdb_conf_setconf 
 ------------------
