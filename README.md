@@ -180,6 +180,15 @@ SELECT CDB_Conf_SetConf(
 );
 ```
 
+#### Geocod.io configuration
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'geocodio_conf',
+    '{"geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}}'
+);
+```
+
 #### Data Observatory
 
 ```sql
