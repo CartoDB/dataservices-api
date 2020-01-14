@@ -626,6 +626,36 @@ $$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
 -- These are the only ones with permissions to publicuser role
 -- and should also be the only ones with SECURITY DEFINER
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_geocodio_geocode_street_point (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
+RETURNS public.Geometry AS $$
+DECLARE
+  ret public.Geometry;
+  username text;
+  orgname text;
+  apikey_permissions json;
+BEGIN
+  
+  SELECT u, o, p INTO username, orgname, apikey_permissions FROM cdb_dataservices_client._cdb_entity_config() AS (u text, o text, p json);
+  IF apikey_permissions IS NULL OR NOT apikey_permissions::jsonb ? 'geocoding' THEN
+    RAISE EXCEPTION 'Geocoding permission denied' USING ERRCODE = '01007';
+  END IF;
+  
+  -- JSON value stored "" is taken as literal
+  IF username IS NULL OR username = '' OR username = '""' THEN
+    RAISE EXCEPTION 'Username is a mandatory argument, check it out';
+  END IF;
+
+  SELECT cdb_dataservices_client._cdb_geocodio_geocode_street_point(username, orgname, searchtext, city, state_province, country) INTO ret; RETURN ret;
+END;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
+    SET search_path = pg_temp;
+
+--
+-- Public dataservices API function
+--
+-- These are the only ones with permissions to publicuser role
+-- and should also be the only ones with SECURITY DEFINER
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.cdb_mapzen_geocode_street_point (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
 RETURNS public.Geometry AS $$
 DECLARE
