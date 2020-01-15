@@ -67,7 +67,7 @@ class GeocodioBulkGeocoder(GeocodioGeocoder, StreetPointBulkGeocoder):
             return results
 
     def _country_code(self, country):
-        country_iso3166 = None
+        country_iso3166 = country
         country_iso3 = country_to_iso3(country)
         if country_iso3:
             country_iso3166 = countries.get(country_iso3).alpha2.lower()

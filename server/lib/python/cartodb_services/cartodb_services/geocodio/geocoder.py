@@ -59,7 +59,8 @@ class GeocodioGeocoder(Traceable):
 
         try:
             free_text_components = [searchtext, city, state_province, country]
-            response = self._geocoder.geocode(';'.join([c for c in free_text_components if c is not None and c.strip()]))
+            req = '; '.join([c for c in free_text_components if c is not None and c.strip()])
+            response = self._geocoder.geocode(req)
 
             return self._parse_geocoder_response(response)
         except GeocodioDataError as gde:

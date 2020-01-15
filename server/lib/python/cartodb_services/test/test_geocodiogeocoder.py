@@ -7,21 +7,31 @@ from credentials import geocodio_api_key
 
 INVALID_TOKEN = 'invalid_token'
 
-VALID_ADDRESS_1 = 'Lexington Ave, New York, US'
+VALID_ADDRESS_1 = 'Lexington Ave; New York; US'
 VALID_ADDRESS_2 = 'E 14th St; New York; US'
+VALID_ADDRESS_3 = '652 Lombard Street; San Francisco; California; United States'
 
-WELL_KNOWN_LONGITUDE_1 = -74.365
-WELL_KNOWN_LATITUDE_1 = 42.240
+VALID_SEARCH_TEXT_1='Lexington Ave'
+VALID_CITY_1='New York'
+VALID_STATE_PROVINCE_1='New York'
+VALID_COUNTRY_1='US'
+
+VALID_SEARCH_TEXT_2='E 14th St'
+VALID_CITY_2='New York'
+VALID_STATE_PROVINCE_2='New York'
+VALID_COUNTRY_2='US'
+
+VALID_SEARCH_TEXT_3='652 Lombard Street'
+VALID_CITY_3='San Francisco'
+VALID_STATE_PROVINCE_3='California'
+VALID_COUNTRY_3='United States'
+
+WELL_KNOWN_LONGITUDE_1 = -73.960
+WELL_KNOWN_LATITUDE_1 = 40.774
 WELL_KNOWN_LONGITUDE_2 = -73.983
 WELL_KNOWN_LATITUDE_2 = 40.731
-
-VALID_SEARCH_TEXT='Lexington Ave'
-VALID_CITY='New York'
-VALID_STATE_PROVINCE='New York'
-VALID_COUNTRY='USA'
-
-WELL_KNOWN_LONGITUDE_COMPONENTS = -76.710
-WELL_KNOWN_LATITUDE_COMPONENTS = 39.964
+WELL_KNOWN_LONGITUDE_3 = -122.412
+WELL_KNOWN_LATITUDE_3 = 37.803207
 
 SEARCH_ID_1 = 1
 SEARCH_ID_2 = 2
@@ -39,20 +49,46 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
         with self.assertRaises(ServiceException):
             invalid_geocoder.geocode(VALID_ADDRESS_1)
 
-    def test_valid_request(self):
+    def test_valid_requests(self):
         place = self.geocoder.geocode(VALID_ADDRESS_1)
 
         self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_1)
         self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_1)
 
-    def test_valid_request_components(self):
-        place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT,
-                                      city=VALID_CITY,
-                                      state_province=VALID_STATE_PROVINCE,
-                                      country=VALID_COUNTRY)
+        place = self.geocoder.geocode(VALID_ADDRESS_2)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_COMPONENTS)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_COMPONENTS)
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_2)
+
+        place = self.geocoder.geocode(VALID_ADDRESS_3)
+
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_3)
+
+    def test_valid_request_components(self):
+        place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_1,
+                                      city=VALID_CITY_1,
+                                      state_province=VALID_STATE_PROVINCE_1,
+                                      country=VALID_COUNTRY_1)
+
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_1)
+
+        place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_2,
+                                      city=VALID_CITY_2,
+                                      state_province=VALID_STATE_PROVINCE_2,
+                                      country=VALID_COUNTRY_2)
+
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_2)
+
+        place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_3,
+                                      city=VALID_CITY_3,
+                                      state_province=VALID_STATE_PROVINCE_3,
+                                      country=VALID_COUNTRY_3)
+
+        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_namedplace(self):
         place = self.geocoder.geocode(searchtext='New York')
@@ -98,12 +134,36 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
         self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_1)
         self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_1)
 
-    def test_valid_request_components_bulk_one(self):
-        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT, VALID_CITY, VALID_STATE_PROVINCE, VALID_COUNTRY)])
+        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_ADDRESS_2, None, None, None)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_COMPONENTS)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_COMPONENTS)
+        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_2)
+
+        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_ADDRESS_3, None, None, None)])
+
+        self.assertEqual(place[0][0], SEARCH_ID_1)
+        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_3)
+
+    def test_valid_request_components_bulk_one(self):
+        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_1, VALID_CITY_1, VALID_STATE_PROVINCE_1, VALID_COUNTRY_1)])
+
+        self.assertEqual(place[0][0], SEARCH_ID_1)
+        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_1)
+
+        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_2, VALID_CITY_2, VALID_STATE_PROVINCE_2, VALID_COUNTRY_2)])
+
+        self.assertEqual(place[0][0], SEARCH_ID_1)
+        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_2)
+
+        place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_3, VALID_CITY_3, VALID_STATE_PROVINCE_3, VALID_COUNTRY_3)])
+
+        self.assertEqual(place[0][0], SEARCH_ID_1)
+        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_namedplace_bulk_one(self):
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, 'New York', None, None, None)])
@@ -156,8 +216,8 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
         self.assertEqual('%.3f' % places[1][1][1], '%.3f' % WELL_KNOWN_LATITUDE_2)
 
     def test_valid_request_components_bulk_many(self):
-        places = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT, VALID_CITY, VALID_STATE_PROVINCE, VALID_COUNTRY),
-                                                    (SEARCH_ID_2, VALID_SEARCH_TEXT, VALID_CITY, VALID_STATE_PROVINCE, VALID_COUNTRY)])
+        places = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_1, VALID_CITY_1, VALID_STATE_PROVINCE_1, VALID_COUNTRY_1),
+                                                    (SEARCH_ID_2, VALID_SEARCH_TEXT_2, VALID_CITY_2, VALID_STATE_PROVINCE_2, VALID_COUNTRY_2)])
 
         self.assertEqual(places[0][0], SEARCH_ID_1)
         self.assertEqual(places[1][0], SEARCH_ID_2)
