@@ -8,9 +8,9 @@ SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 -- HERE goes your code to upgrade/downgrade
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocodio_geocode_street_point_exception_safe (searchtext text ,city text DEFAULT NULL ,state_province text DEFAULT NULL ,country text DEFAULT NULL)
-RETURNS Geometry AS $$
+RETURNS public.Geometry AS $$
 DECLARE
-  ret Geometry;
+  ret public.Geometry;
   username text;
   orgname text;
   _returned_sqlstate TEXT;
@@ -41,7 +41,8 @@ BEGIN
          RETURN ret;
   END;
 END;
-$$ LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE;
+$$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
+    SET search_path = pg_temp;
 
 DROP FUNCTION IF EXISTS cdb_dataservices_client._cdb_geocodio_geocode_street_point (username text, orgname text, searchtext text, city text, state_province text, country text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._cdb_geocodio_geocode_street_point (username text, orgname text, searchtext text, city text DEFAULT NULL, state_province text DEFAULT NULL, country text DEFAULT NULL)
