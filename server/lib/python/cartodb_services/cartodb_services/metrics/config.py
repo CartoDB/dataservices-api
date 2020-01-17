@@ -224,6 +224,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
+    MAPBOX_ISO_PROVIDER = 'mapbox'
     TOMTOM_PROVIDER = 'tomtom'
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = MAPBOX_PROVIDER
@@ -258,6 +259,9 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapbox_matrix_api_keys = self._db_config.mapbox_matrix_api_keys
             self._mapbox_matrix_service_params = db_config.mapbox_matrix_service_params
             self._mapbox_isochrones_service_params = db_config.mapbox_isochrones_service_params
+        elif self._isolines_provider == self.MAPBOX_ISO_PROVIDER:
+            self._mapbox_iso_isolines_api_keys = self._db_config.mapbox_iso_isolines_api_keys
+            self._mapbox_iso_isolines_service_params = db_config.mapbox_iso_isolines_service_params
         elif self._isolines_provider == self.TOMTOM_PROVIDER:
             self._tomtom_isolinesx_api_keys = self._db_config.tomtom_isolines_api_keys
             self._tomtom_isolines_service_params = db_config.tomtom_isolines_service_params
@@ -270,6 +274,8 @@ class IsolinesRoutingConfig(ServiceConfig):
             return 'mapzen_isolines'
         elif self._isolines_provider == self.MAPBOX_PROVIDER:
             return 'mapbox_isolines'
+        elif self._isolines_provider == self.MAPBOX_ISO_PROVIDER:
+            return 'mapbox_iso_isolines'
         elif self._isolines_provider == self.TOMTOM_PROVIDER:
             return 'tomtom_isolines'
 
@@ -332,6 +338,18 @@ class IsolinesRoutingConfig(ServiceConfig):
     @property
     def mapbox_provider(self):
         return self._isolines_provider == self.MAPBOX_PROVIDER
+
+    @property
+    def mapbox_iso_isolines_api_keys(self):
+        return self._mapbox_iso_isolines_api_keys
+
+    @property
+    def mapbox_iso_isolines_service_params(self):
+        return self._mapbox_iso_isolines_service_params
+
+    @property
+    def mapbox_iso_provider(self):
+        return self._isolines_provider == self.MAPBOX_ISO_PROVIDER
 
     @property
     def tomtom_isolines_api_keys(self):
@@ -599,6 +617,7 @@ class ServicesDBConfig:
         self._get_here_config()
         self._get_mapzen_config()
         self._get_mapbox_config()
+        self._get_mapbox_iso_config()
         self._get_tomtom_config()
         self._get_data_observatory_config()
 
@@ -662,6 +681,16 @@ class ServicesDBConfig:
         self._mapbox_geocoder_api_keys = mapbox_conf['geocoder']['api_keys']
         self._mapbox_geocoder_quota = mapbox_conf['geocoder']['monthly_quota']
         self._mapbox_geocoder_service_params = mapbox_conf['geocoder'].get('service', {})
+
+    def _get_mapbox_iso_config(self):
+        mapbox_iso_conf_json = self._get_conf('mapbox_iso_conf')
+        if not mapbox_iso_conf_json:
+            raise ConfigException('Mapbox True Isochrones configuration missing')
+
+        mapbox_iso_conf = json.loads(mapbox_iso_conf_json)
+        self._mapbox_iso_isolines_api_keys = mapbox_conf['isolines']['api_keys']
+        self._mapbox_iso_isolines_quota = tomtom_conf['isolines']['monthly_quota']
+        self._mapbox_iso_isolines_service_params = tomtom_conf.get('isolines', {}).get('service', {})
 
     def _get_tomtom_config(self):
         tomtom_conf_json = self._get_conf('tomtom_conf')
@@ -811,6 +840,18 @@ class ServicesDBConfig:
     @property
     def mapbox_geocoder_service_params(self):
         return self._mapbox_geocoder_service_params
+
+    @property
+    def mapbox_iso_isolines_api_keys(self):
+        return self._mapbox_iso_isolines_api_keys
+
+    @property
+    def mapbox_iso_isolines_monthly_quota(self):
+        return self._mapbox_iso_isolines_quota
+
+    @property
+    def mapbox_iso_isolines_service_params(self):
+        return self._mapbox_iso_isolines_service_params
 
     @property
     def tomtom_isolines_api_keys(self):

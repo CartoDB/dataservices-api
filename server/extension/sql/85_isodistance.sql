@@ -26,6 +26,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     elif user_isolines_config.mapbox_provider:
       mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapbox_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.mapbox_iso_provider:
+      mapbox_iso_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapbox_iso_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(mapbox_iso_plan, [username, orgname, source, mode, range, options])
     elif user_isolines_config.tomtom_provider:
       tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_tomtom_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
@@ -72,6 +75,20 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
   mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+
+  return result
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+
+-- mapbox true isodistance
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_iso_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  mapbox_iso_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_iso_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapbox_iso_plan, [username, orgname, source, mode, range, options])
 
   return result
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

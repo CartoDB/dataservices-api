@@ -22,6 +22,7 @@ class UserMetricsService:
     SERVICE_HERE_ISOLINES = 'here_isolines'
     SERVICE_MAPZEN_ISOLINES = 'mapzen_isolines'
     SERVICE_MAPBOX_ISOLINES = 'mapbox_isolines'
+    SERVICE_MAPBOX_ISO_ISOLINES = 'mapbox_iso_isolines'
     SERVICE_TOMTOM_ISOLINES = 'tomtom_isolines'
     SERVICE_MAPZEN_ROUTING = 'routing_mapzen'
     SERVICE_MAPBOX_ROUTING = 'routing_mapbox'
@@ -39,6 +40,7 @@ class UserMetricsService:
         if service_type in [self.SERVICE_HERE_ISOLINES,
                             self.SERVICE_MAPZEN_ISOLINES,
                             self.SERVICE_MAPBOX_ISOLINES,
+                            self.SERVICE_MAPBOX_ISO_ISOLINES,
                             self.SERVICE_TOMTOM_ISOLINES]:
             return self.__used_isolines_quota(service_type, date)
         elif service_type in [self.SERVICE_MAPZEN_ROUTING,
