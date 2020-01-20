@@ -1,3 +1,12 @@
+Jan 20th, 2020
+==============
+* Version `0.22.0` of the Python library
+    * Added geocodio geocoder
+* Version `0.36.0` of the server extension
+    * Added geocodio geocoder
+* Version `0.28.0` of the client extension
+    * Added geocodio geocoder
+
 Oct 9th, 2019
 ==============
 * Version `0.27.0` of the client extension
