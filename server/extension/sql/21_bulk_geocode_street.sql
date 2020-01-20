@@ -32,6 +32,8 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
       provider_function = "_cdb_bulk_tomtom_geocode_street_point";
     elif user_geocoder_config.mapbox_geocoder:
       provider_function = "_cdb_bulk_mapbox_geocode_street_point";
+    elif user_geocoder_config.geocodio_geocoder:
+      provider_function = "_cdb_bulk_geocodio_geocode_street_point";
     else:
       raise Exception('Requested geocoder is not available')
 
@@ -96,3 +98,19 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocodio_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.refactor.service.geocodio_geocoder_config import GeocodioGeocoderConfigBuilder
+  from cartodb_services.geocodio import GeocodioBulkGeocoder
+  from cartodb_services.tools import Logger
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  service_manager = ServiceManager('geocoder', GeocodioGeocoderConfigBuilder, username, orgname, GD)
+  geocoder = GeocodioBulkGeocoder(service_manager.config.geocodio_api_key, service_manager.logger, service_manager.config.service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
