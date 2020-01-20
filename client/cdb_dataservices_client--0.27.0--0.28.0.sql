@@ -80,3 +80,4 @@ $$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.cdb_geocodio_geocode_street_point(searchtext text, city text, state_province text, country text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._cdb_geocodio_geocode_street_point_exception_safe(searchtext text, city text, state_province text, country text )  TO publicuser;
+
