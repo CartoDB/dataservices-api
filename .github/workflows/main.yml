@@ -45,7 +45,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Run client tests
-        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "cd /dataservices-api/client/ && sudo make clean all install installcheck"
         env:
             PGUSER: postgres
         timeout-minutes: 5
