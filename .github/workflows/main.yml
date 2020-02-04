@@ -1,8 +1,13 @@
 name: dataservices-api PR testing
 on: push
 jobs:
-  dataservices-api-pg10:
+  dataservices-api:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pg_version: [10, 12]
+    env:
+        PG_VERSION: ${{ matrix.pg_version }}
     steps:
       - uses: actions/checkout@v1
 
@@ -12,7 +17,7 @@ jobs:
           service_account_key: ${{ secrets.GCS }}
 
       - name: Pull base image
-        run: gcloud auth configure-docker && docker pull gcr.io/cartodb-on-gcp-ci-testing/cartodb-postgresql-base:10
+        run: gcloud auth configure-docker && docker pull gcr.io/cartodb-on-gcp-ci-testing/cartodb-postgresql-base:${{ matrix.pg_version }}
 
       - name: Checkout ci tools repository
         uses: actions/checkout@v2
@@ -25,13 +30,13 @@ jobs:
         run: cp ci-tools/repos/${{ github.event.repository.name }}/* .
 
       - name: Start docker-compose services
-        run: docker-compose -f docker-compose-pg10.yaml up -d
+        run: docker-compose -f docker-compose.yaml up -d
 
       - name: Install required python libs
-        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && pip install -U -r ./lib/python/cartodb_services/requirements.txt && pip install -U ./lib/python/cartodb_services"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && pip install -U -r ./lib/python/cartodb_services/requirements.txt && pip install -U ./lib/python/cartodb_services"
 
       - name: Run python library tests
-        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && MAPBOX_API_KEY=$MAPBOX_API_KEY TOMTOM_API_KEY=$TOMTOM_API_KEY GEOCODIO_API_KEY=$GEOCODIO_API_KEY nosetests lib/python/cartodb_services/test"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && MAPBOX_API_KEY=$MAPBOX_API_KEY TOMTOM_API_KEY=$TOMTOM_API_KEY GEOCODIO_API_KEY=$GEOCODIO_API_KEY nosetests lib/python/cartodb_services/test"
         env:
            MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
            TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
@@ -39,9 +44,9 @@ jobs:
         timeout-minutes: 5
 
       - name: Run server tests
-        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck"
         timeout-minutes: 5
 
       - name: Run client tests
-        run: docker-compose -f docker-compose-pg10.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
         timeout-minutes: 5
