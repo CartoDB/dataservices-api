@@ -5,7 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        PG_VERSION: [10, 12]
+        pg_version: [10, 12]
+    env:
+        PG_VERSION: ${{ matrix.pg_version }}
     steps:
       - uses: actions/checkout@v1
 
@@ -15,7 +17,7 @@ jobs:
           service_account_key: ${{ secrets.GCS }}
 
       - name: Pull base image
-        run: gcloud auth configure-docker && docker pull gcr.io/cartodb-on-gcp-ci-testing/cartodb-postgresql-base:${{PG_VERSION}}
+        run: gcloud auth configure-docker && docker pull gcr.io/cartodb-on-gcp-ci-testing/cartodb-postgresql-base:${{ matrix.pg_version }}
 
       - name: Checkout ci tools repository
         uses: actions/checkout@v2
