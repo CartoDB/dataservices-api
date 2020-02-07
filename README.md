@@ -171,6 +171,15 @@ SELECT CDB_Conf_SetConf(
 );
 ```
 
+#### Mapbox true isolines configuration
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'mapbox_iso_conf',
+    '{"isolines": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
+);
+```
+
 #### TomTom configuration
 
 ```sql
