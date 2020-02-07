@@ -423,6 +423,8 @@ class GeocoderConfig(ServiceConfig):
     MAPBOX_GEOCODER_API_KEYS = 'mapbox_geocoder_api_keys'
     TOMTOM_GEOCODER = 'tomtom'
     TOMTOM_GEOCODER_API_KEYS = 'tomtom_geocoder_api_keys'
+    GEOCODIO_GEOCODER = 'geocodio'
+    GEOCODIO_GEOCODER_API_KEYS = 'geocodio_geocoder_api_keys'
     QUOTA_KEY = 'geocoding_quota'
     SOFT_LIMIT_KEY = 'soft_geocoding_limit'
     USERNAME_KEY = 'username'
@@ -455,6 +457,9 @@ class GeocoderConfig(ServiceConfig):
         elif self._geocoder_provider == self.TOMTOM_GEOCODER:
             if not self.tomtom_api_keys:
                 raise ConfigException("""TomTom config is not set up""")
+        elif self._geocoder_provider == self.GEOCODIO_GEOCODER:
+            if not self.geocodio_api_keys:
+                raise ConfigException("""Geocodio config is not set up""")
 
         return True
 
@@ -494,6 +499,10 @@ class GeocoderConfig(ServiceConfig):
             self._tomtom_api_keys = db_config.tomtom_geocoder_api_keys
             self._cost_per_hit = 0
             self._tomtom_service_params = db_config.tomtom_geocoder_service_params
+        elif self._geocoder_provider == self.GEOCODIO_GEOCODER:
+            self._geocodio_api_keys = db_config.geocodio_geocoder_api_keys
+            self._cost_per_hit = 0
+            self._geocodio_service_params = db_config.geocodio_geocoder_service_params
 
     @property
     def service_type(self):
@@ -507,6 +516,8 @@ class GeocoderConfig(ServiceConfig):
             return 'geocoder_tomtom'
         elif self._geocoder_provider == self.NOKIA_GEOCODER:
             return 'geocoder_here'
+        elif self._geocoder_provider == self.GEOCODIO_GEOCODER:
+            return 'geocoder_geocodio'
 
     @property
     def heremaps_geocoder(self):
@@ -527,6 +538,10 @@ class GeocoderConfig(ServiceConfig):
     @property
     def tomtom_geocoder(self):
         return self._geocoder_provider == self.TOMTOM_GEOCODER
+
+    @property
+    def geocodio_geocoder(self):
+        return self._geocoder_provider == self.GEOCODIO_GEOCODER
 
     @property
     def google_client_id(self):
@@ -588,6 +603,14 @@ class GeocoderConfig(ServiceConfig):
         return self._tomtom_service_params
 
     @property
+    def geocodio_api_keys(self):
+        return self._geocodio_api_keys
+
+    @property
+    def geocodio_service_params(self):
+        return self._geocodio_service_params
+
+    @property
     def is_high_resolution(self):
         return True
 
@@ -619,6 +642,7 @@ class ServicesDBConfig:
         self._get_mapbox_config()
         self._get_mapbox_iso_config()
         self._get_tomtom_config()
+        self._get_geocodio_config()
         self._get_data_observatory_config()
 
     def _get_server_config(self):
@@ -707,6 +731,16 @@ class ServicesDBConfig:
             self._tomtom_geocoder_api_keys = tomtom_conf['geocoder']['api_keys']
             self._tomtom_geocoder_quota = tomtom_conf['geocoder']['monthly_quota']
             self._tomtom_geocoder_service_params = tomtom_conf['geocoder'].get('service', {})
+
+    def _get_geocodio_config(self):
+        geocodio_conf_json = self._get_conf('geocodio_conf')
+        if not geocodio_conf_json:
+            raise ConfigException('Geocodio configuration missing')
+        else:
+            geocodio_conf = json.loads(geocodio_conf_json)
+            self._geocodio_geocoder_api_keys = geocodio_conf['geocoder']['api_keys']
+            self._geocodio_geocoder_quota = geocodio_conf['geocoder']['monthly_quota']
+            self._geocodio_geocoder_service_params = geocodio_conf['geocoder'].get('service', {})
 
     def _get_data_observatory_config(self):
         do_conf_json = self._get_conf('data_observatory_conf')
@@ -888,6 +922,18 @@ class ServicesDBConfig:
     @property
     def tomtom_geocoder_service_params(self):
         return self._tomtom_geocoder_service_params
+
+    @property
+    def geocodio_geocoder_api_keys(self):
+        return self._geocodio_geocoder_api_keys
+
+    @property
+    def geocodio_geocoder_monthly_quota(self):
+        return self.geocodio_geocoder_quota
+
+    @property
+    def geocodio_geocoder_service_params(self):
+        return self._geocodio_geocoder_service_params
 
     @property
     def data_observatory_connection_str(self):

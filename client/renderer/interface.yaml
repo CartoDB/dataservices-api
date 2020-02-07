@@ -160,6 +160,17 @@
     - { name: state_province,  type: text, default: 'NULL'}
     - { name: country,  type: text, default: 'NULL'}
 
+- name: cdb_geocodio_geocode_street_point
+  return_type: public.Geometry
+  requires_permission: true
+  permission_name: geocoding
+  permission_error: Geocoding permission denied
+  params:
+    - { name: searchtext,  type: text}
+    - { name: city,  type: text, default: 'NULL'}
+    - { name: state_province,  type: text, default: 'NULL'}
+    - { name: country,  type: text, default: 'NULL'}
+
 - name: cdb_mapzen_geocode_street_point
   return_type: public.Geometry
   requires_permission: true

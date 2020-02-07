@@ -79,6 +79,7 @@ def plpy_mock_config():
     plpy_mock._define_result("CDB_Conf_GetConf\('mapbox_conf'\)", [{'conf': '{"routing": {"api_keys": ["api_key_rou"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}, "matrix": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('mapbox_iso_conf'\)", [{'conf': '{"isolines": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('tomtom_conf'\)", [{'conf': '{"routing": {"api_keys": ["api_key_rou"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}, "isolines": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
+    plpy_mock._define_result("CDB_Conf_GetConf\('geocodio_conf'\)", [{'conf': '{"geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('logger_conf'\)", [{'conf': '{"geocoder_log_path": "/dev/null"}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('data_observatory_conf'\)", [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('server_conf'\)", [{'conf': '{"environment": "testing"}'}])

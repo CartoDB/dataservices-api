@@ -7,7 +7,7 @@ from cartodb_services.metrics.config import *
 
 class TestGeocoderUserConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'geocodio', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -30,6 +30,9 @@ class TestGeocoderUserConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'tomtom':
                 assert geocoder_config.tomtom_geocoder is True
+                assert geocoder_config.geocoding_quota == 100
+            elif geocoder_provider == 'geocodio':
+                assert geocoder_config.geocodio_geocoder is True
                 assert geocoder_config.geocoding_quota == 100
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
@@ -84,7 +87,7 @@ class TestGeocoderUserConfig(TestCase):
 
 class TestGeocoderOrgConfig(TestCase):
 
-    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'google']
+    GEOCODER_PROVIDERS = ['heremaps', 'mapzen', 'mapbox', 'tomtom', 'geocodio', 'google']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -112,6 +115,9 @@ class TestGeocoderOrgConfig(TestCase):
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'tomtom':
                 assert geocoder_config.tomtom_geocoder is True
+                assert geocoder_config.geocoding_quota == 200
+            elif geocoder_provider == 'geocodio':
+                assert geocoder_config.geocodio_geocoder is True
                 assert geocoder_config.geocoding_quota == 200
             elif geocoder_provider == 'google':
                 assert geocoder_config.google_geocoder is True
