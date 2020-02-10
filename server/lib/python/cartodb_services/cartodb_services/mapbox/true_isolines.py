@@ -19,7 +19,7 @@ MAX_TIME_RANGE = 60 * 60  # The maximum time that can be specified is 60 minutes
 MAX_SPEEDS = {
     PROFILE_WALKING: 3.3333333,  # In m/s, assuming 12km/h walking speed
     PROFILE_CYCLING: 16.67,  # In m/s, assuming 60km/h max speed
-    PROFILE_DRIVING: 41.67  # In m/s, assuming 140km/h max speed
+    PROFILE_DRIVING: 38.89  # In m/s, assuming 140km/h max speed
 }
 
 VALID_PROFILES = [PROFILE_DRIVING,
