@@ -224,7 +224,7 @@ class IsolinesRoutingConfig(ServiceConfig):
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     MAPZEN_PROVIDER = 'mapzen'
     MAPBOX_PROVIDER = 'mapbox'
-    MAPBOX_ISO_PROVIDER = 'mapbox'
+    MAPBOX_ISO_PROVIDER = 'mapbox_iso'
     TOMTOM_PROVIDER = 'tomtom'
     HEREMAPS_PROVIDER = 'heremaps'
     DEFAULT_PROVIDER = MAPBOX_PROVIDER
