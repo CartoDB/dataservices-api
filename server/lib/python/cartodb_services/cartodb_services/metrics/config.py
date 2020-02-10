@@ -712,9 +712,9 @@ class ServicesDBConfig:
             raise ConfigException('Mapbox True Isochrones configuration missing')
 
         mapbox_iso_conf = json.loads(mapbox_iso_conf_json)
-        self._mapbox_iso_isolines_api_keys = mapbox_conf['isolines']['api_keys']
-        self._mapbox_iso_isolines_quota = tomtom_conf['isolines']['monthly_quota']
-        self._mapbox_iso_isolines_service_params = tomtom_conf.get('isolines', {}).get('service', {})
+        self._mapbox_iso_isolines_api_keys = mapbox_iso_conf['isolines']['api_keys']
+        self._mapbox_iso_isolines_quota = mapbox_iso_conf['isolines']['monthly_quota']
+        self._mapbox_iso_isolines_service_params = mapbox_iso_conf.get('isolines', {}).get('service', {})
 
     def _get_tomtom_config(self):
         tomtom_conf_json = self._get_conf('tomtom_conf')
