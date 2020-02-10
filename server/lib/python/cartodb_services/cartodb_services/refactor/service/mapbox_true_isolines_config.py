@@ -1,6 +1,6 @@
 from dateutil.parser import parse as date_parse
 from cartodb_services.refactor.service.utils import round_robin
-from cartodb_services.mapbox.types import MAPBOX_ISOLINES_APIKEY_ROUNDROBIN
+from cartodb_services.mapbox.types import MAPBOX_ISO_ISOLINES_APIKEY_ROUNDROBIN
 
 
 class MapboxTrueIsolinesConfig(object):
