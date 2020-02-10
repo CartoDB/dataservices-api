@@ -25,6 +25,7 @@ VALID_PROFILES = [PROFILE_DRIVING,
 
 ENTRY_FEATURES = 'features'
 ENTRY_GEOMETRY = 'geometry'
+ENTRY_COORDINATES = 'coordinates'
 
 
 class MapboxTrueIsolines():
@@ -53,7 +54,8 @@ class MapboxTrueIsolines():
                                      [x for x in VALID_PROFILES])))
 
     def _parse_coordinates(self, boundary):
-        return [Coordinate(c[0], c[1]) for c in boundary]
+        coordinates = boundary.get(ENTRY_COORDINATES, [])
+        return [Coordinate(c[0], c[1]) for c in coordinates]
 
     def _parse_isochrone_service(self, response):
         json_response = json.loads(response)
@@ -82,7 +84,6 @@ class MapboxTrueIsolines():
 
             if response.status_code == requests.codes.ok:
                 isolines = []
-
                 coordinates = self._parse_isochrone_service(response.text)
                 for t, c in zip(time_ranges, coordinates):
                     isolines.append(MapboxTrueIsochronesResponse(c, t))
