@@ -13,6 +13,9 @@ PROFILE_CYCLING = 'cycling'
 PROFILE_WALKING = 'walking'
 DEFAULT_PROFILE = PROFILE_DRIVING
 
+MAX_TIME_RANGE = 60 * 60  # The maximum time that can be specified is 60 minutes.
+                          # https://docs.mapbox.com/api/navigation/#retrieve-isochrones-around-a-location
+
 MAX_SPEEDS = {
     PROFILE_WALKING: 3.3333333,  # In m/s, assuming 12km/h walking speed
     PROFILE_CYCLING: 16.67,  # In m/s, assuming 60km/h max speed
@@ -53,6 +56,12 @@ class MapboxTrueIsolines():
                                  valid_profiles=', '.join(
                                      [x for x in VALID_PROFILES])))
 
+    def _validate_time_ranges(self, time_ranges):
+        for time_range in time_ranges:
+            if time_range > MAX_TIME_RANGE:
+                raise ValueError('Cannot query time ranges greater than {max_time_range} seconds'.format(
+                                    max_time_range=MAX_TIME_RANGE))
+
     def _parse_coordinates(self, boundary):
         coordinates = boundary.get(ENTRY_COORDINATES, [])
         return [Coordinate(c[0], c[1]) for c in coordinates]
@@ -71,6 +80,8 @@ class MapboxTrueIsolines():
     @qps_retry(qps=5, provider='mapbox_iso')
     def _calculate_isoline(self, origin, time_ranges,
                            profile=DEFAULT_PROFILE):
+        self._validate_time_ranges(time_ranges)
+
         origin = '{lon},{lat}'.format(lat=origin.latitude,
                                       lon=origin.longitude)
 
