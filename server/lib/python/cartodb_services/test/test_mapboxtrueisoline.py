@@ -14,6 +14,15 @@ class MapboxTrueIsolinesTestCase(unittest.TestCase):
         self.mapbox_isolines = MapboxTrueIsolines(apikey=mapbox_api_key(),
                                                   logger=Mock())
 
+    def test_invalid_time_range(self):
+        time_ranges = [4000]
+
+        with self.assertRaises(ValueError):
+            solution = self.mapbox_isolines.calculate_isochrone(
+                origin=VALID_ORIGIN,
+                profile=DEFAULT_PROFILE,
+                time_ranges=time_ranges)
+
     def test_calculate_isochrone(self):
         time_ranges = [300, 900]
         solution = self.mapbox_isolines.calculate_isochrone(
