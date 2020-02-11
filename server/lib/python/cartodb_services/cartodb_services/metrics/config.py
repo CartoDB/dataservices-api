@@ -255,7 +255,7 @@ class IsolinesRoutingConfig(ServiceConfig):
             self._mapzen_matrix_service_params = db_config.mapzen_matrix_service_params
             self._mapzen_isochrones_service_params = db_config.mapzen_isochrones_service_params
         elif self._isolines_provider == self.MAPBOX_PROVIDER:
-            self._mapbox_matrix_api_key = self._db_config.mapbox_matrix_api_key
+            self._mapbox_matrix_api_keys = self._db_config.mapbox_matrix_api_keys
             self._mapbox_matrix_service_params = db_config.mapbox_matrix_service_params
             self._mapbox_isochrones_service_params = db_config.mapbox_isochrones_service_params
         elif self._isolines_provider == self.TOMTOM_PROVIDER:
@@ -318,8 +318,8 @@ class IsolinesRoutingConfig(ServiceConfig):
         return self._isolines_provider == self.MAPZEN_PROVIDER
 
     @property
-    def mapbox_matrix_api_key(self):
-        return self._mapbox_matrix_api_key
+    def mapbox_matrix_api_keys(self):
+        return self._mapbox_matrix_api_keys
 
     @property
     def mapbox_matrix_service_params(self):
@@ -679,7 +679,7 @@ class ServicesDBConfig:
 
         # Note: We are no longer using the Matrix API but we have avoided renaming the `matrix` parameter
         # to `isolines` to ensure retrocompatibility
-        self._mapbox_matrix_api_key = mapbox_conf['matrix']['api_key']
+        self._mapbox_matrix_api_keys = mapbox_conf['matrix']['api_keys']
         self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
         self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})
         self._mapbox_isochrones_service_params = mapbox_conf.get('isochrones', {}).get('service', {})
