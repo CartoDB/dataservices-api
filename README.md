@@ -167,16 +167,7 @@ SELECT CDB_Conf_SetConf(
 ```sql
 SELECT CDB_Conf_SetConf(
     'mapbox_conf',
-    '{"routing": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "matrix": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
-);
-```
-
-#### Mapbox true isolines configuration
-
-```sql
-SELECT CDB_Conf_SetConf(
-    'mapbox_iso_conf',
-    '{"isolines": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
+    '{"routing": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}, "isolines": {"api_keys": ["your_api_key"], "monthly_quota": 1500000}}'
 );
 ```
 
