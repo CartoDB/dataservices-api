@@ -22,9 +22,9 @@ MAX_SPEEDS = {
     PROFILE_DRIVING: 38.89  # In m/s, assuming 140km/h max speed
 }
 
-VALID_PROFILES = [PROFILE_DRIVING,
+VALID_PROFILES = (PROFILE_DRIVING,
                   PROFILE_CYCLING,
-                  PROFILE_WALKING]
+                  PROFILE_WALKING)
 
 ENTRY_FEATURES = 'features'
 ENTRY_GEOMETRY = 'geometry'

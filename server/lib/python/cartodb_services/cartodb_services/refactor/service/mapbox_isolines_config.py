@@ -92,8 +92,11 @@ class MapboxIsolinesConfigBuilder(object):
 
     def get(self):
         mapbox_server_conf = self._server_conf.get('mapbox_conf')
-        mapbox_api_keys = mapbox_server_conf['isolines']['api_keys']
-        mapbox_service_params = mapbox_server_conf['isolines'].get('service', {})
+
+        # Note: We are no longer using the Matrix API but we have avoided renaming the `matrix` parameter
+        # to `isolines` to ensure retrocompatibility
+        mapbox_api_keys = mapbox_server_conf['matrix']['api_keys']
+        mapbox_service_params = mapbox_server_conf['matrix'].get('service', {})
 
         isolines_quota = self._get_quota()
         soft_isolines_limit = self._user_conf.get('soft_here_isolines_limit').lower() == 'true'
