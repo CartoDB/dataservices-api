@@ -178,23 +178,6 @@ class TestQuotaService(TestCase):
         qs.increment_isolines_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
-    def test_should_check_user_mapbox_iso_isolines_quota_correctly(self):
-        qs = self.__build_isolines_quota_service('test_user',
-                                                 provider='mapbox_iso')
-        qs.increment_isolines_service_use()
-        assert qs.check_user_quota() is True
-        qs.increment_isolines_service_use(amount=1500000)
-        assert qs.check_user_quota() is False
-
-    def test_should_check_org_mapbox_iso_isolines_quota_correctly(self):
-        qs = self.__build_isolines_quota_service('test_user',
-                                                 provider='mapbox_iso',
-                                                 orgname='testorg')
-        qs.increment_isolines_service_use()
-        assert qs.check_user_quota() is True
-        qs.increment_isolines_service_use(amount=1500000)
-        assert qs.check_user_quota() is False
-
     # Quick workaround so we don't take into account numer of credits
     # spent for users that have defined the quota.
     # See https://github.com/CartoDB/bigmetadata/issues/215

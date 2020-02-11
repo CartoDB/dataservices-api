@@ -180,7 +180,7 @@ class TestGeocoderOrgConfig(TestCase):
 
 class TestIsolinesUserConfig(TestCase):
     # Don't test mapbox. See CartoDB/cartodb-management/issues/5199"
-    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom', 'mapbox_iso']
+    ISOLINES_PROVIDERS = ['heremaps', 'mapzen', 'tomtom']
 
     def setUp(self):
         self.redis_conn = MockRedis()
@@ -196,8 +196,6 @@ class TestIsolinesUserConfig(TestCase):
                 assert isolines_config.service_type is 'mapzen_isolines'
             elif isolines_provider is 'mapbox':
                 assert isolines_config.service_type is 'mapbox_isolines'
-            elif isolines_provider is 'mapbox_iso':
-                assert isolines_config.service_type is 'mapbox_iso_isolines'
             elif isolines_provider is 'tomtom':
                 assert isolines_config.service_type is 'tomtom_isolines'
             else:

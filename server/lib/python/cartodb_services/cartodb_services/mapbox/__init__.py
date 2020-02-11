@@ -2,5 +2,3 @@ from routing import MapboxRouting, MapboxRoutingResponse
 from geocoder import MapboxGeocoder
 from bulk_geocoder import MapboxBulkGeocoder
 from isolines import MapboxIsolines, MapboxIsochronesResponse
-from true_isolines import MapboxTrueIsolines, MapboxTrueIsochronesResponse
-from matrix_client import MapboxMatrixClient
