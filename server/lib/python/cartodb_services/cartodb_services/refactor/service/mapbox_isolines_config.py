@@ -92,6 +92,9 @@ class MapboxIsolinesConfigBuilder(object):
 
     def get(self):
         mapbox_server_conf = self._server_conf.get('mapbox_conf')
+
+        # Note: We are no longer using the Matrix API but we have avoided renaming the `matrix` parameter
+        # to `isolines` to ensure retrocompatibility
         mapbox_api_keys = mapbox_server_conf['matrix']['api_keys']
         mapbox_service_params = mapbox_server_conf['matrix'].get('service', {})
 

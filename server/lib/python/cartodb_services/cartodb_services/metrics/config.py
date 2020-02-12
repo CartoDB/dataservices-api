@@ -676,6 +676,9 @@ class ServicesDBConfig:
             raise ConfigException('Mapbox configuration missing')
 
         mapbox_conf = json.loads(mapbox_conf_json)
+
+        # Note: We are no longer using the Matrix API but we have avoided renaming the `matrix` parameter
+        # to `isolines` to ensure retrocompatibility
         self._mapbox_matrix_api_keys = mapbox_conf['matrix']['api_keys']
         self._mapbox_matrix_quota = mapbox_conf['matrix']['monthly_quota']
         self._mapbox_matrix_service_params = mapbox_conf['matrix'].get('service', {})

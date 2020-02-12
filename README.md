@@ -40,6 +40,7 @@ Steps to deploy a new Data Services API version :
     # in dataservices-api repo root path:
     cd server/lib/python/cartodb_services && sudo pip install -r requirements.txt && sudo pip install . --upgrade
     ```
+    **CLOUD DEPLOY NOTE**: we were not installing automatically `requirements.txt`, so we fixed it in https://github.com/CartoDB/cartodb-platform/pull/6187 . Please, be aware that in some corner cases scenarios, rolling back to a previous version might require to manually force-install some dependency versions that were upgraded previously in this step.
 
 - Create a database to hold all the server part and a user for it
 
