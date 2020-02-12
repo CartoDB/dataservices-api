@@ -132,7 +132,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.tools import ServiceManager
-  from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
+  from cartodb_services.mapbox import MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
@@ -144,8 +144,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
-    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
+    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -169,7 +168,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
         # -- TODO encapsulate this block into a func/method
         locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
         wkt_coordinates = ','.join(["%f %f" % (l.longitude, l.latitude) for l in locations])
-        sql = "SELECT st_multi(ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3)) as geom".format(wkt_coordinates)
+        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3) as geom".format(wkt_coordinates)
         multipolygon = plpy.execute(sql, 1)[0]['geom']
       else:
         multipolygon = None
@@ -322,7 +321,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.tools import ServiceManager
-  from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
+  from cartodb_services.mapbox import MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
@@ -335,8 +334,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   service_manager.assert_within_limits()
 
   try:
-    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
-    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
+    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
