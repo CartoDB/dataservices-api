@@ -1,3 +1,10 @@
+Feb 12th, 2020
+==============
+* Version `0.23.0` of the Python library
+    * Added Mapbox true isolines
+* Version `0.37.0` of the server extension
+    * Added Mapbox true isolines
+
 Jan 20th, 2020
 ==============
 * Version `0.22.0` of the Python library
