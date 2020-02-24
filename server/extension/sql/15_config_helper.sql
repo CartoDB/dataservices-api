@@ -8,7 +8,7 @@ RETURNS boolean AS $$
     logger_config = LoggerConfig(plpy)
     GD[cache_key] = logger_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 -- This is done in order to avoid an undesired depedency on cartodb extension
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_conf_getconf(input_key text)
@@ -46,7 +46,7 @@ RETURNS boolean AS $$
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_internal_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -60,7 +60,7 @@ RETURNS boolean AS $$
     geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -74,7 +74,7 @@ RETURNS boolean AS $$
     isolines_routing_config = IsolinesRoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = isolines_routing_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -88,7 +88,7 @@ RETURNS boolean AS $$
     routing_config = RoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = routing_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -102,4 +102,4 @@ RETURNS boolean AS $$
     obs_config = ObservatoryConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = obs_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;

@@ -14,7 +14,7 @@ DO $$
   service_config.user.set('soft_obs_general_limit', True)
   service_config.user.set('period_end_date', '20170516')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 
 -- Mock Observatory backend function

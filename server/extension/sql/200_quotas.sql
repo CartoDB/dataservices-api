@@ -106,7 +106,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
   return ret
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info_batch(
@@ -136,7 +136,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info_batch AS $$
       ret += [[info['service'], info['monthly_quota'], info['used_quota'], info['soft_limit'], info['provider'], info['max_batch_size']]]
 
   return ret
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
   username TEXT,

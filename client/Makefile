@@ -14,6 +14,14 @@ AWK = awk
 PG_CONFIG         = pg_config
 PG_PARALLEL      := $(shell $(PG_CONFIG) --version | ($(AWK) '{$$2*=1000; if ($$2 >= 9600) print 1; else print 0;}' 2> /dev/null || echo 0))
 
+# PG12 compatibility
+PG_VERSION := $(shell $(PG_CONFIG) --version | $(AWK) '{split($$2,a,"."); print a[1]}')
+PG_12_GE := $(shell [ $(PG_VERSION) -ge 12 ] && echo true)
+PLPYTHONU := plpythonu
+ifeq ($(PG_12_GE), true)
+PLPYTHONU := plpython3u
+endif
+
 # OLD_VERSIONS = $(wildcard old_versions/*.sql)
 # DATA =  $(NEW_EXTENSION_ARTIFACT) \
 #   $(OLD_VERSIONS) \
@@ -25,9 +33,9 @@ DATA = $(NEW_EXTENSION_ARTIFACT) \
 		 $(OLD_VERSIONS)
 SOURCES_DATA_DIR = sql/
 
-
 REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
-TEST_DIR = test/
+REGRESS_EXPEC = $(notdir $(basename $(sort $(wildcard test/expected/*test.out))))
+TEST_DIR = test_re
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)' --user='postgres'
 
 # DATA is a special variable used by postgres build infrastructure
@@ -54,7 +62,8 @@ SOURCES_DATA = $(wildcard $(SOURCES_DATA_DIR)/*.sql) $(GENERATED_SQL_FILES)
 
 $(NEW_EXTENSION_ARTIFACT): $(SOURCES_DATA)
 	rm -f $@
-	cat $(SOURCES_DATA_DIR)/*.sql >> $@
+	cat $(SOURCES_DATA_DIR)/*.sql | \
+	$(SED) -e 's/@@plpythonu@@/$(PLPYTHONU)/g' >> $@
 ifeq ($(PG_PARALLEL), 0)
 # Remove PARALLEL in aggregates and functions
 	$(eval TMPFILE := $(shell mktemp /tmp/$(basename $0).XXXXXXXX))
@@ -86,6 +95,7 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 devclean:
 	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
+	rm -rf $(TEST_DIR)
 
 # If needed remove PARALLEL tags from the release files
 release_remove_parallel_deploy:
@@ -97,9 +107,25 @@ ifeq ($(PG_PARALLEL), 0)
 	done
 endif
 
+# TODO
+prepare_tests:
+	mkdir -p $(TEST_DIR)
+	mkdir -p $(TEST_DIR)/expected
+	mkdir -p $(TEST_DIR)/sql
+	for f in $(REGRESS); do \
+		cat test/sql/$${f}.sql | \
+		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
+		>> $(TEST_DIR)/sql/$${f}.sql; \
+	done
+	for f in $(REGRESS_EXPEC); do \
+		cat test/expected/$${f}.out | \
+		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
+		>> $(TEST_DIR)/expected/$${f}.out; \
+	done
+
 # Install the current release into the PostgreSQL extensions directory
 deploy: release_remove_parallel_deploy
 	$(INSTALL_DATA) $(EXTENSION).control '$(DESTDIR)$(datadir)/extension/'
 	$(INSTALL_DATA) old_versions/*.sql *.sql '$(DESTDIR)$(datadir)/extension/'
 
-install: deploy
+install: prepare_tests deploy

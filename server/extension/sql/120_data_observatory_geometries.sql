@@ -49,7 +49,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundary')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
   username TEXT,
@@ -102,7 +102,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetBoundaryId')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
   username TEXT,
@@ -155,7 +155,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundaryById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -215,7 +215,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -277,7 +277,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
   username TEXT,
@@ -337,7 +337,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -399,4 +399,4 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
