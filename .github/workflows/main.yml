@@ -50,3 +50,18 @@ jobs:
       - name: Run client tests
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
         timeout-minutes: 5
+
+  integration-staging:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: ['2.7']
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python_version }}
+      - name: run tests
+        run: cd test && pip install -r requirements.txt && python run_tests.py --host=carto-staging.com dataservices-api-integration ${{ secrets.INTEGRATION_TEST_API_KEY }}
+
