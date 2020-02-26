@@ -107,8 +107,8 @@ ifeq ($(PG_PARALLEL), 0)
 	done
 endif
 
-# TODO
-prepare_tests:
+# Replacing variables defined within test files
+replace_variables:
 	mkdir -p $(TEST_DIR)
 	mkdir -p $(TEST_DIR)/expected
 	mkdir -p $(TEST_DIR)/sql
@@ -128,4 +128,4 @@ deploy: release_remove_parallel_deploy
 	$(INSTALL_DATA) $(EXTENSION).control '$(DESTDIR)$(datadir)/extension/'
 	$(INSTALL_DATA) old_versions/*.sql *.sql '$(DESTDIR)$(datadir)/extension/'
 
-install: prepare_tests deploy
+install: replace_variables deploy
