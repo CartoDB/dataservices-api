@@ -44,9 +44,9 @@ jobs:
         timeout-minutes: 5
 
       - name: Run server tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck || cat /dataservices-api/server/extension/test_out/regression.diffs"
         timeout-minutes: 5
 
       - name: Run client tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck || cat /home/ubuntu/dataservices-api/client/test_out/regression.diffs"
         timeout-minutes: 5
