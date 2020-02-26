@@ -3,6 +3,7 @@ from requests.adapters import HTTPAdapter
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.geocoder import geocoder_error_response
 from cartodb_services.tomtom import TomTomGeocoder
+from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools.exceptions import ServiceException
 
 
@@ -59,6 +60,7 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
             self._logger.error(msg, e)
             return [geocoder_error_response(msg)] * len(searches)
 
+    @qps_retry(qps=5, provider='tomtom')
     def _send_batch(self, searches):
         body = {'batchItems': [{'query': self._query(s)} for s in searches]}
         request_params = {
@@ -76,6 +78,7 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
             self._logger.error(msg)
             raise ServiceException(msg, response)
 
+    @qps_retry(qps=5, provider='tomtom')
     def _download_results(self, location):
         stalled_retries = 0
         while True:
