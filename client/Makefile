@@ -35,7 +35,7 @@ SOURCES_DATA_DIR = sql/
 
 REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 REGRESS_EXPEC = $(notdir $(basename $(sort $(wildcard test/expected/*test.out))))
-TEST_DIR = test_re
+TEST_DIR = test_out
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)' --user='postgres'
 
 # DATA is a special variable used by postgres build infrastructure
