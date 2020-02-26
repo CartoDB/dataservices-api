@@ -4,7 +4,6 @@
 
 
 
-
 # CARTO Data Services API
 The CARTO Data Services SQL API
 
