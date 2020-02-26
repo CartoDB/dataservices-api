@@ -36,7 +36,7 @@ def main():
         set_environment_variables(username, api_key, table_name, host, schema)
         execute_tests()
     except Exception as e:
-        print e.message
+        print(e)
         sys.exit(1)
     finally:
         clean_environment_variables()
@@ -45,11 +45,11 @@ def main():
 
 
 def usage():
-    print """Usage: run_tests.py [options] username api_key
+    print("""Usage: run_tests.py [options] username api_key
         Options:
         -h: Show this help
         --host: take that host as base (by default is cartodb.com)
-        --schema: define the url schema [http/https] (by default https)"""
+        --schema: define the url schema [http/https] (by default https)""")
 
 
 def execute_tests():
@@ -59,7 +59,7 @@ def execute_tests():
         stderr=subprocess.PIPE
     )
     out, err = process.communicate()
-    print err
+    print(err)
     regexp = re.compile(r'FAILED \(.*\)')
     if regexp.search(err) is not None:
         sys.exit(1)

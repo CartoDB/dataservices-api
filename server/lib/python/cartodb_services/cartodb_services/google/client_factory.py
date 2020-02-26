@@ -3,7 +3,7 @@
 
 import googlemaps
 import base64
-from exceptions import InvalidGoogleCredentials
+from cartodb_services.google.exceptions import InvalidGoogleCredentials
 
 
 class GoogleMapsClientFactory():

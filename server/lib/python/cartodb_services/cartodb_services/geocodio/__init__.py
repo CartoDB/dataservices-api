@@ -1,2 +1,2 @@
-from geocoder import GeocodioGeocoder
-from bulk_geocoder import GeocodioBulkGeocoder
+from cartodb_services.geocodio.geocoder import GeocodioGeocoder
+from cartodb_services.geocodio.bulk_geocoder import GeocodioBulkGeocoder
