@@ -1,3 +1,10 @@
+\set ECHO none
+-- add the schema cdb_dataservices_server to the SEARCH_PATH
+DO $$ BEGIN
+    PERFORM set_config('search_path', current_setting('search_path')||', cdb_dataservices_server', false);
+END $$;
+\set ECHO all
+
 SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)
