@@ -151,10 +151,9 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
         query = "SELECT cdb_dataservices_client.cdb_geocode_street_point(street) " \
                 "as geometry FROM {0} LIMIT 1".format(table)
         try:
-            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+            self._run_authenticated(query)['rows'][0]
         except Exception as e:
-            assert_equal(e.message[0],
-                         "permission denied for relation {}".format(table))
+            assert_equal(e, "permission denied for relation {}".format(table))
 
     def test_component_aggregation(self):
         query = "select st_x(the_geom), st_y(the_geom) from (" \
