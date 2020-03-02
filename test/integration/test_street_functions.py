@@ -335,7 +335,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "{}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
                 "'address', null, null, null, {})".format(','.join(streets), batch_size)
-        response = self._run_authenticated(query)
+        response = self._run_authenticated(query, method='POST')
         assert_equal(n, len(response['rows']))
         for row in response['rows']:
             assert_not_equal(row['st_x'], None)
@@ -413,12 +413,14 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         for r, e in zip(response['rows'], expected):
             self.assert_metadata(r['metadata'], e)
 
-    def _run_authenticated(self, query):
-        authenticated_query = "{}&api_key={}".format(query,
-                                                     self.env_variables[
-                                                         'api_key'])
-        return IntegrationTestHelper.execute_query_raw(self.sql_api_url,
-                                                       authenticated_query)
+    def _run_authenticated(self, query, method='GET'):
+        api_key = self.env_variables['api_key']
+        url = self.sql_api_url
+        auth_query = "{}&api_key={}".format(query, api_key)
+        if method.upper() != 'GET':
+            auth_query = query
+            url = "{}?api_key={}".format(self.sql_api_url, api_key)
+        return IntegrationTestHelper.execute_query_raw(url, auth_query, method)
 
     @staticmethod
     def _x_y_by_cartodb_id(response):
