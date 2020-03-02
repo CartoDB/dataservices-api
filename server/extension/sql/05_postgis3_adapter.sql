@@ -3,7 +3,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'geomval') THEN
-        CREATE TYPE geomval AS (
+        CREATE TYPE cdb_dataservices_server.geomval AS (
             geom geometry,
             val double precision
         );

@@ -25,7 +25,7 @@ $f$ LANGUAGE sql IMMUTABLE;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'geomval') THEN
-        CREATE TYPE geomval AS (
+        CREATE TYPE cdb_dataservices_client.geomval AS (
             geom geometry,
             val double precision
         );
