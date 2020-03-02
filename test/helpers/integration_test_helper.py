@@ -10,7 +10,7 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-def assert_close_enough(xy_a, xy_b, rel_tol=0.0001, abs_tol=0.0005):
+def assert_close_enough(xy_a, xy_b, rel_tol=0.001, abs_tol=0.0005):
     """
     Asserts that the given points are "close enough", in a square.
     :param xy_a: Array of 2 elements, X and Y.
@@ -23,7 +23,7 @@ def assert_close_enough(xy_a, xy_b, rel_tol=0.0001, abs_tol=0.0005):
         assert_true(isclose(xy_a[i], xy_b[i], rel_tol, abs_tol),
                     "Coord {} error: {} and {} are not closer than {}, {}".format(
                         i, xy_a[i], xy_b[i], rel_tol, abs_tol
-                    ))
+        ))
 
 
 class IntegrationTestHelper:
@@ -48,8 +48,8 @@ class IntegrationTestHelper:
     def execute_query_raw(cls, sql_api_url, query, method='GET'):
         requests.packages.urllib3.disable_warnings()
         if method.upper() == 'GET':
-        query_url = "{0}?q={1}".format(sql_api_url, query)
-        query_response = requests.get(query_url)
+            query_url = "{0}?q={1}".format(sql_api_url, query)
+            query_response = requests.get(query_url)
             print("Executing query GET: {0}".format(query_url))
         else:
             query_response = requests.post(sql_api_url, data={"q": query})
