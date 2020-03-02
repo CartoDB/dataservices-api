@@ -59,7 +59,7 @@ def execute_tests():
         stderr=subprocess.PIPE
     )
     out, err = process.communicate()
-    print(err)
+    print(err.decode('utf-8'))
     regexp = re.compile(r'FAILED \(.*\)')
     if regexp.search(err) is not None:
         sys.exit(1)
