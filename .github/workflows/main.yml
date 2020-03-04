@@ -48,7 +48,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Show failing tests
-        run: [ -f /dataservices-api/server/extension/test/regression.diffs ] && cat /dataservices-api/server/extension/test/regression.diffs
+        run: cat /dataservices-api/server/extension/test/regression.diffs
 
       - name: Run client tests
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
