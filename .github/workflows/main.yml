@@ -48,6 +48,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Show failing tests
+        if: failure()
         run: cat /dataservices-api/server/extension/test/regression.diffs
 
       - name: Run client tests
