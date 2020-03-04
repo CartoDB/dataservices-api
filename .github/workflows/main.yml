@@ -49,7 +49,7 @@ jobs:
 
       - name: Show failing tests
         if: failure()
-        run: cat /dataservices-api/server/extension/test/regression.diffs
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cat /dataservices-api/server/extension/test/regression.out"
 
       - name: Run client tests
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
