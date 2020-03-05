@@ -45,7 +45,7 @@ class ServiceConfig(object):
 
     def _get_effective_monthly_quota(self, quota_key, default=0):
         quota_from_redis = self._redis_config.get(quota_key, None)
-        if quota_from_redis and quota_from_redis <> '':
+        if quota_from_redis and quota_from_redis != '':
             return int(quota_from_redis)
         else:
             return default

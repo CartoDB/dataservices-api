@@ -40,7 +40,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
     plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
     return plpy.execute(plan, [username, orgname, searches])
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -51,7 +51,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
   geocoder = GoogleMapsBulkGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_heremaps_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -62,7 +62,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
   geocoder = HereMapsBulkGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_tomtom_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -79,7 +79,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = ServiceManager('geocoder', TomTomGeocoderConfigBuilder, username, orgname, GD)
   geocoder = TomTomBulkGeocoder(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_mapbox_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -96,7 +96,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
   geocoder = MapboxBulkGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocodio_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -113,4 +113,4 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = ServiceManager('geocoder', GeocodioGeocoderConfigBuilder, username, orgname, GD)
   geocoder = GeocodioBulkGeocoder(service_manager.config.geocodio_api_key, service_manager.logger, service_manager.config.service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;

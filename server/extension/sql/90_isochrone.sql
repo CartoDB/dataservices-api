@@ -31,7 +31,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- heremaps isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -46,7 +46,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
 
   return result
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- mapzen isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -59,7 +59,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   return result
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- mapbox isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -72,7 +72,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
   return result
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- tomtom isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -85,4 +85,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
   return result
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;

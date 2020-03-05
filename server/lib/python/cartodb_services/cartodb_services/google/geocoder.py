@@ -1,9 +1,11 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
+try:
+    from urlparse import parse_qs
+except:
+    from urllib.parse import parse_qs
 
-from urlparse import parse_qs
-
-from exceptions import MalformedResult
+from cartodb_services.google.exceptions import MalformedResult
 from cartodb_services.geocoder import compose_address, geocoder_metadata, PRECISION_PRECISE, PRECISION_INTERPOLATED, EMPTY_RESPONSE
 from cartodb_services.google.exceptions import InvalidGoogleCredentials
 from client_factory import GoogleMapsClientFactory

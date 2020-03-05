@@ -1,7 +1,7 @@
 import requests
 import json
 
-from exceptions import WrongParams
+from cartodb_services.here.exceptions import WrongParams
 from requests.adapters import HTTPAdapter
 from cartodb_services.metrics import Traceable
 

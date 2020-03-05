@@ -1,5 +1,5 @@
-from routing import MapzenRouting, MapzenRoutingResponse
-from isolines import MapzenIsolines
-from geocoder import MapzenGeocoder
-from matrix_client import MatrixClient
-from isochrones import MapzenIsochrones
+from cartodb_services.mapzen.routing import MapzenRouting, MapzenRoutingResponse
+from cartodb_services.mapzen.isolines import MapzenIsolines
+from cartodb_services.mapzen.geocoder import MapzenGeocoder
+from cartodb_services.mapzen.matrix_client import MatrixClient
+from cartodb_services.mapzen.isochrones import MapzenIsochrones

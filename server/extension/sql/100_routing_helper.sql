@@ -69,7 +69,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate Mapbox routing')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_route_with_waypoints(
   username TEXT,
@@ -137,7 +137,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate TomTom routing')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_with_waypoints(
   username TEXT,
@@ -198,4 +198,4 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate mapzen routing')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;

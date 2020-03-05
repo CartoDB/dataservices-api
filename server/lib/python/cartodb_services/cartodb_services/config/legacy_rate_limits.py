@@ -1,5 +1,5 @@
 import json
-from rate_limits import RateLimitsConfig
+from cartodb_services.config.rate_limits import RateLimitsConfig
 
 class RateLimitsConfigLegacyBuilder(object):
     """
