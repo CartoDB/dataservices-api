@@ -20,7 +20,7 @@ class ImportHelper:
         response.raise_for_status()
         response_json = json.loads(response.text)
         if not response_json['success']:
-            print "Error importing the test dataset: {0}".format(response.text)
+            print("Error importing the test dataset: {0}".format(response.text))
             sys.exit(1)
         while(True):
             table_name = ImportHelper.get_imported_table_name(
@@ -42,8 +42,8 @@ class ImportHelper:
             schema, username, host, import_id, api_key)
         import_data_response = requests.get(import_url)
         if import_data_response.status_code != 200:
-            print "Error getting the table name from " \
-                "the import data: {0}".format(import_data_response.text)
+            print("Error getting the table name from " \
+                "the import data: {0}".format(import_data_response.text))
             sys.exit(1)
         import_data_json = json.loads(import_data_response.text)
 
@@ -57,5 +57,5 @@ class ImportHelper:
         )
         response = requests.get(url)
         if response.status_code != 200:
-            print "Error cleaning the test dataset: {0}".format(response.text)
+            print("Error cleaning the test dataset: {0}".format(response.text))
             sys.exit(1)

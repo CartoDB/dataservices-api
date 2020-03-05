@@ -1,4 +1,4 @@
-from routing import MapboxRouting, MapboxRoutingResponse
-from geocoder import MapboxGeocoder
-from bulk_geocoder import MapboxBulkGeocoder
-from isolines import MapboxIsolines, MapboxIsochronesResponse
+from cartodb_services.mapbox.routing import MapboxRouting, MapboxRoutingResponse
+from cartodb_services.mapbox.geocoder import MapboxGeocoder
+from cartodb_services.mapbox.bulk_geocoder import MapboxBulkGeocoder
+from cartodb_services.mapbox.isolines import MapboxIsolines, MapboxIsochronesResponse

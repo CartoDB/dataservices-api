@@ -35,7 +35,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 

@@ -135,7 +135,7 @@ class MapzenIsolines:
         # delete points that got None
         location_estimates_filtered = []
         for i, c in enumerate(costs):
-            if c <> isorange:
+            if c != isorange:
                 location_estimates_filtered.append(location_estimates[i])
 
         return location_estimates_filtered

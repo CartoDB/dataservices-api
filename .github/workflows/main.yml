@@ -32,6 +32,10 @@ jobs:
       - name: Start docker-compose services
         run: docker-compose -f docker-compose.yaml up -d
 
+      - name: Install required python3 libs
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && sudo pip3 install -U -r ./lib/python/cartodb_services/requirements.txt && sudo pip3 install -U ./lib/python/cartodb_services"
+        if: env.PG_VERSION == 12
+
       - name: Install required python libs
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && pip install -U -r ./lib/python/cartodb_services/requirements.txt && pip install -U ./lib/python/cartodb_services"
 
@@ -44,9 +48,9 @@ jobs:
         timeout-minutes: 5
 
       - name: Run server tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck || (cat /dataservices-api/server/extension/test_out/regression.diffs && false)"
         timeout-minutes: 5
 
       - name: Run client tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck || (cat /home/ubuntu/dataservices-api/client/test_out/regression.diffs && false)"
         timeout-minutes: 5
