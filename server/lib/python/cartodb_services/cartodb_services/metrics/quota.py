@@ -1,5 +1,5 @@
-from user import UserMetricsService
-from log import MetricsDataGatherer
+from cartodb_services.metrics.user import UserMetricsService
+from cartodb_services.metrics.log import MetricsDataGatherer
 from datetime import date
 import re
 

@@ -6,7 +6,10 @@ import uuid
 import plpy
 from datetime import datetime
 from contextlib import contextmanager
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except:
+    from urllib.parse import urlparse
 
 
 @contextmanager

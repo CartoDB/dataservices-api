@@ -18,5 +18,5 @@ class RedisConnectionBuilder():
         else:
             conn = StrictRedis(host=self._config.host, port=self._config.port,
                                db=self._config.db, retry_on_timeout=True,
-                               socket_timeout=self._config.timeout)
+                               socket_timeout=self._config.timeout, decode_responses=True)
             return conn

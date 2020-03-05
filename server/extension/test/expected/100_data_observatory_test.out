@@ -1,3 +1,4 @@
+\set ECHO none
 SELECT exists(SELECT *
               FROM pg_proc p
               INNER JOIN pg_namespace ns ON (p.pronamespace = ns.oid)

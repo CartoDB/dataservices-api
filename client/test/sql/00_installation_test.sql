@@ -2,7 +2,7 @@
 SET client_min_messages TO WARNING;
 -- Install dependencies
 CREATE EXTENSION postgis;
-CREATE EXTENSION plpythonu;
+CREATE EXTENSION @@plpythonu@@;
 CREATE EXTENSION cartodb;
 CREATE EXTENSION plproxy;
 
