@@ -1,3 +1,8 @@
+Mar 6th, 2020
+==============
+* Version `0.23.1` of the Python library
+    * Added query per second throttle to TomTom bulk API calls
+
 Feb 12th, 2020
 ==============
 * Version `0.23.0` of the Python library
