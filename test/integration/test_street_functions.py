@@ -85,9 +85,9 @@ class TestStreetFunctionsSetUp(TestCase):
 
     TOMTOM_METADATAS = {
         'Plaza España, Barcelona':
-            {'relevance': 0.85, 'precision': 'precise', 'match_types': ['street']},
+            {'relevance': 0.72, 'precision': 'precise', 'match_types': ['street']},
         'Santiago Rusiñol 123, Valladolid':
-            {'relevance': 0.45, 'precision': 'interpolated', 'match_types': ['street']}
+            {'relevance': 0.74, 'precision': 'precise', 'match_types': ['street']}
     }
 
     MAPBOX_METADATAS = {
@@ -151,10 +151,9 @@ class TestStreetFunctions(TestStreetFunctionsSetUp):
         query = "SELECT cdb_dataservices_client.cdb_geocode_street_point(street) " \
                 "as geometry FROM {0} LIMIT 1".format(table)
         try:
-            IntegrationTestHelper.execute_query(self.sql_api_url, query)
+            self._run_authenticated(query)['rows'][0]
         except Exception as e:
-            assert_equal(e.message[0],
-                         "permission denied for relation {}".format(table))
+            assert_equal(e, "permission denied for relation {}".format(table))
 
     def test_component_aggregation(self):
         query = "select st_x(the_geom), st_y(the_geom) from (" \
@@ -335,7 +334,7 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
                 "{}" \
                 "]''::jsonb) as (cartodb_id integer, address text)', " \
                 "'address', null, null, null, {})".format(','.join(streets), batch_size)
-        response = self._run_authenticated(query)
+        response = self._run_authenticated(query, method='POST')
         assert_equal(n, len(response['rows']))
         for row in response['rows']:
             assert_not_equal(row['st_x'], None)
@@ -413,12 +412,14 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
         for r, e in zip(response['rows'], expected):
             self.assert_metadata(r['metadata'], e)
 
-    def _run_authenticated(self, query):
-        authenticated_query = "{}&api_key={}".format(query,
-                                                     self.env_variables[
-                                                         'api_key'])
-        return IntegrationTestHelper.execute_query_raw(self.sql_api_url,
-                                                       authenticated_query)
+    def _run_authenticated(self, query, method='GET'):
+        api_key = self.env_variables['api_key']
+        url = self.sql_api_url
+        auth_query = "{}&api_key={}".format(query, api_key)
+        if method.upper() != 'GET':
+            auth_query = query
+            url = "{}?api_key={}".format(self.sql_api_url, api_key)
+        return IntegrationTestHelper.execute_query_raw(url, auth_query, method)
 
     @staticmethod
     def _x_y_by_cartodb_id(response):

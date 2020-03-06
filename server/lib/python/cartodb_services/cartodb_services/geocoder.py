@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
 
-from tools import QuotaExceededException, Logger
+from cartodb_services.tools import QuotaExceededException, Logger
 from collections import namedtuple
 import json
 
@@ -71,7 +71,7 @@ def run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, org
                 except Exception as e:
                     import sys
                     logger.error("Error processing geocode", sys.exc_info(), data={"username": username, "orgname": orgname})
-                    metadata['processing_error'] = 'Error: {}'.format(e.message)
+                    metadata['processing_error'] = 'Error: {}'.format(e)
                     results.append([result[0], None, json.dumps(metadata)])
                     failed_count += 1
 

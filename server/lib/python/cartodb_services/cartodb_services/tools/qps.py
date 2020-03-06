@@ -1,7 +1,7 @@
 import time
 import random
 from datetime import datetime
-from exceptions import TimeoutException
+from cartodb_services.tools.exceptions import TimeoutException
 import re
 
 DEFAULT_RETRY_TIMEOUT = 60

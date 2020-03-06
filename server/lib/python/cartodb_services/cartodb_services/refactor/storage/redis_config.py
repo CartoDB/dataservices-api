@@ -1,5 +1,5 @@
 from ..core.interfaces import ConfigBackendInterface
-from null_config import NullConfigStorage
+from cartodb_services.refactor.storage.null_config import NullConfigStorage
 
 
 class RedisConfigStorage(ConfigBackendInterface):

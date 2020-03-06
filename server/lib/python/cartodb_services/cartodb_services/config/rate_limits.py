@@ -1,6 +1,6 @@
 import json
 
-from service_configuration import ServiceConfiguration
+from cartodb_services.config.service_configuration import ServiceConfiguration
 
 class RateLimitsConfig(object):
     """

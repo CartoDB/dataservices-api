@@ -1,5 +1,5 @@
 from multiprocessing import Pool
-from exceptions import MalformedResult
+from cartodb_services.google.exceptions import MalformedResult
 from cartodb_services import StreetPointBulkGeocoder
 from cartodb_services.geocoder import compose_address, geocoder_error_response
 from cartodb_services.google import GoogleMapsGeocoder

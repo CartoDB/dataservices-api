@@ -55,7 +55,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
         raise Exception('Error trying to OBS_Search')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAvailableBoundaries(
   username TEXT,
@@ -113,4 +113,4 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;

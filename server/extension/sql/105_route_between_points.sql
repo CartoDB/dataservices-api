@@ -37,7 +37,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -76,4 +76,4 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
