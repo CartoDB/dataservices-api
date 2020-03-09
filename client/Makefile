@@ -96,8 +96,8 @@ devclean:
 	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
 	rm -rf $(TEST_DIR)
-	for f in $(OLD_VERSIONS); do \
-		mv $${f}.bak $${f} || true; \
+	for f in $(basename $(wildcard old_versions/*.bak)); do \
+		mv $${f}.bak $${f}; \
 	done
 
 # If needed remove PARALLEL tags from the release files
@@ -125,10 +125,9 @@ replace_variables:
 		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
 		>> $(TEST_DIR)/expected/$${f}.out; \
 	done
-	for f in $(OLD_VERSIONS); do \
-		mv $${f}.bak $${f} || true; \
+	for f in $(basename $(wildcard old_versions/*.bak)); do \
+		mv $${f}.bak $${f}; \
 		sed --in-place=.bak -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
-		echo "sed --in-place=.bak -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}"; \
 	done
 
 # Install the current release into the PostgreSQL extensions directory
