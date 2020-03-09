@@ -67,7 +67,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
   orgname TEXT,
@@ -103,7 +103,7 @@ RETURNS boolean AS $$
       'redis_metrics_connection': redis_metrics_connection,
     }
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
   orgname TEXT,
@@ -191,7 +191,7 @@ RETURNS boolean AS $$
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_internal_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -205,7 +205,7 @@ RETURNS boolean AS $$
     geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -219,7 +219,7 @@ RETURNS boolean AS $$
     isolines_routing_config = IsolinesRoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = isolines_routing_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -233,7 +233,7 @@ RETURNS boolean AS $$
     routing_config = RoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = routing_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_data_observatory_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -247,7 +247,7 @@ RETURNS boolean AS $$
     data_observatory_config = DataObservatoryConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = data_observatory_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 -- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -1049,7 +1049,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))

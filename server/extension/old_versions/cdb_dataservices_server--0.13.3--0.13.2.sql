@@ -15,7 +15,7 @@ RETURNS boolean AS $$
     mapzen_geocoder_config = MapzenGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = mapzen_geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_mapzen_isolines_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -29,7 +29,7 @@ RETURNS boolean AS $$
     mapzen_isolines_config = MapzenIsolinesRoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = mapzen_isolines_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -220,4 +220,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     #plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;

@@ -14,7 +14,7 @@ RETURNS boolean AS $$
     data_observatory_config = DataObservatoryConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = data_observatory_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,

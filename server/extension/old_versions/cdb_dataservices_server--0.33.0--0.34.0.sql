@@ -43,7 +43,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -82,7 +82,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -117,7 +117,7 @@ RETURNS Geometry AS $$
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
 RETURNS SETOF cdb_dataservices_server.geocoding AS $$
@@ -151,7 +151,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
     plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
     return plpy.execute(plan, [username, orgname, searches])
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
@@ -190,7 +190,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin0 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
@@ -229,7 +229,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin1 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_internal_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -274,7 +274,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode namedplace point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -313,7 +313,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
@@ -352,7 +352,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -387,7 +387,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -422,4 +422,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;

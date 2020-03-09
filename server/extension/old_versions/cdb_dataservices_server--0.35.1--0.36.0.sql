@@ -38,7 +38,7 @@ RETURNS Geometry AS $$
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocodio_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -52,7 +52,7 @@ RETURNS Geometry AS $$
   geocodio_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocodio_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
   return plpy.execute(geocodio_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocodio_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -100,7 +100,7 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using Geocodio')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
@@ -138,7 +138,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
     plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
     return plpy.execute(plan, [username, orgname, searches])
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocodio_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
@@ -156,7 +156,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   service_manager = ServiceManager('geocoder', GeocodioGeocoderConfigBuilder, username, orgname, GD)
   geocoder = GeocodioBulkGeocoder(service_manager.config.geocodio_api_key, service_manager.logger, service_manager.config.service_params)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
@@ -194,4 +194,4 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin0 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;

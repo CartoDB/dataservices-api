@@ -70,7 +70,7 @@ release: replace_variables $(EXTENSION).control $(SOURCES_DATA)
 	git mv *.sql old_versions
 	$(SED) $(REPLACEMENTS) $(EXTENSION).control.in > $(EXTENSION).control
 	git add $(EXTENSION).control
-	cat $(SOURCES_DATA_DIR_OUT)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
+	cat $(SOURCES_DATA_DIR)/*.sql > $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
 	git add $(EXTENSION)--$(NEW_VERSION).sql
@@ -86,6 +86,9 @@ devclean:
 	rm -rf $(TEST_DIR)
 	rm -rf $(SOURCES_DATA_DIR_OUT)
 	rm -rf $(EXTENSION).control
+	for f in $(basename $(wildcard old_versions/*.bak)); do \
+		mv $${f}.bak $${f}; \
+	done
 
 # If needed remove PARALLEL tags from the release files
 release_remove_parallel_deploy:
@@ -124,6 +127,10 @@ replace_variables:
 		cat $(SOURCES_DATA_DIR)/$${f} | \
 		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
 		> $(SOURCES_DATA_DIR_OUT)/$${f}; \
+	done
+	for f in $(basename $(wildcard old_versions/*.bak)); do \
+		mv $${f}.bak $${f}; \
+		sed --in-place=.bak -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
 	done
 
 install: deploy

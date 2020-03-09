@@ -36,4 +36,4 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
     plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
     return plpy.execute(plan, [username, orgname, searches])
 
-$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
