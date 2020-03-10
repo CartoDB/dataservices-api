@@ -1,5 +1,5 @@
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
-\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.37.0'" to load this file. \quit
+\echo Use "ALTER EXTENSION cdb_dataservices_server UPDATE TO '0.36.0'" to load this file. \quit
 
 -- HERE goes your code to upgrade/downgrade
 
@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.tools import ServiceManager
-  from cartodb_services.mapbox import MapboxIsolines
+  from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
@@ -24,7 +24,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   service_manager.assert_within_limits()
 
   try:
-    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -48,7 +49,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
         # -- TODO encapsulate this block into a func/method
         locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
         wkt_coordinates = ','.join(["%f %f" % (l.longitude, l.latitude) for l in locations])
-        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3) as geom".format(wkt_coordinates)
+        sql = "SELECT st_multi(ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3)) as geom".format(wkt_coordinates)
         multipolygon = plpy.execute(sql, 1)[0]['geom']
       else:
         multipolygon = None
@@ -65,7 +66,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get Mapbox isolines')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    username TEXT,
@@ -76,7 +78,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.tools import ServiceManager
-  from cartodb_services.mapbox import MapboxIsolines
+  from cartodb_services.mapbox import MapboxMatrixClient, MapboxIsolines
   from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
   from cartodb_services.tools import Coordinate
   from cartodb_services.tools.coordinates import coordinates_to_polygon
@@ -89,7 +91,8 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   service_manager.assert_within_limits()
 
   try:
-    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    client = MapboxMatrixClient(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+    mapbox_isolines = MapboxIsolines(client, service_manager.logger)
 
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
@@ -123,4 +126,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get Mapbox isochrones')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;

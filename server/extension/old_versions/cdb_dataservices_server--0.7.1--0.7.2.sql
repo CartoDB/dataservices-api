@@ -14,7 +14,7 @@ RETURNS text AS $$
   user_obs_snapshot_config = GD["user_obs_snapshot_config_{0}".format(username)]
 
   return user_obs_snapshot_config.connection_str
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -64,7 +64,7 @@ RETURNS json AS $$
       plpy.error(error_msg)
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -112,4 +112,4 @@ RETURNS json AS $$
       plpy.error(error_msg)
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

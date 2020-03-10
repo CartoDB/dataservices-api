@@ -20,7 +20,7 @@ RETURNS Geometry AS $$
   else:
     plpy.error('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -51,4 +51,4 @@ RETURNS Geometry AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

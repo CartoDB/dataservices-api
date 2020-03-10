@@ -1,11 +1,156 @@
 --DO NOT MODIFY THIS FILE, IT IS GENERATED AUTOMATICALLY FROM SOURCES
 -- Complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION cdb_dataservices_server" to load this file. \quit
-CREATE TYPE cdb_dataservices_server.simple_route AS (
+-- PG12_DEPRECATED
+-- Create geomval if it doesn't exist (in postgis 3+ it only exists in postgis_raster)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'geomval') THEN
+        CREATE TYPE cdb_dataservices_server.geomval AS (
+            geom geometry,
+            val double precision
+        );
+    END IF;
+END$$;CREATE TYPE cdb_dataservices_server.simple_route AS (
     shape geometry(LineString,4326),
     length real,
     duration integer
 );
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_route_with_waypoints(
+  username TEXT,
+  orgname TEXT,
+  waypoints geometry(Point, 4326)[],
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
+RETURNS cdb_dataservices_server.simple_route AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.mapbox import MapboxRouting
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.tools.normalize import options_to_dict
+  from cartodb_services.refactor.service.mapbox_routing_config import MapboxRoutingConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('routing', MapboxRoutingConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    client = MapboxRouting(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if not waypoints or len(waypoints) < 2:
+      service_manager.logger.info("Empty origin or destination")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    if len(waypoints) > 25:
+      service_manager.logger.info("Too many waypoints (max 25)")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    waypoint_coords = []
+    for waypoint in waypoints:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % waypoint)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
+      waypoint_coords.append(Coordinate(lon,lat))
+
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
+    options_dict = options_to_dict(options)
+    if 'mode_type' in options_dict:
+      plpy.warning('Mapbox provider doesnt support route type parameter')
+
+    resp = client.directions(waypoint_coords, profile)
+    if resp and resp.shape:
+      shape_linestring = polyline_to_linestring(resp.shape)
+      if shape_linestring:
+        service_manager.quota_service.increment_success_service_use()
+        return [shape_linestring, resp.length, int(round(resp.duration))]
+      else:
+        service_manager.quota_service.increment_empty_service_use()
+        return [None, None, None]
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to calculate Mapbox routing', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to calculate Mapbox routing')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_route_with_waypoints(
+  username TEXT,
+  orgname TEXT,
+  waypoints geometry(Point, 4326)[],
+  mode TEXT,
+  options text[] DEFAULT ARRAY[]::text[],
+  units text DEFAULT 'kilometers')
+RETURNS cdb_dataservices_server.simple_route AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.tomtom import TomTomRouting
+  from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM, DEFAULT_ROUTE_TYPE, MODE_TYPE_TO_TOMTOM
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.tools.polyline import polyline_to_linestring
+  from cartodb_services.tools.normalize import options_to_dict
+  from cartodb_services.refactor.service.tomtom_routing_config import TomTomRoutingConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('routing', TomTomRoutingConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    client = TomTomRouting(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if not waypoints or len(waypoints) < 2:
+      service_manager.logger.info("Empty origin or destination")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    if len(waypoints) > 25:
+      service_manager.logger.info("Too many waypoints (max 25)")
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+
+    waypoint_coords = []
+    for waypoint in waypoints:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % waypoint)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % waypoint)[0]['lon']
+      waypoint_coords.append(Coordinate(lon,lat))
+
+    profile = TRANSPORT_MODE_TO_TOMTOM.get(mode)
+    route_type = DEFAULT_ROUTE_TYPE
+    options_dict = options_to_dict(options)
+    if 'mode_type' in options_dict:
+      route_type = MODE_TYPE_TO_TOMTOM.get(options_dict['mode_type'])
+
+    resp = client.directions(waypoint_coords, profile=profile, route_type=route_type)
+    if resp and resp.shape:
+      shape_linestring = polyline_to_linestring(resp.shape)
+      if shape_linestring:
+        service_manager.quota_service.increment_success_service_use()
+        return [shape_linestring, resp.length, int(round(resp.duration))]
+      else:
+        service_manager.quota_service.increment_empty_service_use()
+        return [None, None, None]
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return [None, None, None]
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to calculate TomTom routing', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to calculate TomTom routing')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_with_waypoints(
   username TEXT,
@@ -34,7 +179,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = MapzenRouting(user_routing_config.mapzen_api_key, logger)
+    client = MapzenRouting(user_routing_config.mapzen_api_key, logger, user_routing_config.mapzen_service_params)
 
     if not waypoints or len(waypoints) < 2:
       logger.info("Empty origin or destination")
@@ -66,7 +211,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate mapzen routing')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
   orgname TEXT,
@@ -78,6 +223,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
 RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger
+
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
@@ -86,12 +232,26 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_route_with_point', user_routing_config, logger):
+  params = {'username': username, 'orgname': orgname, 'origin': origin, 'destination': destination, 'mode': mode, 'options': options, 'units': units}
+
+  with metrics('cdb_route_with_point', user_routing_config, logger, params):
     waypoints = [origin, destination]
-    mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
-    result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
-$$ LANGUAGE plpythonu;
+
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(tomtom_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -104,6 +264,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
 RETURNS cdb_dataservices_server.simple_route AS $$
   from cartodb_services.metrics import metrics
   from cartodb_services.tools import Logger
+
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
@@ -112,11 +273,24 @@ RETURNS cdb_dataservices_server.simple_route AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_route_with_waypoints', user_routing_config, logger):
-    mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
-    result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
-    return [result[0]['shape'],result[0]['length'], result[0]['duration']]
-$$ LANGUAGE plpythonu;
+  params = {'username': username, 'orgname': orgname, 'waypoints': waypoints, 'mode': mode, 'options': options, 'units': units}
+
+  with metrics('cdb_route_with_waypoints', user_routing_config, logger, params):
+    if user_routing_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(mapbox_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    elif user_routing_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
+      result = plpy.execute(tomtom_plan, [username, orgname, waypoints, mode, options, units])
+      return [result[0]['shape'],result[0]['length'], result[0]['duration']]
+    else:
+      raise Exception('Requested routing method is not available')
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 -- Get the connection to redis from cache or create a new one
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
 RETURNS boolean AS $$
@@ -134,7 +308,7 @@ RETURNS boolean AS $$
       'redis_metrics_connection': redis_metrics_connection,
     }
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 --
 -- Observatory connection config
 --
@@ -147,11 +321,11 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._obs_server_conn_str(
 RETURNS text AS $$
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   return user_obs_config.connection_str
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJSON(
   username TEXT,
@@ -162,7 +336,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJS
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -178,8 +352,8 @@ RETURNS json AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -205,7 +379,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
   username TEXT,
@@ -216,7 +390,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetDemographicSnapshot(geom, time_span, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -231,8 +405,8 @@ RETURNS SETOF JSON AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -262,7 +436,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshotJSON(
   username TEXT,
@@ -272,7 +446,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshotJSON(
 RETURNS json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -287,8 +461,8 @@ RETURNS json AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -314,7 +488,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_segment_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
   username TEXT,
@@ -324,7 +498,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
 RETURNS SETOF json AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetSegmentSnapshot(geom, geometry_level);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   username TEXT,
@@ -338,8 +512,8 @@ RETURNS SETOF JSON AS $$
 
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_snapshot_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_snapshot_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
@@ -369,7 +543,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to OBS_GetSegmentSnapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
   username TEXT,
@@ -382,7 +556,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasure(geom, measure_id, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   username TEXT,
@@ -426,7 +600,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetCategory(
   username TEXT,
@@ -438,7 +612,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetCategory(geom, category_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetCategory(
   username TEXT,
@@ -481,7 +655,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
   username TEXT,
@@ -494,7 +668,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusMeasure(geom, name, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   username TEXT,
@@ -538,7 +712,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetUSCensusMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusCategory(
   username TEXT,
@@ -550,7 +724,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusCategory(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetUSCensusCategory(geom, name, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusCategory(
   username TEXT,
@@ -593,7 +767,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetUSCensusCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
   username TEXT,
@@ -605,7 +779,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetPopulation(geom, normalize, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
@@ -648,7 +822,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetPopulation')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasureById(
   username TEXT,
@@ -660,7 +834,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeasureById(
 RETURNS NUMERIC AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetMeasureById(geom_ref, measure_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasureById(
   username TEXT,
@@ -703,7 +877,223 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetData(
+  username TEXT,
+  orgname TEXT,
+  geomvals geomval[],
+  params JSON,
+  merge BOOLEAN DEFAULT True)
+RETURNS TABLE (
+  id INT,
+  data JSON
+) AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory.OBS_GetData(geomvals, params, merge);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
+  username TEXT,
+  orgname TEXT,
+  geomvals geomval[],
+  params JSON,
+  merge BOOLEAN DEFAULT True)
+RETURNS TABLE (
+  id INT,
+  data JSON
+) AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_obs_config, redis_conn)
+  if not quota_service.check_user_quota():
+    raise Exception('You have reached the limit of your quota')
+
+  with metrics('obs_getdata', user_obs_config, logger, params):
+    try:
+        obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetData($1, $2, $3, $4, $5);", ["text", "text", "geomval[]", "json", "boolean"])
+        result = plpy.execute(obs_plan, [username, orgname, geomvals, params, merge])
+        empty_results = len(geomvals) - len(result)
+        if empty_results > 0:
+          quota_service.increment_empty_service_use(empty_results)
+        if result:
+          quota_service.increment_success_service_use(len(result))
+          return result
+        else:
+          return []
+    except BaseException as e:
+        import sys
+        quota_service.increment_failed_service_use(len(geomvals))
+        logger.error('Error trying to OBS_GetData', sys.exc_info(), data={"username": username, "orgname": orgname})
+        raise Exception('Error trying to OBS_GetData')
+    finally:
+        quota_service.increment_total_service_use(len(geomvals))
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetData(
+  username TEXT,
+  orgname TEXT,
+  geomrefs TEXT[],
+  params JSON)
+RETURNS TABLE (
+  id TEXT,
+  data JSON
+) AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory.OBS_GetData(geomrefs, params);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
+  username TEXT,
+  orgname TEXT,
+  geomrefs TEXT[],
+  params JSON)
+RETURNS TABLE (
+  id TEXT,
+  data JSON
+) AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  quota_service = QuotaService(user_obs_config, redis_conn)
+  if not quota_service.check_user_quota():
+    raise Exception('You have reached the limit of your quota')
+
+  with metrics('obs_getdata', user_obs_config, logger, params):
+    try:
+        obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_GetData($1, $2, $3, $4);", ["text", "text", "text[]", "json"])
+        result = plpy.execute(obs_plan, [username, orgname, geomrefs, params])
+        empty_results = len(geomrefs) - len(result)
+        if empty_results > 0:
+          quota_service.increment_empty_service_use(empty_results)
+        if result:
+          quota_service.increment_success_service_use(len(result))
+          return result
+        else:
+          return []
+    except BaseException as e:
+        import sys
+        quota_service.increment_failed_service_use(len(geomrefs))
+        exc_info = sys.exc_info()
+        logger.error('%s, %s, %s' % (exc_info[0], exc_info[1], exc_info[2]))
+        logger.error('Error trying to OBS_GetData', exc_info, data={"username": username, "orgname": orgname})
+        raise Exception('Error trying to OBS_GetData')
+    finally:
+        quota_service.increment_total_service_use(len(geomrefs))
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetMeta(
+  username TEXT,
+  orgname TEXT,
+  geom Geometry(Geometry, 4326),
+  params JSON,
+  max_timespan_rank INTEGER DEFAULT NULL,
+  max_score_rank INTEGER DEFAULT NULL,
+  target_geoms INTEGER DEFAULT NULL)
+RETURNS JSON AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT cdb_observatory.OBS_GetMeta(geom, params, max_timespan_rank, max_score_rank, target_geoms);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeta(
+  username TEXT,
+  orgname TEXT,
+  geom Geometry(Geometry, 4326),
+  params JSON,
+  max_timespan_rank INTEGER DEFAULT NULL,
+  max_score_rank INTEGER DEFAULT NULL,
+  target_geoms INTEGER DEFAULT NULL)
+RETURNS JSON AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
+  with metrics('obs_getmeta', user_obs_config, logger, params):
+    try:
+        obs_plan = plpy.prepare("SELECT cdb_dataservices_server._OBS_GetMeta($1, $2, $3, $4, $5, $6, $7) as meta;", ["text", "text", "Geometry (Geometry, 4326)", "json", "integer", "integer", "integer"])
+        result = plpy.execute(obs_plan, [username, orgname, geom, params, max_timespan_rank, max_score_rank, target_geoms])
+        if result:
+          return result[0]['meta']
+        else:
+          return None
+    except BaseException as e:
+        import sys
+        logger.error('Error trying to OBS_GetMeta', sys.exc_info(), data={"username": username, "orgname": orgname})
+        raise Exception('Error trying to OBS_GetMeta')
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_MetadataValidation(
+  username TEXT,
+  orgname TEXT,
+  geometry_extent Geometry(Geometry, 4326),
+  geometry_type text,
+  params JSON,
+  target_geoms INTEGER DEFAULT NULL)
+RETURNS TABLE(valid boolean, errors text[]) AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory.OBS_MetadataValidation(geometry_extent, geometry_type, params, target_geoms);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_MetadataValidation(
+  username TEXT,
+  orgname TEXT,
+  geometry_extent Geometry(Geometry, 4326),
+  geometry_type text,
+  params JSON,
+  target_geoms INTEGER DEFAULT NULL)
+RETURNS TABLE(valid boolean, errors text[]) AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
+  with metrics('obs_metadatavalidation', user_obs_config, logger):
+    try:
+        obs_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._OBS_MetadataValidation($1, $2, $3, $4, $5, $6);", ["text", "text", "Geometry (Geometry, 4326)",  "text", "json", "integer"])
+        result = plpy.execute(obs_plan, [username, orgname, geometry_extent, geometry_type, params, target_geoms])
+        if result:
+          return result
+        else:
+          return []
+    except BaseException as e:
+        import sys
+        logger.error('Error trying to OBS_MetadataValidation', sys.exc_info(), data={"username": username, "orgname": orgname})
+        raise Exception('Error trying to OBS_MetadataValidation')
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_Search(
   username TEXT,
   orgname TEXT,
@@ -712,7 +1102,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_Search(
 RETURNS TABLE(id text, description text, name text, aggregate text, source text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_Search(search_term, relevant_boundary);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_Search(
   username TEXT,
@@ -761,7 +1151,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
         raise Exception('Error trying to OBS_Search')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAvailableBoundaries(
   username TEXT,
@@ -771,7 +1161,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetAvailableBoundaries(
 RETURNS TABLE(boundary_id text, description text, time_span text, tablename text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetAvailableBoundaries(geom, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableBoundaries(
   username TEXT,
@@ -819,7 +1209,7 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundary(
   username TEXT,
   orgname TEXT,
@@ -829,7 +1219,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundary(
 RETURNS geometry(Geometry, 4326) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundary(geom, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
   username TEXT,
@@ -871,7 +1261,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundary')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
   username TEXT,
@@ -882,7 +1272,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryId(
 RETURNS TEXT AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundaryId(geom, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
   username TEXT,
@@ -924,7 +1314,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetBoundaryId')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
   username TEXT,
@@ -935,7 +1325,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundaryById(
 RETURNS geometry(Geometry, 4326) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.OBS_GetBoundaryById(geometry_id, boundary_id, time_span);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
   username TEXT,
@@ -977,7 +1367,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundaryById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -989,7 +1379,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByGeometry(geom, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -1037,7 +1427,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -1050,7 +1440,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndR
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetBoundariesByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -1099,7 +1489,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
   username TEXT,
@@ -1111,7 +1501,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByGeometry(geom, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   username TEXT,
@@ -1159,7 +1549,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -1172,7 +1562,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadiu
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetPointsByPointAndRadius(geom, radius, boundary_id, time_span, overlap_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -1221,7 +1611,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE TYPE cdb_dataservices_server.ds_fdw_metadata as (schemaname text, tabname text, servername text);
 
 CREATE TYPE cdb_dataservices_server.ds_return_metadata as (colnames text[], coltypes text[]);
@@ -1232,37 +1622,37 @@ RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     return plpy.execute("SELECT * FROM cdb_dataservices_server.__DST_ConnectUserTable({username}::text, {orgname}::text, {user_db_role}::text, {schema}::text, {dbname}::text, {host_addr}::text, {table_name}::text)"
         .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), user_db_role=plpy.quote_literal(user_db_role), schema=plpy.quote_literal(input_schema), dbname=plpy.quote_literal(dbname), table_name=plpy.quote_literal(table_name), host_addr=plpy.quote_literal(host_addr))
         )[0]
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.__DST_ConnectUserTable(username text, orgname text, user_db_role text, input_schema text, dbname text, host_addr text, table_name text)
 RETURNS cdb_dataservices_server.ds_fdw_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_ConnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_GetReturnMetadata(username text, orgname text, function_name text, params json)
 RETURNS cdb_dataservices_server.ds_return_metadata AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_GetReturnMetadata;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_FetchJoinFdwTableData(username text, orgname text, table_schema text, table_name text, function_name text, params json)
 RETURNS SETOF record AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_FetchJoinFdwTableData;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._DST_DisconnectUserTable(username text, orgname text, table_schema text, table_name text, servername text)
 RETURNS boolean AS $$
     CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
     TARGET cdb_observatory._OBS_DisconnectUserTable;
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_dumpversion(username text, orgname text)
 RETURNS text AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT cdb_observatory.obs_dumpversion();
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 -- We could create a super type for the common data like id, name and so on but we need to parse inside the functions because the -- the return data tha comes from OBS is a TABLE() with them
 CREATE TYPE cdb_dataservices_server.obs_meta_numerator AS (numer_id text, numer_name text, numer_description text, numer_weight text, numer_license text, numer_source text, numer_type text, numer_aggregate text, numer_extra jsonb, numer_tags jsonb, valid_denom boolean, valid_geom boolean, valid_timespan boolean);
@@ -1278,7 +1668,24 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableNumerators(
 RETURNS SETOF cdb_dataservices_server.obs_meta_numerator AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetAvailableNumerators(bounds, filter_tags, denom_id, geom_id, timespan);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetNumerators(
+  username TEXT,
+  orgname TEXT,
+  bounds geometry(Geometry, 4326) DEFAULT NULL,
+  section_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  subsection_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  other_tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+  ids TEXT[] DEFAULT ARRAY[]::TEXT[],
+  name TEXT DEFAULT NULL,
+  denom_id TEXT DEFAULT '',
+  geom_id TEXT DEFAULT '',
+  timespan TEXT DEFAULT '')
+RETURNS SETOF cdb_dataservices_server.obs_meta_numerator AS $$
+  CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
+  SELECT * FROM cdb_observatory._OBS_GetNumerators(bounds, section_tags, subsection_tags, other_tags, ids, name, denom_id, geom_id, timespan);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE TYPE cdb_dataservices_server.obs_meta_denominator AS (denom_id text, denom_name text, denom_description text, denom_weight text, denom_license text, denom_source text, denom_type text, denom_aggregate text, denom_extra jsonb, denom_tags jsonb, valid_numer boolean, valid_geom boolean, valid_timespan boolean);
 
@@ -1293,9 +1700,9 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableDenominators(
 RETURNS SETOF cdb_dataservices_server.obs_meta_denominator AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetAvailableDenominators(bounds, filter_tags, numer_id, geom_id, timespan);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
-CREATE TYPE cdb_dataservices_server.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean);
+CREATE TYPE cdb_dataservices_server.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric, geom_type text, geom_extra jsonb, geom_tags jsonb);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableGeometries(
   username TEXT,
@@ -1304,13 +1711,14 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableGeometries(
   filter_tags TEXT[] DEFAULT NULL,
   numer_id TEXT DEFAULT NULL,
   denom_id TEXT DEFAULT NULL,
-  timespan TEXT DEFAULT NULL)
+  timespan TEXT DEFAULT NULL,
+  number_geometries INTEGER DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_server.obs_meta_geometry AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
-  SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan);
-$$ LANGUAGE plproxy;
+  SELECT * FROM cdb_observatory.OBS_GetAvailableGeometries(bounds, filter_tags, numer_id, denom_id, timespan, number_geometries);
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
-CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean);
+CREATE TYPE cdb_dataservices_server.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb);
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableTimespans(
   username TEXT,
@@ -1323,7 +1731,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableTimespans(
 RETURNS SETOF cdb_dataservices_server.obs_meta_timespan AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_GetAvailableTimespans(bounds, filter_tags, numer_id, denom_id, geom_id);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_LegacyBuilderMetadata(
   username TEXT,
@@ -1332,7 +1740,7 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_LegacyBuilderMetadata(
 RETURNS TABLE(name TEXT, subsection JSON) AS $$
   CONNECT cdb_dataservices_server._obs_server_conn_str(username, orgname);
   SELECT * FROM cdb_observatory.OBS_LegacyBuilderMetadata(aggregate_type);
-$$ LANGUAGE plproxy;
+$$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_logger_config()
 RETURNS boolean AS $$
   cache_key = "logger_config"
@@ -1343,13 +1751,31 @@ RETURNS boolean AS $$
     logger_config = LoggerConfig(plpy)
     GD[cache_key] = logger_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 -- This is done in order to avoid an undesired depedency on cartodb extension
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_conf_getconf(input_key text)
 RETURNS JSON AS $$
     SELECT VALUE FROM cartodb.cdb_conf WHERE key = input_key;
-$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+$$ LANGUAGE SQL SECURITY DEFINER STABLE PARALLEL SAFE;
+
+CREATE OR REPLACE
+FUNCTION cdb_dataservices_server.CDB_Conf_SetConf(key text, value JSON)
+    RETURNS void AS $$
+BEGIN
+    PERFORM cdb_dataservices_server.CDB_Conf_RemoveConf(key);
+    EXECUTE 'INSERT INTO cartodb.CDB_CONF (KEY, VALUE) VALUES ($1, $2);' USING key, value;
+END
+$$ LANGUAGE PLPGSQL SECURITY DEFINER VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE
+FUNCTION cdb_dataservices_server.CDB_Conf_RemoveConf(key text)
+    RETURNS void AS $$
+BEGIN
+    EXECUTE 'DELETE FROM cartodb.CDB_CONF WHERE KEY = $1;' USING key;
+END
+$$ LANGUAGE PLPGSQL SECURITY DEFINER VOLATILE PARALLEL UNSAFE ;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_geocoder_config(username text, orgname text, provider text DEFAULT NULL)
 RETURNS boolean AS $$
@@ -1363,7 +1789,7 @@ RETURNS boolean AS $$
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_internal_geocoder_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -1377,7 +1803,7 @@ RETURNS boolean AS $$
     geocoder_config = InternalGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_isolines_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -1391,7 +1817,7 @@ RETURNS boolean AS $$
     isolines_routing_config = IsolinesRoutingConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = isolines_routing_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_routing_config(username text, orgname text)
 RETURNS boolean AS $$
@@ -1407,20 +1833,6 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_snapshot_config(username text, orgname text)
-RETURNS boolean AS $$
-  cache_key = "user_obs_snapshot_config_{0}".format(username)
-  if cache_key in GD:
-    return False
-  else:
-    from cartodb_services.metrics import ObservatorySnapshotConfig
-    plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-    redis_conn = GD["redis_connection_{0}".format(username)]['redis_metadata_connection']
-    obs_snapshot_config = ObservatorySnapshotConfig(redis_conn, plpy, username, orgname)
-    GD[cache_key] = obs_snapshot_config
-    return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
-
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._get_obs_config(username text, orgname text)
 RETURNS boolean AS $$
   cache_key = "user_obs_config_{0}".format(username)
@@ -1433,8 +1845,164 @@ RETURNS boolean AS $$
     obs_config = ObservatoryConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = obs_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type inner join pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+                 WHERE pg_type.typname = 'service_type'
+                 AND pg_namespace.nspname = 'cdb_dataservices_server') THEN
+    CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
+      'isolines',
+      'hires_geocoder',
+      'routing',
+      'observatory'
+    );
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type inner join pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+                 WHERE pg_type.typname = 'service_quota_info'
+                 AND pg_namespace.nspname = 'cdb_dataservices_server') THEN
+    CREATE TYPE cdb_dataservices_server.service_quota_info AS (
+      service cdb_dataservices_server.service_type,
+      monthly_quota NUMERIC,
+      used_quota NUMERIC,
+      soft_limit BOOLEAN,
+      provider TEXT
+    );
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type inner join pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+                 WHERE pg_type.typname = 'service_quota_info_batch'
+                 AND pg_namespace.nspname = 'cdb_dataservices_server') THEN
+    CREATE TYPE cdb_dataservices_server.service_quota_info_batch AS (
+      service cdb_dataservices_server.service_type,
+      monthly_quota NUMERIC,
+      used_quota NUMERIC,
+      soft_limit BOOLEAN,
+      provider TEXT,
+      max_batch_size NUMERIC
+    );
+  END IF;
+END $$;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(
+  username TEXT,
+  orgname TEXT)
+RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
+  from cartodb_services.metrics.user import UserMetricsService
+  from datetime import date
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+
+  today = date.today()
+  ret = []
+
+  #-- Isolines
+  service = 'isolines'
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+  user_service = UserMetricsService(user_isolines_config, redis_conn)
+
+  monthly_quota = user_isolines_config.isolines_quota
+  used_quota = user_service.used_quota(user_isolines_config.service_type, today)
+  soft_limit = user_isolines_config.soft_isolines_limit
+  provider = user_isolines_config.provider
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+
+  #-- Hires Geocoder
+  service = 'hires_geocoder'
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+  user_service = UserMetricsService(user_geocoder_config, redis_conn)
+
+  monthly_quota = user_geocoder_config.geocoding_quota
+  used_quota = user_service.used_quota(user_geocoder_config.service_type, today)
+  soft_limit = user_geocoder_config.soft_geocoding_limit
+  provider = user_geocoder_config.provider
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+
+  #-- Routing
+  service = 'routing'
+  plpy.execute("SELECT cdb_dataservices_server._get_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_routing_config = GD["user_routing_config_{0}".format(username)]
+  user_service = UserMetricsService(user_routing_config, redis_conn)
+
+  monthly_quota = user_routing_config.monthly_quota
+  used_quota = user_service.used_quota(user_routing_config.service_type, today)
+  soft_limit = user_routing_config.soft_limit
+  provider = user_routing_config.provider
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+
+  #-- Observatory
+  service = 'observatory'
+  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_obs_config = GD["user_obs_config_{0}".format(username)]
+  user_service = UserMetricsService(user_obs_config, redis_conn)
+
+  monthly_quota = user_obs_config.monthly_quota
+  used_quota = user_service.used_quota(user_obs_config.service_type, today)
+  soft_limit = user_obs_config.soft_limit
+  provider = user_obs_config.provider
+  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
+
+  return ret
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info_batch(
+  username TEXT,
+  orgname TEXT)
+RETURNS SETOF cdb_dataservices_server.service_quota_info_batch AS $$
+  from cartodb_services.bulk_geocoders import BATCH_GEOCODER_CLASS_BY_PROVIDER
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  sqi = plpy.execute("SELECT * from cdb_dataservices_server.cdb_service_quota_info({0},{1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+
+  ret = []
+  for info in sqi:
+      if info['service'] == 'hires_geocoder':
+          provider = info['provider']
+          batch_geocoder_class = BATCH_GEOCODER_CLASS_BY_PROVIDER.get(provider, None)
+          if batch_geocoder_class and hasattr(batch_geocoder_class, 'MAX_BATCH_SIZE'):
+              max_batch_size = batch_geocoder_class.MAX_BATCH_SIZE
+          else:
+              max_batch_size = 1
+
+          info['max_batch_size'] = max_batch_size
+      else:
+          info['max_batch_size'] = 1
+
+      ret += [[info['service'], info['monthly_quota'], info['used_quota'], info['soft_limit'], info['provider'], info['max_batch_size']]]
+
+  return ret
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(
+  username TEXT,
+  orgname TEXT,
+  service_ TEXT,
+  input_size NUMERIC)
+returns BOOLEAN AS $$
+  DECLARE
+    params cdb_dataservices_server.service_quota_info;
+  BEGIN
+    SELECT * INTO params
+      FROM cdb_dataservices_server.cdb_service_quota_info(username, orgname) AS p
+      WHERE p.service = service_::cdb_dataservices_server.service_type;
+    RETURN params.soft_limit OR ((params.used_quota + input_size) <= params.monthly_quota);
+  END
+$$ LANGUAGE plpgsql STABLE PARALLEL RESTRICTED;
 -- Geocodes a street address given a searchtext and a state and/or country
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
@@ -1447,7 +2015,9 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  with metrics('cdb_geocode_street_point', user_geocoder_config, logger):
+  params = {'username': username, 'orgname': orgname, 'searchtext': searchtext, 'city': city, 'state_province': state_province, 'country': country}
+
+  with metrics('cdb_geocode_street_point', user_geocoder_config, logger, params):
     if user_geocoder_config.heremaps_geocoder:
       here_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_here_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
       return plpy.execute(here_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
@@ -1457,10 +2027,19 @@ RETURNS Geometry AS $$
     elif user_geocoder_config.mapzen_geocoder:
       mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
       return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+    elif user_geocoder_config.mapbox_geocoder:
+      mapbox_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+      return plpy.execute(mapbox_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+    elif user_geocoder_config.tomtom_geocoder:
+      tomtom_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_tomtom_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+      return plpy.execute(tomtom_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+    elif user_geocoder_config.geocodio_geocoder:
+      geocodio_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocodio_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+      return plpy.execute(geocodio_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -1476,7 +2055,7 @@ RETURNS Geometry AS $$
   else:
     raise Exception('Here geocoder is not available for your account.')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -1491,7 +2070,7 @@ RETURNS Geometry AS $$
   else:
     raise Exception('Google geocoder is not available for your account.')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -1504,113 +2083,127 @@ RETURNS Geometry AS $$
   mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
   return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  # The configuration is retrieved but no checks are performed on it
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  mapbox_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+  return plpy.execute(mapbox_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  # The configuration is retrieved but no checks are performed on it
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  tomtom_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_tomtom_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+  return plpy.execute(tomtom_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocodio_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  # The configuration is retrieved but no checks are performed on it
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  geocodio_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocodio_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
+  return plpy.execute(geocodio_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
+
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.tools import QuotaExceededException
   from cartodb_services.here import HereMapsGeocoder
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
-
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  # -- Check the quota
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
 
   try:
-    geocoder = HereMapsGeocoder(user_geocoder_config.heremaps_app_id, user_geocoder_config.heremaps_app_code, logger)
+    service_manager.assert_within_limits()
+    geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using here maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using here maps')
   finally:
-    quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import LegacyServiceManager, QuotaExceededException
   from cartodb_services.google import GoogleMapsGeocoder
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger,LoggerConfig
 
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
-  
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
-  logger_config = GD["logger_config"]
-  logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
 
   try:
-    geocoder = GoogleMapsGeocoder(user_geocoder_config.google_client_id, user_geocoder_config.google_api_key, logger)
+    service_manager.assert_within_limits(quota=False)
+    geocoder = GoogleMapsGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using google maps', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using google maps')
   finally:
-    quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
+  from cartodb_services.mapzen import MapzenGeocoder
+  from cartodb_services.tools.country import country_to_iso3
+  from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
+
   import cartodb_services
   cartodb_services.init(plpy, GD)
-  from cartodb_services.mapzen import MapzenGeocoder
-  from cartodb_services.mapzen.types import country_to_iso3
-  from cartodb_services.metrics import QuotaService
-  from cartodb_services.tools import Logger
-  from cartodb_services.refactor.tools.logger import LoggerConfigBuilder
-  from cartodb_services.refactor.service.mapzen_geocoder_config import MapzenGeocoderConfigBuilder
-  from cartodb_services.refactor.core.environment import ServerEnvironmentBuilder
-  from cartodb_services.refactor.backend.server_config import ServerConfigBackendFactory
-  from cartodb_services.refactor.backend.user_config import UserConfigBackendFactory
-  from cartodb_services.refactor.backend.org_config import OrgConfigBackendFactory
-  from cartodb_services.refactor.backend.redis_metrics_connection import RedisMetricsConnectionFactory
 
-  server_config_backend = ServerConfigBackendFactory().get()
-  environment = ServerEnvironmentBuilder(server_config_backend).get()
-  user_config_backend = UserConfigBackendFactory(username, environment, server_config_backend).get()
-  org_config_backend = OrgConfigBackendFactory(orgname, environment, server_config_backend).get()
-
-  logger_config = LoggerConfigBuilder(environment, server_config_backend).get()
-  logger = Logger(logger_config)
-
-  mapzen_geocoder_config = MapzenGeocoderConfigBuilder(server_config_backend, user_config_backend, org_config_backend, username, orgname).get()
-
-  redis_metrics_connection = RedisMetricsConnectionFactory(environment, server_config_backend).get()
-
-  quota_service = QuotaService(mapzen_geocoder_config, redis_metrics_connection)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
+  service_manager = ServiceManager('geocoder', MapzenGeocoderConfigBuilder, username, orgname)
 
   try:
-    geocoder = MapzenGeocoder(mapzen_geocoder_config.mapzen_api_key, logger)
+    service_manager.assert_within_limits()
+    geocoder = MapzenGeocoder(service_manager.config.mapzen_api_key, service_manager.logger, service_manager.config.service_params)
     country_iso3 = None
     if country:
       country_iso3 = country_to_iso3(country)
@@ -1618,21 +2211,369 @@ RETURNS Geometry AS $$
                                    state_province=state_province,
                                    country=country_iso3, search_type='address')
     if coordinates:
-      quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
       point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
       return point['st_setsrid']
     else:
-      quota_service.increment_empty_service_use()
+      service_manager.quota_service.increment_empty_service_use()
       return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
   except BaseException as e:
     import sys
-    quota_service.increment_failed_service_use()
-    logger.error('Error trying to geocode street point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
     raise Exception('Error trying to geocode street point using mapzen')
   finally:
-    quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  from iso3166 import countries
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
+  from cartodb_services.mapbox import MapboxGeocoder
+  from cartodb_services.tools.country import country_to_iso3
+  from cartodb_services.refactor.service.mapbox_geocoder_config import MapboxGeocoderConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
+
+  try:
+    service_manager.assert_within_limits()
+    geocoder = MapboxGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+
+    country_iso3166 = None
+    if country:
+      country_iso3 = country_to_iso3(country)
+      if country_iso3:
+        country_iso3166 = countries.get(country_iso3).alpha2.lower()
+
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city,
+                                   state_province=state_province,
+                                   country=country_iso3166)
+    if coordinates:
+      service_manager.quota_service.increment_success_service_use()
+      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+      return point['st_setsrid']
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using Mapbox', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using Mapbox')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  from iso3166 import countries
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
+  from cartodb_services.tomtom import TomTomGeocoder
+  from cartodb_services.tools.country import country_to_iso3
+  from cartodb_services.refactor.service.tomtom_geocoder_config import TomTomGeocoderConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('geocoder', TomTomGeocoderConfigBuilder, username, orgname, GD)
+
+  try:
+    service_manager.assert_within_limits()
+    geocoder = TomTomGeocoder(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
+
+    country_iso3166 = None
+    if country:
+      country_iso3 = country_to_iso3(country)
+      if country_iso3:
+        country_iso3166 = countries.get(country_iso3).alpha2.lower()
+
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city,
+                                   state_province=state_province,
+                                   country=country_iso3166)
+    if coordinates:
+      service_manager.quota_service.increment_success_service_use()
+      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+      return point['st_setsrid']
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using TomTom', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using TomTom')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocodio_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
+RETURNS Geometry AS $$
+  from iso3166 import countries
+  from cartodb_services.tools import ServiceManager, QuotaExceededException
+  from cartodb_services.geocodio import GeocodioGeocoder
+  from cartodb_services.tools.country import country_to_iso3
+  from cartodb_services.refactor.service.geocodio_geocoder_config import GeocodioGeocoderConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('geocoder', GeocodioGeocoderConfigBuilder, username, orgname, GD)
+
+  try:
+    service_manager.assert_within_limits()
+    geocoder = GeocodioGeocoder(service_manager.config.geocodio_api_key, service_manager.logger, service_manager.config.service_params)
+
+    country_iso3166 = None
+    if country:
+      country_iso3 = country_to_iso3(country)
+      if country_iso3:
+        country_iso3166 = countries.get(country_iso3).alpha2.lower()
+
+    coordinates = geocoder.geocode(searchtext=searchtext, city=city,
+                                   state_province=state_province,
+                                   country=country_iso3166)
+    if coordinates:
+      service_manager.quota_service.increment_success_service_use()
+      plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
+      point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
+      return point['st_setsrid']
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return None
+  except QuotaExceededException as qe:
+    service_manager.quota_service.increment_failed_service_use()
+    return None
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to geocode street point using Geocodio', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to geocode street point using Geocodio')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_get_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT)
+RETURNS JSON AS $$
+  import json
+  from cartodb_services.config import ServiceConfiguration, RateLimitsConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_config = ServiceConfiguration(service, username, orgname)
+  rate_limit_config = RateLimitsConfigBuilder(service_config.server, service_config.user, service_config.org, service=service, username=username, orgname=orgname).get()
+  if rate_limit_config.is_limited():
+      return json.dumps({'limit': rate_limit_config.limit, 'period': rate_limit_config.period})
+  else:
+      return None
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_user_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
+  else:
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_user_rate_limits(config)
+$$ LANGUAGE @@plpythonu@@ VOLATILE PARALLEL UNSAFE;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_org_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
+  else:
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_org_rate_limits(config)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_server_rate_limit(
+  username TEXT,
+  orgname TEXT,
+  service TEXT,
+  rate_limit_json JSON)
+RETURNS VOID AS $$
+  import json
+  from cartodb_services.config import RateLimitsConfig, RateLimitsConfigSetter
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  config_setter = RateLimitsConfigSetter(service=service, username=username, orgname=orgname)
+  if rate_limit_json:
+      rate_limit = json.loads(rate_limit_json)
+      limit = rate_limit.get('limit', None)
+      period = rate_limit.get('period', None)
+  else:
+      limit = None
+      period = None
+  config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
+  config_setter.set_server_rate_limits(config)
+$$ LANGUAGE @@plpythonu@@ VOLATILE PARALLEL UNSAFE;
+-- TODO: could cartodb_id be replaced by rowid, maybe needing extra care for offset?
+CREATE TYPE cdb_dataservices_server.geocoding AS (
+    cartodb_id integer,
+    the_geom geometry(Point,4326),
+    metadata jsonb
+);
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.tools import Logger
+  import json
+
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+
+  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
+  params = {'username': username, 'orgname': orgname, 'searches': json.loads(searches)}
+
+  with metrics('cdb_bulk_geocode_street_point', user_geocoder_config, logger, params):
+    if user_geocoder_config.google_geocoder:
+      provider_function = "_cdb_bulk_google_geocode_street_point";
+    elif user_geocoder_config.heremaps_geocoder:
+      provider_function = "_cdb_bulk_heremaps_geocode_street_point";
+    elif user_geocoder_config.tomtom_geocoder:
+      provider_function = "_cdb_bulk_tomtom_geocode_street_point";
+    elif user_geocoder_config.mapbox_geocoder:
+      provider_function = "_cdb_bulk_mapbox_geocode_street_point";
+    elif user_geocoder_config.geocodio_geocoder:
+      provider_function = "_cdb_bulk_geocodio_geocode_street_point";
+    else:
+      raise Exception('Requested geocoder is not available')
+
+    plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.{}($1, $2, $3); ".format(provider_function), ["text", "text", "jsonb"])
+    return plpy.execute(plan, [username, orgname, searches])
+
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_google_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.google import GoogleMapsBulkGeocoder
+
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  geocoder = GoogleMapsBulkGeocoder(service_manager.config.google_client_id, service_manager.config.google_api_key, service_manager.logger)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_heremaps_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import LegacyServiceManager
+  from cartodb_services.here import HereMapsBulkGeocoder
+
+  service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
+  geocoder = HereMapsBulkGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_tomtom_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.refactor.service.tomtom_geocoder_config import TomTomGeocoderConfigBuilder
+  from cartodb_services.tomtom import TomTomBulkGeocoder
+  from cartodb_services.tools import Logger
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  service_manager = ServiceManager('geocoder', TomTomGeocoderConfigBuilder, username, orgname, GD)
+  geocoder = TomTomBulkGeocoder(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_mapbox_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.refactor.service.mapbox_geocoder_config import MapboxGeocoderConfigBuilder
+  from cartodb_services.mapbox import MapboxBulkGeocoder
+  from cartodb_services.tools import Logger
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  service_manager = ServiceManager('geocoder', MapboxGeocoderConfigBuilder, username, orgname, GD)
+  geocoder = MapboxBulkGeocoder(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_bulk_geocodio_geocode_street_point(username TEXT, orgname TEXT, searches jsonb)
+RETURNS SETOF cdb_dataservices_server.geocoding AS $$
+  from cartodb_services import run_street_point_geocoder
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.refactor.service.geocodio_geocoder_config import GeocodioGeocoderConfigBuilder
+  from cartodb_services.geocodio import GeocodioBulkGeocoder
+  from cartodb_services.tools import Logger
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  service_manager = ServiceManager('geocoder', GeocodioGeocoderConfigBuilder, username, orgname, GD)
+  geocoder = GeocodioBulkGeocoder(service_manager.config.geocodio_api_key, service_manager.logger, service_manager.config.service_params)
+  return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import QuotaService
@@ -1649,7 +2590,10 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_admin0_polygon', user_geocoder_config, logger):
+
+  params = {'username': username, 'orgname': orgname, 'country_name': country_name}
+
+  with metrics('cdb_geocode_admin0_polygon', user_geocoder_config, logger, params):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin0_polygon(trim($1)) AS mypolygon", ["text"])
       rv = plpy.execute(plan, [country_name], 1)
@@ -1667,7 +2611,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin0 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 
 --------------------------------------------------------------------------------
@@ -1687,7 +2631,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 ---- cdb_geocode_admin1_polygon(admin1_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
@@ -1706,7 +2650,9 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  with metrics('cdb_geocode_admin1_polygon', user_geocoder_config, logger):
+  params = {'username': username, 'orgname': orgname, 'admin1_name': admin1_name}
+
+  with metrics('cdb_geocode_admin1_polygon', user_geocoder_config, logger, params):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_admin1_polygon(trim($1)) AS mypolygon", ["text"])
       rv = plpy.execute(plan, [admin1_name], 1)
@@ -1724,7 +2670,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin1 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
@@ -1762,7 +2708,7 @@ RETURNS Geometry AS $$
         raise Exception('Error trying to geocode admin1 polygon')
       finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -1791,7 +2737,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_admin1_polygon(admin1_name text, country_name text)
@@ -1815,85 +2761,67 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 ---- cdb_geocode_namedplace_point(city_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
-  try:
-    mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
-    return plpy.execute(mapzen_plan, [username, orgname, city_name])[0]['point']
-  except BaseException as e:
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
-$$ LANGUAGE plpythonu;
-
----- cdb_geocode_namedplace_point(city_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
-RETURNS Geometry AS $$
-  try:
-    mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
-    return plpy.execute(mapzen_plan, [username, orgname, city_name, country_name])[0]['point']
-  except BaseException as e:
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
-$$ LANGUAGE plpythonu;
-
----- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
-CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
-RETURNS Geometry AS $$
-  try:
-    mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapzen_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
-    return plpy.execute(mapzen_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
-  except BaseException as e:
-    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
-    return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
-$$ LANGUAGE plpythonu;
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
-RETURNS Geometry AS $$
-  from cartodb_services.mapzen import MapzenGeocoder
-  from cartodb_services.mapzen.types import country_to_iso3
-  from cartodb_services.metrics import QuotaService, metrics
+  from plpy import spiexceptions
   from cartodb_services.tools import Logger,LoggerConfig
-
-  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
-  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
-  plpy.execute("SELECT cdb_dataservices_server._get_geocoder_config({0}, {1}, {2})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname), plpy.quote_nullable('mapzen')))
-  user_geocoder_config = GD["user_geocoder_config_{0}".format(username)]
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
-  quota_service = QuotaService(user_geocoder_config, redis_conn)
-  if not quota_service.check_user_quota():
-    raise Exception('You have reached the limit of your quota')
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
-    try:
-      geocoder = MapzenGeocoder(user_geocoder_config.mapzen_api_key, logger)
-      country_iso3 = None
-      if country_name:
-        country_iso3 = country_to_iso3(country_name)
-      coordinates = geocoder.geocode(searchtext=city_name, city=None,
-                                    state_province=admin1_name,
-                                    country=country_iso3, search_type='locality')
-      if coordinates:
-        quota_service.increment_success_service_use()
-        plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
-        point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
-        return point['st_setsrid']
-      else:
-        quota_service.increment_empty_service_use()
-        return None
-    except BaseException as e:
-      import sys
-      quota_service.increment_failed_service_use()
-      logger.error('Error trying to geocode city point using mapzen', sys.exc_info(), data={"username": username, "orgname": orgname})
-      raise Exception('Error trying to geocode city point using mapzen')
-    finally:
-      quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+  try:
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3) as point;", ["text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name])[0]['point']
+  except spiexceptions.ExternalRoutineException as e:
+    import sys
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+---- cdb_geocode_namedplace_point(city_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
+RETURNS Geometry AS $$
+  from plpy import spiexceptions
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
+  try:
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, NULL, $4) as point;", ["text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name, country_name])[0]['point']
+  except spiexceptions.ExternalRoutineException as e:
+    import sys
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
+RETURNS Geometry AS $$
+  from plpy import spiexceptions
+  from cartodb_services.tools import Logger,LoggerConfig
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+
+  try:
+    street_point = plpy.prepare("SELECT cdb_dataservices_server.cdb_geocode_street_point($1, $2, $3, NULL, $4, $5) as point;", ["text", "text", "text", "text", "text"])
+    return plpy.execute(street_point, [username, orgname, city_name, admin1_name, country_name])[0]['point']
+  except spiexceptions.ExternalRoutineException as e:
+    import sys
+    logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
+    internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
+    return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_internal_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -1911,7 +2839,9 @@ RETURNS Geometry AS $$
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
 
-  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger):
+  params = {'username': username, 'orgname': orgname, 'city_name': city_name, 'admin1_name': admin1_name, 'country_name': country_name}
+
+  with metrics('cdb_geocode_namedplace_point', user_geocoder_config, logger, params):
     try:
       if admin1_name and country_name:
         plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_namedplace_point(trim($1), trim($2), trim($3)) AS mypoint", ["text", "text", "text"])
@@ -1936,7 +2866,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode namedplace point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -1960,7 +2890,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, country_name text)
@@ -1980,7 +2910,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
@@ -2004,7 +2934,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
   END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -2022,7 +2952,10 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
-  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger):
+
+  params = {'username': username, 'orgname': orgname, 'code': code}
+
+  with metrics('cdb_geocode_postalcode_point', user_geocoder_config, logger, params):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_postalcode_point(trim($1)) AS mypoint", ["text"])
       rv = plpy.execute(plan, [code], 1)
@@ -2040,7 +2973,13 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text);
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -2076,7 +3015,13 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code double precision, country text)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_point(username, orgname, code::text, country);
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -2112,7 +3057,14 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text)
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
+
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -2148,7 +3100,12 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code double precision, country text)
+RETURNS Geometry AS $$
+  SELECT cdb_dataservices_server.cdb_geocode_postalcode_polygon(username, orgname, code::text, country);
+$$ LANGUAGE SQL STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -2173,7 +3130,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_point(code text, country text)
 RETURNS Geometry AS $$
@@ -2198,7 +3155,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text)
 RETURNS Geometry AS $$
@@ -2219,7 +3176,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_geocode_postalcode_polygon(code text, country text)
 RETURNS Geometry AS $$
@@ -2244,7 +3201,7 @@ RETURNS Geometry AS $$
 
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
   from cartodb_services.metrics import metrics
@@ -2261,6 +3218,9 @@ RETURNS Geometry AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
   quota_service = QuotaService(user_geocoder_config, redis_conn)
+
+  params = {'username': username, 'orgname': orgname, 'ip': ip}
+
   with metrics('cdb_geocode_ipaddress_point', user_geocoder_config, logger):
     try:
       plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_geocode_ipaddress_point(trim($1)) AS mypoint", ["TEXT"])
@@ -2279,7 +3239,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 --------------------------------------------------------------------------------
 
@@ -2310,7 +3270,7 @@ RETURNS Geometry AS $$
         FROM matches;
     RETURN ret;
 END
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE PARALLEL SAFE;
 CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), data_range integer, the_geom geometry(Multipolygon,4326));
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
@@ -2333,7 +3293,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id, 
+    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id,
       user_isolines_routing_config.heremaps_app_code, logger)
 
     if source:
@@ -2368,13 +3328,11 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
-
-CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isolines(
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isodistance(
    username TEXT,
    orgname TEXT,
-   isotype TEXT,
    source geometry(Geometry, 4326),
    mode TEXT,
    data_range integer[],
@@ -2391,13 +3349,12 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
-  # -- Check the quota
   quota_service = QuotaService(user_isolines_routing_config, redis_conn)
   if not quota_service.check_user_quota():
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger)
+    client = MatrixClient(user_isolines_routing_config.mapzen_matrix_api_key, logger, user_isolines_routing_config.mapzen_matrix_service_params)
     mapzen_isolines = MapzenIsolines(client, logger)
 
     if source:
@@ -2409,14 +3366,9 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
 
     # -- TODO Support options properly
     isolines = {}
-    if isotype == 'isodistance':
-      for r in data_range:
-          isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
-          isolines[r] = isoline
-    elif isotype == 'isochrone':
-      for r in data_range:
-          isoline = mapzen_isolines.calculate_isochrone(origin, mode, r)
-          isolines[r] = isoline
+    for r in data_range:
+        isoline = mapzen_isolines.calculate_isodistance(origin, mode, r)
+        isolines[r] = isoline
 
     result = []
     for r in data_range:
@@ -2442,26 +3394,346 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.mapbox import MapboxIsolines
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = Coordinate(lon,lat)
+    else:
+      raise Exception('source is NULL')
+
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
+
+    # -- TODO Support options properly
+    isolines = {}
+    for r in data_range:
+        isoline = mapbox_isolines.calculate_isodistance(origin, r, profile)
+        isolines[r] = isoline
+
+    result = []
+    for r in data_range:
+
+      if len(isolines[r]) >= 3:
+        # -- TODO encapsulate this block into a func/method
+        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+        wkt_coordinates = ','.join(["%f %f" % (l.longitude, l.latitude) for l in locations])
+        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3) as geom".format(wkt_coordinates)
+        multipolygon = plpy.execute(sql, 1)[0]['geom']
+      else:
+        multipolygon = None
+
+      result.append([source, r, multipolygon])
+
+    service_manager.quota_service.increment_success_service_use()
+    service_manager.quota_service.increment_isolines_service_use(len(isolines))
+    return result
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get Mapbox isolines')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_isodistance(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.tomtom import TomTomIsolines
+  from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.refactor.service.tomtom_isolines_config import TomTomIsolinesConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('isolines', TomTomIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    tomtom_isolines = TomTomIsolines(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = Coordinate(lon,lat)
+    else:
+      raise Exception('source is NULL')
+
+    profile = TRANSPORT_MODE_TO_TOMTOM.get(mode)
+
+    # -- TODO Support options properly
+    isolines = {}
+    for r in data_range:
+        isoline = tomtom_isolines.calculate_isodistance(origin, r, profile)
+        isolines[r] = isoline
+
+    result = []
+    for r in data_range:
+
+      if len(isolines[r]) >= 3:
+        # -- TODO encapsulate this block into a func/method
+        locations = isolines[r] + [ isolines[r][0] ] # close the polygon repeating the first point
+        wkt_coordinates = ','.join(["%f %f" % (l.longitude, l.latitude) for l in locations])
+        sql = "SELECT ST_CollectionExtract(ST_MakeValid(ST_MPolyFromText('MULTIPOLYGON((({0})))', 4326)),3) as geom".format(wkt_coordinates)
+        multipolygon = plpy.execute(sql, 1)[0]['geom']
+      else:
+        multipolygon = None
+
+      result.append([source, r, multipolygon])
+
+    service_manager.quota_service.increment_success_service_use()
+    service_manager.quota_service.increment_isolines_service_use(len(isolines))
+    return result
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get TomTom isolines', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get TomTom isolines')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  import json
+  from cartodb_services.mapzen import MatrixClient, MapzenIsochrones
+  from cartodb_services.metrics import QuotaService
+  from cartodb_services.tools import Logger,LoggerConfig
+  from cartodb_services.mapzen.types import coordinates_to_polygon
+
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  user_isolines_routing_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
+  # -- Check the quota
+  quota_service = QuotaService(user_isolines_routing_config, redis_conn)
+  if not quota_service.check_user_quota():
+    raise Exception('You have reached the limit of your quota')
+
+  try:
+    mapzen_isochrones = MapzenIsochrones(user_isolines_routing_config.mapzen_matrix_api_key,
+                                         logger, user_isolines_routing_config.mapzen_isochrones_service_params)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = {'lat': lat, 'lon': lon}
+    else:
+      raise Exception('source is NULL')
+
+    resp = mapzen_isochrones.isochrone(origin, mode, data_range)
+
+    if resp:
+      result = []
+      for isochrone in resp:
+        result_polygon = coordinates_to_polygon(isochrone.coordinates)
+        if result_polygon:
+          result.append([source, isochrone.duration, result_polygon])
+        else:
+          result.append([source, isochrone.duration, None])
+      quota_service.increment_success_service_use()
+      quota_service.increment_isolines_service_use(len(result))
+      return result
+    else:
+      quota_service.increment_empty_service_use()
+      return []
+  except BaseException as e:
+    import sys
+    quota_service.increment_failed_service_use()
+    logger.error('Error trying to get mapzen isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get mapzen isochrones')
+  finally:
+    quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.mapbox import MapboxIsolines
+  from cartodb_services.mapbox.types import TRANSPORT_MODE_TO_MAPBOX
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.tools.coordinates import coordinates_to_polygon
+  from cartodb_services.refactor.service.mapbox_isolines_config import MapboxIsolinesConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('isolines', MapboxIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    mapbox_isolines = MapboxIsolines(service_manager.config.mapbox_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = Coordinate(lon,lat)
+    else:
+      raise Exception('source is NULL')
+
+    profile = TRANSPORT_MODE_TO_MAPBOX.get(mode)
+
+    resp = mapbox_isolines.calculate_isochrone(origin, data_range, profile)
+
+    if resp:
+      result = []
+      for isochrone in resp:
+        result_polygon = coordinates_to_polygon(isochrone.coordinates)
+        if result_polygon:
+          result.append([source, isochrone.duration, result_polygon])
+        else:
+          result.append([source, isochrone.duration, None])
+      service_manager.quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_isolines_service_use(len(result))
+      return result
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return []
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get Mapbox isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get Mapbox isochrones')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
+CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_isochrones(
+   username TEXT,
+   orgname TEXT,
+   source geometry(Geometry, 4326),
+   mode TEXT,
+   data_range integer[],
+   options text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  from cartodb_services.tools import ServiceManager
+  from cartodb_services.tomtom import TomTomIsolines
+  from cartodb_services.tomtom.types import TRANSPORT_MODE_TO_TOMTOM
+  from cartodb_services.tools import Coordinate
+  from cartodb_services.tools.coordinates import coordinates_to_polygon
+  from cartodb_services.refactor.service.tomtom_isolines_config import TomTomIsolinesConfigBuilder
+
+  import cartodb_services
+  cartodb_services.init(plpy, GD)
+
+  service_manager = ServiceManager('isolines', TomTomIsolinesConfigBuilder, username, orgname, GD)
+  service_manager.assert_within_limits()
+
+  try:
+    tomtom_isolines = TomTomIsolines(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
+
+    if source:
+      lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
+      lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
+      origin = Coordinate(lon,lat)
+    else:
+      raise Exception('source is NULL')
+
+    profile = TRANSPORT_MODE_TO_TOMTOM.get(mode)
+
+    resp = tomtom_isolines.calculate_isochrone(origin, data_range, profile)
+
+    if resp:
+      result = []
+      for isochrone in resp:
+        result_polygon = coordinates_to_polygon(isochrone.coordinates)
+        if result_polygon:
+          result.append([source, isochrone.duration, result_polygon])
+        else:
+          result.append([source, isochrone.duration, None])
+      service_manager.quota_service.increment_success_service_use()
+      service_manager.quota_service.increment_isolines_service_use(len(result))
+      return result
+    else:
+      service_manager.quota_service.increment_empty_service_use()
+      return []
+  except BaseException as e:
+    import sys
+    service_manager.quota_service.increment_failed_service_use()
+    service_manager.logger.error('Error trying to get TomTom isochrones', sys.exc_info(), data={"username": username, "orgname": orgname})
+    raise Exception('Error trying to get TomTom isochrones')
+  finally:
+    service_manager.quota_service.increment_total_service_use()
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  from cartodb_services.metrics import metrics
+  from cartodb_services.tools import Logger
+
   plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+  plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
+  logger_config = GD["logger_config"]
+  logger = Logger(logger_config)
 
   if user_isolines_config.google_services_user:
     raise Exception('This service is not available for google service users.')
 
-  if user_isolines_config.heremaps_provider:
-    here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-    return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
-  elif user_isolines_config.mapzen_provider:
-    mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-    return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
-  else:
-    raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu;
+  params = {'username': username, 'orgname': orgname, 'source': source, 'mode': mode, 'range': range, 'options': options}
+
+  with metrics('cdb_isodistance', user_isolines_config, logger, params):
+    if user_isolines_config.heremaps_provider:
+      here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.mapzen_provider:
+      mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapbox_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_tomtom_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
+    else:
+      raise Exception('Requested isolines provider is not available')
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- heremaps isodistance
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -2476,7 +3748,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
 
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- mapzen isodistance
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -2485,13 +3757,40 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
-  type = 'isodistance'
 
-  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-  result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
 
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+-- mapbox isodistance
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+
+  return result
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+-- tomtom isodistance
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_isodistance($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
+
+  return result
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   from cartodb_services.metrics import metrics
@@ -2508,16 +3807,24 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   if user_isolines_config.google_services_user:
     raise Exception('This service is not available for google service users.')
 
-  with metrics('cb_isochrone', user_isolines_config, logger):
+  params = {'username': username, 'orgname': orgname, 'source': source, 'mode': mode, 'range': range, 'options': options}
+
+  with metrics('cdb_isochrone', user_isolines_config, logger, params):
     if user_isolines_config.heremaps_provider:
       here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_here_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(here_plan, [username, orgname, source, mode, range, options])
     elif user_isolines_config.mapzen_provider:
       mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapzen_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
       return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.mapbox_provider:
+      mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_mapbox_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+    elif user_isolines_config.tomtom_provider:
+      tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server.cdb_tomtom_isochrone($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+      return plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- heremaps isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -2532,7 +3839,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
 
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 -- mapzen isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapzen_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -2541,12 +3848,37 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
   plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
   user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
-  type = 'isochrone'
 
-  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
-  result = plpy.execute(mapzen_plan, [username, orgname, type, source, mode, range, options])
+  mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+-- mapbox isochrone
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
+  return result
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+
+-- tomtom isochrone
+CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_tomtom_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
+RETURNS SETOF cdb_dataservices_server.isoline AS $$
+  plpy.execute("SELECT cdb_dataservices_server._connect_to_redis('{0}')".format(username))
+  redis_conn = GD["redis_connection_{0}".format(username)]['redis_metrics_connection']
+  plpy.execute("SELECT cdb_dataservices_server._get_isolines_routing_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
+  user_isolines_config = GD["user_isolines_routing_config_{0}".format(username)]
+
+  tomtom_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_tomtom_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
+  result = plpy.execute(tomtom_plan, [username, orgname, source, mode, range, options])
+  return result
+$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 DO $$
 BEGIN
     IF NOT EXISTS (

@@ -48,4 +48,4 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
