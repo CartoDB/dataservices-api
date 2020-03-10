@@ -27,7 +27,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
@@ -58,7 +58,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
@@ -89,7 +89,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
 RETURNS Geometry AS $$
@@ -120,7 +120,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
 RETURNS Geometry AS $$
@@ -151,7 +151,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
 RETURNS Geometry AS $$
@@ -182,7 +182,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -213,7 +213,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -244,7 +244,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -275,7 +275,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -306,7 +306,7 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
@@ -337,4 +337,4 @@ RETURNS Geometry AS $$
       plpy.error(error_msg)
     finally:
       quota_service.increment_total_geocoder_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

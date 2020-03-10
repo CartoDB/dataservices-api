@@ -18,7 +18,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
 
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -34,4 +34,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   here_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_here_routing_isolines($1, $2, $3, $4, $5, $6, $7) as isoline; ", ["text", "text", "text", "geometry(Geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(here_plan, [username, orgname, type, source, mode, range, options])
   return result
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

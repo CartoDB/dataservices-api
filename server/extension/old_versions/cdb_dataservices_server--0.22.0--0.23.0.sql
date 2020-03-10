@@ -19,7 +19,7 @@ RETURNS JSON AS $$
       return json.dumps({'limit': rate_limit_config.limit, 'period': rate_limit_config.period})
   else:
       return None
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_user_rate_limit(
   username TEXT,
@@ -43,7 +43,7 @@ RETURNS VOID AS $$
       period = None
   config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
   config_setter.set_user_rate_limits(config)
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_org_rate_limit(
   username TEXT,
@@ -67,7 +67,7 @@ RETURNS VOID AS $$
       period = None
   config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
   config_setter.set_org_rate_limits(config)
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_set_server_rate_limit(
   username TEXT,
@@ -91,7 +91,7 @@ RETURNS VOID AS $$
       period = None
   config = RateLimitsConfig(service=service, username=username, limit=limit, period=period)
   config_setter.set_server_rate_limits(config)
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE
 FUNCTION cdb_dataservices_server.CDB_Conf_SetConf(key text, value JSON)
@@ -137,7 +137,7 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using here maps')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_google_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -166,7 +166,7 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using google maps')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -204,4 +204,4 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using mapzen')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

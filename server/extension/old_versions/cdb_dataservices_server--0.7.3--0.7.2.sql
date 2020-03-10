@@ -52,7 +52,7 @@ RETURNS json AS $$
       plpy.error(error_msg)
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -100,4 +100,4 @@ RETURNS json AS $$
       plpy.error(error_msg)
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
