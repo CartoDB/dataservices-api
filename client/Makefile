@@ -35,7 +35,7 @@ SOURCES_DATA_DIR = sql/
 
 REGRESS = $(notdir $(basename $(sort $(wildcard test/sql/*test.sql))))
 REGRESS_EXPEC = $(notdir $(basename $(sort $(wildcard test/expected/*test.out))))
-TEST_DIR = test_out
+TEST_DIR = test
 REGRESS_OPTS = --inputdir='$(TEST_DIR)' --outputdir='$(TEST_DIR)' --user='postgres'
 
 # DATA is a special variable used by postgres build infrastructure
@@ -95,10 +95,8 @@ release: $(EXTENSION).control $(SOURCES_DATA)
 devclean:
 	rm -f $(NEW_EXTENSION_ARTIFACT)
 	rm -f $(GENERATED_SQL_FILES)
-	rm -rf $(TEST_DIR)
-	for f in $(basename $(wildcard old_versions/*.bak)); do \
-		mv $${f}.bak $${f}; \
-	done
+
+clean: restore_copies
 
 # If needed remove PARALLEL tags from the release files
 release_remove_parallel_deploy:
@@ -110,25 +108,54 @@ ifeq ($(PG_PARALLEL), 0)
 	done
 endif
 
+restore_copies:
+	# tests
+	for f in $(basename $(wildcard test/sql/*.copy)); do \
+		cat $${f}.copy > $${f}; \
+	done
+	for f in $(basename $(wildcard test/expected/*.copy)); do \
+		cat $${f}.copy > $${f}; \
+	done
+	rm -f test/sql/*.copy;
+	rm -f test/expected/*.copy;
+	# data
+	for f in $(basename $(wildcard sql/*.copy)); do \
+		cat $${f}.copy > $${f}; \
+	done
+	rm -f sql/*.copy;
+	# old_versions
+	for f in $(basename $(wildcard old_versions/*.copy)); do \
+		cat $${f}.copy > $${f}; \
+	done
+	rm -f old_versions/*.copy;
+	# current scripts
+	for f in $(basename $(wildcard *.copy)); do \
+		cat $${f}.copy > $${f}; \
+	done
+	rm -f *.copy;
+
 # Replacing variables defined within test files
-replace_variables:
-	mkdir -p $(TEST_DIR)
-	mkdir -p $(TEST_DIR)/expected
-	mkdir -p $(TEST_DIR)/sql
-	for f in $(REGRESS); do \
-		cat test/sql/$${f}.sql | \
-		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
-		>> $(TEST_DIR)/sql/$${f}.sql; \
+replace_variables: restore_copies
+	# tests
+	for f in $(sort $(wildcard test/sql/*test.sql)); do \
+		sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
 	done
-	for f in $(REGRESS_EXPEC); do \
-		cat test/expected/$${f}.out | \
-		sed -e 's/@@plpythonu@@/$(PLPYTHONU)/g' \
-		>> $(TEST_DIR)/expected/$${f}.out; \
+	for f in $(sort $(wildcard test/expected/*test.out)); do \
+		sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
 	done
-	for f in $(basename $(wildcard old_versions/*.bak)); do \
-		mv $${f}.bak $${f}; \
-		sed --in-place=.bak -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
+	# data
+	for f in $(wildcard sql/*.sql); do \
+		sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
 	done
+	# old_versions
+	for f in $(wildcard old_versions/*.sql); do \
+		sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
+	done
+	# current scripts
+	for f in $(wildcard *.sql); do \
+		sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $${f}; \
+	done
+	sed --in-place=.copy -e 's/@@plpythonu@@/$(PLPYTHONU)/g' $(EXTENSION).control;
 
 # Install the current release into the PostgreSQL extensions directory
 deploy: release_remove_parallel_deploy
