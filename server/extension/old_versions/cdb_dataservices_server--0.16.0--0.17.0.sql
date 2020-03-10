@@ -28,7 +28,7 @@ RETURNS Geometry AS $$
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
@@ -64,7 +64,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin0 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text)
 RETURNS Geometry AS $$
@@ -101,7 +101,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode admin1 polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
@@ -139,7 +139,7 @@ RETURNS Geometry AS $$
         raise Exception('Error trying to geocode admin1 polygon')
       finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -184,7 +184,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode city point using mapzen')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_internal_geocode_namedplace(username text, orgname text, city_name text, admin1_name text DEFAULT NULL, country_name text DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -227,7 +227,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode namedplace point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -263,7 +263,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -299,7 +299,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code point')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -335,7 +335,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -371,7 +371,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_ipaddress_point(username text, orgname text, ip text)
 RETURNS Geometry AS $$
@@ -407,7 +407,7 @@ RETURNS Geometry AS $$
       raise Exception('Error trying to geocode postal code polygon')
     finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -434,7 +434,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
@@ -460,7 +460,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
     result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
     return [result[0]['shape'],result[0]['length'], result[0]['duration']]
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -485,7 +485,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     mapzen_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapzen_route_with_waypoints($1, $2, $3, $4, $5, $6) as route;", ["text", "text", "geometry(Point, 4326)[]", "text", "text[]", "text"])
     result = plpy.execute(mapzen_plan, [username, orgname, waypoints, mode, options, units])
     return [result[0]['shape'],result[0]['length'], result[0]['duration']]
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -528,7 +528,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -574,7 +574,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -616,7 +616,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_segment_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetSegmentSnapshot(
   username TEXT,
@@ -661,7 +661,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to OBS_GetSegmentSnapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasure(
   username TEXT,
@@ -705,7 +705,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetCategory(
   username TEXT,
@@ -748,7 +748,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusMeasure(
   username TEXT,
@@ -792,7 +792,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetUSCensusMeasure')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetUSCensusCategory(
   username TEXT,
@@ -835,7 +835,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetUSCensusCategory')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPopulation(
   username TEXT,
@@ -878,7 +878,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetPopulation')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeasureById(
   username TEXT,
@@ -921,7 +921,7 @@ RETURNS NUMERIC AS $$
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_Search(
   username TEXT,
@@ -970,7 +970,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
         raise Exception('Error trying to OBS_Search')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetAvailableBoundaries(
   username TEXT,
@@ -1018,7 +1018,7 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
         raise Exception('Error trying to OBS_GetMeasureById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundary(
   username TEXT,
@@ -1060,7 +1060,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundary')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryId(
   username TEXT,
@@ -1102,7 +1102,7 @@ RETURNS TEXT AS $$
         raise Exception('Error trying to OBS_GetBoundaryId')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundaryById(
   username TEXT,
@@ -1144,7 +1144,7 @@ RETURNS geometry(Geometry, 4326) AS $$
         raise Exception('Error trying to OBS_GetBoundaryById')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -1192,7 +1192,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -1241,7 +1241,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByGeometry(
   username TEXT,
@@ -1289,7 +1289,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByGeometry')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -1338,4 +1338,4 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
         raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

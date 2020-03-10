@@ -19,4 +19,4 @@ RETURNS Geometry AS $$
   else:
     plpy.error('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

@@ -23,7 +23,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   else:
     plpy.error('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -46,4 +46,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     return plpy.execute(mapzen_plan, [username, orgname, source, mode, range, options])
   else:
     plpy.error('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

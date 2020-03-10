@@ -17,7 +17,7 @@ RETURNS boolean AS $$
     geocoder_config = GeocoderConfig(redis_conn, plpy, username, orgname, provider)
     GD[cache_key] = geocoder_config
     return True
-$$ LANGUAGE plpythonu SECURITY DEFINER;
+$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
 
 ---- cdb_geocode_namedplace_point(city_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)

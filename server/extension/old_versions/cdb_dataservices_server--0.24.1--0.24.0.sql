@@ -48,7 +48,7 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomvals))
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
@@ -97,4 +97,4 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomrefs))
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;

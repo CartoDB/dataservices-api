@@ -38,7 +38,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE ;
+$$ LANGUAGE @@plpythonu@@ STABLE ;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -71,7 +71,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE plpythonu STABLE ;
+$$ LANGUAGE @@plpythonu@@ STABLE ;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -102,7 +102,7 @@ RETURNS Geometry AS $$
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE plpythonu STABLE ;
+$$ LANGUAGE @@plpythonu@@ STABLE ;
 
 
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_tomtom_geocode_street_point(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT);
@@ -142,7 +142,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu STABLE ;
+$$ LANGUAGE @@plpythonu@@ STABLE ;
 
 
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_tomtom_isodistance(TEXT, TEXT, geometry(Geometry, 4326), TEXT, integer[], text[]);
@@ -176,7 +176,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE plpythonu STABLE ;
+$$ LANGUAGE @@plpythonu@@ STABLE ;
 
 
 DROP FUNCTION IF EXISTS cdb_dataservices_server.cdb_tomtom_isochrone(TEXT, TEXT, geometry(Geometry, 4326), TEXT, integer[], text[]);

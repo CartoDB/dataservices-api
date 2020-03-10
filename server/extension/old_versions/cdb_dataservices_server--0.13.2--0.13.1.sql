@@ -23,7 +23,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     isolines.append(isoline)
 
   return isolines
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -45,4 +45,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     isolines.append(isoline)
 
   return isolines
-$$ LANGUAGE plpythonu;
+$$ LANGUAGE @@plpythonu@@;
