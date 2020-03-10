@@ -4,10 +4,10 @@
     "requires": {
       "postgresql": "^10.0.0",
       "postgis": "^2.4.0.0",
-      "carto_postgresql_ext": "^0.23.0"
+      "carto_postgresql_ext": "^0.36.0"
     },
     "works_with": {
-      "dataservices-api-server-python-lib": "^0.19.1",
+      "dataservices-api-server-python-lib": "^0.23.1",
       "observatory-server-extension": "^1.9.0"
     }
   }
