@@ -1,3 +1,10 @@
+Mar 13th, 2020
+==============
+* Version `0.29.0` of the client extension
+    * Adapted client to PG12 (https://github.com/CartoDB/cartodb-platform/issues/6237)
+* Version `0.38.0` of the server extension
+    * Adapted server to PG12 (https://github.com/CartoDB/cartodb-platform/issues/6237)
+
 Mar 6th, 2020
 ==============
 * Version `0.23.1` of the Python library
