@@ -66,4 +66,4 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using mapzen')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

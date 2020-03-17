@@ -13,7 +13,7 @@ RETURNS boolean AS $$
     logger_config = LoggerConfig(plpy)
     GD[cache_key] = logger_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -668,7 +668,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isolines(
    username TEXT,
@@ -741,7 +741,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_with_waypoints(
   username TEXT,
@@ -802,7 +802,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to get mapzen routing')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- DO
 

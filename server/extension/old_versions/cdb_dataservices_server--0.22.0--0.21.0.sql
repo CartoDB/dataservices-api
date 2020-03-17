@@ -62,7 +62,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate mapzen routing')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -225,7 +225,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isolines')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_isochrones(
@@ -289,4 +289,4 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get mapzen isochrones')
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;

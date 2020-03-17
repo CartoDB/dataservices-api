@@ -24,7 +24,7 @@ RETURNS cdb_dataservices_server._redis_conf_params AS $$
         "timeout": params['timeout'],
         "redis_db": params['redis_db']
       }
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 -- Get the connection to redis from cache or create a new one
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._connect_to_redis(user_id text)
@@ -43,7 +43,7 @@ RETURNS boolean AS $$
         redis_db=config_params['redis_db']).redis_connection()
     GD[user_id] = {'redis_connection': redis_connection}
     return True
-$$ LANGUAGE @@plpythonu@@;-- Geocodes a street address given a searchtext and a state and/or country
+$$ LANGUAGE plpythonu;-- Geocodes a street address given a searchtext and a state and/or country
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
   RETURNS Geometry
 AS $$
@@ -64,7 +64,7 @@ AS $$
   point = plpy.execute(plan, [coordinates[0], coordinates[1]], 1)[0]
 
   return point['st_setsrid']
-$$ LANGUAGE @@plpythonu@@;-- Interface of the server extension
+$$ LANGUAGE plpythonu;-- Interface of the server extension
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin0_polygon(username text, orgname text, country_name text)
 RETURNS Geometry AS $$
@@ -80,7 +80,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from cdb_geocode_admin0_polygons')
     return rv[0]["mypolygon"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 --------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from cdb_geocode_admin1_polygons')
     return rv[0]["mypolygon"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_admin1_polygon(admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_admin1_polygon(username text, orgname text, admin1_name text, country_name text)
@@ -135,7 +135,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from cdb_geocode_admin1_polygon(admin1_name text, country_name text)')
     return rv[0]["mypolygon"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
 
@@ -207,7 +207,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from geocode_namedplace')
     return rv[0]["mypoint"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
@@ -224,7 +224,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from geocode_namedplace')
     return rv[0]["mypoint"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
@@ -241,7 +241,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from Returning from geocode_namedplace')
     return rv[0]["mypoint"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 --------------------------------------------------------------------------------
 
@@ -327,7 +327,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_point(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -343,7 +343,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["point"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text)
 RETURNS Geometry AS $$
@@ -359,7 +359,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from _cdb_geocode_postalcode_polygon')
     return rv[0]["polygon"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_postalcode_polygon(username text, orgname text, code text, country text)
 RETURNS Geometry AS $$
@@ -375,7 +375,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from _cdb_geocode_postalcode_point')
     return rv[0]["polygon"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 --------------------------------------------------------------------------------
@@ -489,7 +489,7 @@ RETURNS Geometry AS $$
 
     plpy.debug('Returning from _cdb_geocode_ipaddress_point')
     return rv[0]["point"]
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 --------------------------------------------------------------------------------

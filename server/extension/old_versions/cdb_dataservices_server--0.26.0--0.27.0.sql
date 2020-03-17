@@ -47,4 +47,4 @@ RETURNS TABLE(valid boolean, errors text[]) AS $$
         import sys
         logger.error('Error trying to OBS_MetadataValidation', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to OBS_MetadataValidation')
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

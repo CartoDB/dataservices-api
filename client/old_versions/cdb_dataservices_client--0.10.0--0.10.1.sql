@@ -93,4 +93,4 @@ RETURNS boolean AS $$
                 .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
                 )
         return False
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

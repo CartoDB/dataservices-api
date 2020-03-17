@@ -62,7 +62,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate Mapbox routing')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
@@ -97,7 +97,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
   username TEXT,
@@ -129,7 +129,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -159,7 +159,7 @@ RETURNS Geometry AS $$
     else:
       raise Exception('Requested geocoder is not available')
 
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -172,7 +172,7 @@ RETURNS Geometry AS $$
   mapzen_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_mapbox_geocode_street_point($1, $2, $3, $4, $5, $6) as point; ", ["text", "text", "text", "text", "text", "text"])
   return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
 
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -210,7 +210,7 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using mapzen')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
@@ -250,7 +250,7 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using mapbox')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text)
@@ -270,7 +270,7 @@ RETURNS Geometry AS $$
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3) as point;", ["text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name])[0]['point']
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, country_name text)
@@ -290,7 +290,7 @@ RETURNS Geometry AS $$
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, NULL, $4) as point;", ["text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, country_name])[0]['point']
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 ---- cdb_geocode_namedplace_point(city_name text, admin1_name text, country_name text)
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_geocode_namedplace_point(username text, orgname text, city_name text, admin1_name text, country_name text)
@@ -310,7 +310,7 @@ RETURNS Geometry AS $$
     logger.error('Error geocoding namedplace using geocode street point, falling back to internal geocoder', sys.exc_info(), data={"username": username, "orgname": orgname})
     internal_plan = plpy.prepare("SELECT cdb_dataservices_server._cdb_internal_geocode_namedplace($1, $2, $3, $4, $5) as point;", ["text", "text", "text", "text", "text"])
     return plpy.execute(internal_plan, [username, orgname, city_name, admin1_name, country_name])[0]['point']
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isodistance(
    username TEXT,
@@ -375,7 +375,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get Mapbox isolines')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapbox_isochrones(
    username TEXT,
@@ -436,7 +436,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('Error trying to get Mapbox isochrones')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -466,7 +466,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 -- mapbox isodistance
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_isodistance(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -480,7 +480,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
 
   return result
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
@@ -510,7 +510,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
       return plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
     else:
       raise Exception('Requested isolines provider is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 -- mapbox isochrone
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_mapbox_isochrone(username TEXT, orgname TEXT, source geometry(Geometry, 4326), mode TEXT, range integer[], options text[] DEFAULT array[]::text[])
@@ -523,7 +523,7 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   mapbox_plan = plpy.prepare("SELECT * FROM cdb_dataservices_server._cdb_mapbox_isochrones($1, $2, $3, $4, $5, $6) as isoline; ", ["text", "text", "geometry(geometry, 4326)", "text", "integer[]", "text[]"])
   result = plpy.execute(mapbox_plan, [username, orgname, source, mode, range, options])
   return result
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -570,7 +570,7 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomvals))
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetData(
   username TEXT,
@@ -618,7 +618,7 @@ RETURNS TABLE (
         raise Exception('Error trying to OBS_GetData')
     finally:
         quota_service.increment_total_service_use(len(geomrefs))
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetMeta(
   username TEXT,
@@ -653,4 +653,4 @@ RETURNS JSON AS $$
         import sys
         logger.error('Error trying to OBS_GetMeta', sys.exc_info(), data={"username": username, "orgname": orgname})
         raise Exception('Error trying to OBS_GetMeta')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

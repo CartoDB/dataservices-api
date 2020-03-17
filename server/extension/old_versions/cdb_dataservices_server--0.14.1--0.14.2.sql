@@ -56,7 +56,7 @@ RETURNS NUMERIC AS $$
       raise Exception('Error trying to OBS_GetMeasure')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetUSCensusMeasure(
   username TEXT,
@@ -111,7 +111,7 @@ RETURNS NUMERIC AS $$
       raise Exception('Error trying to OBS_GetUSCensusMeasure')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPopulation(
   username TEXT,
@@ -164,7 +164,7 @@ RETURNS NUMERIC AS $$
       raise Exception('Error trying to OBS_GetPopulation')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByGeometry(
   username TEXT,
@@ -222,7 +222,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
       raise Exception('Error trying to OBS_GetBoundariesByGeometry')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetBoundariesByPointAndRadius(
   username TEXT,
@@ -282,7 +282,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
       raise Exception('Error trying to OBS_GetBoundariesByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByGeometry(
   username TEXT,
@@ -340,7 +340,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
       raise Exception('Error trying to OBS_GetPointsByGeometry')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetPointsByPointAndRadius(
   username TEXT,
@@ -400,4 +400,4 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
       raise Exception('Error trying to OBS_GetPointsByPointAndRadius')
   finally:
       quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

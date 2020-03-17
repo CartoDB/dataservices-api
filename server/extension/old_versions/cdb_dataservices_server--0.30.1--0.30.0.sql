@@ -41,4 +41,4 @@ RETURNS Geometry AS $$
     raise Exception('Error trying to geocode street point using mapbox')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
