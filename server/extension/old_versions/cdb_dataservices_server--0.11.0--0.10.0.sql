@@ -43,4 +43,4 @@ RETURNS Geometry AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

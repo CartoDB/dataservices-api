@@ -1282,7 +1282,7 @@ RETURNS boolean AS $$
                 .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
                 )
         return False
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 
@@ -1357,7 +1357,7 @@ RETURNS boolean AS $$
                 .format(username=plpy.quote_nullable(username), orgname=plpy.quote_nullable(orgname), server_schema=plpy.quote_literal(server_schema), server_table_name=plpy.quote_literal(server_table_name), fdw_server=plpy.quote_literal(server_name))
                 )
         return False
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._OBS_ConnectUserTable(username text, orgname text, user_db_role text, user_schema text, dbname text, table_name text)

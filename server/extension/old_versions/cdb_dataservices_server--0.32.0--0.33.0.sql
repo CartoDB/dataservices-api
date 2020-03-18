@@ -15,7 +15,7 @@ RETURNS text AS $$
   user_obs_config = GD["user_obs_config_{0}".format(username)]
 
   return user_obs_config.connection_str
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_demographic_snapshot(
   username TEXT,
@@ -58,7 +58,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.OBS_GetDemographicSnapshot(
   username TEXT,
@@ -104,7 +104,7 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to obs_get_demographic_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.obs_get_segment_snapshot(
   username TEXT,
@@ -146,7 +146,7 @@ RETURNS json AS $$
         raise Exception('Error trying to obs_get_segment_snapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetSegmentSnapshot(
   username TEXT,
@@ -201,4 +201,4 @@ RETURNS SETOF JSON AS $$
         raise Exception('Error trying to OBS_GetSegmentSnapshot')
     finally:
         quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

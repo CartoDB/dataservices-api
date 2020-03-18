@@ -89,7 +89,7 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
   return ret
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_enough_quota(

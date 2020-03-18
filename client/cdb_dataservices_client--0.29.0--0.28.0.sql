@@ -6,3 +6,9 @@
 SET search_path = "$user",cartodb,public,cdb_dataservices_client;
 
 -- HERE goes your code to upgrade/downgrade
+-- PG12_DEPRECATED
+-- Create geomval if it doesn't exist (in postgis 3+ it only exists in postgis_raster)
+DO $$
+BEGIN
+  DROP TYPE IF EXISTS cdb_dataservices_client.geomval RESTRICT;
+END$$;

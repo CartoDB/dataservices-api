@@ -70,7 +70,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate Mapbox routing')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_route_with_waypoints(
   username TEXT,
@@ -138,7 +138,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     raise Exception('Error trying to calculate TomTom routing')
   finally:
     service_manager.quota_service.increment_total_service_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
@@ -179,7 +179,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_with_waypoints(
@@ -218,4 +218,4 @@ RETURNS cdb_dataservices_server.simple_route AS $$
       return [result[0]['shape'],result[0]['length'], result[0]['duration']]
     else:
       raise Exception('Requested routing method is not available')
-$$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
+$$ LANGUAGE plpythonu STABLE PARALLEL RESTRICTED;

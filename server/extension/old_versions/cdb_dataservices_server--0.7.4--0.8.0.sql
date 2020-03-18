@@ -16,7 +16,7 @@ RETURNS boolean AS $$
     obs_config = ObservatoryConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = obs_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._OBS_GetDemographicSnapshotJSON(
   username TEXT,

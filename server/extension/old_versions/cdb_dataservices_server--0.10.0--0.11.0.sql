@@ -98,4 +98,4 @@ RETURNS boolean AS $$
     mapzen_geocoder_config = MapzenGeocoderConfig(redis_conn, plpy, username, orgname)
     GD[cache_key] = mapzen_geocoder_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;

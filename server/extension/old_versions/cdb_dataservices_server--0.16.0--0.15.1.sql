@@ -35,7 +35,7 @@ RETURNS Geometry AS $$
     return plpy.execute(mapzen_plan, [username, orgname, searchtext, city, state_province, country], 1)[0]['point']
   else:
     raise Exception('Requested geocoder is not available')
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;
 
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_here_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
@@ -51,4 +51,4 @@ RETURNS Geometry AS $$
   else:
     raise Exception('Here geocoder is not available for your account.')
 
-$$ LANGUAGE @@plpythonu@@;
+$$ LANGUAGE plpythonu;

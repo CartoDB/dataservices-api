@@ -56,7 +56,7 @@ RETURNS boolean AS $$
       'redis_metrics_connection': redis_metrics_connection,
     }
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 -- Mapzen routing integration
 
@@ -86,7 +86,7 @@ RETURNS boolean AS $$
     routing_config = RoutingConfig(redis_conn, username, orgname, mapzen_app_key)
     GD[cache_key] = routing_config
     return True
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_mapzen_route_point_to_point(
   username TEXT,
@@ -135,7 +135,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     plpy.error(error_msg)
   finally:
     quota_service.increment_total_geocoder_use()
-$$ LANGUAGE @@plpythonu@@ SECURITY DEFINER;
+$$ LANGUAGE plpythonu SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_route_point_to_point(
   username TEXT,
