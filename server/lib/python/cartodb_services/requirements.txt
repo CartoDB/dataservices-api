@@ -4,7 +4,7 @@ python-dateutil==2.2
 googlemaps==2.5.1
 rollbar==0.13.2
 # Dependency for googlemaps package
-requests==2.9.1
+requests==2.20.0
 rratelimit==0.0.4
 mapbox==0.14.0
 pygeocodio==0.11.1

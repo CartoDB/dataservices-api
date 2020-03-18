@@ -4,7 +4,7 @@
     "requires": {
       "postgresql": "^11.0.0",
       "postgis": "^2.5.0.0",
-      "carto_postgresql_ext": "^0.32.0"
+      "carto_postgresql_ext": "^0.36.0"
     },
     "works_with": {
     }
