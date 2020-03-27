@@ -115,7 +115,7 @@ class HereMapsRoutingIsoline(Traceable):
 
     def __parse_source_param(self, source, options):
         key = 'start'
-        if 'is_destination' in options and options['is_destination']:
+        if 'is_destination' in options and options['is_destination'].lower() == 'true':
             key = 'destination'
 
         return {key: source}
