@@ -208,6 +208,16 @@ class HereMapsRoutingIsolineTestCase(unittest.TestCase):
                               text=self.GOOD_RESPONSE)
         response = self.routing.calculate_isochrone('geo!33.0,1.0', 'car',
                                                     ['1000', '2000'],
+                                                    ['is_destination=false'])
+        parsed_url = urlparse(req_mock.request_history[0].url)
+        url_params = parse_qs(parsed_url.query)
+        self.assertEqual(url_params['start'][0], 'geo!33.0,1.0')
+
+    def test_destination_parameters_works_properly(self, req_mock):
+        req_mock.register_uri('GET', requests_mock.ANY,
+                              text=self.GOOD_RESPONSE)
+        response = self.routing.calculate_isochrone('geo!33.0,1.0', 'car',
+                                                    ['1000', '2000'],
                                                     ['is_destination=true'])
         parsed_url = urlparse(req_mock.request_history[0].url)
         url_params = parse_qs(parsed_url.query)
