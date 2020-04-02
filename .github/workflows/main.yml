@@ -4,6 +4,7 @@ jobs:
   dataservices-api:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         pg_version: [10, 12]
     env:
