@@ -2,7 +2,8 @@ Apr 7th, 2020
 =============
 * Version `0.30.0` of the client extension
     * PG12: Use postgis_raster instead of custom geomval.
-
+* Version `0.39.0` of the server extension
+    * PG12: Use postgis_raster instead of custom geomval.
 
 Mar 17th, 2020
 ==============
