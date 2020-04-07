@@ -1,7 +1,7 @@
 # Makefile to generate the extension out of separate sql source files.
 # Once a version is released, it is not meant to be changed. E.g: once version 0.0.1 is out, it SHALL NOT be changed.
 EXTENSION = cdb_dataservices_client
-EXTVERSION = 0.29.0
+EXTVERSION = 0.30.0
 
 # The new version to be generated from templates
 SED ?= sed
@@ -77,6 +77,8 @@ release: $(SOURCES_DATA)
 	git add $(EXTENSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(NEW_VERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql
 	$(ERB) version=$(EXTVERSION) upgrade_downgrade_template.erb > $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql
+	$(SED) -i -e 's/^EXTVERSION =.*/EXTVERSION = $(NEW_VERSION)/g' Makefile
+	git add Makefile
 	@echo
 	@echo "Please review the file $(EXTENSION)--$(EXTVERSION)--$(NEW_VERSION).sql and add any code needed to upgrade $(EXTVERSION) to $(NEW_VERSION)"
 	@echo "Please review the file $(EXTENSION)--$(NEW_VERSION)--$(EXTVERSION).sql and add any code needed to downgrade $(NEW_VERSION) to $(EXTVERSION)"
