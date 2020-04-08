@@ -1,13 +1,13 @@
 -- Only show warning or error messages in the tests output
+\set ECHO none
+\set QUIET on
 SET client_min_messages TO WARNING;
--- Install dependencies
-CREATE EXTENSION postgis;
-CREATE EXTENSION @@plpythonu@@;
-CREATE EXTENSION cartodb;
-CREATE EXTENSION plproxy;
 
 -- Install the extension
-CREATE EXTENSION cdb_dataservices_client;
+CREATE EXTENSION cdb_dataservices_client CASCADE;
+
+\unset ECHO
+\unset QUIET
 
 -- Mock the server connection to point to this very test db
 SELECT cartodb.cdb_conf_setconf('geocoder_server_config', '{"connection_str": "dbname=contrib_regression host=127.0.0.1 user=postgres"}');
