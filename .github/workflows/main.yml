@@ -4,6 +4,7 @@ jobs:
   dataservices-api:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         pg_version: [10, 12]
     env:
@@ -48,9 +49,9 @@ jobs:
         timeout-minutes: 5
 
       - name: Run server tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck || (cat /dataservices-api/server/extension/test_out/regression.diffs && false)"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/extension/ && sudo make clean all install installcheck || (cat /dataservices-api/server/extension/test/regression.diffs && false)"
         timeout-minutes: 5
 
       - name: Run client tests
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck || (cat /home/ubuntu/dataservices-api/client/test_out/regression.diffs && false)"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "sudo createuser publicuser --no-createrole --no-createdb --no-superuser -U postgres && cd /dataservices-api/client/ && sudo make clean all install installcheck || (cat /dataservices-api/client/test/regression.diffs && false)"
         timeout-minutes: 5
