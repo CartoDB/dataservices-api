@@ -280,18 +280,18 @@ class TestBulkStreetFunctions(TestStreetFunctionsSetUp):
     def test_templating_geocoding(self):
         query = "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
                 "cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
-                "'select 1 as cartodb_id, ''Logroño'' as city', " \
+                "'select 1 as cartodb_id, ''Valladolid'' as city', " \
                 "'city || '', '' || ''Spain''') " \
                 "UNION " \
                 "SELECT cartodb_id, st_x(the_geom), st_y(the_geom) from " \
                 "cdb_dataservices_client.cdb_bulk_geocode_street_point(" \
-                "'select 2 as cartodb_id, ''Logroño'' as city', " \
-                "'city || '', '' || ''Argentina''')"
+                "'select 2 as cartodb_id, ''Valladolid'' as city', " \
+                "'city || '', '' || ''Mexico''')"
         response = self._run_authenticated(query)
 
         points_by_cartodb_id = {
-            1: self.fixture_points['Logroño, Spain'],
-            2: self.fixture_points['Logroño, Argentina']
+            1: self.fixture_points['Valladolid, Spain'],
+            2: self.fixture_points['Valladolid, Mexico']
         }
         self.assert_close_points(self._x_y_by_cartodb_id(response), points_by_cartodb_id)
 
