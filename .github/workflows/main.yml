@@ -15,7 +15,7 @@ jobs:
       - name: Setup gcloud authentication
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: '300.0.0'
+          version: '299.0.0'
           service_account_key: ${{ secrets.GCS }}
 
       - name: Pull base image
