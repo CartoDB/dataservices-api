@@ -30,6 +30,9 @@ jobs:
       - name: Copy ci files to root
         run: cp ci-tools/repos/${{ github.event.repository.name }}/* .
 
+      - name: Define CLOUDSDK_PYTHON environment variable
+        run: export CLOUDSDK_PYTHON=/usr/bin/python
+
       - name: Start docker-compose services
         run: docker-compose -f docker-compose.yaml up -d
 
