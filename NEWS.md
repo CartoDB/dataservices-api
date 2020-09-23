@@ -1,3 +1,8 @@
+Sep 23th, 2020
+==============
+* Version `0.23.3` of the Python library
+    * Change HERE batch geocoding URL
+
 Apr 7th, 2020
 =============
 * Version `0.30.0` of the client extension
