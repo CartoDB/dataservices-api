@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - name: Set CLOUDSDK_PYTHON path
+        run: echo '::set-env name=CLOUDSDK_PYTHON::/usr/bin/python'
+
       - name: Setup gcloud authentication
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
