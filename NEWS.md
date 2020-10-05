@@ -1,5 +1,10 @@
 Sep 23th, 2020
 ==============
+* Version `0.39.1` of the server extension
+    * Allow isolines services for google-geocoding users.
+
+Sep 23th, 2020
+==============
 * Version `0.23.3` of the Python library
     * Change HERE batch geocoding URL
 
