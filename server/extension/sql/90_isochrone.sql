@@ -11,9 +11,6 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
   logger_config = GD["logger_config"]
   logger = Logger(logger_config)
 
-  if user_isolines_config.google_services_user:
-    raise Exception('This service is not available for google service users.')
-
   params = {'username': username, 'orgname': orgname, 'source': source, 'mode': mode, 'range': range, 'options': options}
 
   with metrics('cdb_isochrone', user_isolines_config, logger, params):
