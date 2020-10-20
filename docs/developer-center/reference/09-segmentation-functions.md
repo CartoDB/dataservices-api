@@ -1,7 +1,7 @@
 ## Segmentation Functions
 
 <div class="is-caption is-caption--mobile header-warning is-semibold u-vspace--16">
-  <p>We will no longer support these segmentations functions from the 1st of January 2021. For a similar functionality, we recommend using Data Observatory from our Phython library <a href="https://carto.com/developers/cartoframes/">CARTOframes</a> instead.</p>
+  <p>We will no longer support these segmentations functions from the 1st of January 2021. For a similar functionality, we recommend using Data Observatory from our Python library <a href="https://carto.com/developers/cartoframes/">CARTOframes</a> instead.</p>
 </div>
 
 The Segmentation Snapshot functions enable you to determine the pre-calculated population segment for a location. Segmentation is a method that divides a populations into subclassifications based on common traits. For example, you can take the a store location and determine what classification of population exists around that location. If you need help creating coordinates from addresses, see the [Geocoding Functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) documentation.
