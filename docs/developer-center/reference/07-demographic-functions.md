@@ -1,7 +1,7 @@
 ### Demographic Functions
 
 <div class="is-caption is-caption--mobile header-warning is-semibold u-vspace--16">
-  <p>We will no longer support these demographic functions from the 1st of January 2021. If you want to collect demographic reports around a point location, we recommend using Data Observatory from our Phython library <a href="https://carto.com/developers/cartoframes/">CARTOframes</a> instead.</p>
+  <p>We will no longer support these demographic functions from the 1st of January 2021. If you want to collect demographic reports around a point location, we recommend using Data Observatory from our Python library <a href="https://carto.com/developers/cartoframes/">CARTOframes</a> instead.</p>
 </div>
 
 The Demographic Snapshot enables you to collect demographic reports around a point location. For example, you can take the coordinates of a coffee shop and find the average population characteristics, such as total population, educational attainment, housing and income information around that location. You can use raw street addresses by combining the Demographic Snapshot with CARTO's geocoding features. If you need help creating coordinates from addresses, see the [Geocoding Functions]({{site.dataservicesapi_docs}}/reference/#geocoding-functions) documentation.
