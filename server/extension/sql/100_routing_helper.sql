@@ -66,10 +66,11 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     import sys
     service_manager.quota_service.increment_failed_service_use()
     service_manager.logger.error('Error trying to calculate Mapbox routing', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to calculate Mapbox routing')
+    raise Exception('Error trying to calculate Mapbox routing: ' + str(e))
   finally:
     service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
+
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_route_with_waypoints(
   username TEXT,
@@ -134,7 +135,7 @@ RETURNS cdb_dataservices_server.simple_route AS $$
     import sys
     service_manager.quota_service.increment_failed_service_use()
     service_manager.logger.error('Error trying to calculate TomTom routing', sys.exc_info(), data={"username": username, "orgname": orgname})
-    raise Exception('Error trying to calculate TomTom routing')
+    raise Exception('Error trying to calculate TomTom routing: ' + str(e))
   finally:
     service_manager.quota_service.increment_total_service_use()
 $$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
