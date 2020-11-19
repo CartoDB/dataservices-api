@@ -126,7 +126,7 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
             status=polling_root.find('./Response/Status').text)
 
     def _download_results(self, job_id):
-        result_r = self.session.get("{}/{}/result".format(self.BATCH_URL, job_id),
+        result_r = self.session.get("{}/{}/all".format(self.BATCH_URL, job_id),
                                     params=self.credentials_params,
                                     timeout=(self.connect_timeout, self.read_timeout))
         root_zip = zipfile.ZipFile(io.BytesIO(result_r.content))
@@ -147,6 +147,9 @@ class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
                                             precision,
                                             [match_type] if match_type else []
                                         )))
-
+                    elif row['matchLevel'] == 'NOMATCH':
+                        results.append((row['recId'], [], {}))
+                    elif row['matchLevel'] == 'FAILED':
+                        results.append((row['recId'], [], {'error': 'Bulk geocoder failed'}))
         return results
 
