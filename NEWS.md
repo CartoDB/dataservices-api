@@ -1,4 +1,4 @@
-Nov 18th, 2020
+Nov 19th, 2020
 ==============
 * Version `0.39.2` of the server extension
 * Version `0.23.4` of the Python library
