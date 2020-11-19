@@ -105,7 +105,7 @@ class MapboxIsolines():
             elif response.status_code == requests.codes.unprocessable_entity:
                 return []
             else:
-                raise ServiceException(response.status_code, response)
+                raise ServiceException('Unexpected response (' + str(response.status_code) + '): ' + str(response.content), response)
         except requests.Timeout as te:
             # In case of timeout we want to stop the job because the server
             # could be down
