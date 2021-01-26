@@ -1,3 +1,8 @@
+Jan 26th, 2021
+==============
+* Version `0.23.5` of the Python library
+    * Country name conversion to ISO code for TomTom bulk geocoding.
+
 Nov 19th, 2020
 ==============
 * Version `0.39.2` of the server extension
