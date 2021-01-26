@@ -5,6 +5,7 @@ from cartodb_services.geocoder import geocoder_error_response
 from cartodb_services.tomtom import TomTomGeocoder
 from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools.exceptions import ServiceException
+from cartodb_services.tools.country import country_to_iso3
 
 
 class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
@@ -35,6 +36,9 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (search_id, address, city, state, country) = search
+
+            country = country_to_iso3(country) or country
+
             address = address.encode('utf-8') if address else None
             city = city.encode('utf-8') if city else None
             state = state.encode('utf-8') if state else None
