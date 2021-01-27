@@ -35,7 +35,6 @@ class TomTomBulkGeocoder(TomTomGeocoder, StreetPointBulkGeocoder):
         results = []
         for search in searches:
             (search_id, address, city, state, country) = search
-
             address = address.encode('utf-8') if address else None
             city = city.encode('utf-8') if city else None
             state = state.encode('utf-8') if state else None
