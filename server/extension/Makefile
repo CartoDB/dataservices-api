@@ -1,7 +1,7 @@
 # Makefile to generate the extension out of separate sql source files.
 # Once a version is released, it is not meant to be changed. E.g: once version 0.0.1 is out, it SHALL NOT be changed.
 EXTENSION = cdb_dataservices_server
-EXTVERSION = 0.39.2
+EXTVERSION = 0.39.3
 
 # The new version to be generated from templates
 SED ?= sed

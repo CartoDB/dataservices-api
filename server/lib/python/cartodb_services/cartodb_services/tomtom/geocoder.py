@@ -10,6 +10,7 @@ from cartodb_services.metrics import Traceable
 from cartodb_services.tools.exceptions import ServiceException
 from cartodb_services.tools.qps import qps_retry
 from cartodb_services.tools.normalize import normalize
+from cartodb_services.tools.country import country_to_iso3
 
 HOST = 'https://api.tomtom.com'
 API_BASEURI = '/search/2'
@@ -48,7 +49,7 @@ class TomTomGeocoder(Traceable):
     def _request_uri(self, searchtext, country=None, apiKey=None):
         baseuri = REQUEST_BASEURI
         if country:
-            baseuri += '&countrySet={}'.format(country)
+            baseuri += '&countrySet={}'.format(country_to_iso3(country) or country)
         baseuri = baseuri + '&key={apiKey}' if apiKey else baseuri
         return URITemplate(baseuri).expand(apiKey=apiKey,
                                            searchtext=searchtext.encode('utf-8'))

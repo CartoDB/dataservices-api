@@ -275,10 +275,8 @@ $$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_tomtom_geocode_street_point(username TEXT, orgname TEXT, searchtext TEXT, city TEXT DEFAULT NULL, state_province TEXT DEFAULT NULL, country TEXT DEFAULT NULL)
 RETURNS Geometry AS $$
-  from iso3166 import countries
   from cartodb_services.tools import ServiceManager, QuotaExceededException
   from cartodb_services.tomtom import TomTomGeocoder
-  from cartodb_services.tools.country import country_to_iso3
   from cartodb_services.refactor.service.tomtom_geocoder_config import TomTomGeocoderConfigBuilder
 
   import cartodb_services
@@ -290,15 +288,9 @@ RETURNS Geometry AS $$
     service_manager.assert_within_limits()
     geocoder = TomTomGeocoder(service_manager.config.tomtom_api_key, service_manager.logger, service_manager.config.service_params)
 
-    country_iso3166 = None
-    if country:
-      country_iso3 = country_to_iso3(country)
-      if country_iso3:
-        country_iso3166 = countries.get(country_iso3).alpha2.lower()
-
     coordinates = geocoder.geocode(searchtext=searchtext, city=city,
                                    state_province=state_province,
-                                   country=country_iso3166)
+                                   country=country)
     if coordinates:
       service_manager.quota_service.increment_success_service_use()
       plan = plpy.prepare("SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326); ", ["double precision", "double precision"])
