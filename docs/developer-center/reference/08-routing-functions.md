@@ -12,7 +12,7 @@ Name | Type | Description | Accepted values
 --- | --- | --- | ---
 `origin` | `geometry(Point)` | Origin point, in 4326 projection, which defines the start location. |
 `destination` | `geometry(Point)` | Destination point, in 4326 projection, which defines the end location. |
-`mode` | `text` | Type of transport used to calculate the routes. | `car`, `walk`, `bicycle` or `public_transport`
+`mode` | `text` | Type of transport used to calculate the routes. | `car`, `walk` or `bicycle`
 `options` | `text[]` | (Optional) Multiple options to add more capabilities to the analysis. See [Optional routing parameters](#optional-routing-parameters) for details.
 `units` | `text` | (Optional) Unit used to represent the length of the route. | `kilometers`, `miles`. By default is `kilometers`. This option is not supported by Mapbox provider
 
@@ -47,7 +47,7 @@ Returns a route that goes from origin to destination and whose path travels thro
 Name | Type | Description | Accepted values
 --- | --- | --- | ---
 `waypoints` | `geometry(Point)[]` | Array of ordered points, in 4326 projection, which defines the origin point, one or more locations for the route path to travel through, and the destination. The first element of the array defines the origin and the last element the destination of the route. |
-`mode` | `text` | Type of transport used to calculate the routes. | `car`, `walk`, `bicycle` or `public_transport`
+`mode` | `text` | Type of transport used to calculate the routes. | `car`, `walk` or `bicycle`
 `options` | `text[]` | (Optional) Multiple options to add more capabilities to the analysis. See [Optional routing parameters](#optional-routing-parameters) for details.
 `units` | `text` | (Optional) Unit used to represent the length of the route. | `kilometers`, `miles`. By default is `kilometers`. This option is not supported by Mapbox provider
 
