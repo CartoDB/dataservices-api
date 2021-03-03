@@ -1,3 +1,8 @@
+Mar 4th, 2021
+=============
+* Version `0.39.4` of the server extension
+    * Remove Data Observatory v1
+
 Jan 26th, 2021
 ==============
 * Version `0.39.3` of the server extension
