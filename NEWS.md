@@ -1,5 +1,6 @@
 Mar 4th, 2021
 =============
+* Version `0.30.1` of the client extension
 * Version `0.39.4` of the server extension
 * Version `0.23.6` of the Python library
     * Remove Data Observatory
