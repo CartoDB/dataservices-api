@@ -36,6 +36,8 @@ WELL_KNOWN_LATITUDE_3 = 37.803207
 SEARCH_ID_1 = 1
 SEARCH_ID_2 = 2
 
+PRECISION_FORMAT = '%.2f'
+
 
 class GeocodioGeocoderTestCase(unittest.TestCase):
     def setUp(self):
@@ -52,18 +54,18 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
     def test_valid_requests(self):
         place = self.geocoder.geocode(VALID_ADDRESS_1)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_1)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_1)
 
         place = self.geocoder.geocode(VALID_ADDRESS_2)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_2)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_2)
 
         place = self.geocoder.geocode(VALID_ADDRESS_3)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_3)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_components(self):
         place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_1,
@@ -71,24 +73,24 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
                                       state_province=VALID_STATE_PROVINCE_1,
                                       country=VALID_COUNTRY_1)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_1)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_1)
 
         place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_2,
                                       city=VALID_CITY_2,
                                       state_province=VALID_STATE_PROVINCE_2,
                                       country=VALID_COUNTRY_2)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_2)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_2)
 
         place = self.geocoder.geocode(searchtext=VALID_SEARCH_TEXT_3,
                                       city=VALID_CITY_3,
                                       state_province=VALID_STATE_PROVINCE_3,
                                       country=VALID_COUNTRY_3)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE_3)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_namedplace(self):
         place = self.geocoder.geocode(searchtext='New York')
@@ -131,39 +133,39 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_ADDRESS_1, None, None, None)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_1)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_1)
 
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_ADDRESS_2, None, None, None)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_2)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_2)
 
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_ADDRESS_3, None, None, None)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_3)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_components_bulk_one(self):
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_1, VALID_CITY_1, VALID_STATE_PROVINCE_1, VALID_COUNTRY_1)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_1)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_1)
 
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_2, VALID_CITY_2, VALID_STATE_PROVINCE_2, VALID_COUNTRY_2)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_2)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_2)
 
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_3, VALID_CITY_3, VALID_STATE_PROVINCE_3, VALID_COUNTRY_3)])
 
         self.assertEqual(place[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % place[0][1], '%.3f' % WELL_KNOWN_LONGITUDE_3)
-        self.assertEqual('%.3f' % place[0][2], '%.3f' % WELL_KNOWN_LATITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0][1], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_3)
+        self.assertEqual(PRECISION_FORMAT % place[0][2], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_3)
 
     def test_valid_request_namedplace_bulk_one(self):
         place = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, 'New York', None, None, None)])
@@ -208,12 +210,12 @@ class GeocodioGeocoderTestCase(unittest.TestCase):
                                                    (SEARCH_ID_2, VALID_ADDRESS_2, None, None, None)])
 
         self.assertEqual(places[0][0], SEARCH_ID_1)
-        self.assertEqual('%.3f' % places[0][1][0], '%.3f' % WELL_KNOWN_LONGITUDE_1)
-        self.assertEqual('%.3f' % places[0][1][1], '%.3f' % WELL_KNOWN_LATITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % places[0][1][0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_1)
+        self.assertEqual(PRECISION_FORMAT % places[0][1][1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_1)
 
         self.assertEqual(places[1][0], SEARCH_ID_2)
-        self.assertEqual('%.3f' % places[1][1][0], '%.3f' % WELL_KNOWN_LONGITUDE_2)
-        self.assertEqual('%.3f' % places[1][1][1], '%.3f' % WELL_KNOWN_LATITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % places[1][1][0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE_2)
+        self.assertEqual(PRECISION_FORMAT % places[1][1][1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE_2)
 
     def test_valid_request_components_bulk_many(self):
         places = self.bulk_geocoder._batch_geocode([(SEARCH_ID_1, VALID_SEARCH_TEXT_1, VALID_CITY_1, VALID_STATE_PROVINCE_1, VALID_COUNTRY_1),
