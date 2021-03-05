@@ -50,7 +50,7 @@ SELECT cartodb.cdb_conf_setconf('geocodio_conf', '{"geocoder": {"api_keys": ["ge
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
  cdb_conf_setconf 
 ------------------
-  
+ 
 (1 row)
 
 -- Mock the varnish invalidation function
