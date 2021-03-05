@@ -399,8 +399,7 @@ BEGIN
     CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
       'isolines',
       'hires_geocoder',
-      'routing',
-      'observatory'
+      'routing'
     );
   END IF;
 END $$;
