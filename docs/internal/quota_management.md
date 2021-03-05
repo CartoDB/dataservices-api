@@ -56,8 +56,6 @@ This operation could be done through the rails console:
 
   - Geocoding (street level): `geocoding_quota`, `soft_geocoding_limit`
   - Isolines: `here_isolines_quota`, `soft_here_isolines_limit`
-  - Data observatory snapshot: `obs_snapshot_quota`, `soft_obs_snapshot_limit`
-  - Data observatory general: `obs_general_quota`, `soft_obs_general_limit`
 
 ### How is the quota spent?###
 
