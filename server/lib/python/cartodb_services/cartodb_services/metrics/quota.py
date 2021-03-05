@@ -78,9 +78,6 @@ class QuotaChecker:
         elif re.match('^routing_',
                       self._user_service_config.service_type) is not None:
             return self.__check_routing_quota()
-        elif re.match('^obs_',
-                      self._user_service_config.service_type) is not None:
-            return self.__check_data_observatory_quota()
         else:
             return False
 
@@ -120,21 +117,6 @@ class QuotaChecker:
         soft_limit = self._user_service_config.soft_limit
 
         if soft_limit or (user_quota > 0 and current_used < user_quota):
-            return True
-        else:
-            return False
-
-    def __check_data_observatory_quota(self):
-        user_quota = self._user_service_config.monthly_quota
-        soft_limit = self._user_service_config.soft_limit
-        today = date.today()
-        service_type = self._user_service_config.service_type
-        current_used = self._user_service.used_quota(service_type, today)
-
-        # Quick workaround so we don't take into account numer of credits
-        # spent for users that have defined the quota.
-        # See https://github.com/CartoDB/bigmetadata/issues/215
-        if soft_limit or (user_quota > 0):
             return True
         else:
             return False

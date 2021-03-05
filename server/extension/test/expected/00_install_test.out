@@ -50,13 +50,7 @@ SELECT cartodb.cdb_conf_setconf('geocodio_conf', '{"geocoder": {"api_keys": ["ge
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
  cdb_conf_setconf 
 ------------------
- 
-(1 row)
-
-SELECT cartodb.cdb_conf_setconf('data_observatory_conf', '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=contrib_regression user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}, "monthly_quota": 100000}');
- cdb_conf_setconf 
-------------------
- 
+  
 (1 row)
 
 -- Mock the varnish invalidation function

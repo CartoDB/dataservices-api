@@ -39,7 +39,6 @@ Service Types:
 * `'isolines'` [Isoline/Isochrones (isochrone/isodistance lines) service]({{site.dataservicesapi_docs}}/reference/#isoline_functions/)
 * `'hires_geocoder'` [Street level geocoding]({{site.dataservicesapi_docs}}/reference/#street-level-geocoder)
 * `'routing'` [Routing functions]({{site.dataservicesapi_docs}}/reference/#routing_functions/)
-* `'observatory'` Data Observatory services ([demographic]({{site.dataservicesapi_docs}}/reference/#demographic_functions/) and [segmentation]({{site.dataservicesapi_docs}}/reference/#segmentation_functions/) functions)
 
 **Notes**
 
@@ -62,12 +61,11 @@ Result:
  isolines       |           100 |          0 | f          | tomtom
  hires_geocoder |           100 |          0 | f          | tomtom
  routing        |            50 |          0 | f          | tomtom
- observatory    |             0 |          0 | f          | data observatory
 (4 rows)
 
 ```
 
-In this case, notice that the user has no access to the observatory services. All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
+All quotas are *hard-limited* (no soft limits), and no quota has been used in the present period.
 
 ### cdb_enough_quota(service text ,input_size numeric)
 
