@@ -2370,7 +2370,6 @@ $$  LANGUAGE 'plpgsql' SECURITY DEFINER STABLE PARALLEL UNSAFE
 -- Exception-safe private DataServices API function
 --
 
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_get_demographic_snapshot (username text, orgname text, geom public.geometry(Geometry, 4326), time_span text, geometry_level text);
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_get_demographic_snapshot (username text, orgname text, geom public.geometry(Geometry, 4326), time_span text DEFAULT '2009 - 2013'::text, geometry_level text DEFAULT NULL)
 RETURNS json AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2378,7 +2377,7 @@ RETURNS json AS $$
   SELECT cdb_dataservices_server.obs_get_demographic_snapshot (username, orgname, geom, time_span, geometry_level);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_get_segment_snapshot (username text, orgname text, geom public.geometry(Geometry, 4326), geometry_level text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_get_segment_snapshot (username text, orgname text, geom public.geometry(Geometry, 4326), geometry_level text DEFAULT NULL)
 RETURNS json AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2386,7 +2385,7 @@ RETURNS json AS $$
   SELECT cdb_dataservices_server.obs_get_segment_snapshot (username, orgname, geom, geometry_level);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getdemographicsnapshot (username text, orgname text, geom public.geometry(Geometry, 4326), time_span text, geometry_level text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getdemographicsnapshot (username text, orgname text, geom public.geometry(Geometry, 4326), time_span text DEFAULT NULL, geometry_level text DEFAULT NULL)
 RETURNS SETOF JSON AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2394,7 +2393,7 @@ RETURNS SETOF JSON AS $$
   SELECT cdb_dataservices_server.obs_getdemographicsnapshot (username, orgname, geom, time_span, geometry_level);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getsegmentsnapshot (username text, orgname text, geom public.geometry(Geometry, 4326), geometry_level text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getsegmentsnapshot (username text, orgname text, geom public.geometry(Geometry, 4326), geometry_level text DEFAULT NULL)
 RETURNS SETOF JSON AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2402,7 +2401,7 @@ RETURNS SETOF JSON AS $$
   SELECT cdb_dataservices_server.obs_getsegmentsnapshot (username, orgname, geom, geometry_level);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getboundary (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getboundary (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL)
 RETURNS public.Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2410,7 +2409,7 @@ RETURNS public.Geometry AS $$
   SELECT cdb_dataservices_server.obs_getboundary (username, orgname, geom, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getboundaryid (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getboundaryid (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL)
 RETURNS text AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2418,7 +2417,7 @@ RETURNS text AS $$
   SELECT cdb_dataservices_server.obs_getboundaryid (username, orgname, geom, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getboundarybyid (username text, orgname text, geometry_id text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getboundarybyid (username text, orgname text, geometry_id text, boundary_id text, time_span text DEFAULT NULL)
 RETURNS public.Geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2426,7 +2425,7 @@ RETURNS public.Geometry AS $$
   SELECT cdb_dataservices_server.obs_getboundarybyid (username, orgname, geometry_id, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getboundariesbygeometry (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getboundariesbygeometry (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2434,7 +2433,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getboundariesbygeometry (username, orgname, geom, boundary_id, time_span, overlap_type);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getboundariesbypointandradius (username text, orgname text, geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getboundariesbypointandradius (username text, orgname text, geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2442,7 +2441,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getboundariesbypointandradius (username, orgname, geom, radius, boundary_id, time_span, overlap_type);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getpointsbygeometry (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getpointsbygeometry (username text, orgname text, geom public.geometry(Geometry, 4326), boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2450,7 +2449,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getpointsbygeometry (username, orgname, geom, boundary_id, time_span, overlap_type);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getpointsbypointandradius (username text, orgname text, geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getpointsbypointandradius (username text, orgname text, geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text DEFAULT NULL, overlap_type text DEFAULT NULL)
 RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2458,7 +2457,7 @@ RETURNS TABLE(the_geom geometry, geom_refs text) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getpointsbypointandradius (username, orgname, geom, radius, boundary_id, time_span, overlap_type);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getmeasure (username text, orgname text, geom public.Geometry, measure_id text, normalize text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getmeasure (username text, orgname text, geom public.Geometry, measure_id text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2466,7 +2465,7 @@ RETURNS numeric AS $$
   SELECT cdb_dataservices_server.obs_getmeasure (username, orgname, geom, measure_id, normalize, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getmeasurebyid (username text, orgname text, geom_ref text, measure_id text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getmeasurebyid (username text, orgname text, geom_ref text, measure_id text, boundary_id text, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2474,7 +2473,7 @@ RETURNS numeric AS $$
   SELECT cdb_dataservices_server.obs_getmeasurebyid (username, orgname, geom_ref, measure_id, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getdata (username text, orgname text, geomvals geomval[], params json, merge boolean);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getdata (username text, orgname text, geomvals geomval[], params json, merge boolean DEFAULT true)
 RETURNS TABLE(id int, data json) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2482,7 +2481,7 @@ RETURNS TABLE(id int, data json) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getdata (username, orgname, geomvals, params, merge);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getdata (username text, orgname text, geomrefs text[], params json);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getdata (username text, orgname text, geomrefs text[], params json)
 RETURNS TABLE(id text, data json) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2490,7 +2489,7 @@ RETURNS TABLE(id text, data json) AS $$
   SELECT * FROM cdb_dataservices_server.obs_getdata (username, orgname, geomrefs, params);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getmeta (username text, orgname text, geom_ref public.Geometry(Geometry, 4326), params json, max_timespan_rank integer, max_score_rank integer, target_geoms integer);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getmeta (username text, orgname text, geom_ref public.Geometry(Geometry, 4326), params json, max_timespan_rank integer DEFAULT NULL, max_score_rank integer DEFAULT NULL, target_geoms integer DEFAULT NULL)
 RETURNS json AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2498,7 +2497,7 @@ RETURNS json AS $$
   SELECT cdb_dataservices_server.obs_getmeta (username, orgname, geom_ref, params, max_timespan_rank, max_score_rank, target_geoms);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_metadatavalidation (username text, orgname text, geom_extent public.Geometry(Geometry, 4326), geom_type text, params json, target_geoms integer);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_metadatavalidation (username text, orgname text, geom_extent public.Geometry(Geometry, 4326), geom_type text, params json, target_geoms integer DEFAULT NULL)
 RETURNS TABLE(valid boolean, errors text[]) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2506,7 +2505,7 @@ RETURNS TABLE(valid boolean, errors text[]) AS $$
   SELECT * FROM cdb_dataservices_server.obs_metadatavalidation (username, orgname, geom_extent, geom_type, params, target_geoms);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getcategory (username text, orgname text, geom public.Geometry, category_id text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getcategory (username text, orgname text, geom public.Geometry, category_id text, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS text AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2514,7 +2513,7 @@ RETURNS text AS $$
   SELECT cdb_dataservices_server.obs_getcategory (username, orgname, geom, category_id, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getuscensusmeasure (username text, orgname text, geom public.Geometry, name text, normalize text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getuscensusmeasure (username text, orgname text, geom public.Geometry, name text, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2522,7 +2521,7 @@ RETURNS numeric AS $$
   SELECT cdb_dataservices_server.obs_getuscensusmeasure (username, orgname, geom, name, normalize, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getuscensuscategory (username text, orgname text, geom public.Geometry, name text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getuscensuscategory (username text, orgname text, geom public.Geometry, name text, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS text AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2530,7 +2529,7 @@ RETURNS text AS $$
   SELECT cdb_dataservices_server.obs_getuscensuscategory (username, orgname, geom, name, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getpopulation (username text, orgname text, geom public.Geometry, normalize text, boundary_id text, time_span text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getpopulation (username text, orgname text, geom public.Geometry, normalize text DEFAULT NULL, boundary_id text DEFAULT NULL, time_span text DEFAULT NULL)
 RETURNS numeric AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2538,7 +2537,7 @@ RETURNS numeric AS $$
   SELECT cdb_dataservices_server.obs_getpopulation (username, orgname, geom, normalize, boundary_id, time_span);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_search (username text, orgname text, search_term text, relevant_boundary text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_search (username text, orgname text, search_term text, relevant_boundary text DEFAULT NULL)
 RETURNS TABLE(id text, description text, name text, aggregate text, source text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2546,7 +2545,7 @@ RETURNS TABLE(id text, description text, name text, aggregate text, source text)
   SELECT * FROM cdb_dataservices_server.obs_search (username, orgname, search_term, relevant_boundary);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getavailableboundaries (username text, orgname text, geom public.Geometry, timespan text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailableboundaries (username text, orgname text, geom public.Geometry, timespan text DEFAULT NULL)
 RETURNS TABLE(boundary_id text, description text, time_span text, tablename text) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2554,7 +2553,7 @@ RETURNS TABLE(boundary_id text, description text, time_span text, tablename text
   SELECT * FROM cdb_dataservices_server.obs_getavailableboundaries (username, orgname, geom, timespan);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_dumpversion (username text, orgname text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_dumpversion (username text, orgname text)
 RETURNS text AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2562,7 +2561,7 @@ RETURNS text AS $$
   SELECT cdb_dataservices_server.obs_dumpversion (username, orgname);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getavailablenumerators (username text, orgname text, bounds public.geometry(Geometry, 4326), filter_tags text[], denom_id text, geom_id text, timespan text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailablenumerators (username text, orgname text, bounds public.geometry(Geometry, 4326) DEFAULT NULL, filter_tags text[] DEFAULT NULL, denom_id text DEFAULT NULL, geom_id text DEFAULT NULL, timespan text DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2570,7 +2569,7 @@ RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
   SELECT * FROM cdb_dataservices_server.obs_getavailablenumerators (username, orgname, bounds, filter_tags, denom_id, geom_id, timespan);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client.__obs_getnumerators (username text, orgname text, bounds public.geometry(Geometry, 4326), section_tags text[], subsection_tags text[], other_tags text[], ids text[], name text, denom_id text, geom_id text, timespan text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.__obs_getnumerators (username text, orgname text, bounds public.geometry(Geometry, 4326) DEFAULT NULL, section_tags text[] DEFAULT ARRAY[]::TEXT[], subsection_tags text[] DEFAULT ARRAY[]::TEXT[], other_tags text[] DEFAULT ARRAY[]::TEXT[], ids text[] DEFAULT ARRAY[]::TEXT[], name text DEFAULT NULL, denom_id text DEFAULT '', geom_id text DEFAULT '', timespan text DEFAULT '')
 RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2578,7 +2577,7 @@ RETURNS SETOF cdb_dataservices_client.obs_meta_numerator AS $$
   SELECT * FROM cdb_dataservices_server._obs_getnumerators (username, orgname, bounds, section_tags, subsection_tags, other_tags, ids, name, denom_id, geom_id, timespan);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getavailabledenominators (username text, orgname text, bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, geom_id text, timespan text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailabledenominators (username text, orgname text, bounds public.geometry(Geometry, 4326) DEFAULT NULL, filter_tags text[] DEFAULT NULL, numer_id text DEFAULT NULL, geom_id text DEFAULT NULL, timespan text DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.obs_meta_denominator AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2586,7 +2585,7 @@ RETURNS SETOF cdb_dataservices_client.obs_meta_denominator AS $$
   SELECT * FROM cdb_dataservices_server.obs_getavailabledenominators (username, orgname, bounds, filter_tags, numer_id, geom_id, timespan);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getavailablegeometries (username text, orgname text, bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, timespan text, number_geometries integer);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailablegeometries (username text, orgname text, bounds public.geometry(Geometry, 4326) DEFAULT NULL, filter_tags text[] DEFAULT NULL, numer_id text DEFAULT NULL, denom_id text DEFAULT NULL, timespan text DEFAULT NULL, number_geometries integer DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.obs_meta_geometry AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2594,7 +2593,7 @@ RETURNS SETOF cdb_dataservices_client.obs_meta_geometry AS $$
   SELECT * FROM cdb_dataservices_server.obs_getavailablegeometries (username, orgname, bounds, filter_tags, numer_id, denom_id, timespan, number_geometries);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_getavailabletimespans (username text, orgname text, bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, geom_id text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_getavailabletimespans (username text, orgname text, bounds public.geometry(Geometry, 4326) DEFAULT NULL, filter_tags text[] DEFAULT NULL, numer_id text DEFAULT NULL, denom_id text DEFAULT NULL, geom_id text DEFAULT NULL)
 RETURNS SETOF cdb_dataservices_client.obs_meta_timespan AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2602,7 +2601,7 @@ RETURNS SETOF cdb_dataservices_client.obs_meta_timespan AS $$
   SELECT * FROM cdb_dataservices_server.obs_getavailabletimespans (username, orgname, bounds, filter_tags, numer_id, denom_id, geom_id);
   
 $$ LANGUAGE plproxy VOLATILE PARALLEL UNSAFE;
-DROP FUNCTION IF EXISTS cdb_dataservices_client._obs_legacybuildermetadata (username text, orgname text, aggregate_type text);
+
 CREATE OR REPLACE FUNCTION cdb_dataservices_client._obs_legacybuildermetadata (username text, orgname text, aggregate_type text DEFAULT NULL)
 RETURNS TABLE(name text, subsection json) AS $$
   CONNECT cdb_dataservices_client._server_conn_str();
@@ -2668,94 +2667,64 @@ $$ LANGUAGE 'plpgsql' VOLATILE PARALLEL UNSAFE;
 
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_get_demographic_snapshot(geom public.geometry(Geometry, 4326), time_span text, geometry_level text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_get_demographic_snapshot_exception_safe(geom public.geometry(Geometry, 4326), time_span text, geometry_level text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_get_segment_snapshot(geom public.geometry(Geometry, 4326), geometry_level text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_get_segment_snapshot_exception_safe(geom public.geometry(Geometry, 4326), geometry_level text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getdemographicsnapshot(geom public.geometry(Geometry, 4326), time_span text, geometry_level text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getdemographicsnapshot_exception_safe(geom public.geometry(Geometry, 4326), time_span text, geometry_level text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getsegmentsnapshot(geom public.geometry(Geometry, 4326), geometry_level text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getsegmentsnapshot_exception_safe(geom public.geometry(Geometry, 4326), geometry_level text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getboundary(geom public.geometry(Geometry, 4326), boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getboundary_exception_safe(geom public.geometry(Geometry, 4326), boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getboundaryid(geom public.geometry(Geometry, 4326), boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getboundaryid_exception_safe(geom public.geometry(Geometry, 4326), boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getboundarybyid(geometry_id text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getboundarybyid_exception_safe(geometry_id text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getboundariesbygeometry(geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getboundariesbygeometry_exception_safe(geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getboundariesbypointandradius(geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getboundariesbypointandradius_exception_safe(geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getpointsbygeometry(geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getpointsbygeometry_exception_safe(geom public.geometry(Geometry, 4326), boundary_id text, time_span text, overlap_type text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getpointsbypointandradius(geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getpointsbypointandradius_exception_safe(geom public.geometry(Geometry, 4326), radius numeric, boundary_id text, time_span text, overlap_type text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getmeasure(geom public.Geometry, measure_id text, normalize text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getmeasure_exception_safe(geom public.Geometry, measure_id text, normalize text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getmeasurebyid(geom_ref text, measure_id text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getmeasurebyid_exception_safe(geom_ref text, measure_id text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getdata(geomvals geomval[], params json, merge boolean) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getdata_exception_safe(geomvals geomval[], params json, merge boolean )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getdata(geomrefs text[], params json) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getdata_exception_safe(geomrefs text[], params json )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getmeta(geom_ref public.Geometry(Geometry, 4326), params json, max_timespan_rank integer, max_score_rank integer, target_geoms integer) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getmeta_exception_safe(geom_ref public.Geometry(Geometry, 4326), params json, max_timespan_rank integer, max_score_rank integer, target_geoms integer )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_metadatavalidation(geom_extent public.Geometry(Geometry, 4326), geom_type text, params json, target_geoms integer) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_metadatavalidation_exception_safe(geom_extent public.Geometry(Geometry, 4326), geom_type text, params json, target_geoms integer )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getcategory(geom public.Geometry, category_id text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getcategory_exception_safe(geom public.Geometry, category_id text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getuscensusmeasure(geom public.Geometry, name text, normalize text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getuscensusmeasure_exception_safe(geom public.Geometry, name text, normalize text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getuscensuscategory(geom public.Geometry, name text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getuscensuscategory_exception_safe(geom public.Geometry, name text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getpopulation(geom public.Geometry, normalize text, boundary_id text, time_span text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getpopulation_exception_safe(geom public.Geometry, normalize text, boundary_id text, time_span text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_search(search_term text, relevant_boundary text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_search_exception_safe(search_term text, relevant_boundary text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getavailableboundaries(geom public.Geometry, timespan text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getavailableboundaries_exception_safe(geom public.Geometry, timespan text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_dumpversion() TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_dumpversion_exception_safe( )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getavailablenumerators(bounds public.geometry(Geometry, 4326), filter_tags text[], denom_id text, geom_id text, timespan text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getavailablenumerators_exception_safe(bounds public.geometry(Geometry, 4326), filter_tags text[], denom_id text, geom_id text, timespan text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getnumerators(bounds public.geometry(Geometry, 4326), section_tags text[], subsection_tags text[], other_tags text[], ids text[], name text, denom_id text, geom_id text, timespan text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.__obs_getnumerators_exception_safe(bounds public.geometry(Geometry, 4326), section_tags text[], subsection_tags text[], other_tags text[], ids text[], name text, denom_id text, geom_id text, timespan text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getavailabledenominators(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, geom_id text, timespan text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getavailabledenominators_exception_safe(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, geom_id text, timespan text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getavailablegeometries(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, timespan text, number_geometries integer) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getavailablegeometries_exception_safe(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, timespan text, number_geometries integer )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_getavailabletimespans(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, geom_id text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_getavailabletimespans_exception_safe(bounds public.geometry(Geometry, 4326), filter_tags text[], numer_id text, denom_id text, geom_id text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client.obs_legacybuildermetadata(aggregate_type text) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._obs_legacybuildermetadata_exception_safe(aggregate_type text )  TO publicuser;
-
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._DST_PrepareTableOBS_GetMeasure(output_table_name text, params json) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._DST_PopulateTableOBS_GetMeasure(table_name text, output_table_name text, params json) TO publicuser;
 GRANT EXECUTE ON FUNCTION cdb_dataservices_client._OBS_PreCheck(source_query text, params JSON) TO publicuser;
