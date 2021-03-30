@@ -27,9 +27,6 @@ def build_redis_user_config(redis_conn, username, service, quota=100,
         redis_conn.hset(user_redis_name, 'routing_provider', provider)
         redis_conn.hset(user_redis_name, 'mapzen_routing_quota', str(quota))
         redis_conn.hset(user_redis_name, 'soft_mapzen_routing_limit', str(soft_limit).lower())
-    elif service is 'data_observatory':
-        redis_conn.hset(user_redis_name, 'obs_general_quota', str(quota))
-        redis_conn.hset(user_redis_name, 'soft_obs_general_limit', str(soft_limit).lower())
 
     redis_conn.hset(user_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(user_redis_name, 'google_maps_api_key', '')
@@ -53,9 +50,6 @@ def build_redis_org_config(redis_conn, orgname, service, quota=100,
         redis_conn.hset(org_redis_name, 'routing_provider', provider)
         if quota is not None:
             redis_conn.hset(org_redis_name, 'mapzen_routing_quota', str(quota))
-    elif service is 'data_observatory':
-        if quota is not None:
-            redis_conn.hset(org_redis_name, 'obs_general_quota', str(quota))
 
     redis_conn.hset(org_redis_name, 'google_maps_client_id', '')
     redis_conn.hset(org_redis_name, 'google_maps_api_key', '')
@@ -80,6 +74,5 @@ def plpy_mock_config():
     plpy_mock._define_result("CDB_Conf_GetConf\('tomtom_conf'\)", [{'conf': '{"routing": {"api_keys": ["api_key_rou"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}, "isolines": {"api_keys": ["api_key_mat"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('geocodio_conf'\)", [{'conf': '{"geocoder": {"api_keys": ["api_key_geo"], "monthly_quota": 1500000}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('logger_conf'\)", [{'conf': '{"geocoder_log_path": "/dev/null"}'}])
-    plpy_mock._define_result("CDB_Conf_GetConf\('data_observatory_conf'\)", [{'conf': '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'}])
     plpy_mock._define_result("CDB_Conf_GetConf\('server_conf'\)", [{'conf': '{"environment": "testing"}'}])
     plpy_mock._define_result("select txid_current", [{'txid': random.randint(0, 1000)}])

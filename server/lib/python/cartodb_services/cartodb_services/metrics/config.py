@@ -57,57 +57,6 @@ class ServiceConfig(object):
             return None
 
 
-class DataObservatoryConfig(ServiceConfig):
-
-    METRICS_LOG_KEY = 'do_log_path'
-
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(DataObservatoryConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
-
-    @property
-    def monthly_quota(self):
-        return self._monthly_quota
-
-    @property
-    def period_end_date(self):
-        return self._period_end_date
-
-    @property
-    def soft_limit(self):
-        return self._soft_limit
-
-    @property
-    def connection_str(self):
-        return self._connection_str
-
-    @property
-    def provider(self):
-        return 'data observatory'
-
-
-class ObservatoryConfig(DataObservatoryConfig):
-
-    SOFT_LIMIT_KEY = 'soft_obs_general_limit'
-    QUOTA_KEY = 'obs_general_quota'
-    PERIOD_END_DATE = 'period_end_date'
-
-    def __init__(self, redis_connection, db_conn, username, orgname=None):
-        super(ObservatoryConfig, self).__init__(redis_connection, db_conn,
-                                            username, orgname)
-        self._period_end_date = date_parse(self._redis_config[self.PERIOD_END_DATE])
-        if self.SOFT_LIMIT_KEY in self._redis_config and self._redis_config[self.SOFT_LIMIT_KEY].lower() == 'true':
-            self._soft_limit = True
-        else:
-            self._soft_limit = False
-        self._monthly_quota = self._get_effective_monthly_quota(self.QUOTA_KEY)
-        self._connection_str = self._db_config.data_observatory_connection_str
-
-    @property
-    def service_type(self):
-        return 'obs_general'
-
-
 class RoutingConfig(ServiceConfig):
 
     PERIOD_END_DATE = 'period_end_date'
@@ -624,7 +573,6 @@ class ServicesDBConfig:
         self._get_mapbox_config()
         self._get_tomtom_config()
         self._get_geocodio_config()
-        self._get_data_observatory_config()
 
     def _get_server_config(self):
         server_config_json = self._get_conf('server_conf')
@@ -715,19 +663,6 @@ class ServicesDBConfig:
             self._geocodio_geocoder_api_keys = geocodio_conf['geocoder']['api_keys']
             self._geocodio_geocoder_quota = geocodio_conf['geocoder']['monthly_quota']
             self._geocodio_geocoder_service_params = geocodio_conf['geocoder'].get('service', {})
-
-    def _get_data_observatory_config(self):
-        do_conf_json = self._get_conf('data_observatory_conf')
-        if not do_conf_json:
-            raise ConfigException('Data Observatory configuration missing')
-        else:
-            do_conf = json.loads(do_conf_json)
-            if self._orgname and self._orgname in do_conf['connection']['whitelist']:
-                self._data_observatory_connection_str = do_conf['connection']['staging']
-            elif self._username in do_conf['connection']['whitelist']:
-                self._data_observatory_connection_str = do_conf['connection']['staging']
-            else:
-                self._data_observatory_connection_str = do_conf['connection']['production']
 
     def _get_conf(self, key):
         try:
@@ -898,10 +833,6 @@ class ServicesDBConfig:
         return self._geocodio_geocoder_service_params
 
     @property
-    def data_observatory_connection_str(self):
-        return self._data_observatory_connection_str
-
-    @property
     def logger_config(self):
         logger_conf_json = self._get_conf('logger_conf')
         if not logger_conf_json:
@@ -917,7 +848,6 @@ class ServicesRedisConfig:
     QUOTA_KEY = 'geocoding_quota'
     ISOLINES_QUOTA_KEY = 'here_isolines_quota'
     ROUTING_QUOTA_KEY = 'mapzen_routing_quota'
-    OBS_GENERAL_QUOTA_KEY = 'obs_general_quota'
     PERIOD_END_DATE = 'period_end_date'
     GEOCODER_PROVIDER_KEY = 'geocoder_provider'
     ISOLINES_PROVIDER_KEY = 'isolines_provider'
@@ -960,8 +890,6 @@ class ServicesRedisConfig:
                 user_config[self.ISOLINES_QUOTA_KEY] = org_config[self.ISOLINES_QUOTA_KEY]
             if self.ROUTING_QUOTA_KEY in org_config:
                 user_config[self.ROUTING_QUOTA_KEY] = org_config[self.ROUTING_QUOTA_KEY]
-            if self.OBS_GENERAL_QUOTA_KEY in org_config:
-                user_config[self.OBS_GENERAL_QUOTA_KEY] = org_config[self.OBS_GENERAL_QUOTA_KEY]
             if self.PERIOD_END_DATE in org_config:
                 user_config[self.PERIOD_END_DATE] = org_config[self.PERIOD_END_DATE]
             if self.GOOGLE_GEOCODER_CLIENT_ID in org_config:

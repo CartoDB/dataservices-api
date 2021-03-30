@@ -23,7 +23,6 @@ This suite of tests test the following parts of the geocoding API through the SQ
 - Street address functions (This will call Heremaps or Google so it will cost you 2 credits)
 - Routing functions
 - Isolines functions
-- Data Observatory functions
 
 
 ### How to debug the tests
@@ -46,7 +45,7 @@ GEOCODER_API_TEST_USERNAME=your_username \
 GEOCODER_API_TEST_API_KEY=your_api_key \
 GEOCODER_API_TEST_TABLE_NAME=your_test_table \
 GEOCODER_API_TEST_HOST=your_target_test_host \
-nosetests --where=integration/ test_data_observatory_functions.py:TestDataObservatoryFunctions.test_if_obs_search_is_ok
+nosetests --where=integration/ test_admin1_functions.py:TestAdmin1Functions.test_if_select_with_admin1_without_country_is_ok
 ```
 
 (replace the environment variables, test file, class and function according to your needs)

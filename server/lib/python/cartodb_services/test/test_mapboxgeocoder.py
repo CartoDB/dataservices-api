@@ -9,6 +9,7 @@ VALID_ADDRESS = 'Calle Siempreviva 3, Valladolid'
 WELL_KNOWN_LONGITUDE = -4.730947
 WELL_KNOWN_LATITUDE = 41.668654
 
+PRECISION_FORMAT = '%.3f'
 
 class MapboxGeocoderTestCase(unittest.TestCase):
     def setUp(self):
@@ -22,8 +23,8 @@ class MapboxGeocoderTestCase(unittest.TestCase):
     def test_valid_request(self):
         place = self.geocoder.geocode(VALID_ADDRESS)
 
-        self.assertEqual('%.3f' % place[0], '%.3f' % WELL_KNOWN_LONGITUDE)
-        self.assertEqual('%.3f' % place[1], '%.3f' % WELL_KNOWN_LATITUDE)
+        self.assertEqual(PRECISION_FORMAT % place[0], PRECISION_FORMAT % WELL_KNOWN_LONGITUDE)
+        self.assertEqual(PRECISION_FORMAT % place[1], PRECISION_FORMAT % WELL_KNOWN_LATITUDE)
 
     def test_valid_request_namedplace(self):
         place = self.geocoder.geocode(searchtext='Barcelona')
