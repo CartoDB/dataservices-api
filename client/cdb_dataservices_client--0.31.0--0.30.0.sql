@@ -12,13 +12,7 @@ CREATE TYPE cdb_dataservices_client.obs_meta_denominator AS (denom_id text, deno
 CREATE TYPE cdb_dataservices_client.obs_meta_geometry AS (geom_id text, geom_name text, geom_description text, geom_weight text, geom_aggregate text, geom_license text, geom_source text, valid_numer boolean, valid_denom boolean, valid_timespan boolean, score numeric, numtiles bigint, notnull_percent numeric, numgeoms numeric, percentfill numeric, estnumgeoms numeric, meanmediansize numeric, geom_type text, geom_extra jsonb, geom_tags jsonb);
 CREATE TYPE cdb_dataservices_client.obs_meta_timespan AS (timespan_id text, timespan_name text, timespan_description text, timespan_weight text, timespan_aggregate text, timespan_license text, timespan_source text, valid_numer boolean, valid_denom boolean, valid_geom boolean, timespan_type text, timespan_extra jsonb, timespan_tags jsonb);
 
-DROP TYPE IF EXISTS cdb_dataservices_client.service_type; 
-CREATE TYPE cdb_dataservices_client.service_type AS ENUM (
-    'isolines',
-    'hires_geocoder',
-    'routing',
-    'observatory'
-);
+ALTER TYPE cdb_dataservices_client.service_type ADD VALUE 'observatory' AFTER 'routing';
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_client.obs_get_demographic_snapshot (geom public.geometry(Geometry, 4326) ,time_span text DEFAULT '2009 - 2013'::text ,geometry_level text DEFAULT NULL)
 RETURNS json AS $$

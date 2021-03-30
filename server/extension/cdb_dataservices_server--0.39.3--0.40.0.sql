@@ -65,18 +65,12 @@ DROP FUNCTION IF EXISTS cdb_dataservices_server.OBS_LegacyBuilderMetadata(TEXT, 
 DROP FUNCTION IF EXISTS cdb_dataservices_server._OBS_GetNumerators (TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT[] , TEXT[], TEXT[] , TEXT, TEXT, TEXT, TEXT);
 DROP FUNCTION IF EXISTS cdb_dataservices_server._get_obs_config(TEXT, TEXT);
 
-DROP TYPE IF EXISTS cdb_dataservices_client.ds_fdw_metadata;
-DROP TYPE IF EXISTS cdb_dataservices_client.ds_return_metadata;
-DROP TYPE IF EXISTS cdb_dataservices_client.obs_meta_numerator;
-DROP TYPE IF EXISTS cdb_dataservices_client.obs_meta_denominator;
-DROP TYPE IF EXISTS cdb_dataservices_client.obs_meta_geometry;
-DROP TYPE IF EXISTS cdb_dataservices_client.obs_meta_timespan;
-DROP TYPE IF EXISTS cdb_dataservices_client.service_type;
-
-CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
-    'isolines',
-    'hires_geocoder',
-    'routing'
+DELETE FROM pg_enum
+WHERE enumlabel = 'observatory'
+AND enumtypid = (
+  SELECT pg_type.oid
+  FROM pg_type INNER JOIN pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+  WHERE pg_type.typname = 'service_type' AND pg_namespace.nspname = 'cdb_dataservices_server'
 );
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(

@@ -1446,13 +1446,7 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
-DROP TYPE IF EXISTS cdb_dataservices_client.service_type;
-CREATE TYPE cdb_dataservices_server.service_type AS ENUM (
-    'isolines',
-    'hires_geocoder',
-    'routing',
-    'observatory'
-);
+ALTER TYPE cdb_dataservices_server.service_type ADD VALUE 'observatory' AFTER 'routing';
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(
   username TEXT,
