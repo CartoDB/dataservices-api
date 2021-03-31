@@ -178,17 +178,6 @@ class TestQuotaService(TestCase):
         qs.increment_isolines_service_use(amount=1500000)
         assert qs.check_user_quota() is False
 
-    # Quick workaround so we don't take into account numer of credits
-    # spent for users that have defined the quota.
-    # See https://github.com/CartoDB/bigmetadata/issues/215
-    def test_should_check_org_obs_quota_correctly(self):
-        qs = self.__build_obs_quota_service('test_user',
-                                            orgname='testorg')
-        qs.increment_success_service_use()
-        assert qs.check_user_quota() is True
-        qs.increment_success_service_use(amount=100000)
-        assert qs.check_user_quota() is True
-
     def __prepare_quota_service(self, username, service, quota, provider,
                                 orgname, soft_limit, end_date):
         build_redis_user_config(self.redis_conn, username, service,
@@ -226,14 +215,3 @@ class TestQuotaService(TestCase):
         isolines_config = IsolinesRoutingConfig(self.redis_conn, plpy_mock,
                                                username, orgname)
         return QuotaService(isolines_config, redis_connection=self.redis_conn)
-
-    def __build_obs_quota_service(self, username, quota=100,
-                                  provider='obs_general',
-                                  orgname=None,
-                                  soft_limit=False,
-                                  end_date=datetime.today()):
-        self.__prepare_quota_service(username, 'data_observatory', quota,
-                                     None, orgname, soft_limit, end_date)
-        do_config = ObservatoryConfig(self.redis_conn, plpy_mock,
-                                          username, orgname)
-        return QuotaService(do_config, redis_connection=self.redis_conn)

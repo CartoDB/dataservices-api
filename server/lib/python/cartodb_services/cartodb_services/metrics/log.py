@@ -127,8 +127,6 @@ class MetricsServiceLoggerFactory:
             return MetricsGenericLogger(service_config, logger)
         elif re.search('_isolines$', service_config.service_type):
             return MetricsIsolinesLogger(service_config, logger)
-        elif re.search('^obs_*', service_config.service_type):
-            return MetricsGenericLogger(service_config, logger)
         else:
             return None
 

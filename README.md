@@ -80,28 +80,6 @@ Steps to deploy a new Data Services API version :
      psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS cdb_geocoder; COMMIT" -e
      ```
 
-- [optional] install data observatory extension
-   - Make the extension available in postgresql to be installed
-     ```
-     git clone https://github.com/CartoDB/observatory-extension.git
-     cd observatory
-     sudo make install
-     ```
-   - This extension needs data, dumps are not available so we're going to use the test fixtures to make it work. Execute:
-     ```
-     psql -U postgres -d dataservices_db -f src/pg/test/fixtures/load_fixtures.sql
-     ```
-   - Give permission to execute and select to the `geocoder_api` user:
-     ```
-     psql -U postgres -d dataservices_db -c "BEGIN;CREATE EXTENSION IF NOT EXISTS observatory VERSION 'dev'; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA cdb_observatory TO geocoder_api; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT SELECT ON ALL TABLES IN SCHEMA observatory TO geocoder_api; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA observatory TO geocoder_api; COMMIT" -e
-     psql -U postgres -d dataservices_db -c "BEGIN;GRANT USAGE ON SCHEMA observatory TO geocoder_api; COMMIT" -e
-     ```
-
 ### Server configuration
 
 Configuration for the different services must be stored in the server database using `CDB_Conf_SetConf()`.
@@ -187,15 +165,6 @@ SELECT CDB_Conf_SetConf(
 SELECT CDB_Conf_SetConf(
     'geocodio_conf',
     '{"geocoder": {"api_keys": ["your_api_key"], "monthly_quota": 999999}}'
-);
-```
-
-#### Data Observatory
-
-```sql
-SELECT CDB_Conf_SetConf(
-    'data_observatory_conf',
-    '{"connection": {"whitelist": [], "production": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}}'
 );
 ```
 

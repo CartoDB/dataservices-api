@@ -15,7 +15,6 @@ SELECT cartodb.cdb_conf_setconf('mapbox_conf', '{"routing": {"api_keys": ["routi
 SELECT cartodb.cdb_conf_setconf('tomtom_conf', '{"routing": {"api_keys": ["routing_dummy_api_key"], "monthly_quota": 1500000}, "geocoder": {"api_keys": ["geocoder_dummy_api_key"], "monthly_quota": 1500000}, "isolines": {"api_keys": ["isolines_dummy_api_key"], "monthly_quota": 1500000}}');
 SELECT cartodb.cdb_conf_setconf('geocodio_conf', '{"geocoder": {"api_keys": ["geocoder_dummy_api_key"], "monthly_quota": 1500000}}');
 SELECT cartodb.cdb_conf_setconf('logger_conf', '{"geocoder_log_path": "/dev/null"}');
-SELECT cartodb.cdb_conf_setconf('data_observatory_conf', '{"connection": {"whitelist": ["ethervoid"], "production": "host=localhost port=5432 dbname=contrib_regression user=geocoder_api", "staging": "host=localhost port=5432 dbname=dataservices_db user=geocoder_api"}, "monthly_quota": 100000}');
 
 -- Mock the varnish invalidation function
 -- (used by cdb_geocoder tests)

@@ -7,8 +7,7 @@
       "carto_postgresql_ext": "^0.36.0"
     },
     "works_with": {
-      "dataservices-api-server-python-lib": "^0.23.1",
-      "observatory-server-extension": "^1.9.0"
+      "dataservices-api-server-python-lib": "^0.23.1"
     }
   }
 }
