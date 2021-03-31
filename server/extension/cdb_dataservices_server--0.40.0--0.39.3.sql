@@ -1446,7 +1446,13 @@ RETURNS boolean AS $$
     return True
 $$ LANGUAGE @@plpythonu@@ SECURITY DEFINER STABLE PARALLEL RESTRICTED;
 
-ALTER TYPE cdb_dataservices_server.service_type ADD VALUE 'observatory' AFTER 'routing';
+WITH c AS (
+  SELECT pg_type.oid as id
+  FROM pg_type INNER JOIN pg_namespace ON (pg_type.typnamespace = pg_namespace.oid)
+  WHERE pg_type.typname = 'service_type' AND pg_namespace.nspname = 'cdb_dataservices_server'
+)
+INSERT INTO pg_enum (enumtypid, enumsortorder, enumlabel)
+SELECT c.id, 4, 'observatory' FROM c;
 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server.cdb_service_quota_info(
   username TEXT,
