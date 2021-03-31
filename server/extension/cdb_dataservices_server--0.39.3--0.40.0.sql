@@ -65,6 +65,13 @@ DROP FUNCTION IF EXISTS cdb_dataservices_server.OBS_LegacyBuilderMetadata(TEXT, 
 DROP FUNCTION IF EXISTS cdb_dataservices_server._OBS_GetNumerators (TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT[] , TEXT[], TEXT[] , TEXT, TEXT, TEXT, TEXT);
 DROP FUNCTION IF EXISTS cdb_dataservices_server._get_obs_config(TEXT, TEXT);
 
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_numerator;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_denominator;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_geometry;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_timespan;
+DROP TYPE IF EXISTS cdb_dataservices_server.ds_fdw_metadata;
+DROP TYPE IF EXISTS cdb_dataservices_server.ds_return_metadata;
+
 DELETE FROM pg_enum
 WHERE enumlabel = 'observatory'
 AND enumtypid = (
