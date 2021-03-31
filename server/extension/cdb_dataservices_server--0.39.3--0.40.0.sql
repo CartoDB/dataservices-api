@@ -65,6 +65,13 @@ DROP FUNCTION IF EXISTS cdb_dataservices_server.OBS_LegacyBuilderMetadata(TEXT, 
 DROP FUNCTION IF EXISTS cdb_dataservices_server._OBS_GetNumerators (TEXT, TEXT, geometry(Geometry, 4326), TEXT[], TEXT[] , TEXT[], TEXT[] , TEXT, TEXT, TEXT, TEXT);
 DROP FUNCTION IF EXISTS cdb_dataservices_server._get_obs_config(TEXT, TEXT);
 
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_numerator;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_denominator;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_geometry;
+DROP TYPE IF EXISTS cdb_dataservices_server.obs_meta_timespan;
+DROP TYPE IF EXISTS cdb_dataservices_server.ds_fdw_metadata;
+DROP TYPE IF EXISTS cdb_dataservices_server.ds_return_metadata;
+
 DELETE FROM pg_enum
 WHERE enumlabel = 'observatory'
 AND enumtypid = (
@@ -120,18 +127,6 @@ RETURNS SETOF cdb_dataservices_server.service_quota_info AS $$
   used_quota = user_service.used_quota(user_routing_config.service_type, today)
   soft_limit = user_routing_config.soft_limit
   provider = user_routing_config.provider
-  ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
-
-  #-- Observatory
-  service = 'observatory'
-  plpy.execute("SELECT cdb_dataservices_server._get_obs_config({0}, {1})".format(plpy.quote_nullable(username), plpy.quote_nullable(orgname)))
-  user_obs_config = GD["user_obs_config_{0}".format(username)]
-  user_service = UserMetricsService(user_obs_config, redis_conn)
-
-  monthly_quota = user_obs_config.monthly_quota
-  used_quota = user_service.used_quota(user_obs_config.service_type, today)
-  soft_limit = user_obs_config.soft_limit
-  provider = user_obs_config.provider
   ret += [[service, monthly_quota, used_quota, soft_limit, provider]]
 
   return ret
