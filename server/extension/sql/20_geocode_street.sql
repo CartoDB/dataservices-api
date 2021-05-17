@@ -132,7 +132,7 @@ RETURNS Geometry AS $$
 
   try:
     service_manager.assert_within_limits()
-    geocoder = get_geocoder(app_id=service_manager.config.heremaps_app_id or None, app_code=service_manager.config.heremaps_app_code or None, logger=service_manager.logger, service_params=service_manager.config.heremaps_service_params, apikey=service_manager.config.apikey or None, use_apikey=service_manager.config.use_apikey or False)
+    geocoder = get_geocoder(app_id=service_manager.config.heremaps_app_id or None, app_code=service_manager.config.heremaps_app_code or None, logger=service_manager.logger, service_params=service_manager.config.heremaps_service_params, apikey=service_manager.config.heremaps_apikey or None, use_apikey=service_manager.config.heremaps_use_apikey or False)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       service_manager.quota_service.increment_success_service_use()

@@ -60,7 +60,7 @@ RETURNS SETOF cdb_dataservices_server.geocoding AS $$
   from cartodb_services.here import get_bulk_geocoder
 
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
-  geocoder = get_bulk_geocoder(app_id=service_manager.config.heremaps_app_id or None, app_code=service_manager.config.heremaps_app_code or None, logger=service_manager.logger, service_params=service_manager.config.heremaps_service_params, apikey=service_manager.config.apikey or None, use_apikey=service_manager.config.use_apikey or False)
+  geocoder = get_bulk_geocoder(app_id=service_manager.config.heremaps_app_id or None, app_code=service_manager.config.heremaps_app_code or None, logger=service_manager.logger, service_params=service_manager.config.heremaps_service_params, apikey=service_manager.config.heremaps_apikey or None, use_apikey=service_manager.config.heremaps_use_apikey or False)
   return run_street_point_geocoder(plpy, GD, geocoder, service_manager, username, orgname, searches)
 $$ LANGUAGE @@plpythonu@@ STABLE PARALLEL RESTRICTED;
 
