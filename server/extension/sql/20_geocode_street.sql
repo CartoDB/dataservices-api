@@ -125,14 +125,14 @@ CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_geocode_street_poin
 RETURNS Geometry AS $$
   from cartodb_services.tools import LegacyServiceManager
   from cartodb_services.tools import QuotaExceededException
-  from cartodb_services.here import HereMapsGeocoder
+  from cartodb_services.here import get_geocoder
 
   plpy.execute("SELECT cdb_dataservices_server._get_logger_config()")
   service_manager = LegacyServiceManager('geocoder', username, orgname, GD)
 
   try:
     service_manager.assert_within_limits()
-    geocoder = HereMapsGeocoder(service_manager.config.heremaps_app_id, service_manager.config.heremaps_app_code, service_manager.logger, service_manager.config.heremaps_service_params)
+    geocoder = get_geocoder(app_id=service_manager.config.heremaps_app_id or None, app_code=service_manager.config.heremaps_app_code or None, logger=service_manager.logger, service_params=service_manager.config.heremaps_service_params, apikey=service_manager.config.apikey or None, use_apikey=service_manager.config.use_apikey or False)
     coordinates = geocoder.geocode(searchtext=searchtext, city=city, state=state_province, country=country)
     if coordinates:
       service_manager.quota_service.increment_success_service_use()
