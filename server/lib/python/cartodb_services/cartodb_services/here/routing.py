@@ -56,7 +56,8 @@ class HereMapsRoutingIsoline(Traceable):
                                          options)
 
     def __calculate_isolines(self, source, mode, data_range, range_type,
-                             options=[]):
+                             options=None):
+        options = [] if options is None else options
         parsed_options = self.__parse_options(options)
         source_param = self.__parse_source_param(source, parsed_options)
         mode_param = self.__parse_mode_param(mode, parsed_options)
