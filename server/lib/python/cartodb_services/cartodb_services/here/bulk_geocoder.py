@@ -234,7 +234,6 @@ class HereMapsBulkGeocoderV7(HereMapsGeocoderV7, StreetPointBulkGeocoder):
         request_params.update({
             'gen': 8,
             'action': 'run',
-            # 'mailto': 'juanignaciosl@carto.com',
             'header': 'true',
             'inDelim': '|',
             'outDelim': '|',
