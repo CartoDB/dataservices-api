@@ -70,7 +70,7 @@ class HereMapsGeocoder(Traceable):
         'postalCode': 'postal_code'
     }
 
-    def __init__(self, app_id, app_code, logger, maxresults=DEFAULT_MAXRESULTS, service_params=None):
+    def __init__(self, app_id, app_code, logger, service_params=None, maxresults=DEFAULT_MAXRESULTS):
         service_params = service_params or {}
         self.app_id = app_id
         self.app_code = app_code
@@ -202,7 +202,7 @@ class HereMapsGeocoderV7(Traceable):
         'postalCode': 'postal_code'
     }
 
-    def __init__(self, apikey, logger, limit=DEFAULT_MAXRESULTS, service_params=None):
+    def __init__(self, apikey, logger, service_params=None, limit=DEFAULT_MAXRESULTS):
         service_params = service_params or {}
         self.apikey = apikey
         self._logger = logger
