@@ -14,7 +14,7 @@ from cartodb_services.tools.exceptions import ServiceException
 
 
 HereJobStatus = namedtuple('HereJobStatus', 'total_count processed_count status')
-
+# Inoffensive comment here
 class HereMapsBulkGeocoder(HereMapsGeocoder, StreetPointBulkGeocoder):
     MAX_BATCH_SIZE = 1000000  # From the docs
     MIN_BATCHED_SEARCH = 100  # Under this, serial will be used
