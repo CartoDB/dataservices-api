@@ -168,10 +168,12 @@ class HereMapsRoutingIsolineV8(Traceable):
     QUALITY_PARAM_V7 = 'quality'
     DEFAULT_OPTIMIZEFOR = 'quality'
     DEFAULT_ROUTINGMODE = 'short'
+    HERE_WALK_MODE = "pedestrian"
+    HERE_CAR_MODE = "car"
 
     ACCEPTED_MODES = {
-        "walk": "pedestrian",
-        "car": "car"
+        "walk": HERE_WALK_MODE,
+        "car": HERE_CAR_MODE
     }
 
     OPTIONAL_PARAMS = [
@@ -338,7 +340,9 @@ class HereMapsRoutingIsolineV8(Traceable):
         else:
             mode_type = self.DEFAULT_ROUTINGMODE
 
-        mode_params.update({'routingmode': mode_type})
+        # Do not set routingmode if transportmode value is equivalent to 'walk' mode
+        if mode_source != self.HERE_WALK_MODE:
+            mode_params.update({'routingmode': mode_type})
 
         if not ('mode_traffic' in options and options['mode_traffic'] == 'enabled'):
             mode_params.update({'departuretime': 'any'})
