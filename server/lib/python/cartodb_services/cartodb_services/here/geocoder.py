@@ -176,17 +176,17 @@ class HereMapsGeocoderV7(Traceable):
         ]
 
     QUALIFIED_PARAMS = [
-        'state', 
-        'city', 
-        'county', 
-        'district', 
-        'postalcode', 
-        'housenumber', 
+        'state',
+        'city',
+        'county',
+        'district',
+        'postalcode',
+        'housenumber',
         'street'
         ]
 
     PRECISION_BY_MATCH_TYPE = {
-        'pointAddress': PRECISION_PRECISE,
+        'PA': PRECISION_PRECISE,
         'interpolated': PRECISION_INTERPOLATED
     }
     MATCH_TYPE_BY_MATCH_LEVEL = {
@@ -261,7 +261,7 @@ class HereMapsGeocoderV7(Traceable):
 
     def _parse_country(self, country):
         country_iso3 = country_to_iso3(country) or country
-        
+
         parsed_country = "countryCode:{0}".format(country_iso3) if (country_iso3 and self._is_iso3_country(country_iso3)) else None
 
         return parsed_country
@@ -279,7 +279,7 @@ class HereMapsGeocoderV7(Traceable):
         parsed_params = {'q': q}
 
         qq = self._get_qq(params)
-        
+
         parsed_country = self._parse_country(country)
 
         parsed_params.update({k:v for k, v in (('qq', qq), ('in', parsed_country)) if v is not None})
@@ -323,7 +323,7 @@ class HereMapsGeocoderV7(Traceable):
     def _extract_metadata_from_result(self, result):
         # See https://stackoverflow.com/questions/51285622/missing-matchtype-at-here-geocoding-responses
         precision = self.PRECISION_BY_MATCH_TYPE.get(
-            result.get('resultType'), PRECISION_INTERPOLATED)
+            result.get('houseNumberType'), PRECISION_INTERPOLATED)
         match_type = self.MATCH_TYPE_BY_MATCH_LEVEL.get(result.get('resultType'), None)
         return geocoder_metadata(
             result['scoring']['queryScore'],
