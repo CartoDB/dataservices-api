@@ -43,7 +43,7 @@ class HereMapsRoutingIsoline(Traceable):
         self.read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
         self._url = "{0}{1}".format(base_url, isoline_path)
-    
+
     def get_api_version(self):
         return self.API_VERSION
 
@@ -191,7 +191,7 @@ class HereMapsRoutingIsolineV8(Traceable):
         self.connect_timeout = service_params.get('connect_timeout', self.CONNECT_TIMEOUT)
         self.read_timeout = service_params.get('read_timeout', self.READ_TIMEOUT)
         self.max_retries = service_params.get('max_retries', self.MAX_RETRIES)
-    
+
     def get_api_version(self):
         return self.API_VERSION
 
@@ -247,7 +247,7 @@ class HereMapsRoutingIsolineV8(Traceable):
             'range': 'range[values]',
             'rangetype': 'range[type]',
             'mode': {
-                'type': 'routingmode', 
+                'type': 'routingmode',
                 'transportmodes': 'transportmode',
                 'trafficmode': None,
                 'feature': 'avoid[feature]'
