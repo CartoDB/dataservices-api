@@ -31,7 +31,7 @@ class HereMapsGeocoder(Traceable):
         'searchtext',
         'state',
         'street'
-        ]
+    ]
 
     ADMITTED_PARAMS = [
         'additionaldata',
@@ -51,7 +51,7 @@ class HereMapsGeocoder(Traceable):
         'politicalview',
         'prox',
         'strictlanguagemode'
-        ] + ADDRESS_PARAMS
+    ] + ADDRESS_PARAMS
 
     PRECISION_BY_MATCH_TYPE = {
         'pointAddress': PRECISION_PRECISE,
@@ -173,7 +173,7 @@ class HereMapsGeocoderV7(Traceable):
         'searchtext',
         'state',
         'street'
-        ]
+    ]
 
     QUALIFIED_PARAMS = [
         'state',
@@ -183,7 +183,7 @@ class HereMapsGeocoderV7(Traceable):
         'postalcode',
         'housenumber',
         'street'
-        ]
+    ]
 
     PRECISION_BY_MATCH_TYPE = {
         'PA': PRECISION_PRECISE,

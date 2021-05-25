@@ -57,7 +57,7 @@ class HereMapsRoutingIsoline(Traceable):
 
     def __calculate_isolines(self, source, mode, data_range, range_type,
                              options=None):
-        options = [] if options is None else options
+        options = options or []
         parsed_options = self.__parse_options(options)
         source_param = self.__parse_source_param(source, parsed_options)
         mode_param = self.__parse_mode_param(mode, parsed_options)
@@ -196,18 +196,18 @@ class HereMapsRoutingIsolineV8(Traceable):
         return self.API_VERSION
 
     def calculate_isodistance(self, source, mode, data_range, options=None):
-        options = [] if options is None else options
+        options = options or []
         return self.__calculate_isolines(source, mode, data_range, 'distance',
                                          options)
 
     def calculate_isochrone(self, source, mode, data_range, options=None):
-        options = [] if options is None else options
+        options = options or []
         return self.__calculate_isolines(source, mode, data_range, 'time',
                                          options)
 
     def __calculate_isolines(self, source, mode, data_range, range_type,
                              options=None):
-        options = [] if options is None else options
+        options = options or []
         parsed_options = self.__parse_options(options)
         source_param = self.__parse_source_param(source, parsed_options)
         mode_params = self.__get_mode_params(mode, parsed_options)
