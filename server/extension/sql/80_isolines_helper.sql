@@ -3,7 +3,7 @@ CREATE TYPE cdb_dataservices_server.isoline AS (center geometry(Geometry,4326), 
 CREATE OR REPLACE FUNCTION cdb_dataservices_server._cdb_here_routing_isolines(username TEXT, orgname TEXT, type TEXT, source geometry(Geometry, 4326), mode TEXT, data_range integer[], options text[])
 RETURNS SETOF cdb_dataservices_server.isoline AS $$
   import json
-  from cartodb_services.here import HereMapsRoutingIsoline
+  from cartodb_services.here import get_routing_isoline
   from cartodb_services.metrics import QuotaService
   from cartodb_services.here.types import geo_polyline_to_multipolygon
   from cartodb_services.tools import Logger,LoggerConfig
@@ -20,13 +20,18 @@ RETURNS SETOF cdb_dataservices_server.isoline AS $$
     raise Exception('You have reached the limit of your quota')
 
   try:
-    client = HereMapsRoutingIsoline(user_isolines_routing_config.heremaps_app_id,
-      user_isolines_routing_config.heremaps_app_code, logger)
-
+    client = get_routing_isoline(app_id=user_isolines_routing_config.heremaps_app_id or None,
+      app_code=user_isolines_routing_config.heremaps_app_code or None, logger=logger, 
+      apikey=user_isolines_routing_config.heremaps_apikey or None,
+      use_apikey=user_isolines_routing_config.heremaps_use_apikey or False)
+    client_api_version = client.get_api_version()
     if source:
       lat = plpy.execute("SELECT ST_Y('%s') AS lat" % source)[0]['lat']
       lon = plpy.execute("SELECT ST_X('%s') AS lon" % source)[0]['lon']
-      source_str = 'geo!%f,%f' % (lat, lon)
+      if client_api_version == 7:
+        source_str = 'geo!%f,%f' % (lat, lon)
+      else:
+        source_str = '%f,%f' % (lat, lon)
     else:
       source_str = None
 

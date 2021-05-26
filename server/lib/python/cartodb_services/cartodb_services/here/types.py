@@ -11,7 +11,10 @@ def geo_polyline_to_multipolygon(polyline):
     else:
         coordinates = []
         for point in polyline:
-            lat, lon = point.split(',')
+            if isinstance(point, tuple):
+                lat, lon = point
+            else:
+                lat, lon = point.split(',') 
             coordinates.append("%s %s" % (lon, lat))
         wkt_coordinates = ','.join(coordinates)
 
