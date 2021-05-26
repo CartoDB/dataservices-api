@@ -1,3 +1,9 @@
+May 26th, 2021
+==============
+* Version `0.40.1` of the server extension
+* Version `0.24.1` of the Python library
+    * Support new HERE API keys
+
 Mar 4th, 2021
 =============
 * Version `0.31.0` of the client extension
