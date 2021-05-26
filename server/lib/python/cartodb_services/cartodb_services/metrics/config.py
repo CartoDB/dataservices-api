@@ -198,6 +198,8 @@ class IsolinesRoutingConfig(ServiceConfig):
         if self._isolines_provider == self.HEREMAPS_PROVIDER:
             self._heremaps_app_id = db_config.heremaps_isolines_app_id
             self._heremaps_app_code = db_config.heremaps_isolines_app_code
+            self._heremaps_apikey = db_config.heremaps_isolines_apikey
+            self._heremaps_use_apikey = db_config.heremaps_isolines_use_apikey
             self._heremaps_service_params = db_config.heremaps_isolines_service_params
         elif self._isolines_provider == self.MAPZEN_PROVIDER:
             self._mapzen_matrix_api_key = self._db_config.mapzen_matrix_api_key
@@ -249,6 +251,14 @@ class IsolinesRoutingConfig(ServiceConfig):
     @property
     def heremaps_service_params(self):
         return self._heremaps_service_params
+
+    @property
+    def heremaps_apikey(self):
+        return self._heremaps_apikey
+
+    @property
+    def heremaps_use_apikey(self):
+        return self._heremaps_use_apikey
 
     @property
     def mapzen_matrix_api_key(self):
@@ -373,8 +383,12 @@ class GeocoderConfig(ServiceConfig):
 
     def __check_config(self, filtered_config):
         if self._geocoder_provider == self.NOKIA_GEOCODER:
-            if not set(self.NOKIA_GEOCODER_REDIS_MANDATORY_KEYS).issubset(set(filtered_config.keys())) or \
-            not self.heremaps_app_id or not self.heremaps_app_code:
+            if not set(self.NOKIA_GEOCODER_REDIS_MANDATORY_KEYS).issubset(set(filtered_config.keys())):
+                raise ConfigException("""Heremaps config is not set up""")
+            if self.heremaps_use_apikey is True:
+                if not self.heremaps_apikey:
+                    raise ConfigException("""Heremaps apikey is not set up""")
+            elif not self.heremaps_app_id or not self.heremaps_app_code:
                 raise ConfigException("""Heremaps app id or app code is not set up""")
         elif self._geocoder_provider == self.GOOGLE_GEOCODER:
             if self.GOOGLE_GEOCODER_API_KEY not in filtered_config.keys():
@@ -412,6 +426,8 @@ class GeocoderConfig(ServiceConfig):
         if self._geocoder_provider == self.NOKIA_GEOCODER:
             self._heremaps_app_id = db_config.heremaps_geocoder_app_id
             self._heremaps_app_code = db_config.heremaps_geocoder_app_code
+            self._heremaps_apikey = db_config.heremaps_geocoder_apikey
+            self._heremaps_use_apikey = db_config.heremaps_geocoder_use_apikey
             self._cost_per_hit = db_config.heremaps_geocoder_cost_per_hit
             self._heremaps_service_params = db_config.heremaps_geocoder_service_params
         elif self._geocoder_provider == self.GOOGLE_GEOCODER:
@@ -506,6 +522,14 @@ class GeocoderConfig(ServiceConfig):
         return self._heremaps_app_code
 
     @property
+    def heremaps_apikey(self):
+        return self._heremaps_apikey
+
+    @property
+    def heremaps_use_apikey(self):
+        return self._heremaps_use_apikey
+
+    @property
     def heremaps_service_params(self):
         return self._heremaps_service_params
 
@@ -593,11 +617,15 @@ class ServicesDBConfig:
         heremaps_conf = json.loads(heremaps_conf_json)
         self._heremaps_geocoder_app_id = heremaps_conf['geocoder']['app_id']
         self._heremaps_geocoder_app_code = heremaps_conf['geocoder']['app_code']
+        self._heremaps_geocoder_apikey = heremaps_conf['geocoder'].get('apikey')
+        self._heremaps_geocoder_use_apikey = heremaps_conf['geocoder'].get('use_apikey', False)
         self._heremaps_geocoder_cost_per_hit = heremaps_conf['geocoder'][
             'geocoder_cost_per_hit']
         self._heremaps_geocoder_service_params = heremaps_conf['geocoder'].get('service', {})
         self._heremaps_isolines_app_id = heremaps_conf['isolines']['app_id']
         self._heremaps_isolines_app_code = heremaps_conf['isolines']['app_code']
+        self._heremaps_isolines_apikey = heremaps_conf['isolines'].get('apikey')
+        self._heremaps_isolines_use_apikey = heremaps_conf['isolines'].get('use_apikey', False)
         self._heremaps_isolines_service_params = heremaps_conf['isolines'].get('service', {})
 
     def _get_mapzen_config(self):
@@ -685,6 +713,14 @@ class ServicesDBConfig:
         return self._heremaps_isolines_app_code
 
     @property
+    def heremaps_isolines_apikey(self):
+        return self._heremaps_isolines_apikey
+
+    @property
+    def heremaps_isolines_use_apikey(self):
+        return self._heremaps_isolines_use_apikey
+
+    @property
     def heremaps_isolines_service_params(self):
         return self._heremaps_isolines_service_params
 
@@ -695,6 +731,14 @@ class ServicesDBConfig:
     @property
     def heremaps_geocoder_app_code(self):
         return self._heremaps_geocoder_app_code
+
+    @property
+    def heremaps_geocoder_apikey(self):
+        return self._heremaps_geocoder_apikey
+
+    @property
+    def heremaps_geocoder_use_apikey(self):
+        return self._heremaps_geocoder_use_apikey
 
     @property
     def heremaps_geocoder_cost_per_hit(self):

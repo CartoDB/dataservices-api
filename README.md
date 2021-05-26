@@ -132,6 +132,15 @@ SELECT CDB_Conf_SetConf(
 );
 ```
 
+Use HERE apikeys 
+
+```sql
+SELECT CDB_Conf_SetConf(
+    'heremaps_conf',
+    '{"geocoder": {"app_id": "here_geocoder_app_id", "app_code": "here_geocoder_app_code", "apikey": "here_geocoder_apikey", "use_apikey": true, "geocoder_cost_per_hit": "1"}, "isolines" : {"app_id": "here_isolines_app_id", "app_code": "here_geocoder_app_code", "apikey": "here_geocoder_apikey", "use_apikey": true}}'
+);
+```
+
 #### Mapzen configuration
 
 ```sql
