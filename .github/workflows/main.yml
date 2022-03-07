@@ -42,7 +42,7 @@ jobs:
         if: env.PG_VERSION == 12
 
       - name: Install required python libs
-        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && pip install -U -r ./lib/python/cartodb_services/requirements.txt && pip install -U ./lib/python/cartodb_services"
+        run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && pip install --upgrade pip && pip install -U -r ./lib/python/cartodb_services/requirements.txt && pip install -U ./lib/python/cartodb_services"
 
       - name: Run python library tests
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && MAPBOX_API_KEY=$MAPBOX_API_KEY TOMTOM_API_KEY=$TOMTOM_API_KEY GEOCODIO_API_KEY=$GEOCODIO_API_KEY nosetests lib/python/cartodb_services/test"
