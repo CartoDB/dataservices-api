@@ -16,7 +16,7 @@ jobs:
         run: echo "CLOUDSDK_PYTHON=/usr/bin/python" >> $GITHUB_ENV
 
       - name: Setup gcloud authentication
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@v0
         with:
           service_account_key: ${{ secrets.GCS }}
 
