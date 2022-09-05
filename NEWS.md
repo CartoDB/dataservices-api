@@ -1,3 +1,8 @@
+Sep 5th, 2022
+==============
+* Version `0.24.2` of the Python library
+    * Fix error calculating isolines with HERE
+
 May 26th, 2021
 ==============
 * Version `0.40.1` of the server extension

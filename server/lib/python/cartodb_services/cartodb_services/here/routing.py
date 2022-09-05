@@ -345,6 +345,9 @@ class HereMapsRoutingIsolineV8(Traceable):
             mode_params.update({'routingmode': mode_type})
 
         if not ('mode_traffic' in options and options['mode_traffic'] == 'enabled'):
-            mode_params.update({'departuretime': 'any'})
+            if 'is_destination' in options and options['is_destination'].lower() == 'true':
+                mode_params.update({'arrivaltime': 'any'})
+            else:
+                mode_params.update({'departuretime': 'any'})
 
         return mode_params
