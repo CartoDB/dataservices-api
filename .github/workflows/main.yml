@@ -8,18 +8,17 @@ jobs:
       matrix:
         pg_version: [10, 12]
     env:
-        PG_VERSION: ${{ matrix.pg_version }}
+      PG_VERSION: ${{ matrix.pg_version }}
     steps:
       - uses: actions/checkout@v1
 
       - name: Set CLOUDSDK_PYTHON path
         run: echo "CLOUDSDK_PYTHON=/usr/bin/python" >> $GITHUB_ENV
 
-      - name: Set up docker registry
-        env:
-          SA_TO_USE: ${{ secrets.GCS }}
-        run: |
-          echo "${SA_TO_USE}" | base64 -d | docker login -u _json_key --password-stdin https://gcr.io
+      - name: Setup gcloud authentication
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          service_account_key: ${{ secrets.GCS }}
 
       - name: Pull base image
         run: docker pull gcr.io/cartodb-on-gcp-ci-testing/cartodb-postgresql-base:${{ matrix.pg_version }}
@@ -47,9 +46,9 @@ jobs:
       - name: Run python library tests
         run: docker-compose -f docker-compose.yaml exec -T postgres-server bash -c "cd /dataservices-api/server/ && MAPBOX_API_KEY=$MAPBOX_API_KEY TOMTOM_API_KEY=$TOMTOM_API_KEY GEOCODIO_API_KEY=$GEOCODIO_API_KEY nosetests lib/python/cartodb_services/test"
         env:
-           MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
-           TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
-           GEOCODIO_API_KEY: ${{ secrets.GEOCODIO_API_KEY }}
+          MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
+          TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
+          GEOCODIO_API_KEY: ${{ secrets.GEOCODIO_API_KEY }}
         timeout-minutes: 5
 
       - name: Run server tests
