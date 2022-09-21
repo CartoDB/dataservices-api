@@ -52,13 +52,7 @@ class QPSService:
             except Exception as e:
                 response = getattr(e, 'response', None)
                 if response is not None:
-                    if self._provider is not None and self._provider == 'tomtom' and (response.status_code == 403):
-                        detail_header = response.headers.get(TOMTOM_DETAIL_HEADER)
-                        if detail_header and TOMTOM_403_RATE_LIMIT_HEADER_PATTERN.search(detail_header):
-                            self.retry(start_time, attempt_number)
-                        else:
-                            raise e
-                    elif response.status_code == 429:
+                    if response.status_code == 429:
                         self.retry(start_time, attempt_number)
                     else:
                         raise e
