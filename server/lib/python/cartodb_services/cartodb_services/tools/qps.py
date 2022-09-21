@@ -7,13 +7,6 @@ import re
 DEFAULT_RETRY_TIMEOUT = 60
 DEFAULT_QUERIES_PER_SECOND = 10
 
-TOMTOM_403_RATE_LIMIT_HEADERS = [
-    'Account Over Queries Per Second Limit',
-    'Developer Over Qps'
-]
-TOMTOM_DETAIL_HEADER = 'X-Error-Detail-Header'
-TOMTOM_403_RATE_LIMIT_HEADER_PATTERN = re.compile('|'.join(TOMTOM_403_RATE_LIMIT_HEADERS), re.IGNORECASE)
-
 def qps_retry(original_function=None, **options):
     """ Query Per Second retry decorator
         The intention of this decorator is to retry requests against third
