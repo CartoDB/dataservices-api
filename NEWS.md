@@ -1,3 +1,8 @@
+Aug 17th, 2023
+==============
+* Version `0.24.3` of the Python library
+    * Add support to mode_feature parameter on HERE isolines
+
 Sep 5th, 2022
 ==============
 * Version `0.24.2` of the Python library
