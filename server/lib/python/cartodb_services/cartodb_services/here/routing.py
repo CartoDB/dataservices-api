@@ -180,7 +180,8 @@ class HereMapsRoutingIsolineV8(Traceable):
         'departure',
         'arrival',
         'maxpoints',
-        'quality'
+        'quality',
+        'mode_feature'
     ]
 
     def __init__(self, apikey, logger, service_params=None):
@@ -257,7 +258,8 @@ class HereMapsRoutingIsolineV8(Traceable):
             'start': 'origin',
             'destination': 'destination',
             'departure': 'departuretime',
-            'arrival': 'arrivaltime'
+            'arrival': 'arrivaltime',
+            'mode_feature': 'avoid[features]'
         }
 
         if reverse is True:
